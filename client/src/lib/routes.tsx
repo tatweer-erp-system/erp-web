@@ -16,8 +16,12 @@ export const routes: RouteConfig[] = [
   { path: "/pos",                    component: lz(() => import("@/modules/pos/POSPage")),                          breadcrumb: ["POS"] },
   { path: "/pos/tables",             component: lz(() => import("@/modules/pos/pages/TablesPage")),                  breadcrumb: ["POS", "Table Map"] },
   { path: "/pos/loyalty-report",     component: lz(() => import("@/modules/pos/pages/LoyaltyReport")),              breadcrumb: ["POS", "Loyalty Report"] },
-  { path: "/pos/reports/vouchers",   component: lz(() => import("@/modules/pos/pages/reports/VouchersReport")),     breadcrumb: ["POS", "Vouchers Report"] },
-  { path: "/pos/reports/gift-cards", component: lz(() => import("@/modules/pos/pages/reports/GiftCardsReport")),    breadcrumb: ["POS", "Gift Cards Report"] },
+  { path: "/pos/reports/vouchers",         component: lz(() => import("@/modules/pos/pages/reports/VouchersReport")),          breadcrumb: ["POS", "Vouchers Report"] },
+  { path: "/pos/reports/gift-cards",       component: lz(() => import("@/modules/pos/pages/reports/GiftCardsReport")),        breadcrumb: ["POS", "Gift Cards Report"] },
+  { path: "/pos/reports/hourly",           component: lz(() => import("@/modules/pos/pages/reports/HourlySalesReport")),      breadcrumb: ["POS", "Hourly Sales Report"] },
+  { path: "/pos/reports/payments",         component: lz(() => import("@/modules/pos/pages/reports/PaymentBreakdownReport")), breadcrumb: ["POS", "Payment Breakdown"] },
+  { path: "/pos/reports/cash-movements",   component: lz(() => import("@/modules/pos/pages/reports/CashMovementsReport")),    breadcrumb: ["POS", "Cash Movements"] },
+  { path: "/pos/reports/table-turnover",   component: lz(() => import("@/modules/pos/pages/reports/TableTurnoverReport")),    breadcrumb: ["POS", "Table Turnover"] },
   { path: "/pos/settings",           component: lz(() => import("@/pages/POSSettings")),                            breadcrumb: ["POS", "Settings"] },
 
   // ── Main ────────────────────────────────────────────────────────────────────

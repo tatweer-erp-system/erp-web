@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Switch, Select, Button, theme as antTheme, message } from "antd";
+import { InputNumber, Switch, Select, Button, theme as antTheme, message } from "antd";
 import {
   WifiOutlined,
   ReloadOutlined,
@@ -10,7 +10,7 @@ import { usePOSStore } from "../../store/posStore";
 import { cacheProducts } from "../../services/offlineService";
 import { getProducts } from "../../services/posService";
 
-export function OfflineSettingsTab() {
+export function OfflineSettingsTab({ onDirty }: { onDirty?: () => void } = {}) {
   const { token } = antTheme.useToken();
   const isOnline              = usePOSStore((s) => s.isOnline);
   const offlineModeEnabled    = usePOSStore((s) => s.offlineModeEnabled);
@@ -20,6 +20,7 @@ export function OfflineSettingsTab() {
   const lastCacheSync         = usePOSStore((s) => s.lastCacheSync);
   const setLastCacheSync      = usePOSStore((s) => s.setLastCacheSync);
   const [refreshing, setRefreshing] = useState(false);
+  const [maxQueueSize, setMaxQueueSize] = useState(500);
 
   async function handleRefreshCache() {
     if (!isOnline) {
@@ -88,7 +89,7 @@ export function OfflineSettingsTab() {
           "Save transactions locally when disconnected and sync when online",
           <Switch
             checked={offlineModeEnabled}
-            onChange={setOfflineModeEnabled}
+            onChange={(v) => { setOfflineModeEnabled(v); onDirty?.(); }}
             checkedChildren="ON"
             unCheckedChildren="OFF"
           />
@@ -101,7 +102,7 @@ export function OfflineSettingsTab() {
               "How often to update the local product database",
               <Select
                 value={cacheRefreshInterval}
-                onChange={setCacheRefreshInterval}
+                onChange={(v) => { setCacheRefreshInterval(v); onDirty?.(); }}
                 style={{ width: 140 }}
                 options={[
                   { value: 15,  label: "Every 15 min" },
@@ -109,6 +110,20 @@ export function OfflineSettingsTab() {
                   { value: 60,  label: "Every 60 min" },
                   { value: 0,   label: "Manual only"  },
                 ]}
+              />
+            )}
+
+            {settingRow(
+              "Max Offline Queue Size",
+              "Maximum number of transactions held locally before sync is required",
+              <InputNumber
+                min={50}
+                max={5000}
+                step={50}
+                value={maxQueueSize}
+                onChange={(v) => { setMaxQueueSize(v ?? 500); onDirty?.(); }}
+                addonAfter="transactions"
+                style={{ width: 200 }}
               />
             )}
 
