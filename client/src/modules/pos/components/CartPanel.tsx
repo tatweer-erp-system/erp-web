@@ -1,12 +1,17 @@
 import { useState } from "react";
 import { Select, InputNumber, Button, Empty, Badge, Divider, theme as antTheme, Popconfirm, Tooltip, Tag } from "antd";
-import { ShoppingCartOutlined, ClearOutlined, PauseCircleOutlined, ReloadOutlined, WarningOutlined, SafetyOutlined } from "@ant-design/icons";
+import { ShoppingCartOutlined, ClearOutlined, PauseCircleOutlined, ReloadOutlined, WarningOutlined, SafetyOutlined, ScissorOutlined } from "@ant-design/icons";
 import { CartItem } from "./CartItem";
 import { PaymentSection } from "./PaymentSection";
 import { CustomerSearch } from "./cart/CustomerSearch";
 import { CustomerCard } from "./cart/CustomerCard";
 import { LoyaltyRedemption } from "./cart/LoyaltyRedemption";
 import { VoucherInput } from "./cart/VoucherInput";
+import { CourseManager } from "./restaurant/CourseManager";
+import { FireCourseButton } from "./restaurant/FireCourseButton";
+import { KitchenTicket } from "./restaurant/KitchenTicket";
+import { SplitBillModal } from "./restaurant/SplitBillModal";
+import { useRestaurantMode } from "../hooks/useRestaurantMode";
 import { useCart } from "../hooks/useCart";
 import { useCheckout } from "../hooks/useCheckout";
 import { usePOSContext } from "../context/POSContext";
@@ -51,9 +56,11 @@ export function CartPanel({ isMobile }: CartPanelProps) {
   const setDiscountOverrideGranted = usePOSStore((s) => s.setDiscountOverrideGranted);
   const { requestManagerOverride } = usePOSContext();
   const { charge, isCharging } = useCheckout();
+  const restaurantMode = useRestaurantMode();
   const isEmpty = cartItems.length === 0;
 
   const [requestingOverride, setRequestingOverride] = useState(false);
+  const [splitBillOpen, setSplitBillOpen] = useState(false);
 
   const discountThreshold = posSettings.requireManagerForDiscountsAbove;
   const needsOverride =
@@ -102,6 +109,19 @@ export function CartPanel({ isMobile }: CartPanelProps) {
             <span style={{ fontSize: 14, fontWeight: 700, color: token.colorText }}>{t.cart}</span>
           </div>
           <div style={{ display: "flex", gap: 6 }}>
+            {/* Restaurant: Split Bill */}
+            {restaurantMode.isRestaurant && !isEmpty && (
+              <Tooltip title={t.splitBill}>
+                <Button
+                  size="small"
+                  icon={<ScissorOutlined />}
+                  onClick={() => setSplitBillOpen(true)}
+                  style={{ borderRadius: 8, height: 32, fontSize: 11, color: "#6366F1", borderColor: "#6366F140" }}
+                >
+                  {t.splitBill}
+                </Button>
+              </Tooltip>
+            )}
             {heldOrders.length > 0 && (
               <Tooltip title={t.heldOrdersTooltip(heldOrders.length)}>
                 <Button
@@ -305,6 +325,21 @@ export function CartPanel({ isMobile }: CartPanelProps) {
 
           <PaymentSection grandTotal={amountDue} isMobile={isMobile} />
 
+          {/* Restaurant: Course Management */}
+          {restaurantMode.isRestaurant && restaurantMode.courseManagementEnabled && (
+            <CourseManager items={cartItems} />
+          )}
+
+          {/* Restaurant: Fire Course buttons */}
+          {restaurantMode.isRestaurant && restaurantMode.courseManagementEnabled && (
+            <FireCourseButton items={cartItems} />
+          )}
+
+          {/* Restaurant: Send to Kitchen */}
+          {restaurantMode.isRestaurant && restaurantMode.kitchenPrintingEnabled && (
+            <KitchenTicket items={cartItems} />
+          )}
+
           <Button
             type="primary"
             size="large"
@@ -325,6 +360,17 @@ export function CartPanel({ isMobile }: CartPanelProps) {
             {isCharging ? t.processing : `${t.chargeButton} $${amountDue.toFixed(2)}`}
           </Button>
         </div>
+      )}
+
+      {/* Restaurant: Split Bill Modal */}
+      {restaurantMode.isRestaurant && (
+        <SplitBillModal
+          open={splitBillOpen}
+          onClose={() => setSplitBillOpen(false)}
+          cartItems={cartItems}
+          grandTotal={grandTotal}
+          isMobile={isMobile}
+        />
       )}
     </div>
   );

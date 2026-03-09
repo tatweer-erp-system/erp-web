@@ -4,10 +4,15 @@ import type { OrderResult } from "../services/posService";
 import type { Customer } from "../data/mockCustomers";
 import { getTier, DEFAULT_EARN_RATIO, DEFAULT_REDEEM_RATIO } from "../data/mockCustomers";
 import type { CashierRole } from "../services/cashierAuthService";
+import type { RestaurantTable } from "../data/mockRestaurant";
 
 export interface CartItem {
   product: Product;
   quantity: number;
+  /** Restaurant: course assignment (courseId) */
+  course?: string;
+  /** Restaurant: kitchen special note */
+  note?: string;
 }
 
 export type PaymentMethod = "cash" | "card" | "split";
@@ -98,6 +103,10 @@ export interface OrderTab {
   splitCard: number;
   splitCardRef: string;
   discount: Discount;
+  /** Restaurant: table attached to this order */
+  attachedTable: RestaurantTable | null;
+  /** Restaurant: number of guests at this table */
+  guestCount: number;
 }
 
 export function createEmptyOrder(id?: string): OrderTab {
@@ -115,6 +124,8 @@ export function createEmptyOrder(id?: string): OrderTab {
     splitCard: 0,
     splitCardRef: "",
     discount: { type: "percent", value: 0 },
+    attachedTable: null,
+    guestCount: 1,
   };
 }
 
@@ -135,6 +146,8 @@ function flatFromOrder(order: OrderTab): Partial<POSState> {
     splitCard: order.splitCard,
     splitCardRef: order.splitCardRef,
     discount: order.discount,
+    attachedTable: order.attachedTable,
+    guestCount: order.guestCount,
   };
 }
 
@@ -271,6 +284,30 @@ interface POSState {
   setFailedCount: (n: number) => void;
   isSyncing: boolean;
   setIsSyncing: (v: boolean) => void;
+
+  // ── Restaurant — attached table ───────────────────────────────────────────
+  attachedTable: RestaurantTable | null;
+  setAttachedTable: (table: RestaurantTable | null) => void;
+  guestCount: number;
+  setGuestCount: (n: number) => void;
+  setItemCourse: (productId: string, courseId: string) => void;
+  setItemNote: (productId: string, note: string) => void;
+
+  // ── Restaurant — settings ─────────────────────────────────────────────────
+  restaurantMode: boolean;
+  setRestaurantMode: (v: boolean) => void;
+  tableManagementEnabled: boolean;
+  setTableManagementEnabled: (v: boolean) => void;
+  courseManagementEnabled: boolean;
+  setCourseManagementEnabled: (v: boolean) => void;
+  kitchenPrintingEnabled: boolean;
+  setKitchenPrintingEnabled: (v: boolean) => void;
+  autoSendKitchen: boolean;
+  setAutoSendKitchen: (v: boolean) => void;
+  allowTakeAway: boolean;
+  setAllowTakeAway: (v: boolean) => void;
+  defaultGuests: number;
+  setDefaultGuests: (n: number) => void;
 
   // ── Computed helpers ──────────────────────────────────────────────────────
   subtotal: () => number;
@@ -462,6 +499,8 @@ export const usePOSStore = create<POSState>()((set, get) => ({
         splitCard: 0,
         splitCardRef: "",
         discountOverrideGranted: false,
+        attachedTable: null,
+        guestCount: 1,
         orders: syncOrder(state, idx, clearedOrder),
       };
     });
@@ -686,6 +725,115 @@ export const usePOSStore = create<POSState>()((set, get) => ({
 
   discountOverrideGranted: false,
   setDiscountOverrideGranted: (v) => set({ discountOverrideGranted: v }),
+
+  // ── Restaurant — attached table ───────────────────────────────────────────
+  attachedTable: INITIAL_ORDER.attachedTable,
+
+  setAttachedTable(table) {
+    set((state) => ({
+      attachedTable: table,
+      guestCount: table ? state.guestCount : 1,
+      orders: syncOrder(state, state.activeOrderIndex, { attachedTable: table }),
+    }));
+  },
+
+  guestCount: INITIAL_ORDER.guestCount,
+
+  setGuestCount(n) {
+    set((state) => ({
+      guestCount: n,
+      orders: syncOrder(state, state.activeOrderIndex, { guestCount: n }),
+    }));
+  },
+
+  setItemCourse(productId, courseId) {
+    set((state) => {
+      const idx = state.activeOrderIndex;
+      const newCartItems = state.cartItems.map((i) =>
+        i.product.id === productId ? { ...i, course: courseId } : i
+      );
+      return {
+        cartItems: newCartItems,
+        orders: syncOrder(state, idx, { cartItems: newCartItems }),
+      };
+    });
+  },
+
+  setItemNote(productId, note) {
+    set((state) => {
+      const idx = state.activeOrderIndex;
+      const newCartItems = state.cartItems.map((i) =>
+        i.product.id === productId ? { ...i, note } : i
+      );
+      return {
+        cartItems: newCartItems,
+        orders: syncOrder(state, idx, { cartItems: newCartItems }),
+      };
+    });
+  },
+
+  // ── Restaurant — settings ─────────────────────────────────────────────────
+  restaurantMode: (() => {
+    try { return localStorage.getItem("pos-restaurant-mode") === "true"; } catch { return false; }
+  })(),
+  setRestaurantMode: (v) => {
+    try { localStorage.setItem("pos-restaurant-mode", String(v)); } catch { /* noop */ }
+    set({ restaurantMode: v });
+  },
+
+  tableManagementEnabled: (() => {
+    try {
+      const v = localStorage.getItem("pos-restaurant-table-management");
+      return v === null ? true : v === "true";
+    } catch { return true; }
+  })(),
+  setTableManagementEnabled: (v) => {
+    try { localStorage.setItem("pos-restaurant-table-management", String(v)); } catch { /* noop */ }
+    set({ tableManagementEnabled: v });
+  },
+
+  courseManagementEnabled: (() => {
+    try { return localStorage.getItem("pos-restaurant-course-management") === "true"; } catch { return false; }
+  })(),
+  setCourseManagementEnabled: (v) => {
+    try { localStorage.setItem("pos-restaurant-course-management", String(v)); } catch { /* noop */ }
+    set({ courseManagementEnabled: v });
+  },
+
+  kitchenPrintingEnabled: (() => {
+    try { return localStorage.getItem("pos-restaurant-kitchen-printing") === "true"; } catch { return false; }
+  })(),
+  setKitchenPrintingEnabled: (v) => {
+    try { localStorage.setItem("pos-restaurant-kitchen-printing", String(v)); } catch { /* noop */ }
+    set({ kitchenPrintingEnabled: v });
+  },
+
+  autoSendKitchen: (() => {
+    try { return localStorage.getItem("pos-restaurant-auto-send-kitchen") === "true"; } catch { return false; }
+  })(),
+  setAutoSendKitchen: (v) => {
+    try { localStorage.setItem("pos-restaurant-auto-send-kitchen", String(v)); } catch { /* noop */ }
+    set({ autoSendKitchen: v });
+  },
+
+  allowTakeAway: (() => {
+    try {
+      const v = localStorage.getItem("pos-restaurant-allow-takeaway");
+      return v === null ? true : v === "true";
+    } catch { return true; }
+  })(),
+  setAllowTakeAway: (v) => {
+    try { localStorage.setItem("pos-restaurant-allow-takeaway", String(v)); } catch { /* noop */ }
+    set({ allowTakeAway: v });
+  },
+
+  defaultGuests: (() => {
+    try { return parseInt(localStorage.getItem("pos-restaurant-default-guests") ?? "2", 10); } catch { return 2; }
+  })(),
+  setDefaultGuests: (n) => {
+    try { localStorage.setItem("pos-restaurant-default-guests", String(n)); } catch { /* noop */ }
+    set({ defaultGuests: n });
+  },
 
   // ── POS session settings ──────────────────────────────────────────────────
   posSessionSettings: {

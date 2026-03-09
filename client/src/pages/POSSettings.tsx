@@ -2,6 +2,7 @@ import { useState } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
 import { usePOSStore } from "@/modules/pos/store/posStore";
+import { OfflineSettingsTab } from "@/modules/pos/components/offline/OfflineSettingsTab";
 import {
   Button,
   Card,
@@ -25,8 +26,8 @@ import {
   ShoppingOutlined,
   TeamOutlined,
   WifiOutlined,
+  ShopOutlined,
 } from "@ant-design/icons";
-import { OfflineSettingsTab } from "@/modules/pos/components/offline/OfflineSettingsTab";
 
 const { Text } = Typography;
 
@@ -78,6 +79,7 @@ const NAV_ITEMS = [
   { key: "shift",       icon: <DollarOutlined />,      label: "Shift & Cash"          },
   { key: "customer",    icon: <TeamOutlined />,        label: "Customer & Display"    },
   { key: "offline",     icon: <WifiOutlined />,        label: "Offline Mode"          },
+  { key: "restaurant",  icon: <ShopOutlined />,        label: "Restaurant"            },
 ];
 
 export default function POSSettings() {
@@ -135,6 +137,22 @@ export default function POSSettings() {
   const [showLoyaltyAtCheckout,setShowLoyaltyAtCheckout]= useState(true);
   const [defaultProductSort,   setDefaultProductSort]   = useState<"name" | "price_asc" | "price_desc" | "category">("name");
   const [hideOutOfStock,       setHideOutOfStock]       = useState(false);
+
+  // Restaurant settings
+  const restaurantMode          = usePOSStore((s) => s.restaurantMode);
+  const setRestaurantMode       = usePOSStore((s) => s.setRestaurantMode);
+  const tableManagementEnabled  = usePOSStore((s) => s.tableManagementEnabled);
+  const setTableManagementEnabled = usePOSStore((s) => s.setTableManagementEnabled);
+  const courseManagementEnabled = usePOSStore((s) => s.courseManagementEnabled);
+  const setCourseManagementEnabled = usePOSStore((s) => s.setCourseManagementEnabled);
+  const kitchenPrintingEnabled  = usePOSStore((s) => s.kitchenPrintingEnabled);
+  const setKitchenPrintingEnabled = usePOSStore((s) => s.setKitchenPrintingEnabled);
+  const autoSendKitchen         = usePOSStore((s) => s.autoSendKitchen);
+  const setAutoSendKitchen      = usePOSStore((s) => s.setAutoSendKitchen);
+  const allowTakeAway           = usePOSStore((s) => s.allowTakeAway);
+  const setAllowTakeAway        = usePOSStore((s) => s.setAllowTakeAway);
+  const defaultGuests           = usePOSStore((s) => s.defaultGuests);
+  const setDefaultGuests        = usePOSStore((s) => s.setDefaultGuests);
 
   // ── Tab content ─────────────────────────────────────────────────────────────
 
@@ -633,6 +651,101 @@ export default function POSSettings() {
     </div>
   );
 
+  const RestaurantTab = (
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <Section title="Restaurant Mode">
+        <SettingRow
+          label="Enable Restaurant Mode"
+          sublabel="Master toggle — activates all restaurant features (table map, courses, kitchen printing)"
+          control={
+            <Switch
+              checked={restaurantMode}
+              onChange={setRestaurantMode}
+              checkedChildren="ON"
+              unCheckedChildren="OFF"
+            />
+          }
+        />
+        <SettingRow
+          label="Enable Table Management"
+          sublabel="Show the Table Map page and attach tables to orders"
+          control={
+            <Switch
+              checked={tableManagementEnabled}
+              disabled={!restaurantMode}
+              onChange={setTableManagementEnabled}
+            />
+          }
+        />
+        <SettingRow
+          label="Enable Course Management"
+          sublabel="Assign Starter / Main / Dessert courses to cart items"
+          control={
+            <Switch
+              checked={courseManagementEnabled}
+              disabled={!restaurantMode}
+              onChange={setCourseManagementEnabled}
+            />
+          }
+        />
+        <SettingRow
+          label="Enable Kitchen Printing"
+          sublabel="Show Send to Kitchen button; print kitchen tickets via window.print()"
+          control={
+            <Switch
+              checked={kitchenPrintingEnabled}
+              disabled={!restaurantMode}
+              onChange={setKitchenPrintingEnabled}
+            />
+          }
+        />
+        <SettingRow
+          label="Auto Send to Kitchen on Checkout"
+          sublabel="Automatically send all items to kitchen when order is checked out"
+          control={
+            <Switch
+              checked={autoSendKitchen}
+              disabled={!restaurantMode || !kitchenPrintingEnabled}
+              onChange={setAutoSendKitchen}
+            />
+          }
+        />
+        <SettingRow
+          label="Allow Take Away Orders"
+          sublabel="Show a Take Away button on the Table Map to skip table selection"
+          control={
+            <Switch
+              checked={allowTakeAway}
+              disabled={!restaurantMode}
+              onChange={setAllowTakeAway}
+            />
+          }
+        />
+        <SettingRow
+          label="Default Number of Guests"
+          sublabel="Pre-filled guest count when a table is opened"
+          last
+          control={
+            <InputNumber
+              min={1}
+              max={20}
+              value={defaultGuests}
+              onChange={(v) => setDefaultGuests(v ?? 2)}
+              disabled={!restaurantMode}
+              addonAfter="guests"
+              style={{ width: 140 }}
+            />
+          }
+        />
+      </Section>
+      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        <Button type="primary" icon={<SaveOutlined />} onClick={() => message.success("Restaurant settings saved")}>
+          Save Settings
+        </Button>
+      </div>
+    </div>
+  );
+
   // ── Layout helpers ───────────────────────────────────────────────────────────
 
   const navCard = (
@@ -684,6 +797,7 @@ export default function POSSettings() {
       {activeTab === "shift"       && ShiftTab}
       {activeTab === "customer"    && CustomerDisplayTab}
       {activeTab === "offline"     && <OfflineSettingsTab />}
+      {activeTab === "restaurant"  && RestaurantTab}
     </Card>
   );
 

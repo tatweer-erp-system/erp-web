@@ -14,6 +14,7 @@ const lz = (fn: () => Promise<{ default: ComponentType }>) =>
 export const routes: RouteConfig[] = [
   // ── POS ─────────────────────────────────────────────────────────────────────
   { path: "/pos",                    component: lz(() => import("@/modules/pos/POSPage")),                          breadcrumb: ["POS"] },
+  { path: "/pos/tables",             component: lz(() => import("@/modules/pos/pages/TablesPage")),                  breadcrumb: ["POS", "Table Map"] },
   { path: "/pos/loyalty-report",     component: lz(() => import("@/modules/pos/pages/LoyaltyReport")),              breadcrumb: ["POS", "Loyalty Report"] },
   { path: "/pos/reports/vouchers",   component: lz(() => import("@/modules/pos/pages/reports/VouchersReport")),     breadcrumb: ["POS", "Vouchers Report"] },
   { path: "/pos/reports/gift-cards", component: lz(() => import("@/modules/pos/pages/reports/GiftCardsReport")),    breadcrumb: ["POS", "Gift Cards Report"] },

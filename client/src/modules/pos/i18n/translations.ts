@@ -194,6 +194,50 @@ interface POSTranslations {
   removeItem: string;
   editPrice: string;
   itemNote: string;
+  // Restaurant — Table Map
+  tableMap: string;
+  takeAway: string;
+  allSections: string;
+  noTablesFound: string;
+  availableStatus: string;
+  occupiedStatus: string;
+  reservedStatus: string;
+  tableCapacity: (n: number) => string;
+  tableSeated: (dur: string) => string;
+  tableGuests: (n: number) => string;
+  openTable: string;
+  resumeTableOrder: string;
+  selectTable: string;
+  // Restaurant — POS header
+  tableAttached: (name: string) => string;
+  transferTable: string;
+  releaseTable: string;
+  guestCount: string;
+  // Restaurant — Split Bill
+  splitBill: string;
+  splitEqually: string;
+  splitByItems: string;
+  numberOfWays: string;
+  amountPerPerson: string;
+  processSplit: string;
+  assignBill: string;
+  bill: (n: number) => string;
+  // Restaurant — Kitchen
+  sendToKitchen: string;
+  sentToKitchen: string;
+  kitchenNote: string;
+  // Restaurant — Courses
+  assignCourse: string;
+  noCourse: string;
+  courseStarter: string;
+  courseMain: string;
+  courseDessert: string;
+  fireCourse: (name: string) => string;
+  courseStatusPending: string;
+  courseStatusSent: string;
+  courseStatusReady: string;
+  courseStatusServed: string;
+  fireAll: string;
   // Misc
   confirm: string;
   save: string;
@@ -395,6 +439,50 @@ const en: POSTranslations = {
   removeItem: "Remove item",
   editPrice: "Edit price",
   itemNote: "Add note",
+  // Restaurant — Table Map
+  tableMap: "Table Map",
+  takeAway: "Take Away",
+  allSections: "All Sections",
+  noTablesFound: "No tables found",
+  availableStatus: "Available",
+  occupiedStatus: "Occupied",
+  reservedStatus: "Reserved",
+  tableCapacity: (n) => `${n} seats`,
+  tableSeated: (dur) => `Seated ${dur} ago`,
+  tableGuests: (n) => `${n} guest${n !== 1 ? "s" : ""}`,
+  openTable: "Open Table",
+  resumeTableOrder: "Resume Order",
+  selectTable: "Select a table to begin",
+  // Restaurant — POS header
+  tableAttached: (name) => `Table ${name}`,
+  transferTable: "Transfer Table",
+  releaseTable: "Release Table",
+  guestCount: "Guests",
+  // Restaurant — Split Bill
+  splitBill: "Split Bill",
+  splitEqually: "Split Equally",
+  splitByItems: "Split by Items",
+  numberOfWays: "Number of ways",
+  amountPerPerson: "Amount per person",
+  processSplit: "Process Split",
+  assignBill: "Assign to bill",
+  bill: (n) => `Bill ${n}`,
+  // Restaurant — Kitchen
+  sendToKitchen: "Send to Kitchen",
+  sentToKitchen: "Sent to kitchen",
+  kitchenNote: "Kitchen note",
+  // Restaurant — Courses
+  assignCourse: "Course",
+  noCourse: "No Course",
+  courseStarter: "Starter",
+  courseMain: "Main",
+  courseDessert: "Dessert",
+  fireCourse: (name) => `Fire ${name}`,
+  courseStatusPending: "Pending",
+  courseStatusSent: "Sent",
+  courseStatusReady: "Ready",
+  courseStatusServed: "Served",
+  fireAll: "Fire All",
   // Misc
   confirm: "Confirm",
   save: "Save",
@@ -596,6 +684,50 @@ const ar: POSTranslations = {
   removeItem: "إزالة المنتج",
   editPrice: "تعديل السعر",
   itemNote: "إضافة ملاحظة",
+  // Restaurant — Table Map
+  tableMap: "خريطة الطاولات",
+  takeAway: "طلب خارجي",
+  allSections: "جميع الأقسام",
+  noTablesFound: "لا توجد طاولات",
+  availableStatus: "متاحة",
+  occupiedStatus: "مشغولة",
+  reservedStatus: "محجوزة",
+  tableCapacity: (n) => `${n} مقاعد`,
+  tableSeated: (dur) => `جلس منذ ${dur}`,
+  tableGuests: (n) => `${n} ضيف`,
+  openTable: "فتح الطاولة",
+  resumeTableOrder: "استئناف الطلب",
+  selectTable: "اختر طاولة للبدء",
+  // Restaurant — POS header
+  tableAttached: (name) => `طاولة ${name}`,
+  transferTable: "نقل الطاولة",
+  releaseTable: "تحرير الطاولة",
+  guestCount: "الضيوف",
+  // Restaurant — Split Bill
+  splitBill: "تقسيم الفاتورة",
+  splitEqually: "تقسيم متساوٍ",
+  splitByItems: "تقسيم حسب الأصناف",
+  numberOfWays: "عدد الأجزاء",
+  amountPerPerson: "المبلغ للشخص",
+  processSplit: "تنفيذ التقسيم",
+  assignBill: "إسناد للفاتورة",
+  bill: (n) => `فاتورة ${n}`,
+  // Restaurant — Kitchen
+  sendToKitchen: "إرسال للمطبخ",
+  sentToKitchen: "تم الإرسال للمطبخ",
+  kitchenNote: "ملاحظة المطبخ",
+  // Restaurant — Courses
+  assignCourse: "المرحلة",
+  noCourse: "بدون مرحلة",
+  courseStarter: "مقبلات",
+  courseMain: "طبق رئيسي",
+  courseDessert: "حلويات",
+  fireCourse: (name) => `إرسال ${name}`,
+  courseStatusPending: "قيد الانتظار",
+  courseStatusSent: "أُرسل",
+  courseStatusReady: "جاهز",
+  courseStatusServed: "قُدِّم",
+  fireAll: "إرسال الكل",
   // Misc
   confirm: "تأكيد",
   save: "حفظ",

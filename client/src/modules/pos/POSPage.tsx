@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { theme as antTheme, Grid, Badge, Drawer, Button, Tooltip } from "antd";
+import { theme as antTheme, Grid, Badge, Drawer, Button, Tooltip, message } from "antd";
 import {
   ArrowLeftOutlined,
   ArrowRightOutlined,
@@ -10,9 +10,12 @@ import {
   GiftOutlined,
   WalletOutlined,
   MonitorOutlined,
-ArrowDownOutlined,
+  ArrowDownOutlined,
   ArrowUpOutlined,
   LockOutlined,
+  TableOutlined,
+  SwapOutlined,
+  SendOutlined,
 } from "@ant-design/icons";
 import { useLocation } from "wouter";
 import { AntProvider } from "@/lib/antd-provider";
@@ -38,6 +41,10 @@ import { useOfflineSync } from "./hooks/useOfflineSync";
 import { usePOSStore } from "./store/posStore";
 import { usePOSTranslations } from "./i18n/translations";
 import type { OrderTab } from "./store/posStore";
+import { useRestaurantMode } from "./hooks/useRestaurantMode";
+import { KitchenTicket } from "./components/restaurant/KitchenTicket";
+import { SplitBillModal } from "./components/restaurant/SplitBillModal";
+import { releaseTable } from "./services/tableService";
 
 const { useBreakpoint } = Grid;
 
@@ -68,12 +75,14 @@ function POSLayout() {
   const [mergeOpen, setMergeOpen] = useState(false);
   const [cashInOpen, setCashInOpen] = useState(false);
   const [cashOutOpen, setCashOutOpen] = useState(false);
-  const { addToCart, itemCount } = useCart();
+  const [splitBillOpen, setSplitBillOpen] = useState(false);
+  const { addToCart, itemCount, cartItems, grandTotal } = useCart();
   const { receiptVisible, closeReceipt, completedOrder } = useCheckout();
   useOfflineSync();
   const { currentBranch, language } = useAppSettings();
   const isRTL = language === "ar";
   const t = usePOSTranslations(language);
+  const restaurantMode = useRestaurantMode();
 
   const { user, isCashier, logout } = useAuthContext();
 
@@ -84,6 +93,19 @@ function POSLayout() {
   const setCashierSession  = usePOSStore((s) => s.setCashierSession);
   const lockSession        = usePOSStore((s) => s.lockSession);
   const posSettings        = usePOSStore((s) => s.posSessionSettings);
+  const attachedTable      = usePOSStore((s) => s.attachedTable);
+  const setAttachedTable   = usePOSStore((s) => s.setAttachedTable);
+
+  async function handleReleaseTable() {
+    if (!attachedTable) return;
+    try {
+      await releaseTable(attachedTable.id);
+      setAttachedTable(null);
+      message.success(`Table ${attachedTable.name} released`);
+    } catch {
+      message.error("Failed to release table");
+    }
+  }
 
   // ── Auto-init session from ERP logged-in user ─────────────────────────────
   useEffect(() => {
@@ -229,6 +251,59 @@ function POSLayout() {
           </span>
         </div>
 
+        {/* Restaurant: attached table badge */}
+        {restaurantMode.isRestaurant && attachedTable && (
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            background: "#F59E0B10",
+            border: "1.5px solid #F59E0B40",
+            borderRadius: 10,
+            padding: "4px 10px",
+            fontSize: 12,
+            fontWeight: 700,
+            color: "#D97706",
+          }}>
+            <TableOutlined style={{ fontSize: 12 }} />
+            {t.tableAttached(attachedTable.name)}
+            <div style={{ width: 1, height: 12, background: "#F59E0B30" }} />
+            <Tooltip title={t.releaseTable}>
+              <button
+                onClick={handleReleaseTable}
+                style={{
+                  background: "none", border: "none", cursor: "pointer",
+                  color: "#EF4444", fontSize: 11, padding: 0, lineHeight: 1,
+                }}
+              >
+                ✕
+              </button>
+            </Tooltip>
+          </div>
+        )}
+
+        {/* Restaurant: table map button */}
+        {restaurantMode.isRestaurant && restaurantMode.tableManagementEnabled && (
+          <Tooltip title={t.tableMap}>
+            <Button
+              icon={<TableOutlined />}
+              onClick={() => setLocation("/pos/tables")}
+              style={{ borderRadius: 10, height: 36, width: 36, padding: 0, display: "flex", alignItems: "center", justifyContent: "center" }}
+            />
+          </Tooltip>
+        )}
+
+        {/* Restaurant: transfer table button */}
+        {restaurantMode.isRestaurant && attachedTable && (
+          <Tooltip title={t.transferTable}>
+            <Button
+              icon={<SwapOutlined />}
+              onClick={() => setLocation("/pos/tables")}
+              style={{ borderRadius: 10, height: 36, width: 36, padding: 0, display: "flex", alignItems: "center", justifyContent: "center", color: "#F59E0B", borderColor: "#F59E0B40" }}
+            />
+          </Tooltip>
+        )}
+
         {/* Spacer */}
         <div style={{ flex: 1 }} />
 
@@ -236,6 +311,26 @@ function POSLayout() {
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           {!isMobile && (
             <>
+              {restaurantMode.isRestaurant && restaurantMode.kitchenPrintingEnabled && (
+                <Tooltip title={t.sendToKitchen}>
+                  <Button
+                    icon={<SendOutlined />}
+                    onClick={() => {
+                      const kc = document.getElementById("kitchen-ticket-btn");
+                      if (kc) (kc as HTMLButtonElement).click();
+                    }}
+                    disabled={cartItems.length === 0}
+                    style={{
+                      borderRadius: 10, height: 36, fontSize: 12,
+                      background: cartItems.length > 0 ? `linear-gradient(135deg, #F59E0B, #D97706)` : undefined,
+                      border: "none",
+                      color: cartItems.length > 0 ? "#fff" : undefined,
+                    }}
+                  >
+                    {t.sendToKitchen}
+                  </Button>
+                </Tooltip>
+              )}
               {cashierSession && (
                 <>
                   <Tooltip title={t.recordCashIn}>
@@ -406,6 +501,22 @@ function POSLayout() {
       <MergeOrdersModal open={mergeOpen} onClose={() => setMergeOpen(false)} />
       <CashInOutModal type="in"  open={cashInOpen}  onClose={() => setCashInOpen(false)}  />
       <CashInOutModal type="out" open={cashOutOpen} onClose={() => setCashOutOpen(false)} />
+      {/* Restaurant modals */}
+      {restaurantMode.isRestaurant && (
+        <SplitBillModal
+          open={splitBillOpen}
+          onClose={() => setSplitBillOpen(false)}
+          cartItems={cartItems}
+          grandTotal={grandTotal}
+          isMobile={isMobile}
+        />
+      )}
+      {/* Hidden kitchen ticket trigger (used by header button) */}
+      {restaurantMode.isRestaurant && restaurantMode.kitchenPrintingEnabled && (
+        <div style={{ display: "none" }}>
+          <KitchenTicket items={cartItems} compact />
+        </div>
+      )}
     </div>
     </POSContextProvider>
   );
