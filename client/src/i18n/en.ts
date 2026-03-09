@@ -1,0 +1,103 @@
+export const en: Record<string, string> = {
+  // Navigation sections
+  "Dashboard": "Dashboard",
+  "SALES": "Sales",
+  "PURCHASES": "Purchases",
+  "INVENTORY": "Inventory",
+  "ACCOUNTING": "Accounting",
+  "TREASURY": "Treasury",
+  "REPORTS": "Reports",
+  "SETTINGS": "Settings",
+
+  // Sales
+  "Customers": "Customers",
+  "All Customers": "All Customers",
+  "Customer Groups": "Customer Groups",
+  "Quotations": "Quotations",
+  "Sales Orders": "Sales Orders",
+  "All Orders": "All Orders",
+  "Pending": "Pending",
+  "Completed": "Completed",
+  "Sales Invoices": "Sales Invoices",
+  "Sales Returns": "Sales Returns",
+  "Customer Receipts": "Customer Receipts",
+  "Customer Statements": "Customer Statements",
+
+  // Purchases
+  "Vendors": "Vendors",
+  "All Vendors": "All Vendors",
+  "Vendor Groups": "Vendor Groups",
+  "Purchase Orders": "Purchase Orders",
+  "Purchase Invoices": "Purchase Invoices",
+  "Purchase Returns": "Purchase Returns",
+  "Vendor Payments": "Vendor Payments",
+  "Vendor Statements": "Vendor Statements",
+
+  // Inventory
+  "Products": "Products",
+  "All Products": "All Products",
+  "In Stock": "In Stock",
+  "Low Stock": "Low Stock",
+  "Product Categories": "Product Categories",
+  "Units of Measure": "Units of Measure",
+  "Warehouses": "Warehouses",
+  "Opening Stock": "Opening Stock",
+  "Stock Adjustments": "Stock Adjustments",
+  "Stock Transfers": "Stock Transfers",
+  "Stock Count": "Stock Count",
+  "Inventory Valuation": "Inventory Valuation",
+  "Stock Movement Report": "Stock Movement Report",
+
+  // Accounting
+  "Chart of Accounts": "Chart of Accounts",
+  "Journal Entries": "Journal Entries",
+  "Journal Types": "Journal Types",
+  "Opening Balances": "Opening Balances",
+  "Fiscal Years": "Fiscal Years",
+  "Period Closing": "Period Closing",
+  "Account Statements": "Account Statements",
+  "Trial Balance": "Trial Balance",
+  "General Ledger": "General Ledger",
+  "Income Statement": "Income Statement",
+  "Balance Sheet": "Balance Sheet",
+  "Cash Flow Statement": "Cash Flow Statement",
+
+  // Treasury
+  "Cash Accounts": "Cash Accounts",
+  "Bank Accounts": "Bank Accounts",
+  "Receipts": "Receipts",
+  "Payments": "Payments",
+  "Bank Transfers": "Bank Transfers",
+  "Bank Reconciliation": "Bank Reconciliation",
+
+  // Reports
+  "Sales Reports": "Sales Reports",
+  "Purchase Reports": "Purchase Reports",
+  "Inventory Reports": "Inventory Reports",
+  "Financial Reports": "Financial Reports",
+  "Aging Reports": "Aging Reports",
+  "Tax Reports": "Tax Reports",
+
+  // Settings
+  "Company Profile": "Company Profile",
+  "Branches": "Branches",
+  "Currencies": "Currencies",
+  "Exchange Rates": "Exchange Rates",
+  "Taxes": "Taxes",
+  "Numbering Series": "Numbering Series",
+  "Payment Methods": "Payment Methods",
+  "Price Lists": "Price Lists",
+  "Cost Centers": "Cost Centers",
+  "Users": "Users",
+  "Roles & Permissions": "Roles & Permissions",
+  "Audit Logs": "Audit Logs",
+
+  // Definitions
+  "Definitions": "Definitions",
+
+  // UI
+  "Logout": "Logout",
+  "Search": "Search",
+  "Settings": "Settings",
+  "Profile": "Profile",
+};
