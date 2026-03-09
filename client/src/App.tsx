@@ -13,8 +13,6 @@ import DashboardLayout from "./components/layout/DashboardLayout";
 
 const NotFound = lazy(() => import("@/pages/NotFound"));
 const Login = lazy(() => import("@/pages/Login"));
-const POSPage = lazy(() => import("@/modules/pos/POSPage"));
-const CustomerDisplayScreen = lazy(() => import("@/modules/pos/pages/CustomerDisplayScreen"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -27,7 +25,7 @@ const queryClient = new QueryClient({
 
 function Router() {
   const [location] = useLocation();
-  const { user, isAuthenticated, isCashier } = useAuthContext();
+  const { user, isAuthenticated } = useAuthContext();
 
   // ── Unauthenticated ───────────────────────────────────────────────────────
   if (!isAuthenticated && location !== "/login") {
@@ -36,33 +34,10 @@ function Router() {
 
   // ── Login page ────────────────────────────────────────────────────────────
   if (location === "/login") {
-    // Already logged in → redirect to their home
-    if (user) return <Redirect to={isCashier ? "/pos" : "/"} />;
+    if (user) return <Redirect to="/" />;
     return (
       <Suspense fallback={<PageSkeleton />}>
         <Login />
-      </Suspense>
-    );
-  }
-
-  // ── Cashier role — POS only ───────────────────────────────────────────────
-  if (isCashier && location !== "/pos" && location !== "/pos/customer-display") {
-    return <Redirect to="/pos" />;
-  }
-
-  // ── POS full-screen ───────────────────────────────────────────────────────
-  if (location === "/pos") {
-    return (
-      <Suspense fallback={<PageSkeleton />}>
-        <POSPage />
-      </Suspense>
-    );
-  }
-
-  if (location === "/pos/customer-display") {
-    return (
-      <Suspense fallback={<PageSkeleton />}>
-        <CustomerDisplayScreen />
       </Suspense>
     );
   }

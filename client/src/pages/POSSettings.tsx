@@ -36,6 +36,7 @@ import {
   WifiOutlined,
   ShopOutlined,
   GiftOutlined,
+  RollbackOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 
@@ -101,6 +102,7 @@ const NAV_ITEMS = [
   { key: "customer",    icon: <TeamOutlined />,        label: "Customer & Display"    },
   { key: "offline",     icon: <WifiOutlined />,        label: "Offline Mode"          },
   { key: "restaurant",  icon: <ShopOutlined />,        label: "Restaurant"            },
+  { key: "returns",     icon: <RollbackOutlined />,    label: "Returns & Refunds"     },
 ];
 
 // ── Main component ───────────────────────────────────────────────────────────
@@ -190,6 +192,10 @@ export default function POSSettings() {
   const [taxInclusive,        setTaxInclusive]         = useState(false);
   const [showTaxBreakdown,    setShowTaxBreakdown]     = useState(true);
   const [tipsEnabled,         setTipsEnabled]          = useState(false);
+  const [tipPresets,          setTipPresets]           = useState<number[]>([10, 15, 18, 20]);
+  const [autoGratuityEnabled, setAutoGratuityEnabled]  = useState(false);
+  const [autoGratuityPct,     setAutoGratuityPct]      = useState(18);
+  const [autoGratuityPartySize, setAutoGratuityPartySize] = useState(6);
   const [roundingRule,        setRoundingRule]         = useState<"none" | "0.05" | "0.10" | "1.00">("none");
   const [cashEnabled,         setCashEnabled]          = useState(true);
   const [cardEnabled,         setCardEnabled]          = useState(true);
@@ -204,6 +210,15 @@ export default function POSSettings() {
   const [allowOrderDiscount,  setAllowOrderDiscount]  = useState(true);
   const [maxDiscountPercent,  setMaxDiscountPercent]  = useState(50);
   const [requireManagerAbove, setRequireManagerAbove] = useState(20);
+
+  // ── Returns & Refunds tab ─────────────────────────────────────────────────
+  const [returnWindowDays,    setReturnWindowDays]     = useState(30);
+  const [requireManagerRefund, setRequireManagerRefund] = useState(true);
+  const [restockingFeePct,    setRestockingFeePct]     = useState(0);
+  const [allowCashRefund,     setAllowCashRefund]      = useState(true);
+  const [allowOriginalRefund, setAllowOriginalRefund]  = useState(true);
+  const [allowCreditRefund,   setAllowCreditRefund]    = useState(true);
+  const [refundNoteRequired,  setRefundNoteRequired]   = useState(true);
 
   // ── Checkout Rules tab ────────────────────────────────────────────────────
   const [allowPriceOverride,  setAllowPriceOverride]   = useState(false);
@@ -690,9 +705,62 @@ export default function POSSettings() {
         <SettingRow
           label="Enable Tips / Gratuity"
           sublabel="Show a tip prompt on the customer-facing display at checkout"
-          last
           control={<Switch checked={tipsEnabled} onChange={(v) => { setTipsEnabled(v); mark(); }} />}
         />
+        {tipsEnabled && (
+          <>
+            <SettingRow
+              label="Tip Preset Percentages"
+              sublabel="Percentage buttons shown to customers when prompted for a tip"
+              control={
+                <Select
+                  mode="tags"
+                  value={tipPresets.map(String)}
+                  onChange={(vals) => { setTipPresets(vals.map(Number).filter((n) => n >= 0 && n <= 100)); mark(); }}
+                  style={{ minWidth: 200 }}
+                  tokenSeparators={[","]}
+                  placeholder="e.g. 10, 15, 20"
+                  options={[10, 15, 18, 20, 25].map((p) => ({ label: `${p}%`, value: String(p) }))}
+                />
+              }
+            />
+            <SettingRow
+              label="Auto-Gratuity"
+              sublabel="Automatically add gratuity for large parties (restaurant mode)"
+              control={<Switch checked={autoGratuityEnabled} onChange={(v) => { setAutoGratuityEnabled(v); mark(); }} />}
+            />
+            {autoGratuityEnabled && (
+              <>
+                <SettingRow
+                  label="Auto-Gratuity Percentage"
+                  sublabel="Gratuity rate applied automatically to qualifying orders"
+                  control={
+                    <InputNumber
+                      min={0} max={100}
+                      value={autoGratuityPct}
+                      onChange={(v) => { setAutoGratuityPct(v ?? 18); mark(); }}
+                      addonAfter="%"
+                      style={{ width: 120 }}
+                    />
+                  }
+                />
+                <SettingRow
+                  label="Minimum Party Size"
+                  sublabel="Auto-gratuity applies when the party has this many or more guests"
+                  control={
+                    <InputNumber
+                      min={2} max={50}
+                      value={autoGratuityPartySize}
+                      onChange={(v) => { setAutoGratuityPartySize(v ?? 6); mark(); }}
+                      addonAfter="guests"
+                      style={{ width: 140 }}
+                    />
+                  }
+                />
+              </>
+            )}
+          </>
+        )}
       </Section>
 
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
@@ -1233,6 +1301,75 @@ export default function POSSettings() {
     </div>
   );
 
+  const ReturnsTab = (
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <Section title="Return Policy">
+        <SettingRow
+          label="Return Window (days)"
+          sublabel="Maximum number of days after purchase a return is accepted"
+          control={
+            <InputNumber
+              min={0} max={365}
+              value={returnWindowDays}
+              onChange={(v) => { setReturnWindowDays(v ?? 30); mark(); }}
+              addonAfter="days"
+              style={{ width: 140 }}
+            />
+          }
+        />
+        <SettingRow
+          label="Require Manager Approval"
+          sublabel="All refunds must be approved by a manager before processing"
+          control={<Switch checked={requireManagerRefund} onChange={(v) => { setRequireManagerRefund(v); mark(); }} />}
+        />
+        <SettingRow
+          label="Require Refund Reason"
+          sublabel="Cashiers must select a reason when processing any refund"
+          control={<Switch checked={refundNoteRequired} onChange={(v) => { setRefundNoteRequired(v); mark(); }} />}
+        />
+        <SettingRow
+          label="Restocking Fee"
+          sublabel="Automatically deduct a restocking fee from the refund amount"
+          last
+          control={
+            <InputNumber
+              min={0} max={50}
+              value={restockingFeePct}
+              onChange={(v) => { setRestockingFeePct(v ?? 0); mark(); }}
+              addonAfter="%"
+              style={{ width: 120 }}
+            />
+          }
+        />
+      </Section>
+
+      <Section title="Allowed Refund Methods">
+        <SettingRow
+          label="Refund to Original Payment Method"
+          sublabel="Allow refund back to the card or method used at purchase"
+          control={<Switch checked={allowOriginalRefund} onChange={(v) => { setAllowOriginalRefund(v); mark(); }} />}
+        />
+        <SettingRow
+          label="Refund to Cash"
+          sublabel="Allow cashier to issue a cash refund regardless of original payment"
+          control={<Switch checked={allowCashRefund} onChange={(v) => { setAllowCashRefund(v); mark(); }} />}
+        />
+        <SettingRow
+          label="Refund to Store Credit"
+          sublabel="Allow issuing store credit or gift card instead of a cash/card refund"
+          last
+          control={<Switch checked={allowCreditRefund} onChange={(v) => { setAllowCreditRefund(v); mark(); }} />}
+        />
+      </Section>
+
+      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        <Button type="primary" icon={<SaveOutlined />} onClick={() => saveAndNotify("Returns & Refunds")}>
+          Save Settings
+        </Button>
+      </div>
+    </div>
+  );
+
   // ── Dirty indicator badge ─────────────────────────────────────────────────
 
   function navLabel(item: typeof NAV_ITEMS[number]) {
@@ -1309,6 +1446,7 @@ export default function POSSettings() {
       {activeTab === "customer"    && CustomerDisplayTab}
       {activeTab === "offline"     && OfflineTab}
       {activeTab === "restaurant"  && RestaurantTab}
+      {activeTab === "returns"     && ReturnsTab}
     </Card>
   );
 

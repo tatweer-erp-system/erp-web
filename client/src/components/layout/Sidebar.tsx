@@ -11,7 +11,6 @@ import {
   DownOutlined,
   // Navigation
   DashboardOutlined,
-  ShopOutlined,
   // Definitions
   DatabaseOutlined,
   // Sales
@@ -93,7 +92,6 @@ const NAV_ITEMS: NavItem[] = [
   { name: "Dashboard", icon: <DashboardOutlined />, href: "/" },
 
   { name: "POS", isHeader: true },
-  { name: "Point of Sale", icon: <ShopOutlined />, href: "/pos" },
   { name: "Loyalty Report", icon: <TrophyOutlined />, href: "/pos/loyalty-report" },
   { name: "Vouchers Report", icon: <TagOutlined />, href: "/pos/reports/vouchers" },
   { name: "Gift Cards Report", icon: <GiftOutlined />, href: "/pos/reports/gift-cards" },
