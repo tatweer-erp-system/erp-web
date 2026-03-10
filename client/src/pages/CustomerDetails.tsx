@@ -23,6 +23,7 @@ import { StatCard } from "@/components/common/StatCard";
 import { CollapsibleCard } from "@/components/common/CollapsibleCard";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import AnimatedModal from "@/components/AnimatedModal";
+import AttachmentsTab from "@/components/AttachmentsTab";
 import { useLocation } from "wouter";
 
 // ── Mock customer data ────────────────────────────────────────────────────────
@@ -139,6 +140,7 @@ export default function CustomerDetails() {
             <TabsTrigger value="overview"       className="gap-1.5"><User size={14} />Overview</TabsTrigger>
             <TabsTrigger value="orders"         className="gap-1.5"><ShoppingCart size={14} />Orders</TabsTrigger>
             <TabsTrigger value="communications" className="gap-1.5"><MessageSquare size={14} />Communications</TabsTrigger>
+            <TabsTrigger value="attachments"    className="gap-1.5"><Tag size={14} />Attachments</TabsTrigger>
             <TabsTrigger value="settings"       className="gap-1.5"><Shield size={14} />Settings</TabsTrigger>
           </TabsList>
 
@@ -242,6 +244,11 @@ export default function CustomerDetails() {
                 <p>· SMS notifications: <span className="text-muted-foreground font-medium">Disabled</span></p>
               </div>
             </CollapsibleCard>
+          </TabsContent>
+
+          {/* Attachments */}
+          <TabsContent value="attachments" className="mt-4">
+            <AttachmentsTab entityName={`Customer: ${CUSTOMER.name}`} />
           </TabsContent>
 
           {/* Settings */}

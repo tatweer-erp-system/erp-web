@@ -25,6 +25,8 @@ export const routes: RouteConfig[] = [
   // ── Main ────────────────────────────────────────────────────────────────────
   { path: "/",                component: lz(() => import("@/pages/Dashboard")),     breadcrumb: ["Dashboard"] },
   { path: "/notifications",   component: lz(() => import("@/pages/Notifications")), breadcrumb: ["Notifications"] },
+  { path: "/chat",            component: lz(() => import("@/pages/Chat")),          breadcrumb: ["Chat"] },
+  { path: "/documents",       component: lz(() => import("@/pages/Documents")),     breadcrumb: ["Documents"] },
   { path: "/inventory",  component: lz(() => import("@/pages/Inventory")),  permissions: ["inventory:read"], breadcrumb: ["Inventory"] },
   { path: "/analytics",  component: lz(() => import("@/pages/Analytics")),  breadcrumb: ["Analytics"] },
   { path: "/settings",   component: lz(() => import("@/pages/Settings")),   breadcrumb: ["Settings"] },

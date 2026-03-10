@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import TabsWithIcons from "@/components/TabsWithIcons";
 import AnimatedModal from "@/components/AnimatedModal";
+import AttachmentsTab from "@/components/AttachmentsTab";
 import {
   User,
   Phone,
@@ -662,35 +663,7 @@ export default function EmployeeDetails() {
 
               {/* ── Documents ── */}
               {activeTab === "documents" && (
-                <section>
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-sm font-semibold text-foreground">All Documents</h3>
-                    <Button className="bg-primary hover:bg-primary/90 text-white text-xs px-3 py-1.5 h-auto">
-                      Upload Document
-                    </Button>
-                  </div>
-                  <div className="space-y-3">
-                    {employee.documents.map((doc, i) => (
-                      <div
-                        key={i}
-                        className="flex items-center justify-between p-4 rounded-xl border border-border bg-secondary/20"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center">
-                            <FileText size={16} className="text-primary" />
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium text-foreground">{doc.name}</p>
-                            <p className="text-xs text-muted-foreground">{doc.size}</p>
-                          </div>
-                        </div>
-                        <Button variant="ghost" size="sm" className="text-primary">
-                          <Download size={16} />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                </section>
+                <AttachmentsTab entityName={`Employee: ${employee.name}`} />
               )}
 
               {/* ── Performance ── */}

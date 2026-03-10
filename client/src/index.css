@@ -356,3 +356,49 @@
     }
   }
 }
+
+@media print {
+  /* Hide navigation chrome */
+  aside,
+  nav,
+  header,
+  .ant-layout-sider,
+  .ant-menu,
+  [class*="Sidebar"],
+  [class*="Navbar"],
+  [class*="navbar"],
+  [class*="sidebar"] {
+    display: none !important;
+  }
+
+  /* Hide action buttons */
+  button,
+  .ant-btn,
+  [class*="action"],
+  [class*="toolbar"] {
+    display: none !important;
+  }
+
+  /* Full-width content */
+  main,
+  .ant-layout-content,
+  [class*="content"] {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Clean page */
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  /* Ensure tables don't break across pages */
+  table {
+    page-break-inside: auto;
+  }
+  tr {
+    page-break-inside: avoid;
+  }
+}

@@ -42,7 +42,6 @@ import {
   // Accounting
   UnorderedListOutlined,
   BookOutlined,
-  ReadOutlined,
   FundOutlined,
   CalendarOutlined,
   LockOutlined,
@@ -68,6 +67,8 @@ import {
   // Reports
   // Settings
   BellOutlined,
+  MessageOutlined,
+  FolderOpenOutlined,
   PercentageOutlined,
   SettingOutlined,
   TrophyOutlined,
@@ -90,7 +91,9 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { name: "Dashboard", icon: <DashboardOutlined />, href: "/" },
+  { name: "Dashboard", icon: <DashboardOutlined />,    href: "/" },
+  { name: "Chat",      icon: <MessageOutlined />,    href: "/chat" },
+  { name: "Documents", icon: <FolderOpenOutlined />, href: "/documents" },
 
   { name: "POS", isHeader: true },
   { name: "Loyalty Report", icon: <TrophyOutlined />, href: "/pos/loyalty-report" },
@@ -131,11 +134,7 @@ const NAV_ITEMS: NavItem[] = [
   { name: "Purchases Settings",icon: <SettingOutlined />,   href: "/settings/purchases" },
 
   { name: "INVENTORY", isHeader: true },
-  { name: "Products", icon: <AppstoreOutlined />, submenu: [
-    { name: "All Products", href: "/product-details" },
-    { name: "In Stock",     href: "/product-details" },
-    { name: "Low Stock",    href: "/product-details" },
-  ]},
+  { name: "Products", icon: <AppstoreOutlined />, href: "/product-details" },
   { name: "Product Categories",    icon: <TagsOutlined />,       href: "/product-categories" },
   { name: "Units of Measure",      icon: <ColumnWidthOutlined />,href: "/units-of-measure" },
   { name: "Warehouses",            icon: <HomeOutlined />,        href: "/warehouses" },
@@ -151,9 +150,7 @@ const NAV_ITEMS: NavItem[] = [
   { name: "ACCOUNTING", isHeader: true },
   { name: "Chart of Accounts",  icon: <UnorderedListOutlined />, href: "/chart-of-accounts" },
   { name: "Journal Entries",    icon: <BookOutlined />,          href: "/journal-entries" },
-  { name: "Journal Types",      icon: <ReadOutlined />,          href: "/journal-types" },
   { name: "Opening Balances",   icon: <FundOutlined />,          href: "/opening-balances" },
-  { name: "Fiscal Years",       icon: <CalendarOutlined />,      href: "/fiscal-years" },
   { name: "Period Closing",     icon: <LockOutlined />,          href: "/period-closing" },
   { name: "Account Statements", icon: <FileSearchOutlined />,    href: "/account-statements" },
   { name: "Trial Balance",      icon: <CalculatorOutlined />,    href: "/trial-balance" },
@@ -179,7 +176,6 @@ const NAV_ITEMS: NavItem[] = [
     { name: "All Employees",    href: "/employees" },
     { name: "Employee Details", href: "/employee-details" },
   ]},
-  { name: "Departments",      icon: <ApartmentOutlined />,  href: "/departments" },
   { name: "Job Positions",    icon: <SolutionOutlined />,   href: "/job-positions" },
   { name: "Attendance",       icon: <ClockCircleOutlined />,href: "/attendance" },
   { name: "Leave Management", icon: <CalendarOutlined />,   href: "/leave-management" },

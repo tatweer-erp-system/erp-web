@@ -39,7 +39,7 @@ export default function Invoice() {
               <Eye size={16} className="mr-2" />
               Preview
             </Button>
-            <Button variant="outline" className="border-border">
+            <Button variant="outline" className="border-border" onClick={() => window.print()}>
               <Printer size={16} className="mr-2" />
               Print
             </Button>

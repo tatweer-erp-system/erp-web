@@ -20,7 +20,7 @@ export default defineConfig({
     emptyOutDir: true,
   },
   server: {
-    port: 3000,
+    port: 4200,
     strictPort: false,
     host: true,
     allowedHosts: ["localhost", "127.0.0.1"],
