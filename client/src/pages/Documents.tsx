@@ -13,7 +13,6 @@ import {
   Row,
   Col,
   Card,
-  Statistic,
   Dropdown,
   Progress,
   Avatar,
@@ -623,42 +622,92 @@ export default function Documents() {
 
         {/* Stats Row */}
         <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+          {[
+            {
+              title: "Total Files",
+              value: DOCUMENTS.length,
+              icon: <FolderOpenOutlined style={{ color: token.colorPrimary, fontSize: 20 }} />,
+              iconBg: token.colorPrimaryBg,
+              borderAccent: token.colorPrimaryBorder,
+              valueColor: token.colorPrimary,
+              sub: `${formatBytes(totalBytes(DOCUMENTS))} total`,
+            },
+            {
+              title: "Active",
+              value: active,
+              icon: <CheckCircleOutlined style={{ color: token.colorSuccess, fontSize: 20 }} />,
+              iconBg: token.colorSuccessBg,
+              borderAccent: token.colorSuccessBorder,
+              valueColor: token.colorSuccess,
+              sub: `${Math.round((active / DOCUMENTS.length) * 100)}% of all files`,
+            },
+            {
+              title: "Archived",
+              value: archived,
+              icon: <WarningOutlined style={{ color: token.colorWarning, fontSize: 20 }} />,
+              iconBg: token.colorWarningBg,
+              borderAccent: token.colorWarningBorder,
+              valueColor: token.colorWarning,
+              sub: `${Math.round((archived / DOCUMENTS.length) * 100)}% of all files`,
+            },
+          ].map((card) => (
+            <Col xs={24} sm={6} key={card.title}>
+              <div
+                style={{
+                  background: token.colorBgContainer,
+                  border: `1px solid ${token.colorBorderSecondary}`,
+                  borderRadius: token.borderRadiusLG,
+                  padding: "18px 20px",
+                  display: "flex",
+                  alignItems: "flex-start",
+                  justifyContent: "space-between",
+                  gap: 12,
+                }}
+              >
+                <div>
+                  <Text type="secondary" style={{ fontSize: 12 }}>{card.title}</Text>
+                  <div style={{ marginTop: 6 }}>
+                    <Text strong style={{ fontSize: 24, color: card.valueColor }}>{card.value}</Text>
+                  </div>
+                  <Text type="secondary" style={{ fontSize: 11, marginTop: 4, display: "block" }}>
+                    {card.sub}
+                  </Text>
+                </div>
+                <div
+                  style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: 10,
+                    background: card.iconBg,
+                    border: `1px solid ${card.borderAccent}`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                  }}
+                >
+                  {card.icon}
+                </div>
+              </div>
+            </Col>
+          ))}
           <Col xs={24} sm={6}>
-            <Card size="small" bordered={false} style={{ background: token.colorFillAlter }}>
-              <Statistic
-                title="Total Files"
-                value={DOCUMENTS.length}
-                prefix={<FolderOpenOutlined />}
-                valueStyle={{ color: token.colorPrimary }}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={6}>
-            <Card size="small" bordered={false} style={{ background: token.colorFillAlter }}>
-              <Statistic
-                title="Active"
-                value={active}
-                prefix={<CheckCircleOutlined />}
-                valueStyle={{ color: token.colorSuccess }}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={6}>
-            <Card size="small" bordered={false} style={{ background: token.colorFillAlter }}>
-              <Statistic
-                title="Archived"
-                value={archived}
-                prefix={<WarningOutlined />}
-                valueStyle={{ color: token.colorWarning }}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={6}>
-            <Card size="small" bordered={false} style={{ background: token.colorFillAlter }}>
-              <div>
-                <Text type="secondary" style={{ fontSize: 13 }}>Storage Used</Text>
-                <div style={{ marginTop: 4 }}>
-                  <Text strong style={{ fontSize: 20, color: token.colorText }}>
+            <div
+              style={{
+                background: token.colorBgContainer,
+                border: `1px solid ${token.colorBorderSecondary}`,
+                borderRadius: token.borderRadiusLG,
+                padding: "18px 20px",
+                display: "flex",
+                alignItems: "flex-start",
+                justifyContent: "space-between",
+                gap: 12,
+              }}
+            >
+              <div style={{ flex: 1 }}>
+                <Text type="secondary" style={{ fontSize: 12 }}>Storage Used</Text>
+                <div style={{ marginTop: 6 }}>
+                  <Text strong style={{ fontSize: 24 }}>
                     {formatBytes(totalSize)}
                   </Text>
                   <Text type="secondary" style={{ fontSize: 12, marginLeft: 6 }}>/ 200 MB</Text>
@@ -667,11 +716,30 @@ export default function Documents() {
                   percent={usedPercent}
                   size="small"
                   strokeColor={usedPercent > 80 ? token.colorError : token.colorPrimary}
-                  showInfo={false}
-                  style={{ marginTop: 6 }}
+                  style={{ marginTop: 8 }}
                 />
               </div>
-            </Card>
+              <div
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: 10,
+                  background: usedPercent > 80 ? token.colorErrorBg : token.colorPrimaryBg,
+                  border: `1px solid ${usedPercent > 80 ? token.colorErrorBorder : token.colorPrimaryBorder}`,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                }}
+              >
+                <CloudUploadOutlined
+                  style={{
+                    color: usedPercent > 80 ? token.colorError : token.colorPrimary,
+                    fontSize: 20,
+                  }}
+                />
+              </div>
+            </div>
           </Col>
         </Row>
 
