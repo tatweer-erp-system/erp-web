@@ -43,11 +43,11 @@ const DARK = {
 };
 
 export function AntProvider({ children }: { children: React.ReactNode }) {
-  const { theme, accentColor, themeRadius, language } = useAppSettings();
+  const { theme, accentColor, themeRadius, language, currentPreset } = useAppSettings();
   const isDark = theme === "dark";
   const isRTL = language === "ar";
   const t = isDark ? DARK : LIGHT;
-  const primary = accentColor || t.primary;
+  const primary = accentColor || (currentPreset ? currentPreset[theme].primary : "") || t.primary;
 
   const config = React.useMemo(() => ({
     algorithm: isDark ? antTheme.darkAlgorithm : antTheme.defaultAlgorithm,
@@ -191,7 +191,7 @@ export function AntProvider({ children }: { children: React.ReactNode }) {
         colorBgElevated:      t.bgCard,
       },
     },
-  }), [isDark, t, primary, themeRadius]);
+  }), [isDark, t, primary, themeRadius, currentPreset]);
 
   return (
     <StyleProvider layer>
