@@ -199,24 +199,24 @@ function NavbarInner({ sidebarOpen, setSidebarOpen, isRTL }: NavbarProps) {
         <Divider type="vertical" style={{ height: 20, margin: "0 4px" }} />
 
         {/* Language */}
-        <Dropdown
-          menu={{
-            items: [
-              { key: "en", label: "English", style: language === "en" ? { color: token.colorPrimary, fontWeight: 600 } : {} },
-              { key: "ar", label: "العربية", style: language === "ar" ? { color: token.colorPrimary, fontWeight: 600 } : {} },
-            ],
-            onClick: ({ key }) => setLanguage(key),
-          }}
-          placement="bottomRight"
-          trigger={["click"]}
-        >
-          <Tooltip title="Language">
-            <Button type="text" style={{ ...iconBtnStyle, width: "auto", padding: "0 8px", gap: 5, fontSize: 12, fontWeight: 700, color: token.colorPrimary }}>
-              <GlobalOutlined style={{ fontSize: 14, color: token.colorPrimary }} />
-              <span>{language === "en" ? "EN" : "AR"}</span>
+        <Tooltip title={isRTL ? "Switch to English" : "التبديل إلى العربية"}>
+          {isMobile ? (
+            <Button
+              type="text"
+              icon={<GlobalOutlined />}
+              onClick={() => setLanguage(isRTL ? "en" : "ar")}
+              style={{ ...iconBtnStyle, fontSize: 11, fontWeight: 700 }}
+            />
+          ) : (
+            <Button
+              icon={<GlobalOutlined />}
+              onClick={() => setLanguage(isRTL ? "en" : "ar")}
+              style={{ borderRadius: 10, height: 36, fontSize: 12, fontWeight: 700 }}
+            >
+              {isRTL ? "EN" : "AR"}
             </Button>
-          </Tooltip>
-        </Dropdown>
+          )}
+        </Tooltip>
 
         {/* Profile */}
         <Dropdown
