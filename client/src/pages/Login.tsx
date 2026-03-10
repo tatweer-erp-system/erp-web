@@ -664,12 +664,17 @@ export default function Login() {
       const { token, branches } = await authService.login(email, password);
       const matchedUser = MOCK_USERS.find((u) => u.email === email) ?? MOCK_USERS.find((u) => u.role === Role.Admin)!;
 
+      if (matchedUser.role === Role.Cashier) {
+        setErrors({ email: "Cashier accounts must use the POS terminal to log in." });
+        return;
+      }
+
       if (branches.length === 1) {
         // Single branch — log in directly
         authLogin(matchedUser);
         localStorage.setItem("auth_token", token);
         localStorage.setItem("app-branch", branches[0].id);
-        setRedirectTo(matchedUser.role === Role.Cashier ? "/pos" : "/");
+        setRedirectTo("/");
         setSuccess(true);
       } else {
         // Multiple branches — let user choose
@@ -690,13 +695,14 @@ export default function Login() {
     authLogin(u);
     localStorage.setItem("auth_token", pendingToken);
     localStorage.setItem("app-branch", branch.id);
-    setRedirectTo(u.role === Role.Cashier ? "/pos" : "/");
+    setRedirectTo("/");
     setSuccess(true);
   }
 
   function handleQuickLogin(user: typeof MOCK_USERS[0]) {
+    if (user.role === Role.Cashier) return;
     authLogin(user);
-    setLocation(user.role === Role.Cashier ? "/pos" : "/");
+    setLocation("/");
   }
 
   // Shared input class builder
@@ -1001,12 +1007,15 @@ export default function Login() {
                 {MOCK_USERS.map((u) => {
                   const rd = ROLE_DISPLAY[u.role];
                   const initials = u.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
+                  const isCashier = u.role === Role.Cashier;
                   return (
                     <button
                       key={u.id}
                       type="button"
                       onClick={() => handleQuickLogin(u)}
-                      className="flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm transition-all text-left group"
+                      disabled={isCashier}
+                      title={isCashier ? "Cashier accounts use the POS terminal" : undefined}
+                      className="flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm transition-all text-left group disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-slate-200 disabled:hover:shadow-none"
                     >
                       <div
                         className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold flex-shrink-0"

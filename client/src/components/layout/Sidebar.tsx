@@ -76,6 +76,7 @@ import {
 } from "@ant-design/icons";
 import { t } from "@/i18n";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { useAuthContext } from "@/contexts/AuthContext";
 import type React from "react";
 
 // ─── Nav Data ─────────────────────────────────────────────────────────────────
@@ -281,6 +282,7 @@ function SidebarInner({ isOpen, isRTL, language }: SidebarProps) {
   const collapsed = !visible;
   const [location, setLocation] = useLocation();
   const { branches, currentBranch, setBranch } = useAppSettings();
+  const { logout } = useAuthContext();
 
   // Resolve which menu key to highlight — exact match first, then longest prefix
   // (handles /:tab sub-routes like /settings/company/profile)
@@ -689,6 +691,7 @@ function SidebarInner({ isOpen, isRTL, language }: SidebarProps) {
       }}>
         {visible ? (
           <button
+            onClick={() => { logout(); window.location.href = "/login"; }}
             style={{
               width: "100%", display: "flex", alignItems: "center", gap: 8,
               padding: "7px 10px", borderRadius: 8, border: "none",
@@ -712,6 +715,7 @@ function SidebarInner({ isOpen, isRTL, language }: SidebarProps) {
         ) : (
           <Tooltip title={t("Logout", language)} placement={isRTL ? "left" : "right"}>
             <button
+              onClick={() => { logout(); window.location.href = "/login"; }}
               style={{
                 width: "100%", display: "flex", alignItems: "center", justifyContent: "center",
                 padding: "8px 0", borderRadius: 8, border: "none",

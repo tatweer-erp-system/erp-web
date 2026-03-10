@@ -7,12 +7,13 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { AppSettingsProvider } from "./contexts/AppSettingsContext";
 import { AuthProvider, useAuthContext } from "./contexts/AuthContext";
+import { Role } from "@/types/auth";
 import { PageSkeleton } from "./components/common/LoadingSkeleton";
 import { routes } from "./lib/routes";
 import DashboardLayout from "./components/layout/DashboardLayout";
 
+import Login from "@/pages/Login";
 const NotFound = lazy(() => import("@/pages/NotFound"));
-const Login = lazy(() => import("@/pages/Login"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -27,19 +28,15 @@ function Router() {
   const [location] = useLocation();
   const { user, isAuthenticated } = useAuthContext();
 
-  // ── Unauthenticated ───────────────────────────────────────────────────────
-  if (!isAuthenticated && location !== "/login") {
+  // ── Unauthenticated or cashier (POS-only role) ────────────────────────────
+  if ((!isAuthenticated || user?.role === Role.Cashier) && location !== "/login") {
     return <Redirect to="/login" />;
   }
 
   // ── Login page ────────────────────────────────────────────────────────────
   if (location === "/login") {
-    if (user) return <Redirect to="/" />;
-    return (
-      <Suspense fallback={<PageSkeleton />}>
-        <Login />
-      </Suspense>
-    );
+    if (user && user.role !== Role.Cashier) return <Redirect to="/" />;
+    return <Login />;
   }
 
   // ── ERP Dashboard layout ──────────────────────────────────────────────────
