@@ -49,10 +49,39 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[] | ["*"]> = {
   [Role.Cashier]: [], // No ERP permissions — POS terminal only
 };
 
-export interface User {
+export interface Tenant {
+  slug: string;
+  name: string;
+  logo?: string;
+}
+
+export interface Branch {
   id: string;
   name: string;
+  code: string;
+  isDefault: boolean;
+}
+
+export interface User {
+  id: string;
+  firstName: string;
+  lastName: string;
   email: string;
   role: Role;
+  permissions: string[];
+  preferredLang: string;
   avatarUrl?: string;
+}
+
+export interface LoginResponse {
+  accessToken: string;
+  refreshToken: string;
+  user: User;
+  tenant: Tenant;
+  branches: Branch[];
+}
+
+export interface RefreshResponse {
+  accessToken: string;
+  refreshToken: string;
 }

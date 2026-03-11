@@ -59,7 +59,7 @@ function NavbarInner({ sidebarOpen, setSidebarOpen, isRTL }: NavbarProps) {
       key: "profile-header",
       label: (
         <div style={{ padding: "4px 0 8px" }}>
-          <div style={{ fontWeight: 600, fontSize: 13 }}>{user?.name ?? "User"}</div>
+          <div style={{ fontWeight: 600, fontSize: 13 }}>{user ? `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim() || "User" : "User"}</div>
           <div style={{ fontSize: 12, color: token.colorTextSecondary }}>{user?.email ?? ""}</div>
           {user && (
             <div style={{
@@ -228,7 +228,7 @@ function NavbarInner({ sidebarOpen, setSidebarOpen, isRTL }: NavbarProps) {
             style={{ background: user ? ROLE_DISPLAY[user.role].color : token.colorPrimary, cursor: "pointer", fontWeight: 700, fontSize: 13 }}
             size={32}
           >
-            {user ? user.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() : "?"}
+            {user ? `${(user.firstName ?? "U")[0]}${(user.lastName ?? "")[0]}`.toUpperCase() : "?"}
           </Avatar>
         </Dropdown>
       </div>

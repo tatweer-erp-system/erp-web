@@ -1,4 +1,5 @@
-import axios, { AxiosError } from "axios";
+import axios, { type AxiosError, type InternalAxiosRequestConfig } from "axios";
+import { getAccessToken, getRefreshToken, setTokens, clearTokens } from "@/lib/token";
 import type { ApiError } from "@/types/api";
 
 export const apiClient = axios.create({
@@ -9,7 +10,7 @@ export const apiClient = axios.create({
 
 // ─── Request interceptor: attach Bearer token + X-Request-Id ─────────────────
 apiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem("auth_token");
+  const token = getAccessToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -17,29 +18,88 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
-// ─── Response interceptor: normalize errors + redirect on 401 ────────────────
+// ─── Response interceptor: handle 401 with silent token refresh ──────────────
+let isRefreshing = false;
+let pendingQueue: Array<{
+  resolve: (token: string) => void;
+  reject: (error: unknown) => void;
+}> = [];
+
+function processQueue(error: unknown, token: string | null) {
+  for (const p of pendingQueue) {
+    if (error) p.reject(error);
+    else p.resolve(token!);
+  }
+  pendingQueue = [];
+}
+
 apiClient.interceptors.response.use(
   (response) => response,
-  (error: AxiosError) => {
-    const status = error.response?.status ?? 0;
+  async (error: AxiosError) => {
+    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
-    if (status === 401) {
-      localStorage.removeItem("auth_token");
+    // Only handle 401 for non-auth endpoints
+    if (
+      error.response?.status !== 401 ||
+      originalRequest._retry ||
+      originalRequest.url === "/auth/login" ||
+      originalRequest.url === "/auth/refresh"
+    ) {
+      // Normalize non-401 errors
+      const status = error.response?.status ?? 0;
+      const data = error.response?.data as Record<string, unknown> | undefined;
+
+      const apiError: ApiError = {
+        message: (data?.message as string) ?? error.message ?? "An unexpected error occurred",
+        code: (data?.code as string) ?? "UNKNOWN_ERROR",
+        field: data?.field as string | undefined,
+        status,
+      };
+
+      return Promise.reject(apiError);
+    }
+
+    const refreshTokenValue = getRefreshToken();
+    if (!refreshTokenValue) {
+      clearTokens();
       window.location.href = "/login";
       return Promise.reject(error);
     }
 
-    const data = error.response?.data as Record<string, unknown> | undefined;
+    if (isRefreshing) {
+      // Queue this request until refresh completes
+      return new Promise<string>((resolve, reject) => {
+        pendingQueue.push({ resolve, reject });
+      }).then((token) => {
+        originalRequest.headers.Authorization = `Bearer ${token}`;
+        return apiClient(originalRequest);
+      });
+    }
 
-    const apiError: ApiError = {
-      message: (data?.message as string) ?? error.message ?? "An unexpected error occurred",
-      code: (data?.code as string) ?? "UNKNOWN_ERROR",
-      field: data?.field as string | undefined,
-      status,
-    };
+    originalRequest._retry = true;
+    isRefreshing = true;
 
-    return Promise.reject(apiError);
-  }
+    try {
+      const { data } = await axios.post<{ accessToken: string; refreshToken: string }>(
+        `${apiClient.defaults.baseURL}/auth/refresh`,
+        { refreshToken: refreshTokenValue },
+        { headers: { "Content-Type": "application/json" } },
+      );
+
+      setTokens(data.accessToken, data.refreshToken);
+      processQueue(null, data.accessToken);
+
+      originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
+      return apiClient(originalRequest);
+    } catch (refreshError) {
+      processQueue(refreshError, null);
+      clearTokens();
+      window.location.href = "/login";
+      return Promise.reject(refreshError);
+    } finally {
+      isRefreshing = false;
+    }
+  },
 );
 
 export default apiClient;

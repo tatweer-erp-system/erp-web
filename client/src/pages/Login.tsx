@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useLocation } from "wouter";
-import { authService, type LoginBranch } from "@/services/auth.service";
-import { useAuthContext, MOCK_USERS, ROLE_DISPLAY } from "@/contexts/AuthContext";
-import { Role } from "@/types/auth";
+import { useAuthContext } from "@/contexts/AuthContext";
+import { type Branch, Role } from "@/types/auth";
+import { t } from "@/i18n";
+import { AxiosError } from "axios";
 
 interface EyePos { x: number; y: number }
 
@@ -112,9 +113,7 @@ function SaudiIllustration() {
         })
       )}
 
-      {/* ══════════════════════════════════════════════════════════════════ */}
       {/* ── RIYADH SKYLINE SILHOUETTES ── */}
-
       {/* Far background buildings (faint) */}
       <rect x="0"   y="430" width="28"  height="200" rx="2" fill="white" opacity="0.06" />
       <rect x="32"  y="400" width="20"  height="230" rx="2" fill="white" opacity="0.06" />
@@ -138,22 +137,13 @@ function SaudiIllustration() {
       <rect x="490" y="310" width="38"  height="320" rx="2" fill="white" opacity="0.1" />
       <rect x="532" y="345" width="28"  height="285" rx="2" fill="white" opacity="0.1" />
 
-      {/* ── Al Faisaliah Tower (برج الفيصلية) — left, tapered with sphere ── */}
-      {/* Base */}
+      {/* ── Al Faisaliah Tower ── */}
       <rect x="88" y="490" width="52" height="10" rx="1" fill="white" opacity="0.14" />
-      {/* Tower body — tapering polygon */}
-      <polygon
-        points="96,490 102,290 114,280 126,280 138,290 132,490"
-        fill="white"
-        opacity="0.15"
-      />
-      {/* Glass sphere */}
+      <polygon points="96,490 102,290 114,280 126,280 138,290 132,490" fill="white" opacity="0.15" />
       <circle cx="114" cy="268" r="22" fill="white" opacity="0.18" />
       <circle cx="114" cy="268" r="14" fill="white" opacity="0.08" />
-      {/* Antenna */}
       <line x1="114" y1="246" x2="114" y2="210" stroke="white" strokeWidth="2.5" opacity="0.2" />
       <circle cx="114" cy="208" r="3" fill="white" opacity="0.3" />
-      {/* Windows */}
       <rect x="108" y="310" width="12" height="8" rx="1" fill="#4ade80" opacity="0.2" />
       <rect x="108" y="330" width="12" height="8" rx="1" fill="#4ade80" opacity="0.2" />
       <rect x="108" y="350" width="12" height="8" rx="1" fill="#4ade80" opacity="0.2" />
@@ -164,25 +154,12 @@ function SaudiIllustration() {
       <rect x="108" y="450" width="12" height="8" rx="1" fill="#4ade80" opacity="0.15" />
       <rect x="108" y="470" width="12" height="8" rx="1" fill="#4ade80" opacity="0.2" />
 
-      {/* ── Kingdom Centre Tower (برج المملكة) — center, iconic keyhole top ── */}
-      {/* Base platform */}
+      {/* ── Kingdom Centre Tower ── */}
       <rect x="218" y="520" width="124" height="14" rx="2" fill="white" opacity="0.16" />
-      {/* Left tower column */}
       <rect x="228" y="170" width="26" height="350" rx="2" fill="white" opacity="0.2" />
-      {/* Right tower column */}
       <rect x="306" y="170" width="26" height="350" rx="2" fill="white" opacity="0.2" />
-      {/* Sky bridge / arch connecting top — the iconic keyhole */}
-      <path
-        d="M228 220 Q280 145 332 220"
-        fill="none"
-        stroke="white"
-        strokeWidth="20"
-        opacity="0.18"
-        strokeLinecap="round"
-      />
-      {/* Mid-level sky lobby bridge */}
+      <path d="M228 220 Q280 145 332 220" fill="none" stroke="white" strokeWidth="20" opacity="0.18" strokeLinecap="round" />
       <rect x="222" y="330" width="116" height="12" rx="2" fill="white" opacity="0.18" />
-      {/* Antennas */}
       <line x1="241" y1="168" x2="241" y2="130" stroke="white" strokeWidth="2" opacity="0.22" />
       <line x1="319" y1="168" x2="319" y2="130" stroke="white" strokeWidth="2" opacity="0.22" />
       <circle cx="241" cy="128" r="3" fill="white" opacity="0.3" />
@@ -232,11 +209,9 @@ function SaudiIllustration() {
 
       {/* ── Al Mamlaka / other tall tower (right side) ── */}
       <rect x="408" y="290" width="40" height="240" rx="2" fill="white" opacity="0.16" />
-      {/* Crown / stepped top */}
       <rect x="412" y="275" width="32" height="16" rx="2" fill="white" opacity="0.18" />
       <rect x="418" y="260" width="20" height="16" rx="2" fill="white" opacity="0.2"  />
       <line x1="428" y1="258" x2="428" y2="235" stroke="white" strokeWidth="2.5" opacity="0.22" />
-      {/* Windows */}
       <rect x="415" y="300" width="10" height="8" rx="1" fill="#facc15" opacity="0.2" />
       <rect x="430" y="300" width="10" height="8" rx="1" fill="#facc15" opacity="0.2" />
       <rect x="415" y="320" width="10" height="8" rx="1" fill="#facc15" opacity="0.2" />
@@ -251,96 +226,53 @@ function SaudiIllustration() {
       <rect x="430" y="400" width="10" height="8" rx="1" fill="#4ade80" opacity="0.2" />
 
       {/* ── Desert dunes ── */}
-      <path
-        d="M0 558 Q50 532 120 552 Q200 572 290 545 Q370 522 450 548 Q500 560 560 540 L560 760 L0 760 Z"
-        fill="url(#sandGrad)"
-        opacity="0.55"
-      />
-      <path
-        d="M0 580 Q90 558 180 578 Q270 598 360 572 Q440 550 560 572 L560 760 L0 760 Z"
-        fill="url(#sandGrad)"
-        opacity="0.35"
-      />
-      {/* Sand highlight */}
-      <path
-        d="M0 580 Q90 558 180 578 Q270 598 360 572 Q440 550 560 572"
-        fill="none"
-        stroke="#e8c870"
-        strokeWidth="1.5"
-        opacity="0.4"
-      />
+      <path d="M0 558 Q50 532 120 552 Q200 572 290 545 Q370 522 450 548 Q500 560 560 540 L560 760 L0 760 Z" fill="url(#sandGrad)" opacity="0.55" />
+      <path d="M0 580 Q90 558 180 578 Q270 598 360 572 Q440 550 560 572 L560 760 L0 760 Z" fill="url(#sandGrad)" opacity="0.35" />
+      <path d="M0 580 Q90 558 180 578 Q270 598 360 572 Q440 550 560 572" fill="none" stroke="#e8c870" strokeWidth="1.5" opacity="0.4" />
 
-      {/* ══════════════════════════════════════════════════════════════════ */}
       {/* ── FINANCIAL CHART ELEMENTS ── */}
-
-      {/* Rising bar chart card (top left area) */}
       <g filter="url(#softGlow)">
         <rect x="30" y="185" width="148" height="110" rx="10" fill="#003d18" opacity="0.85" stroke="#22c55e" strokeWidth="0.8" />
-        {/* Title */}
         <rect x="42" y="198" width="55" height="5" rx="2" fill="#86efac" opacity="0.7" />
-        {/* Bars */}
         <rect x="42"  y="255" width="14" height="32" rx="2" fill="url(#barUp)" />
         <rect x="62"  y="241" width="14" height="46" rx="2" fill="url(#barUp)" />
         <rect x="82"  y="228" width="14" height="59" rx="2" fill="url(#barUp)" />
         <rect x="102" y="213" width="14" height="74" rx="2" fill="url(#barUp)" />
         <rect x="122" y="204" width="14" height="83" rx="2" fill="url(#barUp)" />
         <rect x="142" y="196" width="14" height="91" rx="2" fill="url(#barUp)" />
-        {/* Trend line */}
-        <polyline
-          points="49,253 69,239 89,226 109,211 129,202 149,193"
-          stroke="#facc15"
-          strokeWidth="2"
-          fill="none"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        {/* Up arrow */}
+        <polyline points="49,253 69,239 89,226 109,211 129,202 149,193" stroke="#facc15" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
         <polygon points="149,188 157,196 141,196" fill="#facc15" />
-        {/* Axis */}
         <line x1="38" y1="290" x2="162" y2="290" stroke="#22c55e" strokeWidth="0.6" opacity="0.5" />
       </g>
 
-      {/* KPI card – total revenue */}
+      {/* KPI card */}
       <g>
         <rect x="30" y="310" width="148" height="62" rx="10" fill="#003d18" opacity="0.85" stroke="#22c55e" strokeWidth="0.8" />
-        <text x="44" y="330" fill="#86efac" fontSize="10" fontFamily="Arial, sans-serif" opacity="0.85">إجمالي الإيرادات</text>
-        <text x="44" y="356" fill="#4ade80" fontSize="19" fontWeight="bold" fontFamily="Arial, sans-serif" filter="url(#softGlow)">٢.٤M ريال</text>
-        {/* trend badge */}
+        <text x="44" y="330" fill="#86efac" fontSize="10" fontFamily="Arial, sans-serif" opacity="0.85">{"\u0625\u062C\u0645\u0627\u0644\u064A \u0627\u0644\u0625\u064A\u0631\u0627\u062F\u0627\u062A"}</text>
+        <text x="44" y="356" fill="#4ade80" fontSize="19" fontWeight="bold" fontFamily="Arial, sans-serif" filter="url(#softGlow)">{"\u0662.\u0664M \u0631\u064A\u0627\u0644"}</text>
         <rect x="128" y="320" width="38" height="18" rx="9" fill="#15803d" opacity="0.9" />
-        <text x="147" y="332" fill="#bbf7d0" fontSize="9" textAnchor="middle" fontFamily="Arial, sans-serif">▲ 8.2%</text>
+        <text x="147" y="332" fill="#bbf7d0" fontSize="9" textAnchor="middle" fontFamily="Arial, sans-serif">{"\u25B2 8.2%"}</text>
       </g>
 
-      {/* Pie / donut chart card (right side) */}
+      {/* Pie / donut chart card */}
       <g filter="url(#softGlow)">
         <rect x="382" y="185" width="148" height="120" rx="10" fill="#003d18" opacity="0.85" stroke="#22c55e" strokeWidth="0.8" />
-        {/* Donut chart */}
-        {/* Background circle */}
         <circle cx="434" cy="240" r="38" fill="none" stroke="#005522" strokeWidth="18" />
-        {/* Slice 1 – 38% green */}
-        <circle cx="434" cy="240" r="38" fill="none" stroke="#4ade80"  strokeWidth="18"
-          strokeDasharray="90 148" strokeDashoffset="0" />
-        {/* Slice 2 – 28% light green */}
-        <circle cx="434" cy="240" r="38" fill="none" stroke="#86efac"  strokeWidth="18"
-          strokeDasharray="66 172" strokeDashoffset="-90" />
-        {/* Slice 3 – 22% yellow */}
-        <circle cx="434" cy="240" r="38" fill="none" stroke="#fde68a"  strokeWidth="18"
-          strokeDasharray="52 186" strokeDashoffset="-156" />
-        {/* Slice 4 – 12% white */}
-        <circle cx="434" cy="240" r="38" fill="none" stroke="#ffffff"  strokeWidth="18"
-          strokeDasharray="30 208" strokeDashoffset="-208" opacity="0.5"/>
-        {/* Center text */}
+        <circle cx="434" cy="240" r="38" fill="none" stroke="#4ade80"  strokeWidth="18" strokeDasharray="90 148" strokeDashoffset="0" />
+        <circle cx="434" cy="240" r="38" fill="none" stroke="#86efac"  strokeWidth="18" strokeDasharray="66 172" strokeDashoffset="-90" />
+        <circle cx="434" cy="240" r="38" fill="none" stroke="#fde68a"  strokeWidth="18" strokeDasharray="52 186" strokeDashoffset="-156" />
+        <circle cx="434" cy="240" r="38" fill="none" stroke="#ffffff"  strokeWidth="18" strokeDasharray="30 208" strokeDashoffset="-208" opacity="0.5"/>
         <circle cx="434" cy="240" r="22" fill="#003d18" />
         <text x="434" y="237" textAnchor="middle" fill="#4ade80" fontSize="10" fontWeight="bold" fontFamily="Arial, sans-serif">2026</text>
         <text x="434" y="249" textAnchor="middle" fill="#86efac" fontSize="8"  fontFamily="Arial, sans-serif">SAR</text>
-        {/* Legend items */}
         <rect x="480" y="210" width="8" height="8" rx="2" fill="#4ade80" />
-        <text x="492" y="218" fill="#86efac" fontSize="8" fontFamily="Arial, sans-serif">مبيعات</text>
+        <text x="492" y="218" fill="#86efac" fontSize="8" fontFamily="Arial, sans-serif">{"\u0645\u0628\u064A\u0639\u0627\u062A"}</text>
         <rect x="480" y="224" width="8" height="8" rx="2" fill="#86efac" />
-        <text x="492" y="232" fill="#86efac" fontSize="8" fontFamily="Arial, sans-serif">مشتريات</text>
+        <text x="492" y="232" fill="#86efac" fontSize="8" fontFamily="Arial, sans-serif">{"\u0645\u0634\u062A\u0631\u064A\u0627\u062A"}</text>
         <rect x="480" y="238" width="8" height="8" rx="2" fill="#fde68a" />
-        <text x="492" y="246" fill="#86efac" fontSize="8" fontFamily="Arial, sans-serif">نفقات</text>
+        <text x="492" y="246" fill="#86efac" fontSize="8" fontFamily="Arial, sans-serif">{"\u0646\u0641\u0642\u0627\u062A"}</text>
         <rect x="480" y="252" width="8" height="8" rx="2" fill="white" opacity="0.5" />
-        <text x="492" y="260" fill="#86efac" fontSize="8" fontFamily="Arial, sans-serif">أخرى</text>
+        <text x="492" y="260" fill="#86efac" fontSize="8" fontFamily="Arial, sans-serif">{"\u0623\u062E\u0631\u0649"}</text>
       </g>
 
       {/* Ledger / document card */}
@@ -353,69 +285,16 @@ function SaudiIllustration() {
         <rect x="394" y="368" width="84"  height="3" rx="1.5" fill="#4ade80"  opacity="0.5" />
         <rect x="394" y="376" width="70"  height="3" rx="1.5" fill="#86efac" opacity="0.45" />
         <rect x="394" y="384" width="96"  height="3" rx="1.5" fill="#fde68a" opacity="0.5" />
-        {/* Currency symbol right */}
-        <text x="508" y="358" fill="#4ade80" fontSize="22" fontWeight="bold" fontFamily="Arial, sans-serif" opacity="0.25">﷼</text>
+        <text x="508" y="358" fill="#4ade80" fontSize="22" fontWeight="bold" fontFamily="Arial, sans-serif" opacity="0.25">{"\uFDFC"}</text>
       </g>
 
-      {/* ══════════════════════════════════════════════════════════════════ */}
       {/* ── BRANDING OVERLAY ── */}
-
-      {/* Horizontal rule */}
       <line x1="80" y1="150" x2="480" y2="150" stroke="#22c55e" strokeWidth="0.6" opacity="0.25" />
-
-      {/* System name in Arabic */}
-      <text
-        x="280" y="118"
-        textAnchor="middle"
-        fill="white"
-        fontSize="44"
-        fontWeight="bold"
-        fontFamily="Arial, sans-serif"
-        opacity="0.95"
-        filter="url(#softGlow)"
-      >
-        تطوير
-      </text>
-      <text
-        x="280" y="142"
-        textAnchor="middle"
-        fill="#86efac"
-        fontSize="12"
-        fontFamily="Arial, sans-serif"
-        letterSpacing="4"
-        opacity="0.85"
-      >
-        TATWEER  ERP
-      </text>
-
-      {/* Bottom tagline */}
-      <text
-        x="280" y="720"
-        textAnchor="middle"
-        fill="white"
-        fontSize="10"
-        fontFamily="Arial, sans-serif"
-        opacity="0.35"
-        letterSpacing="2"
-      >
-        المملكة العربية السعودية  ·  رؤية ٢٠٣٠
-      </text>
-
-      {/* Saudi Vision 2030 inspired accent bar at bottom */}
+      <text x="280" y="118" textAnchor="middle" fill="white" fontSize="44" fontWeight="bold" fontFamily="Arial, sans-serif" opacity="0.95" filter="url(#softGlow)">{"\u062A\u0637\u0648\u064A\u0631"}</text>
+      <text x="280" y="142" textAnchor="middle" fill="#86efac" fontSize="12" fontFamily="Arial, sans-serif" letterSpacing="4" opacity="0.85">TATWEER  ERP</text>
+      <text x="280" y="720" textAnchor="middle" fill="white" fontSize="10" fontFamily="Arial, sans-serif" opacity="0.35" letterSpacing="2">{"\u0627\u0644\u0645\u0645\u0644\u0643\u0629 \u0627\u0644\u0639\u0631\u0628\u064A\u0629 \u0627\u0644\u0633\u0639\u0648\u062F\u064A\u0629  \u00B7  \u0631\u0624\u064A\u0629 \u0662\u0660\u0663\u0660"}</text>
       <rect x="80" y="730" width="400" height="2" rx="1" fill="#22c55e" opacity="0.3" />
-
-      {/* Floating Saudi riyal symbol (watermark) */}
-      <text
-        x="280" y="460"
-        textAnchor="middle"
-        fill="#22c55e"
-        fontSize="220"
-        fontFamily="Arial, sans-serif"
-        opacity="0.03"
-        fontWeight="bold"
-      >
-        ﷼
-      </text>
+      <text x="280" y="460" textAnchor="middle" fill="#22c55e" fontSize="220" fontFamily="Arial, sans-serif" opacity="0.03" fontWeight="bold">{"\uFDFC"}</text>
     </svg>
   );
 }
@@ -439,28 +318,17 @@ function BusinessCharacter({
       className="w-full h-full"
       aria-hidden="true"
     >
-      {/* Shadow */}
       <ellipse cx="80" cy="212" rx="44" ry="7" fill="#003d18" opacity="0.18" />
-
-      {/* Legs */}
       <rect x="57"  y="160" width="19" height="40" rx="8" fill="#14532d" />
       <rect x="84"  y="160" width="19" height="40" rx="8" fill="#14532d" />
-      {/* Shoes */}
       <rect x="53"  y="192" width="27" height="12" rx="6" fill="#0f172a" />
       <rect x="80"  y="192" width="27" height="12" rx="6" fill="#0f172a" />
-
-      {/* Body / Thobe (Saudi traditional white robe with green trim) */}
       <rect x="43"  y="108" width="74" height="60" rx="14" fill="#f8fafc" />
-      {/* Green collar/trim */}
       <rect x="43"  y="108" width="74" height="8"  rx="4" fill="#006C35" />
-      {/* Center placket */}
       <rect x="73"  y="116" width="14" height="42" rx="3" fill="#f0f0f0" />
-      {/* Saudi green badge */}
       <rect x="84"  y="122" width="22" height="15" rx="3" fill="#006C35" opacity="0.9" />
       <rect x="87"  y="125" width="16" height="2"  rx="1" fill="white"   opacity="0.8" />
       <rect x="87"  y="130" width="12" height="2"  rx="1" fill="white"   opacity="0.6" />
-
-      {/* Briefcase arm (left) — swings up to cover eyes on password focus */}
       <g
         style={{
           transform: isPasswordFocused
@@ -470,58 +338,28 @@ function BusinessCharacter({
           transition: "transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)",
         }}
       >
-        {/* Arm */}
         <rect x="28" y="118" width="22" height="13" rx="6" fill="#f5d5b8" />
-        {/* Briefcase body */}
         <rect x="8"  y="124" width="38" height="28" rx="5" fill="#92400e" />
         <rect x="8"  y="124" width="38" height="28" rx="5" stroke="#78350f" strokeWidth="1.5" />
-        {/* Handle */}
         <path d="M20 124 Q28 114 36 124" stroke="#78350f" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-        {/* Center latch */}
         <rect x="24" y="134" width="8"  height="8"  rx="2" fill="#fbbf24" />
-        {/* Shine */}
         <rect x="11" y="127" width="7"  height="12" rx="2" fill="#a16207" opacity="0.35" />
       </g>
-
-      {/* Right arm (holding document) */}
       <rect x="110" y="118" width="22" height="13" rx="6" fill="#f5d5b8" />
-      {/* Document */}
       <rect x="112" y="126" width="30" height="36" rx="3" fill="#f8fafc" stroke="#cbd5e1" strokeWidth="1.5" />
       <line x1="117" y1="133" x2="138" y2="133" stroke="#94a3b8" strokeWidth="1.5" />
       <line x1="117" y1="139" x2="138" y2="139" stroke="#94a3b8" strokeWidth="1.5" />
       <line x1="117" y1="145" x2="132" y2="145" stroke="#94a3b8" strokeWidth="1.5" />
       <line x1="117" y1="151" x2="135" y2="151" stroke="#bbf7d0" strokeWidth="1.5" />
-      {/* SAR symbol on doc */}
-      <text x="122" y="158" fill="#006C35" fontSize="8" fontFamily="Arial" opacity="0.6">﷼</text>
-
-      {/* Neck */}
+      <text x="122" y="158" fill="#006C35" fontSize="8" fontFamily="Arial" opacity="0.6">{"\uFDFC"}</text>
       <rect x="69" y="94" width="22" height="18" rx="6" fill="#f5d5b8" />
-
-      {/* Head */}
       <ellipse cx="80" cy="74" rx="31" ry="32" fill="#f5d5b8" />
-      {/* Ear left */}
       <ellipse cx="49" cy="74" rx="5" ry="7" fill="#f5d5b8" />
-      {/* Ear right */}
       <ellipse cx="111" cy="74" rx="5" ry="7" fill="#f5d5b8" />
-
-      {/* Ghutra (Saudi head covering — white) */}
-      <path
-        d="M49 58 Q50 32 80 28 Q110 32 111 58 Q108 44 80 40 Q52 44 49 58Z"
-        fill="#f8fafc"
-      />
-      {/* Igal (black rope on ghutra) */}
-      <path
-        d="M49 56 Q52 50 80 48 Q108 50 111 56"
-        stroke="#1c1917"
-        strokeWidth="5"
-        fill="none"
-        strokeLinecap="round"
-      />
-
-      {/* Eyes */}
+      <path d="M49 58 Q50 32 80 28 Q110 32 111 58 Q108 44 80 40 Q52 44 49 58Z" fill="#f8fafc" />
+      <path d="M49 56 Q52 50 80 48 Q108 50 111 56" stroke="#1c1917" strokeWidth="5" fill="none" strokeLinecap="round" />
       <ellipse cx="67" cy="74" rx="9"  ry="8" fill="white" />
       <ellipse cx="93" cy="74" rx="9"  ry="8" fill="white" />
-
       {!isPasswordFocused && (
         <>
           <circle cx={67 + px} cy={74 + py} r="4.5" fill="#1e293b" />
@@ -530,52 +368,18 @@ function BusinessCharacter({
           <circle cx={95 + px} cy={72 + py} r="1.5" fill="white"   opacity="0.9" />
         </>
       )}
-
       {isPasswordFocused && (
         <>
-          {/* Closed eyes — curved downward arc */}
           <path d="M58 74 Q67 80 76 74" stroke="#1e293b" strokeWidth="2.5" fill="none" strokeLinecap="round" />
           <path d="M84 74 Q93 80 102 74" stroke="#1e293b" strokeWidth="2.5" fill="none" strokeLinecap="round" />
         </>
       )}
-
-      {/* Eyebrows */}
-      <path
-        d="M59 63 Q67 59 75 62"
-        stroke="#4a3728"
-        strokeWidth="2.5"
-        fill="none"
-        strokeLinecap="round"
-        style={{
-          transform: isPasswordFocused ? "translateY(2px)" : "translateY(0)",
-          transition: "transform 0.3s ease",
-        }}
-      />
-      <path
-        d="M85 62 Q93 59 101 63"
-        stroke="#4a3728"
-        strokeWidth="2.5"
-        fill="none"
-        strokeLinecap="round"
-        style={{
-          transform: isPasswordFocused ? "translateY(2px)" : "translateY(0)",
-          transition: "transform 0.3s ease",
-        }}
-      />
-
-      {/* Smile */}
-      <path
-        d="M69 88 Q80 96 91 88"
-        stroke="#c97d5a"
-        strokeWidth="2"
-        fill="none"
-        strokeLinecap="round"
-        style={{
-          transform: isPasswordFocused ? "scaleX(0.65) translateX(14px)" : "scaleX(1)",
-          transformOrigin: "80px 91px",
-          transition: "transform 0.35s ease",
-        }}
-      />
+      <path d="M59 63 Q67 59 75 62" stroke="#4a3728" strokeWidth="2.5" fill="none" strokeLinecap="round"
+        style={{ transform: isPasswordFocused ? "translateY(2px)" : "translateY(0)", transition: "transform 0.3s ease" }} />
+      <path d="M85 62 Q93 59 101 63" stroke="#4a3728" strokeWidth="2.5" fill="none" strokeLinecap="round"
+        style={{ transform: isPasswordFocused ? "translateY(2px)" : "translateY(0)", transition: "transform 0.3s ease" }} />
+      <path d="M69 88 Q80 96 91 88" stroke="#c97d5a" strokeWidth="2" fill="none" strokeLinecap="round"
+        style={{ transform: isPasswordFocused ? "scaleX(0.65) translateX(14px)" : "scaleX(1)", transformOrigin: "80px 91px", transition: "transform 0.35s ease" }} />
     </svg>
   );
 }
@@ -589,35 +393,45 @@ function InputIcon({ children }: { children: React.ReactNode }) {
   );
 }
 
+// ─── Inline error message component ──────────────────────────────────────────
+function ErrorMsg({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="mt-1.5 text-xs text-red-500 flex items-center gap-1">
+      <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+        <path fillRule="evenodd"
+          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+          clipRule="evenodd" />
+      </svg>
+      {children}
+    </p>
+  );
+}
+
 // ─── Main Login Page ──────────────────────────────────────────────────────────
 export default function Login() {
   const [, setLocation] = useLocation();
-  const { login: authLogin } = useAuthContext();
+  const { login, branches, selectBranch } = useAuthContext();
+  const lang = localStorage.getItem("app-language") ?? "en";
 
   const [email, setEmail]               = useState("");
   const [password, setPassword]         = useState("");
-  const [rememberMe, setRememberMe]     = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
   const [eyePos, setEyePos]   = useState<EyePos>({ x: 0, y: 0 });
-  const [errors, setErrors]   = useState<{ email?: string; password?: string }>({});
+  const [error, setError]     = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess]     = useState(false);
-  const [showDemoUsers, setShowDemoUsers] = useState(false);
 
   // Branch selection step
-  const [step, setStep]               = useState<"form" | "branch">("form");
-  const [loginBranches, setLoginBranches] = useState<LoginBranch[]>([]);
-  const [pendingToken, setPendingToken]   = useState("");
-  const [pendingUser, setPendingUser]     = useState<typeof MOCK_USERS[0] | null>(null);
-  const [redirectTo, setRedirectTo]       = useState("/");
+  const [step, setStep]                   = useState<"form" | "branch">("form");
+  const [pendingBranches, setPendingBranches] = useState<Branch[]>([]);
 
   // Redirect to dashboard after successful login
   useEffect(() => {
     if (!success) return;
-    const t = setTimeout(() => setLocation(redirectTo), 1200);
-    return () => clearTimeout(t);
-  }, [success, redirectTo]);
+    const timer = setTimeout(() => setLocation("/"), 1200);
+    return () => clearTimeout(timer);
+  }, [success, setLocation]);
 
   const characterRef = useRef<HTMLDivElement>(null);
 
@@ -640,69 +454,72 @@ export default function Login() {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [handleMouseMove]);
 
-  function validate() {
-    const errs: typeof errors = {};
-    if (!email.trim())
-      errs.email = "البريد الإلكتروني مطلوب.";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-      errs.email = "أدخل بريداً إلكترونياً صحيحاً.";
-    if (!password)
-      errs.password = "كلمة المرور مطلوبة.";
-    else if (password.length < 6)
-      errs.password = "كلمة المرور 6 أحرف على الأقل.";
-    return errs;
-  }
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const errs = validate();
-    setErrors(errs);
-    if (Object.keys(errs).length) return;
+    if (!email.trim() || !password.trim()) return;
 
+    setError(null);
     setIsLoading(true);
+
     try {
-      const { token, branches } = await authService.login(email, password);
-      const matchedUser = MOCK_USERS.find((u) => u.email === email) ?? MOCK_USERS.find((u) => u.role === Role.Admin)!;
+      await login(email.trim(), password);
 
-      if (matchedUser.role === Role.Cashier) {
-        setErrors({ email: "Cashier accounts must use the POS terminal to log in." });
-        return;
-      }
+      // After login, branches are set in context
+      // We need to check from the response — branches are stored in context
+      // If single branch, auto-select and go. If multiple, show branch picker.
+      // Since login() stores branches in context, we read from there after state update.
+      // We use a small trick: login sets branches, but React batches state updates.
+      // So we check branches length after login completes.
+    } catch (err) {
+      if (err instanceof AxiosError) {
+        const status = err.response?.status;
+        const message = err.response?.data?.message as string | undefined;
 
-      if (branches.length === 1) {
-        // Single branch — log in directly
-        authLogin(matchedUser);
-        localStorage.setItem("auth_token", token);
-        localStorage.setItem("app-branch", branches[0].id);
-        setRedirectTo("/");
-        setSuccess(true);
+        if (status === 401) {
+          setError(t("login.invalidCredentials", lang));
+        } else if (status === 423) {
+          setError(t("login.accountLocked", lang));
+        } else if (message) {
+          setError(message);
+        } else {
+          setError(t("login.networkError", lang));
+        }
+      } else if (err && typeof err === "object" && "message" in err) {
+        const apiErr = err as { message: string; status?: number };
+        if (apiErr.status === 401) {
+          setError(t("login.invalidCredentials", lang));
+        } else if (apiErr.status === 423) {
+          setError(t("login.accountLocked", lang));
+        } else {
+          setError(apiErr.message);
+        }
       } else {
-        // Multiple branches — let user choose
-        setPendingToken(token);
-        setPendingUser(matchedUser);
-        setLoginBranches(branches);
-        setStep("branch");
+        setError(t("login.networkError", lang));
       }
-    } catch {
-      setErrors({ email: "بيانات الاعتماد غير صحيحة. حاول مجدداً." });
-    } finally {
       setIsLoading(false);
+      return;
     }
+
+    setIsLoading(false);
   }
 
-  function handleBranchSelect(branch: LoginBranch) {
-    const u = pendingUser ?? MOCK_USERS.find((u) => u.role === Role.Admin)!;
-    authLogin(u);
-    localStorage.setItem("auth_token", pendingToken);
-    localStorage.setItem("app-branch", branch.id);
-    setRedirectTo("/");
+  // After login succeeds and branches are updated in context, handle branch selection
+  useEffect(() => {
+    if (!branches?.length || isLoading) return;
+
+    if (branches.length === 1) {
+      selectBranch(branches[0]);
+      setSuccess(true);
+    } else if (branches.length > 1 && step === "form" && email.trim()) {
+      setPendingBranches(branches);
+      setStep("branch");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [branches]);
+
+  function handleBranchSelect(branch: Branch) {
+    selectBranch(branch);
     setSuccess(true);
-  }
-
-  function handleQuickLogin(user: typeof MOCK_USERS[0]) {
-    if (user.role === Role.Cashier) return;
-    authLogin(user);
-    setLocation("/");
   }
 
   // Shared input class builder
@@ -718,22 +535,19 @@ export default function Login() {
   return (
     <div className="min-h-screen flex flex-col lg:flex-row overflow-hidden">
 
-      {/* ════════════════════════════════════════════════════════════════ */}
-      {/* LEFT PANEL — Saudi accounting illustration (full height on desktop) */}
+      {/* LEFT PANEL — Saudi accounting illustration */}
       <div className="relative lg:w-[55%] h-52 lg:h-auto flex-shrink-0 overflow-hidden">
         <div className="absolute inset-0">
           <SaudiIllustration />
         </div>
-        {/* Subtle right-edge fade on desktop so it blends into the white panel */}
         <div className="hidden lg:block absolute inset-y-0 right-0 w-16 bg-gradient-to-r from-transparent to-white/10" />
       </div>
 
-      {/* ════════════════════════════════════════════════════════════════ */}
       {/* RIGHT PANEL — Login form */}
       <div className="flex-1 flex items-center justify-center bg-gradient-to-b from-white to-slate-50 px-6 py-10 lg:py-0">
         <div className="w-full max-w-sm relative">
 
-          {/* ── Character — floats above the card, centred on its top edge ── */}
+          {/* Character */}
           <div
             ref={characterRef}
             className="absolute top-0 left-1/2 -translate-x-1/2 z-10 w-32 h-40 select-none"
@@ -745,13 +559,12 @@ export default function Login() {
             />
           </div>
 
-          {/* ── Card — mt-16 so the character's top half sits above the card ── */}
+          {/* Card */}
           <div className="mt-16 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
 
-            {/* Header — pt-24 pushes the brand below the character overlap */}
+            {/* Header */}
             <div className="bg-gradient-to-r from-[#006C35] to-[#00933f] px-8 pt-24 pb-5 text-center text-white">
               <div className="flex items-center justify-center gap-2.5 mb-1">
-                {/* Saudi-style icon */}
                 <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center">
                   <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <rect x="3" y="3" width="7" height="7" rx="1.5" fill="white" />
@@ -761,7 +574,7 @@ export default function Login() {
                   </svg>
                 </div>
                 <div className="text-right">
-                  <div className="font-bold text-lg leading-tight tracking-wide">تطوير</div>
+                  <div className="font-bold text-lg leading-tight tracking-wide">{t("Tatweer", lang)}</div>
                   <div className="text-green-200 text-[10px] tracking-widest font-medium uppercase">Tatweer ERP</div>
                 </div>
               </div>
@@ -770,10 +583,10 @@ export default function Login() {
             {/* Form body */}
             <div className="px-7 pt-5 pb-7">
               <h1 className="text-lg font-bold text-slate-800 text-center mb-0.5">
-                مرحباً بك
+                {t("login.welcome", lang)}
               </h1>
               <p className="text-slate-500 text-xs text-center mb-5">
-                سجّل الدخول للمتابعة إلى لوحة التحكم
+                {t("login.subtitle", lang)}
               </p>
 
               {success ? (
@@ -783,18 +596,18 @@ export default function Login() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <p className="text-green-700 font-semibold text-sm">تم تسجيل الدخول بنجاح!</p>
-                  <p className="text-slate-400 text-xs">جارٍ التحويل إلى لوحة التحكم…</p>
+                  <p className="text-green-700 font-semibold text-sm">{t("login.success", lang)}</p>
+                  <p className="text-slate-400 text-xs">{t("login.redirecting", lang)}</p>
                 </div>
               ) : step === "branch" ? (
-                /* ── Step 2: Branch selection ─────────────────────────────── */
+                /* Branch selection */
                 <div className="space-y-2.5">
                   <div className="text-center mb-4">
-                    <h2 className="text-base font-bold text-slate-800">اختر الفرع</h2>
-                    <p className="text-xs text-slate-500 mt-1">حدد الفرع الذي تريد الدخول إليه</p>
+                    <h2 className="text-base font-bold text-slate-800">{t("login.selectBranch", lang)}</h2>
+                    <p className="text-xs text-slate-500 mt-1">{t("login.selectBranchHint", lang)}</p>
                   </div>
 
-                  {loginBranches.map((branch) => (
+                  {pendingBranches.map((branch) => (
                     <button
                       key={branch.id}
                       type="button"
@@ -805,11 +618,11 @@ export default function Login() {
                       <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#006C35] to-[#00933f]
                         flex items-center justify-center text-white font-bold text-sm flex-shrink-0
                         shadow-sm group-hover:shadow-md transition-shadow">
-                        {branch.initials}
+                        {branch.code}
                       </div>
                       <div className="flex-1 min-w-0 text-right">
                         <div className="font-semibold text-sm text-slate-800">{branch.name}</div>
-                        <div className="text-xs text-slate-400">{branch.location}</div>
+                        <div className="text-xs text-slate-400">{branch.code}</div>
                       </div>
                       <svg className="w-4 h-4 text-slate-300 group-hover:text-[#006C35] transition-colors flex-shrink-0 rotate-180"
                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -826,16 +639,19 @@ export default function Login() {
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                     </svg>
-                    رجوع
+                    {t("login.back", lang)}
                   </button>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} noValidate className="space-y-4">
 
+                  {/* Error message */}
+                  {error && <ErrorMsg>{error}</ErrorMsg>}
+
                   {/* Email */}
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1.5" htmlFor="email">
-                      البريد الإلكتروني
+                      {t("login.emailLabel", lang)}
                     </label>
                     <div className="relative">
                       <InputIcon>
@@ -849,22 +665,20 @@ export default function Login() {
                         type="email"
                         autoComplete="email"
                         value={email}
-                        onChange={(e) => {
-                          setEmail(e.target.value);
-                          if (errors.email) setErrors((p) => ({ ...p, email: undefined }));
-                        }}
-                        placeholder="you@company.com"
-                        className={inputCls(!!errors.email)}
+                        onChange={(e) => { setEmail(e.target.value); setError(null); }}
+                        placeholder={t("login.emailPlaceholder", lang)}
+                        className={inputCls(!!error)}
                         dir="ltr"
+                        disabled={isLoading}
+                        autoFocus
                       />
                     </div>
-                    {errors.email && <ErrorMsg>{errors.email}</ErrorMsg>}
                   </div>
 
                   {/* Password */}
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1.5" htmlFor="password">
-                      كلمة المرور
+                      {t("login.passwordLabel", lang)}
                     </label>
                     <div className="relative">
                       <InputIcon>
@@ -878,23 +692,20 @@ export default function Login() {
                         type={showPassword ? "text" : "password"}
                         autoComplete="current-password"
                         value={password}
-                        onChange={(e) => {
-                          setPassword(e.target.value);
-                          if (errors.password) setErrors((p) => ({ ...p, password: undefined }));
-                        }}
+                        onChange={(e) => { setPassword(e.target.value); setError(null); }}
                         onFocus={() => setIsPasswordFocused(true)}
                         onBlur={()  => setIsPasswordFocused(false)}
-                        placeholder="••••••••"
-                        className={`${inputCls(!!errors.password)} pr-11`}
+                        placeholder={t("login.passwordPlaceholder", lang)}
+                        className={`${inputCls(!!error)} pr-11`}
                         dir="ltr"
+                        disabled={isLoading}
                       />
-                      {/* Show/hide toggle */}
                       <button
                         type="button"
                         onClick={() => setShowPassword((v) => !v)}
                         className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
                         tabIndex={-1}
-                        aria-label={showPassword ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"}
+                        aria-label={showPassword ? t("login.hidePassword", lang) : t("login.showPassword", lang)}
                       >
                         {showPassword ? (
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -910,35 +721,12 @@ export default function Login() {
                         )}
                       </button>
                     </div>
-                    {errors.password && <ErrorMsg>{errors.password}</ErrorMsg>}
-                  </div>
-
-                  {/* Remember me + Forgot password */}
-                  <div className="flex items-center justify-between pt-0.5">
-                    <label className="flex items-center gap-2 cursor-pointer group select-none">
-                      <input
-                        type="checkbox"
-                        checked={rememberMe}
-                        onChange={(e) => setRememberMe(e.target.checked)}
-                        className="w-4 h-4 rounded border-slate-300 accent-green-600 cursor-pointer"
-                      />
-                      <span className="text-sm text-slate-600 group-hover:text-slate-800 transition-colors">
-                        تذكّرني
-                      </span>
-                    </label>
-                    <a
-                      href="#"
-                      className="text-sm text-[#006C35] hover:text-[#004d26] font-medium transition-colors"
-                      onClick={(e) => e.preventDefault()}
-                    >
-                      نسيت كلمة المرور؟
-                    </a>
                   </div>
 
                   {/* Submit */}
                   <button
                     type="submit"
-                    disabled={isLoading}
+                    disabled={isLoading || !email.trim() || !password.trim()}
                     className="w-full py-3 px-4 bg-gradient-to-r from-[#006C35] to-[#00933f]
                       hover:from-[#004d26] hover:to-[#006C35]
                       disabled:opacity-60 disabled:cursor-not-allowed
@@ -951,11 +739,11 @@ export default function Login() {
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                         </svg>
-                        جارٍ تسجيل الدخول…
+                        {t("login.signingIn", lang)}
                       </>
                     ) : (
                       <>
-                        تسجيل الدخول
+                        {t("login.signIn", lang)}
                         <svg className="w-4 h-4 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                         </svg>
@@ -969,91 +757,17 @@ export default function Login() {
             {/* Footer */}
             <div className="px-7 py-3 bg-slate-50 border-t border-slate-100 text-center">
               <p className="text-[10px] text-slate-400">
-                © {new Date().getFullYear()} تطوير ERP &nbsp;·&nbsp; نظام آمن للمؤسسات &nbsp;·&nbsp;
-                <a
-                  href="#"
-                  className="hover:text-[#006C35] transition-colors"
-                  onClick={(e) => e.preventDefault()}
-                >
-                  سياسة الخصوصية
-                </a>
+                {t("login.footerNote", lang)}
               </p>
             </div>
           </div>
 
           {/* Vision 2030 badge */}
           <p className="text-center text-[10px] text-slate-400 mt-4 tracking-wide">
-            المملكة العربية السعودية &nbsp;·&nbsp; رؤية ٢٠٣٠
+            {t("login.vision2030", lang)}
           </p>
-
-          {/* ── Demo Quick Login ── */}
-          <div className="mt-4">
-            <button
-              type="button"
-              onClick={() => setShowDemoUsers((v) => !v)}
-              className="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-xl border border-dashed border-slate-300 text-xs text-slate-400 hover:text-slate-600 hover:border-slate-400 transition-all"
-            >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              Demo Users — Quick Login
-              <svg className={`w-3 h-3 transition-transform ${showDemoUsers ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-
-            {showDemoUsers && (
-              <div className="mt-3 grid grid-cols-2 gap-2">
-                {MOCK_USERS.map((u) => {
-                  const rd = ROLE_DISPLAY[u.role];
-                  const initials = u.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
-                  const isCashier = u.role === Role.Cashier;
-                  return (
-                    <button
-                      key={u.id}
-                      type="button"
-                      onClick={() => handleQuickLogin(u)}
-                      disabled={isCashier}
-                      title={isCashier ? "Cashier accounts use the POS terminal" : undefined}
-                      className="flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm transition-all text-left group disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-slate-200 disabled:hover:shadow-none"
-                    >
-                      <div
-                        className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
-                        style={{ background: rd.color }}
-                      >
-                        {initials}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="text-xs font-semibold text-slate-700 truncate leading-tight">{u.name}</div>
-                        <div
-                          className="text-[10px] font-medium mt-0.5 px-1.5 py-0.5 rounded-full inline-block leading-tight"
-                          style={{ color: rd.color, background: rd.bg }}
-                        >
-                          {rd.label}
-                        </div>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
         </div>
       </div>
     </div>
-  );
-}
-
-// ─── Inline error message component ──────────────────────────────────────────
-function ErrorMsg({ children }: { children: React.ReactNode }) {
-  return (
-    <p className="mt-1.5 text-xs text-red-500 flex items-center gap-1">
-      <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-        <path fillRule="evenodd"
-          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-          clipRule="evenodd" />
-      </svg>
-      {children}
-    </p>
   );
 }
