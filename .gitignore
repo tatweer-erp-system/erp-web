@@ -110,3 +110,6 @@ temp/
 
 # Manus debug logs
 .manus-logs/
+
+# Claude Code local settings (keep .claude/settings.json for team)
+.claude/settings.local.json
