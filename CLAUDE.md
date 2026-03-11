@@ -7,6 +7,14 @@
 - **Lint:** `pnpm lint`
 - **Type check:** `pnpm check` or `npx tsc --noEmit`
 
+## Git Branching
+- **Main branch:** `prod` (protected — never push directly)
+- **Branch prefixes:** `feat/`, `fix/`, `hotfix/`, `chore/`, `refactor/`
+- Branch names: lowercase, kebab-case (e.g., `feat/invoice-export`)
+- Always branch from `dev`, PR into `dev`
+- Hotfixes branch from `prod`, merge into both `prod` and `dev`
+- Delete branches after merge
+
 ## Tech Stack
 - React 19 + TypeScript 5.6 + Vite 7
 - UI: Ant Design 6 + Radix UI + Tailwind CSS 4
