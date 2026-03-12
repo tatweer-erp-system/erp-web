@@ -61,7 +61,7 @@ function NavbarInner({ sidebarOpen, setSidebarOpen, isRTL }: NavbarProps) {
         <div style={{ padding: "4px 0 8px" }}>
           <div style={{ fontWeight: 600, fontSize: 13 }}>{user ? `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim() || "User" : "User"}</div>
           <div style={{ fontSize: 12, color: token.colorTextSecondary }}>{user?.email ?? ""}</div>
-          {user && (
+          {user && ROLE_DISPLAY[user.role] && (
             <div style={{
               display: "inline-block", marginTop: 4, fontSize: 10, fontWeight: 600,
               padding: "1px 6px", borderRadius: 20,
@@ -225,7 +225,7 @@ function NavbarInner({ sidebarOpen, setSidebarOpen, isRTL }: NavbarProps) {
           trigger={["click"]}
         >
           <Avatar
-            style={{ background: user ? ROLE_DISPLAY[user.role].color : token.colorPrimary, cursor: "pointer", fontWeight: 700, fontSize: 13 }}
+            style={{ background: user ? ROLE_DISPLAY[user.role]?.color ?? token.colorPrimary : token.colorPrimary, cursor: "pointer", fontWeight: 700, fontSize: 13 }}
             size={32}
           >
             {user ? `${(user.firstName ?? "U")[0]}${(user.lastName ?? "")[0]}`.toUpperCase() : "?"}
