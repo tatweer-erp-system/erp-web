@@ -19,6 +19,9 @@ import {
 } from "@ant-design/icons";
 import { useLocation } from "wouter";
 import {
+  AlertOutlined,
+} from "@ant-design/icons";
+import {
   useNotificationsStore,
   type NotifType,
   type NotifModule,
@@ -124,6 +127,7 @@ export default function NotificationCenter() {
     const [hovered, setHovered] = useState(false);
     const typeCfg = TYPE_CFG[n.type];
     const modCfg  = MODULE_CFG[n.module];
+    const isLowStock = n.meta?.notifKind === "inventory.low_stock";
 
     return (
       <div
@@ -151,7 +155,7 @@ export default function NotificationCenter() {
           display: "flex", alignItems: "center", justifyContent: "center",
           fontSize: 15, color: typeCfg.color, flexShrink: 0, marginTop: 1,
         }}>
-          {typeCfg.icon}
+          {isLowStock ? <AlertOutlined /> : typeCfg.icon}
         </div>
 
         {/* Body */}

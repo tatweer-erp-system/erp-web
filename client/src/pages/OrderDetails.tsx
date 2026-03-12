@@ -7,7 +7,7 @@ import AdvancedFilters from "@/components/AdvancedFilters";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ChevronLeft, ChevronRight, Edit, Trash2, Eye, Search, Plus, Download, Printer, RotateCcw, Grid3x3, List } from "lucide-react";
+import { ChevronLeft, ChevronRight, Edit, Trash2, Eye, Search, Plus, Download, Printer, RotateCcw, Grid3x3, List, ExternalLink, User, ArrowLeftRight } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useSettings } from "@/contexts/SettingsContext";
+import { useLocation } from "wouter";
 
 const ordersData = [
   { id: 1, orderNo: "ORD-2024-001", customer: "John Doe", amount: "$1,299", status: "completed", date: "2024-02-20" },
@@ -47,6 +48,7 @@ function getStatusColor(status: string) {
 export default function OrderDetails() {
   const { language } = useSettings();
   const isRTL = language === "ar";
+  const [, navigate] = useLocation();
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -392,6 +394,39 @@ export default function OrderDetails() {
             ))}
           </div>
         )}
+
+        {/* Cross-Module Navigation Links */}
+        <Card className="p-4 dark:bg-card bg-card shadow-sm border-0">
+          <h3 className="text-sm font-semibold text-foreground mb-3">Related Modules</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <button
+              onClick={() => navigate("/customer-details")}
+              className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-secondary/50 transition-colors text-left group"
+            >
+              <div className="w-9 h-9 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
+                <User size={16} className="text-blue-600" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-foreground">Related Contact</p>
+                <p className="text-xs text-muted-foreground">View customer details</p>
+              </div>
+              <ExternalLink size={14} className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+            </button>
+            <button
+              onClick={() => navigate("/stock-movement?reference_type=sales_order")}
+              className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-secondary/50 transition-colors text-left group"
+            >
+              <div className="w-9 h-9 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
+                <ArrowLeftRight size={16} className="text-green-600" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-foreground">Stock Movements</p>
+                <p className="text-xs text-muted-foreground">View stock movements for orders</p>
+              </div>
+              <ExternalLink size={14} className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+            </button>
+          </div>
+        </Card>
 
         {/* Create Modal */}
         <AnimatedModal

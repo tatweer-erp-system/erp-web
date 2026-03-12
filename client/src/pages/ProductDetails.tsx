@@ -3,7 +3,8 @@ import DashboardLayout from "@/components/DashboardLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ChevronLeft, Star, ShoppingCart, Edit, MoreVertical, TrendingUp, Package, DollarSign, Eye, Info, Zap, MessageCircle, Search, Download, Printer, RotateCcw, Grid3x3, List, Plus } from "lucide-react";
+import { ChevronLeft, Star, ShoppingCart, Edit, MoreVertical, TrendingUp, Package, DollarSign, Eye, Info, Zap, MessageCircle, Search, Download, Printer, RotateCcw, Grid3x3, List, Plus, ExternalLink, Warehouse, AlertTriangle } from "lucide-react";
+import { useLocation } from "wouter";
 import TabsWithIcons from "@/components/TabsWithIcons";
 import AnimatedModal from "@/components/AnimatedModal";
 import BulkActions from "@/components/BulkActions";
@@ -40,6 +41,7 @@ function getStatusColor(status: string) {
 export default function ProductDetails() {
   const { language } = useSettings();
   const isRTL = language === "ar";
+  const [, navigate] = useLocation();
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -384,6 +386,54 @@ export default function ProductDetails() {
             ))}
           </div>
         )}
+
+        {/* Cross-Module Quick Links */}
+        <Card className="p-4 dark:bg-card bg-card shadow-sm border-0">
+          <h3 className="text-sm font-semibold text-foreground mb-3">Quick Navigation</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <button
+              onClick={() => navigate("/warehouses")}
+              className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-secondary/50 transition-colors text-left group"
+            >
+              <div className="w-9 h-9 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
+                <Warehouse size={16} className="text-blue-600" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-foreground">Stock Levels</p>
+                <p className="text-xs text-muted-foreground">View stock per warehouse</p>
+              </div>
+              <ExternalLink size={14} className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+            </button>
+            <button
+              onClick={() => navigate("/all-orders")}
+              className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-secondary/50 transition-colors text-left group"
+            >
+              <div className="w-9 h-9 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
+                <ShoppingCart size={16} className="text-green-600" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-foreground">Related Order Lines</p>
+                <p className="text-xs text-muted-foreground">Sales orders with this product</p>
+              </div>
+              <ExternalLink size={14} className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+            </button>
+            <button
+              onClick={() => navigate("/stock-movement")}
+              className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-secondary/50 transition-colors text-left group"
+            >
+              <div className="w-9 h-9 rounded-lg bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center shrink-0">
+                <AlertTriangle size={16} className="text-orange-600" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-foreground">Low Stock Alert</p>
+                <p className="text-xs text-muted-foreground">
+                  {productsData.filter(p => p.status === "low-stock").length} products need attention
+                </p>
+              </div>
+              <ExternalLink size={14} className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+            </button>
+          </div>
+        </Card>
 
         {/* Edit Modal */}
         <AnimatedModal

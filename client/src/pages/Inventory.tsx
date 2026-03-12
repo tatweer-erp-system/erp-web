@@ -4,7 +4,7 @@ import { useAppSettings } from "@/contexts/AppSettingsContext";
 import {
   Table, Button, Input, Tag, Space, Card, Row, Col, Grid, Statistic,
   Modal, Form, InputNumber, Select, Tooltip, Popconfirm, message,
-  Typography, Progress, Dropdown, Segmented,
+  Typography, Progress, Dropdown, Segmented, Switch,
 } from "antd";
 import type { TableColumnsType, TableProps } from "antd";
 import {
@@ -68,6 +68,7 @@ export default function Inventory() {
   const [viewMode,      setViewMode]      = useState<"table" | "grid">("table");
   const [search,        setSearch]        = useState("");
   const [statusFilter,  setStatusFilter]  = useState("all");
+  const [showLowStockOnly, setShowLowStockOnly] = useState(false);
   const [selectedRows,  setSelectedRows]  = useState<number[]>([]);
   const [isCreateOpen,  setIsCreateOpen]  = useState(false);
   const [isEditOpen,    setIsEditOpen]    = useState(false);
@@ -82,8 +83,9 @@ export default function Inventory() {
       d = d.filter((i) => i.name.toLowerCase().includes(q) || i.sku.toLowerCase().includes(q) || i.category.toLowerCase().includes(q));
     }
     if (statusFilter !== "all") d = d.filter((i) => i.status === statusFilter);
+    if (showLowStockOnly) d = d.filter((i) => i.quantity <= i.reorderLevel);
     return d;
-  }, [search, statusFilter]);
+  }, [search, statusFilter, showLowStockOnly]);
 
   const totalValue = inventoryData.reduce((s, i) => s + i.price * i.quantity, 0);
 
@@ -111,7 +113,19 @@ export default function Inventory() {
       sorter: (a, b) => a.name.localeCompare(b.name),
       render: (v, r) => (
         <div>
-          <Text strong style={{ display: "block" }}>{v}</Text>
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <Text strong>{v}</Text>
+            {r.quantity <= r.reorderLevel && r.quantity > 0 && (
+              <Tag color="warning" style={{ borderRadius: 10, fontSize: 10, lineHeight: "16px", padding: "0 6px", margin: 0 }}>
+                <WarningOutlined style={{ marginInlineEnd: 2 }} />Low Stock
+              </Tag>
+            )}
+            {r.quantity === 0 && (
+              <Tag color="error" style={{ borderRadius: 10, fontSize: 10, lineHeight: "16px", padding: "0 6px", margin: 0 }}>
+                <CloseCircleOutlined style={{ marginInlineEnd: 2 }} />Out of Stock
+              </Tag>
+            )}
+          </div>
           <Text code style={{ fontSize: 11 }}>{r.sku}</Text>
         </div>
       ),
@@ -275,6 +289,16 @@ export default function Inventory() {
                     { value: "out-of-stock", label: "✕ Out of Stock" },
                   ]}
                 />
+                <Tooltip title="Show Low Stock Only">
+                  <Button
+                    type={showLowStockOnly ? "primary" : "default"}
+                    icon={<AlertOutlined />}
+                    onClick={() => setShowLowStockOnly(!showLowStockOnly)}
+                    danger={showLowStockOnly}
+                  >
+                    {showLowStockOnly ? "Low Stock" : "Low Stock"}
+                  </Button>
+                </Tooltip>
               </Space>
 
               <Space>

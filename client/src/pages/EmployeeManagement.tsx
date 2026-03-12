@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, Search, Edit, Trash2, Shield, Clock, CheckCircle, AlertCircle, Mail, Phone, MapPin, Download, Printer, RotateCcw, Grid3x3, List, MoreVertical } from "lucide-react";
 import AnimatedModal from "@/components/AnimatedModal";
+import BranchSelector from "@/components/BranchSelector";
 import BulkActions from "@/components/BulkActions";
 import AdvancedFilters from "@/components/AdvancedFilters";
 import {
@@ -14,13 +15,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useSettings } from "@/contexts/SettingsContext";
+import { t } from "@/i18n";
 
 const employeesData = [
-  { id: 1, name: "Sarah Johnson", role: "Sales Manager", department: "Sales", email: "sarah@company.com", phone: "+1 (555) 123-4567", status: "active", joinDate: "Jan 15, 2023" },
-  { id: 2, name: "Michael Chen", role: "Software Developer", department: "IT", email: "michael@company.com", phone: "+1 (555) 234-5678", status: "active", joinDate: "Mar 20, 2023" },
-  { id: 3, name: "Emily Rodriguez", role: "HR Specialist", department: "Human Resources", email: "emily@company.com", phone: "+1 (555) 345-6789", status: "active", joinDate: "Feb 10, 2023" },
-  { id: 4, name: "David Williams", role: "Accountant", department: "Finance", email: "david@company.com", phone: "+1 (555) 456-7890", status: "on-leave", joinDate: "May 5, 2022" },
-  { id: 5, name: "Jessica Lee", role: "Marketing Manager", department: "Marketing", email: "jessica@company.com", phone: "+1 (555) 567-8901", status: "active", joinDate: "Jul 12, 2023" },
+  { id: 1, employeeNumber: "EMP-RYD-00001", name: "Sarah Johnson", role: "Sales Manager", department: "Sales", email: "sarah@company.com", phone: "+1 (555) 123-4567", status: "active", joinDate: "Jan 15, 2023", branch: "Riyadh HQ" },
+  { id: 2, employeeNumber: "EMP-JED-00002", name: "Michael Chen", role: "Software Developer", department: "IT", email: "michael@company.com", phone: "+1 (555) 234-5678", status: "active", joinDate: "Mar 20, 2023", branch: "Jeddah" },
+  { id: 3, employeeNumber: "EMP-RYD-00003", name: "Emily Rodriguez", role: "HR Specialist", department: "Human Resources", email: "emily@company.com", phone: "+1 (555) 345-6789", status: "active", joinDate: "Feb 10, 2023", branch: "Riyadh HQ" },
+  { id: 4, employeeNumber: "EMP-DMM-00004", name: "David Williams", role: "Accountant", department: "Finance", email: "david@company.com", phone: "+1 (555) 456-7890", status: "on-leave", joinDate: "May 5, 2022", branch: "Dammam" },
+  { id: 5, employeeNumber: "EMP-RYD-00005", name: "Jessica Lee", role: "Marketing Manager", department: "Marketing", email: "jessica@company.com", phone: "+1 (555) 567-8901", status: "active", joinDate: "Jul 12, 2023", branch: "Riyadh HQ" },
 ];
 
 function getStatusColor(status: string) {
@@ -44,23 +46,23 @@ export default function EmployeeManagement() {
   const [pageSize, setPageSize] = useState(10);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [appliedFilters, setAppliedFilters] = useState<Record<string, string>>({});
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editFormData, setEditFormData] = useState({ name: "", email: "", phone: "", role: "", department: "" });
+  const [editFormData, setEditFormData] = useState({ employeeNumber: "", name: "", email: "", phone: "", role: "", department: "", branchId: "" });
+  const [createFormData, setCreateFormData] = useState({ name: "", email: "", phone: "", role: "", department: "", branchId: "" });
 
   const totalPages = Math.ceil(employeesData.length / pageSize);
   const startIndex = (currentPage - 1) * pageSize;
   const paginatedData = employeesData.slice(startIndex, startIndex + pageSize);
 
-  const handlePrint = () => {
-    window.print();
-  };
+  const handlePrint = () => window.print();
 
   const handleExport = () => {
     const csv = [
-      ["Employee Name", "Role", "Department", "Email", "Phone", "Status", "Join Date"],
-      ...employeesData.map(item => [item.name, item.role, item.department, item.email, item.phone, item.status, item.joinDate])
+      [t("employeeNumber", language), t("name", language), "Role", "Department", t("email", language), "Phone", t("status", language), "Join Date", t("branch", language)],
+      ...employeesData.map(item => [item.employeeNumber, item.name, item.role, item.department, item.email, item.phone, item.status, item.joinDate, item.branch])
     ].map(row => row.join(",")).join("\n");
-    
+
     const blob = new Blob([csv], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -69,14 +71,10 @@ export default function EmployeeManagement() {
     a.click();
   };
 
-  const handleReload = () => {
-    window.location.reload();
-  };
-
   const breadcrumbs = [
-    { label: "Dashboard", href: "/" },
-    { label: "Settings", href: "#" },
-    { label: "Users" },
+    { label: t("Dashboard", language), href: "/" },
+    { label: t("Settings", language), href: "#" },
+    { label: t("Users", language) },
   ];
 
   return (
@@ -84,7 +82,10 @@ export default function EmployeeManagement() {
       <div className="space-y-6">
         {/* Header Section */}
         <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 ${isRTL ? "text-right" : ""}`}>
-          <Button className="bg-primary hover:bg-blue-700 text-white flex items-center gap-2 w-full sm:w-auto">
+          <Button
+            className="bg-primary hover:bg-blue-700 text-white flex items-center gap-2 w-full sm:w-auto"
+            onClick={() => setIsCreateModalOpen(true)}
+          >
             <Plus size={18} />
             Add Employee
           </Button>
@@ -119,75 +120,37 @@ export default function EmployeeManagement() {
           <BulkActions
             selectedCount={selectedItems.length}
             isAllSelected={selectedItems.length === paginatedData.length}
-            onSelectAll={(checked) => {
-              if (checked) {
-                setSelectedItems(paginatedData.map(item => item.id));
-              } else {
-                setSelectedItems([]);
-              }
-            }}
-            onDelete={() => {
-              setSelectedItems([]);
-            }}
-            onExport={() => {
-              handleExport();
-              setSelectedItems([]);
-            }}
-            onStatusUpdate={() => {
-              setSelectedItems([]);
-            }}
+            onSelectAll={(checked) => setSelectedItems(checked ? paginatedData.map(item => item.id) : [])}
+            onDelete={() => setSelectedItems([])}
+            onExport={() => { handleExport(); setSelectedItems([]); }}
+            onStatusUpdate={() => setSelectedItems([])}
           />
         )}
 
-        {/* Search and Advanced Controls - Single Row */}
+        {/* Search and Advanced Controls */}
         <Card className="p-4 dark:bg-card bg-card shadow-sm border-0">
-          <div className={`flex flex-wrap gap-2 items-center`}>
-            {/* Search Bar */}
+          <div className="flex flex-wrap gap-2 items-center">
             <div className="flex-1 min-w-xs">
-                            <Input 
-                type="text" 
-                placeholder="Search by name or email..." 
-                className={`${isRTL ? "pr-12 text-right" : "pl-12"} bg-secondary border-0`} 
+              <Input
+                type="text"
+                placeholder={`${t("Search", language)}...`}
+                className={`${isRTL ? "pr-12 text-right" : "pl-12"} bg-secondary border-0`}
               />
             </div>
-
-            {/* Advanced Filters */}
             <AdvancedFilters
               onApplyFilters={(filters) => setAppliedFilters(filters)}
               onClearFilters={() => setAppliedFilters({})}
               filterOptions={{
-                status: {
-                  label: "Status",
-                  options: ["Active", "On Leave", "Inactive"],
-                },
-                department: {
-                  label: "Department",
-                  options: ["Sales", "IT", "HR", "Finance", "Marketing"],
-                },
+                status: { label: t("status", language), options: ["Active", "On Leave", "Inactive"] },
+                department: { label: "Department", options: ["Sales", "IT", "HR", "Finance", "Marketing"] },
               }}
             />
-
-            {/* Reload Button */}
-            <Button
-              variant="outline"
-              className="border-border"
-              onClick={handleReload}
-              title="Reload data"
-            >
+            <Button variant="outline" className="border-border" onClick={() => window.location.reload()}>
               <RotateCcw size={16} />
             </Button>
-
-            {/* Print Button */}
-            <Button
-              variant="outline"
-              className="border-border"
-              onClick={handlePrint}
-              title="Print table"
-            >
+            <Button variant="outline" className="border-border" onClick={handlePrint}>
               <Printer size={16} />
             </Button>
-
-            {/* Export Button */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="border-border flex items-center gap-2">
@@ -201,29 +164,11 @@ export default function EmployeeManagement() {
                 <DropdownMenuItem>Export as PDF</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-
-            {/* View Mode Toggle */}
             <div className="flex gap-1 border border-border rounded-lg p-1">
-              <button
-                onClick={() => setViewMode("table")}
-                className={`p-2 rounded transition-colors ${
-                  viewMode === "table"
-                    ? "bg-primary text-white"
-                    : "text-foreground hover:bg-secondary"
-                }`}
-                title="Table view"
-              >
+              <button onClick={() => setViewMode("table")} className={`p-2 rounded transition-colors ${viewMode === "table" ? "bg-primary text-white" : "text-foreground hover:bg-secondary"}`}>
                 <List size={16} />
               </button>
-              <button
-                onClick={() => setViewMode("grid")}
-                className={`p-2 rounded transition-colors ${
-                  viewMode === "grid"
-                    ? "bg-primary text-white"
-                    : "text-foreground hover:bg-secondary"
-                }`}
-                title="Grid view"
-              >
+              <button onClick={() => setViewMode("grid")} className={`p-2 rounded transition-colors ${viewMode === "grid" ? "bg-primary text-white" : "text-foreground hover:bg-secondary"}`}>
                 <Grid3x3 size={16} />
               </button>
             </div>
@@ -241,23 +186,18 @@ export default function EmployeeManagement() {
                       <input
                         type="checkbox"
                         checked={selectedItems.length === paginatedData.length && paginatedData.length > 0}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setSelectedItems(paginatedData.map(item => item.id));
-                          } else {
-                            setSelectedItems([]);
-                          }
-                        }}
+                        onChange={(e) => setSelectedItems(e.target.checked ? paginatedData.map(item => item.id) : [])}
                         className="w-4 h-4 rounded border-border"
                       />
                     </th>
-                    <th className="px-6 py-4 text-sm font-semibold text-foreground text-left">Employee Name</th>
-                    <th className="px-6 py-4 text-sm font-semibold text-foreground text-left">Role</th>
-                    <th className="px-6 py-4 text-sm font-semibold text-foreground text-left">Department</th>
-                    <th className="px-6 py-4 text-sm font-semibold text-foreground text-left">Email</th>
-                    <th className="px-6 py-4 text-sm font-semibold text-foreground text-left">Status</th>
-                    <th className="px-6 py-4 text-sm font-semibold text-foreground text-left">Join Date</th>
-                    <th className="px-6 py-4 text-sm font-semibold text-foreground text-center">Actions</th>
+                    <th className={`px-6 py-4 text-sm font-semibold text-foreground ${isRTL ? "text-right" : "text-left"}`}>{t("employeeNumber", language)}</th>
+                    <th className={`px-6 py-4 text-sm font-semibold text-foreground ${isRTL ? "text-right" : "text-left"}`}>{t("name", language)}</th>
+                    <th className={`px-6 py-4 text-sm font-semibold text-foreground ${isRTL ? "text-right" : "text-left"}`}>Role</th>
+                    <th className={`px-6 py-4 text-sm font-semibold text-foreground ${isRTL ? "text-right" : "text-left"}`}>Department</th>
+                    <th className={`px-6 py-4 text-sm font-semibold text-foreground ${isRTL ? "text-right" : "text-left"}`}>{t("branch", language)}</th>
+                    <th className={`px-6 py-4 text-sm font-semibold text-foreground ${isRTL ? "text-right" : "text-left"}`}>{t("email", language)}</th>
+                    <th className={`px-6 py-4 text-sm font-semibold text-foreground ${isRTL ? "text-right" : "text-left"}`}>{t("status", language)}</th>
+                    <th className="px-6 py-4 text-sm font-semibold text-foreground text-center">{t("actions", language)}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -268,25 +208,25 @@ export default function EmployeeManagement() {
                           type="checkbox"
                           checked={selectedItems.includes(item.id)}
                           onChange={(e) => {
-                            if (e.target.checked) {
-                              setSelectedItems([...selectedItems, item.id]);
-                            } else {
-                              setSelectedItems(selectedItems.filter(id => id !== item.id));
-                            }
+                            setSelectedItems(e.target.checked
+                              ? [...selectedItems, item.id]
+                              : selectedItems.filter(id => id !== item.id)
+                            );
                           }}
                           className="w-4 h-4 rounded border-border"
                         />
                       </td>
+                      <td className="px-6 py-4 text-sm text-primary font-medium">{item.employeeNumber}</td>
                       <td className="px-6 py-4 text-sm text-foreground font-medium">{item.name}</td>
                       <td className="px-6 py-4 text-sm text-muted-foreground">{item.role}</td>
                       <td className="px-6 py-4 text-sm text-muted-foreground">{item.department}</td>
+                      <td className="px-6 py-4 text-sm text-muted-foreground">{item.branch}</td>
                       <td className="px-6 py-4 text-sm text-muted-foreground">{item.email}</td>
                       <td className="px-6 py-4 text-sm">
                         <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(item.status)}`}>
                           {item.status === "on-leave" ? "On Leave" : item.status.charAt(0).toUpperCase() + item.status.slice(1)}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-muted-foreground">{item.joinDate}</td>
                       <td className="px-6 py-4 text-center">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -295,7 +235,18 @@ export default function EmployeeManagement() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align={isRTL ? "start" : "end"}>
-                            <DropdownMenuItem onClick={() => setIsEditModalOpen(true)}>Edit</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => {
+                              setEditFormData({
+                                employeeNumber: item.employeeNumber,
+                                name: item.name,
+                                email: item.email,
+                                phone: item.phone,
+                                role: item.role,
+                                department: item.department,
+                                branchId: "",
+                              });
+                              setIsEditModalOpen(true);
+                            }}>Edit</DropdownMenuItem>
                             <DropdownMenuItem>View Details</DropdownMenuItem>
                             <DropdownMenuItem>Send Email</DropdownMenuItem>
                             <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
@@ -309,46 +260,28 @@ export default function EmployeeManagement() {
             </div>
 
             {/* Pagination */}
-            <div className={`flex items-center justify-between px-6 py-4 border-t border-border`}>
+            <div className="flex items-center justify-between px-6 py-4 border-t border-border">
               <div className="text-sm text-muted-foreground">
                 Showing {startIndex + 1} to {Math.min(startIndex + pageSize, employeesData.length)} of {employeesData.length}
               </div>
-              <div className={`flex gap-2`}>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                  disabled={currentPage === 1}
-                >
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" onClick={() => setCurrentPage(Math.max(1, currentPage - 1))} disabled={currentPage === 1}>
                   Previous
                 </Button>
                 <div className="flex items-center gap-1">
                   {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <Button
-                      key={page}
-                      variant={currentPage === page ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setCurrentPage(page)}
-                    >
+                    <Button key={page} variant={currentPage === page ? "default" : "outline"} size="sm" onClick={() => setCurrentPage(page)}>
                       {page}
                     </Button>
                   ))}
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                  disabled={currentPage === totalPages}
-                >
+                <Button variant="outline" size="sm" onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))} disabled={currentPage === totalPages}>
                   Next
                 </Button>
               </div>
               <select
                 value={pageSize}
-                onChange={(e) => {
-                  setPageSize(Number(e.target.value));
-                  setCurrentPage(1);
-                }}
+                onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); }}
                 className="px-3 py-2 border border-border rounded-lg text-sm dark:bg-card bg-card text-foreground"
               >
                 <option value={5}>5 per page</option>
@@ -365,11 +298,13 @@ export default function EmployeeManagement() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {paginatedData.map((item) => (
               <Card key={item.id} className="p-4 dark:bg-card bg-card shadow-sm border-0">
-                <div className={`flex items-start justify-between`}>
+                <div className="flex items-start justify-between">
                   <div className={isRTL ? "text-right" : ""}>
                     <h3 className="font-semibold text-foreground">{item.name}</h3>
+                    <p className="text-xs text-primary mt-0.5">{item.employeeNumber}</p>
                     <p className="text-xs text-muted-foreground mt-1">{item.role}</p>
                     <p className="text-xs text-muted-foreground">{item.department}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{item.branch}</p>
                     <p className="text-xs text-muted-foreground mt-2">{item.email}</p>
                     <p className="text-xs text-muted-foreground">Joined: {item.joinDate}</p>
                   </div>
@@ -382,15 +317,86 @@ export default function EmployeeManagement() {
           </div>
         )}
 
-        {/* Edit Modal */}
+        {/* Create Modal - NO employee number input, has branch selector */}
+        <AnimatedModal
+          isOpen={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+          title="Add Employee"
+        >
+          <div className="space-y-4">
+            <BranchSelector
+              value={createFormData.branchId}
+              onChange={(branchId) => setCreateFormData({ ...createFormData, branchId })}
+            />
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-2">{t("name", language)}</label>
+              <Input
+                type="text"
+                value={createFormData.name}
+                onChange={(e) => setCreateFormData({ ...createFormData, name: e.target.value })}
+                placeholder="Employee name"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-2">{t("email", language)}</label>
+              <Input
+                type="email"
+                value={createFormData.email}
+                onChange={(e) => setCreateFormData({ ...createFormData, email: e.target.value })}
+                placeholder="Email address"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-2">Phone</label>
+              <Input
+                type="tel"
+                value={createFormData.phone}
+                onChange={(e) => setCreateFormData({ ...createFormData, phone: e.target.value })}
+                placeholder="Phone number"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-2">Role</label>
+              <Input
+                type="text"
+                value={createFormData.role}
+                onChange={(e) => setCreateFormData({ ...createFormData, role: e.target.value })}
+                placeholder="Job role"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-2">Department</label>
+              <Input
+                type="text"
+                value={createFormData.department}
+                onChange={(e) => setCreateFormData({ ...createFormData, department: e.target.value })}
+                placeholder="Department"
+              />
+            </div>
+            <Button className="w-full bg-primary hover:bg-blue-700 text-white">{t("save", language)}</Button>
+          </div>
+        </AnimatedModal>
+
+        {/* Edit Modal - employee number shown as read-only badge, has branch selector */}
         <AnimatedModal
           isOpen={isEditModalOpen}
           onClose={() => setIsEditModalOpen(false)}
           title="Edit Employee"
         >
           <div className="space-y-4">
+            {/* Employee Number - read-only badge */}
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">Name</label>
+              <label className="block text-sm font-medium text-foreground mb-2">{t("employeeNumber", language)}</label>
+              <div className="px-3 py-2 bg-secondary/50 border border-border rounded-lg text-sm text-primary font-medium">
+                {editFormData.employeeNumber}
+              </div>
+            </div>
+            <BranchSelector
+              value={editFormData.branchId}
+              onChange={(branchId) => setEditFormData({ ...editFormData, branchId })}
+            />
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-2">{t("name", language)}</label>
               <Input
                 type="text"
                 value={editFormData.name}
@@ -399,7 +405,7 @@ export default function EmployeeManagement() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">Email</label>
+              <label className="block text-sm font-medium text-foreground mb-2">{t("email", language)}</label>
               <Input
                 type="email"
                 value={editFormData.email}
@@ -434,7 +440,7 @@ export default function EmployeeManagement() {
                 placeholder="Department"
               />
             </div>
-            <Button className="w-full bg-primary hover:bg-blue-700 text-white">Save Changes</Button>
+            <Button className="w-full bg-primary hover:bg-blue-700 text-white">{t("save", language)}</Button>
           </div>
         </AnimatedModal>
       </div>

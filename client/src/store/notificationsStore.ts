@@ -3,6 +3,14 @@ import { create } from "zustand";
 export type NotifType   = "success" | "warning" | "info" | "error";
 export type NotifModule = "Orders" | "Inventory" | "Finance" | "HR" | "POS" | "System";
 
+export interface NotificationMeta {
+  notifKind?: string;
+  productName?: string;
+  currentQty?: number;
+  reorderPoint?: number;
+  [key: string]: unknown;
+}
+
 export interface Notification {
   id: string;
   type: NotifType;
@@ -12,6 +20,7 @@ export interface Notification {
   timestamp: Date;
   read: boolean;
   href?: string;
+  meta?: NotificationMeta;
 }
 
 const now = Date.now();
@@ -32,10 +41,11 @@ const INITIAL: Notification[] = [
     type: "warning",
     module: "Inventory",
     title: "Low Stock Alert",
-    message: "Wireless Headphones (SKU-001) has only 3 units remaining.",
+    message: "Wireless Headphones (SKU-001) has only 3 units remaining (reorder point: 15).",
     timestamp: new Date(now - 18 * 60000),
     read: false,
-    href: "/products",
+    href: "/product-details?id=2",
+    meta: { notifKind: "inventory.low_stock", productName: "Wireless Headphones", currentQty: 3, reorderPoint: 15 },
   },
   {
     id: "3",

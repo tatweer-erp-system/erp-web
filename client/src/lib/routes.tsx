@@ -104,6 +104,7 @@ export const routes: RouteConfig[] = [
   { path: "/exchange-rates",     component: lz(() => import("@/pages/ExchangeRates")),     permissions: ["settings:read"], breadcrumb: ["Settings", "Exchange Rates"] },
   { path: "/taxes",              component: lz(() => import("@/pages/Taxes")),              permissions: ["settings:write"], breadcrumb: ["Settings", "Taxes"] },
   { path: "/numbering-series",   component: lz(() => import("@/pages/NumberingSeries")),   permissions: ["settings:write"], breadcrumb: ["Settings", "Numbering Series"] },
+  { path: "/settings/sequences", component: lz(() => import("@/pages/SequenceSettings")),  permissions: ["settings:write"], breadcrumb: ["Settings", "Sequence Settings"] },
   { path: "/payment-methods",    component: lz(() => import("@/pages/PaymentMethods")),    permissions: ["settings:write"], breadcrumb: ["Settings", "Payment Methods"] },
   { path: "/price-lists",        component: lz(() => import("@/pages/PriceLists")),         permissions: ["settings:write"], breadcrumb: ["Settings", "Price Lists"] },
   { path: "/cost-centers",       component: lz(() => import("@/pages/CostCenters")),        permissions: ["settings:write"], breadcrumb: ["Settings", "Cost Centers"] },

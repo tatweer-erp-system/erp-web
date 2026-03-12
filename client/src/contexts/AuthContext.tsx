@@ -124,7 +124,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       selectedBranch,
       isAuthenticated: !!user && !!getAccessToken(),
       isLoading,
-      isCashier: user?.role === Role.Cashier,
+      isCashier: user?.role === Role.Cashier || (user?.roles ?? []).some(r => r.name.toLowerCase() === "cashier"),
       login,
       logout,
       selectBranch,

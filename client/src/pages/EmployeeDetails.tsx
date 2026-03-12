@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import TabsWithIcons from "@/components/TabsWithIcons";
 import AnimatedModal from "@/components/AnimatedModal";
+import BranchSelector from "@/components/BranchSelector";
 import AttachmentsTab from "@/components/AttachmentsTab";
 import {
   User,
@@ -25,8 +26,13 @@ import {
   Building2,
   CreditCard,
   Users,
+  ExternalLink,
+  ClipboardList,
+  UserCog,
 } from "lucide-react";
 import { useSettings } from "@/contexts/SettingsContext";
+import { useLocation } from "wouter";
+import { t } from "@/i18n";
 
 const employee = {
   id: "EMP-00142",
@@ -42,6 +48,7 @@ const employee = {
   religion: "Christianity",
   joinDate: "15 Jan 2023",
   contractType: "Full-time",
+  branch: "Riyadh HQ",
   phone: "+1 (555) 123-4567",
   email: "sarah.johnson@company.com",
   currentAddress: "3495 Red Hawk Road, Buffalo Lake, MN 55314",
@@ -161,6 +168,7 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 export default function EmployeeDetails() {
   const { language } = useSettings();
   const isRTL = language === "ar";
+  const [, navigate] = useLocation();
   const [activeTab, setActiveTab] = useState("personal");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editForm, setEditForm] = useState({
@@ -169,6 +177,7 @@ export default function EmployeeDetails() {
     phone: employee.phone,
     role: employee.role,
     department: employee.department,
+    branchId: "",
   });
 
   const breadcrumbs = [
@@ -221,9 +230,14 @@ export default function EmployeeDetails() {
               {employee.status === "active" ? "Active" : employee.status}
             </span>
             <h2 className="text-base font-bold text-foreground">{employee.name}</h2>
-            <p className="text-xs text-primary font-medium">{employee.id}</p>
+            <span className="inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
+              {employee.id}
+            </span>
             <p className="text-xs text-muted-foreground mt-1">
               {employee.role} · {employee.department}
+            </p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {employee.branch}
             </p>
           </Card>
 
@@ -739,6 +753,52 @@ export default function EmployeeDetails() {
         </div>
       </div>
 
+      {/* Cross-Module Navigation Links */}
+      <Card className="p-4 dark:bg-card bg-card shadow-sm border-0 mt-6">
+        <h3 className="text-sm font-semibold text-foreground mb-3">Related Modules</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <button
+            onClick={() => navigate(`/leave-management?employeeId=${employee.id}`)}
+            className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-secondary/50 transition-colors text-left group"
+          >
+            <div className="w-9 h-9 rounded-lg bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center shrink-0">
+              <Calendar size={16} className="text-orange-600" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-foreground">Leave Requests</p>
+              <p className="text-xs text-muted-foreground">View leave requests for this employee</p>
+            </div>
+            <ExternalLink size={14} className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+          </button>
+          <button
+            onClick={() => navigate(`/employees?assignedTo=${employee.id}`)}
+            className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-secondary/50 transition-colors text-left group"
+          >
+            <div className="w-9 h-9 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
+              <ClipboardList size={16} className="text-blue-600" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-foreground">Assigned Tasks</p>
+              <p className="text-xs text-muted-foreground">View tasks assigned to this employee</p>
+            </div>
+            <ExternalLink size={14} className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+          </button>
+          <button
+            onClick={() => navigate("/users")}
+            className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-secondary/50 transition-colors text-left group"
+          >
+            <div className="w-9 h-9 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center shrink-0">
+              <UserCog size={16} className="text-purple-600" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-foreground">User Account</p>
+              <p className="text-xs text-muted-foreground">Manage user profile and permissions</p>
+            </div>
+            <ExternalLink size={14} className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+          </button>
+        </div>
+      </Card>
+
       {/* Edit Modal */}
       <AnimatedModal
         isOpen={isEditModalOpen}
@@ -746,6 +806,17 @@ export default function EmployeeDetails() {
         title="Edit Employee"
       >
         <div className="space-y-4">
+          {/* Employee Number - read-only */}
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-2">{t("employeeNumber", language)}</label>
+            <div className="px-3 py-2 bg-secondary/50 border border-border rounded-lg text-sm text-primary font-medium">
+              {employee.id}
+            </div>
+          </div>
+          <BranchSelector
+            value={editForm.branchId}
+            onChange={(branchId) => setEditForm({ ...editForm, branchId })}
+          />
           {(
             [
               { label: "Full Name", key: "name", type: "text" },
@@ -766,7 +837,7 @@ export default function EmployeeDetails() {
             </div>
           ))}
           <Button className="w-full bg-primary hover:bg-primary/90 text-white">
-            Save Changes
+            {t("save", language)}
           </Button>
         </div>
       </AnimatedModal>

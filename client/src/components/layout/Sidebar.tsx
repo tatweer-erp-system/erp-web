@@ -199,6 +199,7 @@ const NAV_ITEMS: NavItem[] = [
   { name: "Users & Permissions",   icon: <UsergroupAddOutlined />, href: "/settings/users" },
   { name: "Notifications",         icon: <BellOutlined />,         href: "/settings/notifications" },
   { name: "Billing & Subscription",icon: <PayCircleOutlined />,   href: "/settings/billing" },
+  { name: "Sequence Settings",     icon: <OrderedListOutlined />,  href: "/settings/sequences" },
 ];
 
 

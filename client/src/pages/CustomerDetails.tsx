@@ -7,6 +7,7 @@ import {
   User, Mail, Phone, MapPin, Building2, Tag,
   ShoppingCart, DollarSign, Calendar,
   MessageSquare, Send, Bell, Shield, Trash2,
+  ExternalLink, Users, FileText,
 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
@@ -176,6 +177,38 @@ export default function CustomerDetails() {
                   }
                 />
                 <InfoRow label="Customer Since" value={CUSTOMER.since} />
+              </div>
+            </CollapsibleCard>
+
+            {/* Cross-Module Navigation Links */}
+            <CollapsibleCard title="Related Modules" icon={<ExternalLink size={15} />}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <button
+                  onClick={() => navigate(`/all-orders?customerId=${CUSTOMER.id}`)}
+                  className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-secondary/50 transition-colors text-left group"
+                >
+                  <div className="w-9 h-9 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
+                    <ShoppingCart size={16} className="text-blue-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground">Related Sales Orders</p>
+                    <p className="text-xs text-muted-foreground">View orders placed by this customer</p>
+                  </div>
+                  <ExternalLink size={14} className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                </button>
+                <button
+                  onClick={() => navigate(`/all-customers?relatedLeads=${CUSTOMER.id}`)}
+                  className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-secondary/50 transition-colors text-left group"
+                >
+                  <div className="w-9 h-9 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center shrink-0">
+                    <Users size={16} className="text-purple-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground">Related Leads</p>
+                    <p className="text-xs text-muted-foreground">View leads linked to this contact</p>
+                  </div>
+                  <ExternalLink size={14} className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                </button>
               </div>
             </CollapsibleCard>
           </TabsContent>

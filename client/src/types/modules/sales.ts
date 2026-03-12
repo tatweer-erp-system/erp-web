@@ -15,8 +15,10 @@ export interface Customer {
 
 export interface SalesOrder {
   id: string;
-  orderNumber: string;
+  readonly orderNumber: string;
   customer: Pick<Customer, "id" | "name">;
+  branchId: string;
+  branchName?: string;
   date: string;
   dueDate?: string;
   status: OrderStatus;
@@ -24,6 +26,45 @@ export interface SalesOrder {
   tax: number;
   discount: number;
   items: OrderItem[];
+}
+
+export interface PurchaseOrder {
+  id: string;
+  readonly orderNumber: string;
+  vendor: { id: string; name: string };
+  branchId: string;
+  branchName?: string;
+  date: string;
+  dueDate?: string;
+  status: OrderStatus;
+  total: number;
+  tax: number;
+  discount: number;
+  items: OrderItem[];
+}
+
+export interface Employee {
+  id: string;
+  readonly employeeNumber: string;
+  name: string;
+  email: string;
+  phone?: string;
+  role: string;
+  department: string;
+  branchId: string;
+  branchName?: string;
+  status: string;
+  joinDate: string;
+}
+
+export interface ProjectMember {
+  id: number;
+  userId: string;
+  role: "owner" | "member" | "viewer";
+  user: {
+    name: string;
+    email: string;
+  };
 }
 
 export interface OrderItem {

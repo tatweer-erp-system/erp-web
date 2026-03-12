@@ -62,12 +62,18 @@ export interface Branch {
   isDefault: boolean;
 }
 
+export interface UserRole {
+  id: string;
+  name: string;
+}
+
 export interface User {
   id: string;
   firstName: string;
   lastName: string;
   email: string;
   role: Role;
+  roles: UserRole[];
   permissions: string[];
   preferredLang: string;
   avatarUrl?: string;
