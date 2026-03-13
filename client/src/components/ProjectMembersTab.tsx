@@ -43,14 +43,18 @@ function getRoleIcon(role: string) {
   }
 }
 
-export default function ProjectMembersTab({ projectId }: ProjectMembersTabProps) {
+export default function ProjectMembersTab({
+  projectId,
+}: ProjectMembersTabProps) {
   const { language } = useSettings();
   const isRTL = language === "ar";
   const queryClient = useQueryClient();
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isRemoveConfirmOpen, setIsRemoveConfirmOpen] = useState(false);
-  const [memberToRemove, setMemberToRemove] = useState<ProjectMember | null>(null);
+  const [memberToRemove, setMemberToRemove] = useState<ProjectMember | null>(
+    null
+  );
   const [newMemberUserId, setNewMemberUserId] = useState("");
   const [newMemberRole, setNewMemberRole] = useState<string>("member");
   const [userSearch, setUserSearch] = useState("");
@@ -65,7 +69,8 @@ export default function ProjectMembersTab({ projectId }: ProjectMembersTabProps)
   // Fetch available users for the add modal
   const { data: usersData } = useQuery({
     queryKey: ["users-list", userSearch],
-    queryFn: () => usersService.list({ page: 1, limit: 20, search: userSearch }),
+    queryFn: () =>
+      usersService.list({ page: 1, limit: 20, search: userSearch }),
     enabled: isAddModalOpen,
   });
 
@@ -77,7 +82,9 @@ export default function ProjectMembersTab({ projectId }: ProjectMembersTabProps)
     mutationFn: (data: { userId: string; role: string }) =>
       projectsService.addMember(projectId, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["project-members", projectId] });
+      queryClient.invalidateQueries({
+        queryKey: ["project-members", projectId],
+      });
       setIsAddModalOpen(false);
       setNewMemberUserId("");
       setNewMemberRole("member");
@@ -89,7 +96,9 @@ export default function ProjectMembersTab({ projectId }: ProjectMembersTabProps)
     mutationFn: ({ userId, role }: { userId: string; role: string }) =>
       projectsService.updateMemberRole(projectId, userId, { role }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["project-members", projectId] });
+      queryClient.invalidateQueries({
+        queryKey: ["project-members", projectId],
+      });
     },
   });
 
@@ -98,7 +107,9 @@ export default function ProjectMembersTab({ projectId }: ProjectMembersTabProps)
     mutationFn: (userId: string) =>
       projectsService.removeMember(projectId, userId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["project-members", projectId] });
+      queryClient.invalidateQueries({
+        queryKey: ["project-members", projectId],
+      });
       setIsRemoveConfirmOpen(false);
       setMemberToRemove(null);
     },
@@ -117,7 +128,9 @@ export default function ProjectMembersTab({ projectId }: ProjectMembersTabProps)
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className={`flex items-center justify-between ${isRTL ? "flex-row-reverse" : ""}`}>
+      <div
+        className={`flex items-center justify-between ${isRTL ? "flex-row-reverse" : ""}`}
+      >
         <h3 className="text-sm font-semibold text-foreground">
           {t("projectMembers", language)}
         </h3>
@@ -139,7 +152,7 @@ export default function ProjectMembersTab({ projectId }: ProjectMembersTabProps)
         </Card>
       ) : (
         <div className="space-y-3">
-          {members.map((memberItem) => (
+          {members.map(memberItem => (
             <div
               key={memberItem.id}
               className="flex items-center justify-between p-4 rounded-xl bg-secondary/50 border border-border"
@@ -152,7 +165,9 @@ export default function ProjectMembersTab({ projectId }: ProjectMembersTabProps)
                   <p className="text-sm font-semibold text-foreground">
                     {memberItem.user.name}
                   </p>
-                  <p className="text-xs text-muted-foreground">{memberItem.user.email}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {memberItem.user.email}
+                  </p>
                 </div>
               </div>
 
@@ -160,7 +175,7 @@ export default function ProjectMembersTab({ projectId }: ProjectMembersTabProps)
                 {/* Inline role change */}
                 <select
                   value={memberItem.role}
-                  onChange={(e) =>
+                  onChange={e =>
                     updateRoleMutation.mutate({
                       userId: memberItem.userId,
                       role: e.target.value,
@@ -168,7 +183,7 @@ export default function ProjectMembersTab({ projectId }: ProjectMembersTabProps)
                   }
                   className="px-2 py-1 text-xs border border-border rounded-lg bg-card text-foreground"
                 >
-                  {MEMBER_ROLES.map((r) => (
+                  {MEMBER_ROLES.map(r => (
                     <option key={r} value={r}>
                       {t(r, language)}
                     </option>
@@ -222,16 +237,16 @@ export default function ProjectMembersTab({ projectId }: ProjectMembersTabProps)
               type="text"
               placeholder={t("Search", language)}
               value={userSearch}
-              onChange={(e) => setUserSearch(e.target.value)}
+              onChange={e => setUserSearch(e.target.value)}
               className="mb-2 bg-secondary border-0"
             />
             <select
               value={newMemberUserId}
-              onChange={(e) => setNewMemberUserId(e.target.value)}
+              onChange={e => setNewMemberUserId(e.target.value)}
               className="w-full px-3 py-2 border border-border rounded-lg text-sm dark:bg-card bg-card text-foreground"
             >
               <option value="">{t("selectUser", language)}</option>
-              {availableUsers.map((u) => (
+              {availableUsers.map(u => (
                 <option key={u.id} value={u.id}>
                   {u.firstName} {u.lastName} ({u.email})
                 </option>
@@ -246,10 +261,10 @@ export default function ProjectMembersTab({ projectId }: ProjectMembersTabProps)
             </label>
             <select
               value={newMemberRole}
-              onChange={(e) => setNewMemberRole(e.target.value)}
+              onChange={e => setNewMemberRole(e.target.value)}
               className="w-full px-3 py-2 border border-border rounded-lg text-sm dark:bg-card bg-card text-foreground"
             >
-              {MEMBER_ROLES.map((r) => (
+              {MEMBER_ROLES.map(r => (
                 <option key={r} value={r}>
                   {t(r, language)}
                 </option>
@@ -276,8 +291,12 @@ export default function ProjectMembersTab({ projectId }: ProjectMembersTabProps)
         </p>
         {memberToRemove && (
           <div className="mt-3 p-3 rounded-lg bg-secondary/50 border border-border">
-            <p className="text-sm font-medium text-foreground">{memberToRemove.user.name}</p>
-            <p className="text-xs text-muted-foreground">{memberToRemove.user.email}</p>
+            <p className="text-sm font-medium text-foreground">
+              {memberToRemove.user.name}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {memberToRemove.user.email}
+            </p>
           </div>
         )}
       </AnimatedModal>

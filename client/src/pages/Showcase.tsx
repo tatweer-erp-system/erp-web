@@ -1,8 +1,28 @@
 import { useState } from "react";
-import { ChevronRight, Check, BarChart3, Users, Package, Zap, Eye, Share2, Download } from "lucide-react";
+import {
+  ChevronRight,
+  Check,
+  BarChart3,
+  Users,
+  Package,
+  Zap,
+  Eye,
+  Share2,
+  Download,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import {
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 const chartData = [
   { month: "Jan", value: 4000 },
@@ -25,10 +45,15 @@ export default function Showcase() {
             <div className="w-10 h-10 bg-gradient-to-br from-primary to-blue-700 rounded-lg flex items-center justify-center text-white font-bold">
               E
             </div>
-            <span className="font-display font-bold text-xl text-foreground">ERP Dashboard</span>
+            <span className="font-display font-bold text-xl text-foreground">
+              ERP Dashboard
+            </span>
           </div>
           <div className="flex gap-4">
-            <a href="/" className="text-sm font-medium text-foreground hover:text-primary transition-colors">
+            <a
+              href="/"
+              className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+            >
               View Dashboard
             </a>
           </div>
@@ -49,13 +74,19 @@ export default function Showcase() {
             Modern ERP Admin Dashboard
           </h1>
           <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
-            A professional, minimalist dashboard design built with the latest technologies. Featuring intuitive navigation, real-time data visualization, and a modern aesthetic that enhances user experience and productivity.
+            A professional, minimalist dashboard design built with the latest
+            technologies. Featuring intuitive navigation, real-time data
+            visualization, and a modern aesthetic that enhances user experience
+            and productivity.
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
             <Button className="bg-primary hover:bg-blue-700 text-white px-8 py-6 text-lg">
               Explore Dashboard
             </Button>
-            <Button variant="outline" className="border-border px-8 py-6 text-lg">
+            <Button
+              variant="outline"
+              className="border-border px-8 py-6 text-lg"
+            >
               View Features
             </Button>
           </div>
@@ -74,9 +105,13 @@ export default function Showcase() {
               <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-6">
                 <BarChart3 size={24} className="text-white" />
               </div>
-              <h3 className="font-display font-bold text-xl text-foreground mb-3">Real-Time Analytics</h3>
+              <h3 className="font-display font-bold text-xl text-foreground mb-3">
+                Real-Time Analytics
+              </h3>
               <p className="text-muted-foreground leading-relaxed">
-                Interactive charts and visualizations that update in real-time, providing instant insights into your business metrics and performance indicators.
+                Interactive charts and visualizations that update in real-time,
+                providing instant insights into your business metrics and
+                performance indicators.
               </p>
               <ul className="mt-4 space-y-2">
                 <li className="flex items-center gap-2 text-sm text-foreground">
@@ -96,9 +131,12 @@ export default function Showcase() {
               <div className="w-12 h-12 bg-accent rounded-lg flex items-center justify-center mb-6">
                 <Package size={24} className="text-white" />
               </div>
-              <h3 className="font-display font-bold text-xl text-foreground mb-3">Inventory Management</h3>
+              <h3 className="font-display font-bold text-xl text-foreground mb-3">
+                Inventory Management
+              </h3>
               <p className="text-muted-foreground leading-relaxed">
-                Comprehensive inventory tracking with stock level monitoring, reorder alerts, and detailed product information management.
+                Comprehensive inventory tracking with stock level monitoring,
+                reorder alerts, and detailed product information management.
               </p>
               <ul className="mt-4 space-y-2">
                 <li className="flex items-center gap-2 text-sm text-foreground">
@@ -118,9 +156,13 @@ export default function Showcase() {
               <div className="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center mb-6">
                 <Users size={24} className="text-white" />
               </div>
-              <h3 className="font-display font-bold text-xl text-foreground mb-3">User Management</h3>
+              <h3 className="font-display font-bold text-xl text-foreground mb-3">
+                User Management
+              </h3>
               <p className="text-muted-foreground leading-relaxed">
-                Intuitive user interface with role-based access control, activity monitoring, and comprehensive user administration tools.
+                Intuitive user interface with role-based access control,
+                activity monitoring, and comprehensive user administration
+                tools.
               </p>
               <ul className="mt-4 space-y-2">
                 <li className="flex items-center gap-2 text-sm text-foreground">
@@ -146,9 +188,14 @@ export default function Showcase() {
           </h2>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h3 className="font-display font-bold text-2xl text-foreground mb-6">Modern Minimalist Approach</h3>
+              <h3 className="font-display font-bold text-2xl text-foreground mb-6">
+                Modern Minimalist Approach
+              </h3>
               <p className="text-muted-foreground leading-relaxed mb-4">
-                Our design philosophy emphasizes clarity, efficiency, and professionalism. We use a carefully curated color palette with cool blues for trust, semantic accent colors for status indication, and generous whitespace for visual breathing room.
+                Our design philosophy emphasizes clarity, efficiency, and
+                professionalism. We use a carefully curated color palette with
+                cool blues for trust, semantic accent colors for status
+                indication, and generous whitespace for visual breathing room.
               </p>
               <div className="space-y-3 mt-6">
                 <div className="flex gap-3">
@@ -157,7 +204,10 @@ export default function Showcase() {
                   </div>
                   <div>
                     <p className="font-medium text-foreground">Color Palette</p>
-                    <p className="text-sm text-muted-foreground">Primary blue (#0066CC), accent green (#10B981), warning amber (#F59E0B)</p>
+                    <p className="text-sm text-muted-foreground">
+                      Primary blue (#0066CC), accent green (#10B981), warning
+                      amber (#F59E0B)
+                    </p>
                   </div>
                 </div>
                 <div className="flex gap-3">
@@ -166,7 +216,9 @@ export default function Showcase() {
                   </div>
                   <div>
                     <p className="font-medium text-foreground">Typography</p>
-                    <p className="text-sm text-muted-foreground">Geist for headings, Inter for body, Fira Code for data</p>
+                    <p className="text-sm text-muted-foreground">
+                      Geist for headings, Inter for body, Fira Code for data
+                    </p>
                   </div>
                 </div>
                 <div className="flex gap-3">
@@ -175,7 +227,10 @@ export default function Showcase() {
                   </div>
                   <div>
                     <p className="font-medium text-foreground">Interactions</p>
-                    <p className="text-sm text-muted-foreground">Smooth transitions, subtle shadows, responsive hover states</p>
+                    <p className="text-sm text-muted-foreground">
+                      Smooth transitions, subtle shadows, responsive hover
+                      states
+                    </p>
                   </div>
                 </div>
               </div>
@@ -187,7 +242,9 @@ export default function Showcase() {
                     <div className="w-6 h-6 bg-primary rounded"></div>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-foreground">Primary Color</p>
+                    <p className="text-sm font-medium text-foreground">
+                      Primary Color
+                    </p>
                     <p className="text-xs text-muted-foreground">#0066CC</p>
                   </div>
                 </div>
@@ -196,7 +253,9 @@ export default function Showcase() {
                     <div className="w-6 h-6 bg-accent rounded"></div>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-foreground">Success Color</p>
+                    <p className="text-sm font-medium text-foreground">
+                      Success Color
+                    </p>
                     <p className="text-xs text-muted-foreground">#10B981</p>
                   </div>
                 </div>
@@ -205,7 +264,9 @@ export default function Showcase() {
                     <div className="w-6 h-6 bg-orange-500 rounded"></div>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-foreground">Warning Color</p>
+                    <p className="text-sm font-medium text-foreground">
+                      Warning Color
+                    </p>
                     <p className="text-xs text-muted-foreground">#F59E0B</p>
                   </div>
                 </div>
@@ -214,7 +275,9 @@ export default function Showcase() {
                     <div className="w-6 h-6 bg-destructive rounded"></div>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-foreground">Destructive Color</p>
+                    <p className="text-sm font-medium text-foreground">
+                      Destructive Color
+                    </p>
                     <p className="text-xs text-muted-foreground">#EF4444</p>
                   </div>
                 </div>
@@ -237,19 +300,25 @@ export default function Showcase() {
                 <BarChart3 size={48} className="text-primary opacity-30" />
               </div>
               <div className="p-6">
-                <h3 className="font-display font-bold text-xl text-foreground mb-2">Dashboard</h3>
+                <h3 className="font-display font-bold text-xl text-foreground mb-2">
+                  Dashboard
+                </h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Executive overview with KPI cards, revenue trends, inventory status, and top-selling products visualization.
+                  Executive overview with KPI cards, revenue trends, inventory
+                  status, and top-selling products visualization.
                 </p>
                 <ul className="space-y-2 text-sm">
                   <li className="flex items-center gap-2">
-                    <ChevronRight size={14} className="text-primary" /> KPI metrics
+                    <ChevronRight size={14} className="text-primary" /> KPI
+                    metrics
                   </li>
                   <li className="flex items-center gap-2">
-                    <ChevronRight size={14} className="text-primary" /> Revenue charts
+                    <ChevronRight size={14} className="text-primary" /> Revenue
+                    charts
                   </li>
                   <li className="flex items-center gap-2">
-                    <ChevronRight size={14} className="text-primary" /> Inventory pie chart
+                    <ChevronRight size={14} className="text-primary" />{" "}
+                    Inventory pie chart
                   </li>
                 </ul>
               </div>
@@ -261,19 +330,25 @@ export default function Showcase() {
                 <Package size={48} className="text-accent opacity-30" />
               </div>
               <div className="p-6">
-                <h3 className="font-display font-bold text-xl text-foreground mb-2">Inventory</h3>
+                <h3 className="font-display font-bold text-xl text-foreground mb-2">
+                  Inventory
+                </h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Complete product management with stock levels, reorder tracking, status indicators, and bulk actions.
+                  Complete product management with stock levels, reorder
+                  tracking, status indicators, and bulk actions.
                 </p>
                 <ul className="space-y-2 text-sm">
                   <li className="flex items-center gap-2">
-                    <ChevronRight size={14} className="text-primary" /> Product table
+                    <ChevronRight size={14} className="text-primary" /> Product
+                    table
                   </li>
                   <li className="flex items-center gap-2">
-                    <ChevronRight size={14} className="text-primary" /> Stock status
+                    <ChevronRight size={14} className="text-primary" /> Stock
+                    status
                   </li>
                   <li className="flex items-center gap-2">
-                    <ChevronRight size={14} className="text-primary" /> Search & filter
+                    <ChevronRight size={14} className="text-primary" /> Search &
+                    filter
                   </li>
                 </ul>
               </div>
@@ -285,19 +360,25 @@ export default function Showcase() {
                 <Zap size={48} className="text-purple-600 opacity-30" />
               </div>
               <div className="p-6">
-                <h3 className="font-display font-bold text-xl text-foreground mb-2">Analytics</h3>
+                <h3 className="font-display font-bold text-xl text-foreground mb-2">
+                  Analytics
+                </h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Advanced reporting with revenue trends, category performance, customer metrics, and key insights.
+                  Advanced reporting with revenue trends, category performance,
+                  customer metrics, and key insights.
                 </p>
                 <ul className="space-y-2 text-sm">
                   <li className="flex items-center gap-2">
-                    <ChevronRight size={14} className="text-primary" /> Revenue trends
+                    <ChevronRight size={14} className="text-primary" /> Revenue
+                    trends
                   </li>
                   <li className="flex items-center gap-2">
-                    <ChevronRight size={14} className="text-primary" /> Category analysis
+                    <ChevronRight size={14} className="text-primary" /> Category
+                    analysis
                   </li>
                   <li className="flex items-center gap-2">
-                    <ChevronRight size={14} className="text-primary" /> Customer insights
+                    <ChevronRight size={14} className="text-primary" /> Customer
+                    insights
                   </li>
                 </ul>
               </div>
@@ -319,9 +400,13 @@ export default function Showcase() {
                   <Eye size={24} className="text-white" />
                 </div>
                 <div>
-                  <h4 className="font-display font-bold text-lg text-foreground mb-2">Explore Data More Intuitively</h4>
+                  <h4 className="font-display font-bold text-lg text-foreground mb-2">
+                    Explore Data More Intuitively
+                  </h4>
                   <p className="text-muted-foreground">
-                    Interactive visualizations and intuitive layouts make it easy to understand complex business data at a glance, reducing cognitive load and improving decision-making speed.
+                    Interactive visualizations and intuitive layouts make it
+                    easy to understand complex business data at a glance,
+                    reducing cognitive load and improving decision-making speed.
                   </p>
                 </div>
               </div>
@@ -330,9 +415,13 @@ export default function Showcase() {
                   <BarChart3 size={24} className="text-white" />
                 </div>
                 <div>
-                  <h4 className="font-display font-bold text-lg text-foreground mb-2">Understand Trends Better</h4>
+                  <h4 className="font-display font-bold text-lg text-foreground mb-2">
+                    Understand Trends Better
+                  </h4>
                   <p className="text-muted-foreground">
-                    Real-time charts and comprehensive analytics reveal patterns and trends in your business metrics, enabling data-driven strategies and proactive management.
+                    Real-time charts and comprehensive analytics reveal patterns
+                    and trends in your business metrics, enabling data-driven
+                    strategies and proactive management.
                   </p>
                 </div>
               </div>
@@ -341,19 +430,27 @@ export default function Showcase() {
                   <Share2 size={24} className="text-white" />
                 </div>
                 <div>
-                  <h4 className="font-display font-bold text-lg text-foreground mb-2">Easily Save or Share</h4>
+                  <h4 className="font-display font-bold text-lg text-foreground mb-2">
+                    Easily Save or Share
+                  </h4>
                   <p className="text-muted-foreground">
-                    Export reports, share dashboards with team members, and maintain audit trails—all with built-in functionality for seamless collaboration and compliance.
+                    Export reports, share dashboards with team members, and
+                    maintain audit trails—all with built-in functionality for
+                    seamless collaboration and compliance.
                   </p>
                 </div>
               </div>
             </div>
             <Card className="p-8 dark:bg-card bg-card shadow-sm border-0">
-              <h4 className="font-display font-bold text-xl text-foreground mb-6">Dashboard Capabilities</h4>
+              <h4 className="font-display font-bold text-xl text-foreground mb-6">
+                Dashboard Capabilities
+              </h4>
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <Check size={20} className="text-accent" />
-                  <span className="text-foreground">Real-time data updates</span>
+                  <span className="text-foreground">
+                    Real-time data updates
+                  </span>
                 </div>
                 <div className="flex items-center gap-3">
                   <Check size={20} className="text-accent" />
@@ -373,7 +470,9 @@ export default function Showcase() {
                 </div>
                 <div className="flex items-center gap-3">
                   <Check size={20} className="text-accent" />
-                  <span className="text-foreground">Accessibility compliant</span>
+                  <span className="text-foreground">
+                    Accessibility compliant
+                  </span>
                 </div>
                 <div className="flex items-center gap-3">
                   <Check size={20} className="text-accent" />
@@ -396,13 +495,17 @@ export default function Showcase() {
             Ready to Transform Your ERP System?
           </h2>
           <p className="text-lg text-muted-foreground mb-8">
-            Experience the modern dashboard design with intuitive navigation, real-time analytics, and professional aesthetics.
+            Experience the modern dashboard design with intuitive navigation,
+            real-time analytics, and professional aesthetics.
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
             <Button className="bg-primary hover:bg-blue-700 text-white px-8 py-6 text-lg">
               View Live Dashboard
             </Button>
-            <Button variant="outline" className="border-border px-8 py-6 text-lg flex items-center gap-2">
+            <Button
+              variant="outline"
+              className="border-border px-8 py-6 text-lg flex items-center gap-2"
+            >
               <Download size={18} />
               Download Design Assets
             </Button>
@@ -417,31 +520,68 @@ export default function Showcase() {
             <div>
               <h4 className="font-display font-bold mb-4">Product</h4>
               <ul className="space-y-2 text-sm opacity-80">
-                <li><a href="#" className="hover:opacity-100 transition-opacity">Dashboard</a></li>
-                <li><a href="#" className="hover:opacity-100 transition-opacity">Inventory</a></li>
-                <li><a href="#" className="hover:opacity-100 transition-opacity">Analytics</a></li>
+                <li>
+                  <a href="#" className="hover:opacity-100 transition-opacity">
+                    Dashboard
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:opacity-100 transition-opacity">
+                    Inventory
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:opacity-100 transition-opacity">
+                    Analytics
+                  </a>
+                </li>
               </ul>
             </div>
             <div>
               <h4 className="font-display font-bold mb-4">Design</h4>
               <ul className="space-y-2 text-sm opacity-80">
-                <li><a href="#" className="hover:opacity-100 transition-opacity">Color System</a></li>
-                <li><a href="#" className="hover:opacity-100 transition-opacity">Typography</a></li>
-                <li><a href="#" className="hover:opacity-100 transition-opacity">Components</a></li>
+                <li>
+                  <a href="#" className="hover:opacity-100 transition-opacity">
+                    Color System
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:opacity-100 transition-opacity">
+                    Typography
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:opacity-100 transition-opacity">
+                    Components
+                  </a>
+                </li>
               </ul>
             </div>
             <div>
               <h4 className="font-display font-bold mb-4">Resources</h4>
               <ul className="space-y-2 text-sm opacity-80">
-                <li><a href="#" className="hover:opacity-100 transition-opacity">Documentation</a></li>
-                <li><a href="#" className="hover:opacity-100 transition-opacity">Support</a></li>
-                <li><a href="#" className="hover:opacity-100 transition-opacity">Contact</a></li>
+                <li>
+                  <a href="#" className="hover:opacity-100 transition-opacity">
+                    Documentation
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:opacity-100 transition-opacity">
+                    Support
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:opacity-100 transition-opacity">
+                    Contact
+                  </a>
+                </li>
               </ul>
             </div>
             <div>
               <h4 className="font-display font-bold mb-4">About</h4>
               <p className="text-sm opacity-80">
-                Modern ERP Admin Dashboard built with React, Tailwind CSS, and Recharts for superior data visualization.
+                Modern ERP Admin Dashboard built with React, Tailwind CSS, and
+                Recharts for superior data visualization.
               </p>
             </div>
           </div>

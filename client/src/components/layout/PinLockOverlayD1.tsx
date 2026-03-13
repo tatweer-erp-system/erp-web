@@ -1,7 +1,11 @@
 import { useEffect } from "react";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { Avatar, Spin, theme as antTheme, Typography } from "antd";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
 import { usePinOverlayLogic } from "@/hooks/usePinOverlayLogic";
 
 const { Text } = Typography;
@@ -9,8 +13,17 @@ const { Text } = Typography;
 // ─── Design 1: Minimal Frosted-Glass Card ────────────────────────────────────
 export function PinLockOverlayD1() {
   const { token } = antTheme.useToken();
-  const { isLocked, pin, setPin, error, setError, loading, handleComplete, title, subtitle } =
-    usePinOverlayLogic();
+  const {
+    isLocked,
+    pin,
+    setPin,
+    error,
+    setError,
+    loading,
+    handleComplete,
+    title,
+    subtitle,
+  } = usePinOverlayLogic();
 
   // Auto-submit when 4 digits entered
   useEffect(() => {
@@ -32,8 +45,8 @@ export function PinLockOverlayD1() {
         backdropFilter: "blur(12px)",
         WebkitBackdropFilter: "blur(12px)",
       }}
-      onMouseDown={(e) => e.stopPropagation()}
-      onPointerDown={(e) => e.stopPropagation()}
+      onMouseDown={e => e.stopPropagation()}
+      onPointerDown={e => e.stopPropagation()}
     >
       <div
         style={{
@@ -46,7 +59,8 @@ export function PinLockOverlayD1() {
           alignItems: "center",
           gap: 28,
           width: 380,
-          boxShadow: "0 32px 64px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05)",
+          boxShadow:
+            "0 32px 64px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05)",
         }}
       >
         {/* Lock icon ring */}
@@ -66,7 +80,14 @@ export function PinLockOverlayD1() {
         </div>
 
         {/* Avatar + user */}
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 6,
+          }}
+        >
           <Avatar
             size={52}
             icon={<UserOutlined />}
@@ -77,14 +98,25 @@ export function PinLockOverlayD1() {
               boxShadow: `0 4px 12px ${token.colorPrimary}50`,
             }}
           />
-          <Text strong style={{ fontSize: 15, marginTop: 4 }}>John Doe</Text>
-          <Text type="secondary" style={{ fontSize: 12 }}>admin@tatweer.io</Text>
+          <Text strong style={{ fontSize: 15, marginTop: 4 }}>
+            John Doe
+          </Text>
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            admin@tatweer.io
+          </Text>
         </div>
 
         {/* Title */}
         <div style={{ textAlign: "center" }}>
-          <Text strong style={{ fontSize: 20, display: "block", marginBottom: 4 }}>{title}</Text>
-          <Text type="secondary" style={{ fontSize: 13 }}>{subtitle}</Text>
+          <Text
+            strong
+            style={{ fontSize: 20, display: "block", marginBottom: 4 }}
+          >
+            {title}
+          </Text>
+          <Text type="secondary" style={{ fontSize: 13 }}>
+            {subtitle}
+          </Text>
         </div>
 
         {/* PIN slots */}
@@ -92,10 +124,13 @@ export function PinLockOverlayD1() {
           <InputOTP
             maxLength={4}
             value={pin}
-            onChange={(v) => { setPin(v); setError(""); }}
+            onChange={v => {
+              setPin(v);
+              setError("");
+            }}
           >
             <InputOTPGroup style={{ gap: 12 }}>
-              {[0, 1, 2, 3].map((i) => (
+              {[0, 1, 2, 3].map(i => (
                 <InputOTPSlot
                   key={i}
                   index={i}

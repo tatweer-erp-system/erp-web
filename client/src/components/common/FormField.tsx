@@ -14,7 +14,14 @@ interface FormFieldProps<T extends FieldValues> {
   label: string;
   required?: boolean;
   rules?: RegisterOptions<T, FieldPath<T>>;
-  children: ReactNode | ((field: { value: unknown; onChange: (...args: unknown[]) => void; onBlur: () => void; name: string }) => ReactNode);
+  children:
+    | ReactNode
+    | ((field: {
+        value: unknown;
+        onChange: (...args: unknown[]) => void;
+        onBlur: () => void;
+        name: string;
+      }) => ReactNode);
 }
 
 export function FormField<T extends FieldValues>({
@@ -42,7 +49,9 @@ export function FormField<T extends FieldValues>({
             : children}
 
           {fieldState.error && (
-            <p className="text-xs text-destructive">{fieldState.error.message}</p>
+            <p className="text-xs text-destructive">
+              {fieldState.error.message}
+            </p>
           )}
         </div>
       )}

@@ -13,7 +13,9 @@ export default function Payments() {
     >
       <Card className="p-8 text-center">
         <h2 className="text-2xl font-bold text-foreground mb-2">Payments</h2>
-        <p className="text-muted-foreground">This page is coming soon. Content will be added here.</p>
+        <p className="text-muted-foreground">
+          This page is coming soon. Content will be added here.
+        </p>
       </Card>
     </DashboardLayout>
   );

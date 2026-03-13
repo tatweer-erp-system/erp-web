@@ -1,4 +1,9 @@
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PAGE_SIZE_OPTIONS } from "@/lib/constants";
 import type { PaginationState } from "./types";
@@ -9,13 +14,18 @@ interface DataTablePaginationProps {
   onPaginationChange: (next: PaginationState) => void;
 }
 
-export function DataTablePagination({ pagination, totalRows, onPaginationChange }: DataTablePaginationProps) {
+export function DataTablePagination({
+  pagination,
+  totalRows,
+  onPaginationChange,
+}: DataTablePaginationProps) {
   const { pageIndex, pageSize } = pagination;
   const totalPages = Math.max(1, Math.ceil(totalRows / pageSize));
   const from = pageIndex * pageSize + 1;
   const to = Math.min((pageIndex + 1) * pageSize, totalRows);
 
-  const go = (idx: number) => onPaginationChange({ ...pagination, pageIndex: idx });
+  const go = (idx: number) =>
+    onPaginationChange({ ...pagination, pageIndex: idx });
 
   return (
     <div className="flex items-center justify-between px-4 py-3 border-t border-border">
@@ -23,10 +33,19 @@ export function DataTablePagination({ pagination, totalRows, onPaginationChange 
         <span className="text-xs text-muted-foreground">Rows per page</span>
         <select
           value={pageSize}
-          onChange={(e) => onPaginationChange({ pageIndex: 0, pageSize: Number(e.target.value) })}
+          onChange={e =>
+            onPaginationChange({
+              pageIndex: 0,
+              pageSize: Number(e.target.value),
+            })
+          }
           className="text-xs border border-border rounded px-2 py-1 bg-background"
         >
-          {PAGE_SIZE_OPTIONS.map((s) => <option key={s} value={s}>{s}</option>)}
+          {PAGE_SIZE_OPTIONS.map(s => (
+            <option key={s} value={s}>
+              {s}
+            </option>
+          ))}
         </select>
       </div>
 
@@ -35,19 +54,43 @@ export function DataTablePagination({ pagination, totalRows, onPaginationChange 
       </span>
 
       <div className="flex items-center gap-1">
-        <Button variant="ghost" size="sm" onClick={() => go(0)} disabled={pageIndex === 0} className="h-7 w-7 p-0">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => go(0)}
+          disabled={pageIndex === 0}
+          className="h-7 w-7 p-0"
+        >
           <ChevronsLeft size={14} />
         </Button>
-        <Button variant="ghost" size="sm" onClick={() => go(pageIndex - 1)} disabled={pageIndex === 0} className="h-7 w-7 p-0">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => go(pageIndex - 1)}
+          disabled={pageIndex === 0}
+          className="h-7 w-7 p-0"
+        >
           <ChevronLeft size={14} />
         </Button>
         <span className="text-xs text-muted-foreground px-2">
           {pageIndex + 1} / {totalPages}
         </span>
-        <Button variant="ghost" size="sm" onClick={() => go(pageIndex + 1)} disabled={pageIndex >= totalPages - 1} className="h-7 w-7 p-0">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => go(pageIndex + 1)}
+          disabled={pageIndex >= totalPages - 1}
+          className="h-7 w-7 p-0"
+        >
           <ChevronRight size={14} />
         </Button>
-        <Button variant="ghost" size="sm" onClick={() => go(totalPages - 1)} disabled={pageIndex >= totalPages - 1} className="h-7 w-7 p-0">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => go(totalPages - 1)}
+          disabled={pageIndex >= totalPages - 1}
+          className="h-7 w-7 p-0"
+        >
           <ChevronsRight size={14} />
         </Button>
       </div>

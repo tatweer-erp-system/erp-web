@@ -259,7 +259,8 @@ const CUSTOMERS: Customer[] = [
     paymentTerms: "Net 45",
     taxId: "IN-GSTIN2938471",
     currency: "USD",
-    notes: "Longest running enterprise client. Dedicated account manager assigned.",
+    notes:
+      "Longest running enterprise client. Dedicated account manager assigned.",
   },
   {
     id: "C-007",
@@ -307,7 +308,8 @@ const CUSTOMERS: Customer[] = [
     paymentTerms: "Prepaid",
     taxId: "",
     currency: "USD",
-    notes: "Account suspended due to overdue balance. Legal review in progress.",
+    notes:
+      "Account suspended due to overdue balance. Legal review in progress.",
   },
   {
     id: "C-009",
@@ -361,32 +363,110 @@ const CUSTOMERS: Customer[] = [
 
 const ACTIVITY_MAP: Record<string, ActivityItem[]> = {
   "C-001": [
-    { time: "2026-03-01 14:22", action: "Order Placed", detail: "Order #QT-2310 — $18,400", type: "order" },
-    { time: "2026-02-15 09:10", action: "Payment Received", detail: "$24,500 via wire transfer", type: "payment" },
-    { time: "2026-01-28 11:45", action: "Support Ticket Resolved", detail: "Ticket #4872 — Shipping delay", type: "support" },
-    { time: "2026-01-10 16:00", action: "Note Added", detail: "Annual contract renewal discussion", type: "note" },
-    { time: "2022-04-15 08:00", action: "Account Created", detail: "Enterprise onboarding started", type: "signup" },
+    {
+      time: "2026-03-01 14:22",
+      action: "Order Placed",
+      detail: "Order #QT-2310 — $18,400",
+      type: "order",
+    },
+    {
+      time: "2026-02-15 09:10",
+      action: "Payment Received",
+      detail: "$24,500 via wire transfer",
+      type: "payment",
+    },
+    {
+      time: "2026-01-28 11:45",
+      action: "Support Ticket Resolved",
+      detail: "Ticket #4872 — Shipping delay",
+      type: "support",
+    },
+    {
+      time: "2026-01-10 16:00",
+      action: "Note Added",
+      detail: "Annual contract renewal discussion",
+      type: "note",
+    },
+    {
+      time: "2022-04-15 08:00",
+      action: "Account Created",
+      detail: "Enterprise onboarding started",
+      type: "signup",
+    },
   ],
   default: [
-    { time: "2026-02-20 10:00", action: "Order Placed", detail: "New order submitted", type: "order" },
-    { time: "2026-02-10 14:30", action: "Payment Received", detail: "Invoice cleared", type: "payment" },
-    { time: "2026-01-15 09:00", action: "Note Added", detail: "Follow-up scheduled", type: "note" },
+    {
+      time: "2026-02-20 10:00",
+      action: "Order Placed",
+      detail: "New order submitted",
+      type: "order",
+    },
+    {
+      time: "2026-02-10 14:30",
+      action: "Payment Received",
+      detail: "Invoice cleared",
+      type: "payment",
+    },
+    {
+      time: "2026-01-15 09:00",
+      action: "Note Added",
+      detail: "Follow-up scheduled",
+      type: "note",
+    },
   ],
 };
 
 const MOCK_ORDERS = [
-  { key: "1", id: "ORD-2310", date: "2026-03-01", items: 8, total: 18400, status: "Delivered" },
-  { key: "2", id: "ORD-2289", date: "2026-02-14", items: 5, total: 9200, status: "Delivered" },
-  { key: "3", id: "ORD-2241", date: "2026-01-27", items: 12, total: 22800, status: "Delivered" },
-  { key: "4", id: "ORD-2198", date: "2026-01-09", items: 3, total: 5400, status: "Cancelled" },
+  {
+    key: "1",
+    id: "ORD-2310",
+    date: "2026-03-01",
+    items: 8,
+    total: 18400,
+    status: "Delivered",
+  },
+  {
+    key: "2",
+    id: "ORD-2289",
+    date: "2026-02-14",
+    items: 5,
+    total: 9200,
+    status: "Delivered",
+  },
+  {
+    key: "3",
+    id: "ORD-2241",
+    date: "2026-01-27",
+    items: 12,
+    total: 22800,
+    status: "Delivered",
+  },
+  {
+    key: "4",
+    id: "ORD-2198",
+    date: "2026-01-09",
+    items: 3,
+    total: 5400,
+    status: "Cancelled",
+  },
 ];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-const AVATAR_COLORS = ["#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6", "#EC4899", "#06B6D4", "#84CC16"];
+const AVATAR_COLORS = [
+  "#3B82F6",
+  "#10B981",
+  "#F59E0B",
+  "#EF4444",
+  "#8B5CF6",
+  "#EC4899",
+  "#06B6D4",
+  "#84CC16",
+];
 function avatarColor(name: string): string {
   let h = 0;
-  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) & 0xffffffff;
+  for (let i = 0; i < name.length; i++)
+    h = (h * 31 + name.charCodeAt(i)) & 0xffffffff;
   return AVATAR_COLORS[Math.abs(h) % AVATAR_COLORS.length];
 }
 
@@ -394,7 +474,7 @@ function initials(name: string): string {
   return name
     .split(" ")
     .slice(0, 2)
-    .map((w) => w[0])
+    .map(w => w[0])
     .join("")
     .toUpperCase();
 }
@@ -403,25 +483,45 @@ const fmt = (n: number) =>
   n >= 1000 ? `$${(n / 1000).toFixed(n >= 10000 ? 0 : 1)}k` : `$${n}`;
 
 const STATUS_CFG = {
-  vip:       { color: "#F59E0B", bg: "#FEF3C7", label: "VIP",       icon: <CrownOutlined /> },
-  active:    { color: "#10B981", bg: "#D1FAE5", label: "Active",    icon: <CheckCircleOutlined /> },
-  inactive:  { color: "#94A3B8", bg: "#F1F5F9", label: "Inactive",  icon: <ClockCircleOutlined /> },
-  suspended: { color: "#EF4444", bg: "#FEE2E2", label: "Suspended", icon: <CloseCircleOutlined /> },
+  vip: {
+    color: "#F59E0B",
+    bg: "#FEF3C7",
+    label: "VIP",
+    icon: <CrownOutlined />,
+  },
+  active: {
+    color: "#10B981",
+    bg: "#D1FAE5",
+    label: "Active",
+    icon: <CheckCircleOutlined />,
+  },
+  inactive: {
+    color: "#94A3B8",
+    bg: "#F1F5F9",
+    label: "Inactive",
+    icon: <ClockCircleOutlined />,
+  },
+  suspended: {
+    color: "#EF4444",
+    bg: "#FEE2E2",
+    label: "Suspended",
+    icon: <CloseCircleOutlined />,
+  },
 };
 
 const GROUP_CFG = {
-  enterprise: { color: "blue",   label: "Enterprise" },
-  smb:        { color: "green",  label: "SMB" },
-  startup:    { color: "orange", label: "Startup" },
+  enterprise: { color: "blue", label: "Enterprise" },
+  smb: { color: "green", label: "SMB" },
+  startup: { color: "orange", label: "Startup" },
   individual: { color: "purple", label: "Individual" },
 };
 
 const ACTIVITY_ICONS = {
-  order:   <ShoppingOutlined style={{ color: "#3B82F6" }} />,
-  payment: <DollarOutlined   style={{ color: "#10B981" }} />,
-  support: <MessageOutlined  style={{ color: "#F59E0B" }} />,
-  signup:  <UserOutlined     style={{ color: "#8B5CF6" }} />,
-  note:    <FileTextOutlined style={{ color: "#94A3B8" }} />,
+  order: <ShoppingOutlined style={{ color: "#3B82F6" }} />,
+  payment: <DollarOutlined style={{ color: "#10B981" }} />,
+  support: <MessageOutlined style={{ color: "#F59E0B" }} />,
+  signup: <UserOutlined style={{ color: "#8B5CF6" }} />,
+  note: <FileTextOutlined style={{ color: "#94A3B8" }} />,
 };
 
 // ─── Customer Drawer ──────────────────────────────────────────────────────────
@@ -448,12 +548,20 @@ function CustomerDrawer({
   const sc = STATUS_CFG[customer.status];
   const gc = GROUP_CFG[customer.group];
   const activity = ACTIVITY_MAP[customer.id] ?? ACTIVITY_MAP["default"];
-  const creditUsed = ((customer.balance / customer.creditLimit) * 100).toFixed(0);
-  const creditPct = Math.min(100, Math.max(0, (customer.balance / customer.creditLimit) * 100));
+  const creditUsed = ((customer.balance / customer.creditLimit) * 100).toFixed(
+    0
+  );
+  const creditPct = Math.min(
+    100,
+    Math.max(0, (customer.balance / customer.creditLimit) * 100)
+  );
 
   function saveNote() {
     if (!noteText.trim()) return;
-    setSavedNotes((prev) => [`${dayjs().format("MMM D, YYYY HH:mm")} — ${noteText}`, ...prev]);
+    setSavedNotes(prev => [
+      `${dayjs().format("MMM D, YYYY HH:mm")} — ${noteText}`,
+      ...prev,
+    ]);
     setNoteText("");
     message.success("Note saved");
   }
@@ -466,12 +574,23 @@ function CustomerDrawer({
       destroyOnClose
       title={
         <Space size={12}>
-          <Avatar size={40} style={{ background: avatarColor(customer.name), fontWeight: 600, fontSize: 15 }}>
+          <Avatar
+            size={40}
+            style={{
+              background: avatarColor(customer.name),
+              fontWeight: 600,
+              fontSize: 15,
+            }}
+          >
             {initials(customer.name)}
           </Avatar>
           <div>
-            <div style={{ fontWeight: 600, fontSize: 15, lineHeight: 1.3 }}>{customer.name}</div>
-            <Text type="secondary" style={{ fontSize: 12 }}>{customer.company} · {customer.id}</Text>
+            <div style={{ fontWeight: 600, fontSize: 15, lineHeight: 1.3 }}>
+              {customer.name}
+            </div>
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              {customer.company} · {customer.id}
+            </Text>
           </div>
         </Space>
       }
@@ -481,18 +600,31 @@ function CustomerDrawer({
             <Button icon={<MailOutlined />} size="small" />
           </Tooltip>
           <Tooltip title="Edit Customer">
-            <Button icon={<EditOutlined />} size="small" type="primary" onClick={() => onEdit(customer)} />
+            <Button
+              icon={<EditOutlined />}
+              size="small"
+              type="primary"
+              onClick={() => onEdit(customer)}
+            />
           </Tooltip>
         </Space>
       }
     >
       {/* Status + tags row */}
       <Space wrap style={{ marginBottom: 16 }}>
-        <Tag icon={sc.icon} style={{ color: sc.color, background: sc.bg, border: "none", fontWeight: 600 }}>
+        <Tag
+          icon={sc.icon}
+          style={{
+            color: sc.color,
+            background: sc.bg,
+            border: "none",
+            fontWeight: 600,
+          }}
+        >
           {sc.label}
         </Tag>
         <Tag color={gc.color}>{gc.label}</Tag>
-        {customer.tags.map((t) => (
+        {customer.tags.map(t => (
           <Tag key={t}>{t}</Tag>
         ))}
       </Space>
@@ -500,16 +632,52 @@ function CustomerDrawer({
       {/* KPI row */}
       <Row gutter={12} style={{ marginBottom: 20 }}>
         {[
-          { label: "Total Revenue", value: `$${customer.revenue.toLocaleString()}`, icon: <DollarOutlined />, color: "#10B981" },
-          { label: "Orders",        value: customer.orders,                          icon: <ShoppingOutlined />, color: "#3B82F6" },
-          { label: "Balance",       value: `$${customer.balance.toLocaleString()}`,  icon: <BankOutlined />,    color: customer.balance >= 0 ? "#10B981" : "#EF4444" },
-          { label: "Rating",        value: <Rate disabled defaultValue={customer.rating} style={{ fontSize: 12 }} />, icon: <StarOutlined />, color: "#F59E0B" },
-        ].map((k) => (
+          {
+            label: "Total Revenue",
+            value: `$${customer.revenue.toLocaleString()}`,
+            icon: <DollarOutlined />,
+            color: "#10B981",
+          },
+          {
+            label: "Orders",
+            value: customer.orders,
+            icon: <ShoppingOutlined />,
+            color: "#3B82F6",
+          },
+          {
+            label: "Balance",
+            value: `$${customer.balance.toLocaleString()}`,
+            icon: <BankOutlined />,
+            color: customer.balance >= 0 ? "#10B981" : "#EF4444",
+          },
+          {
+            label: "Rating",
+            value: (
+              <Rate
+                disabled
+                defaultValue={customer.rating}
+                style={{ fontSize: 12 }}
+              />
+            ),
+            icon: <StarOutlined />,
+            color: "#F59E0B",
+          },
+        ].map(k => (
           <Col xs={12} sm={6} key={k.label}>
-            <Card size="small" style={{ textAlign: "center", border: `1px solid ${token.colorBorderSecondary}` }}>
-              <div style={{ color: k.color, fontSize: 18, marginBottom: 4 }}>{k.icon}</div>
+            <Card
+              size="small"
+              style={{
+                textAlign: "center",
+                border: `1px solid ${token.colorBorderSecondary}`,
+              }}
+            >
+              <div style={{ color: k.color, fontSize: 18, marginBottom: 4 }}>
+                {k.icon}
+              </div>
               <div style={{ fontWeight: 700, fontSize: 13 }}>{k.value}</div>
-              <Text type="secondary" style={{ fontSize: 11 }}>{k.label}</Text>
+              <Text type="secondary" style={{ fontSize: 11 }}>
+                {k.label}
+              </Text>
             </Card>
           </Col>
         ))}
@@ -522,7 +690,9 @@ function CustomerDrawer({
             key: "overview",
             label: "Overview",
             children: (
-              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              <div
+                style={{ display: "flex", flexDirection: "column", gap: 16 }}
+              >
                 <Descriptions
                   size="small"
                   bordered
@@ -530,36 +700,103 @@ function CustomerDrawer({
                   labelStyle={{ fontWeight: 500, fontSize: 12 }}
                   contentStyle={{ fontSize: 12 }}
                 >
-                  <Descriptions.Item label={<><MailOutlined /> Email</>} span={2}>
-                    <Link href={`mailto:${customer.email}`}>{customer.email}</Link>
+                  <Descriptions.Item
+                    label={
+                      <>
+                        <MailOutlined /> Email
+                      </>
+                    }
+                    span={2}
+                  >
+                    <Link href={`mailto:${customer.email}`}>
+                      {customer.email}
+                    </Link>
                   </Descriptions.Item>
-                  <Descriptions.Item label={<><PhoneOutlined /> Phone</>}>{customer.phone}</Descriptions.Item>
-                  <Descriptions.Item label={<><GlobalOutlined /> Country</>}>{customer.country}</Descriptions.Item>
-                  <Descriptions.Item label="City">{customer.city}</Descriptions.Item>
-                  <Descriptions.Item label="Currency">{customer.currency}</Descriptions.Item>
-                  <Descriptions.Item label="Payment Terms">{customer.paymentTerms}</Descriptions.Item>
-                  <Descriptions.Item label="Tax ID">{customer.taxId || "—"}</Descriptions.Item>
-                  <Descriptions.Item label="Member Since">{dayjs(customer.joinDate).format("MMM D, YYYY")}</Descriptions.Item>
-                  <Descriptions.Item label="Last Order">{dayjs(customer.lastOrder).format("MMM D, YYYY")}</Descriptions.Item>
+                  <Descriptions.Item
+                    label={
+                      <>
+                        <PhoneOutlined /> Phone
+                      </>
+                    }
+                  >
+                    {customer.phone}
+                  </Descriptions.Item>
+                  <Descriptions.Item
+                    label={
+                      <>
+                        <GlobalOutlined /> Country
+                      </>
+                    }
+                  >
+                    {customer.country}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="City">
+                    {customer.city}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Currency">
+                    {customer.currency}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Payment Terms">
+                    {customer.paymentTerms}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Tax ID">
+                    {customer.taxId || "—"}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Member Since">
+                    {dayjs(customer.joinDate).format("MMM D, YYYY")}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Last Order">
+                    {dayjs(customer.lastOrder).format("MMM D, YYYY")}
+                  </Descriptions.Item>
                 </Descriptions>
 
                 {/* Credit utilization */}
-                <Card size="small" title="Credit Utilization" style={{ border: `1px solid ${token.colorBorderSecondary}` }}>
-                  <Space style={{ width: "100%", justifyContent: "space-between", marginBottom: 8 }}>
-                    <Text type="secondary" style={{ fontSize: 12 }}>Used: ${customer.balance.toLocaleString()}</Text>
-                    <Text type="secondary" style={{ fontSize: 12 }}>Limit: ${customer.creditLimit.toLocaleString()}</Text>
+                <Card
+                  size="small"
+                  title="Credit Utilization"
+                  style={{ border: `1px solid ${token.colorBorderSecondary}` }}
+                >
+                  <Space
+                    style={{
+                      width: "100%",
+                      justifyContent: "space-between",
+                      marginBottom: 8,
+                    }}
+                  >
+                    <Text type="secondary" style={{ fontSize: 12 }}>
+                      Used: ${customer.balance.toLocaleString()}
+                    </Text>
+                    <Text type="secondary" style={{ fontSize: 12 }}>
+                      Limit: ${customer.creditLimit.toLocaleString()}
+                    </Text>
                   </Space>
                   <Progress
                     percent={+creditPct.toFixed(1)}
-                    status={creditPct > 90 ? "exception" : creditPct > 70 ? "normal" : "success"}
-                    strokeColor={creditPct > 90 ? "#EF4444" : creditPct > 70 ? "#F59E0B" : "#10B981"}
+                    status={
+                      creditPct > 90
+                        ? "exception"
+                        : creditPct > 70
+                          ? "normal"
+                          : "success"
+                    }
+                    strokeColor={
+                      creditPct > 90
+                        ? "#EF4444"
+                        : creditPct > 70
+                          ? "#F59E0B"
+                          : "#10B981"
+                    }
                     size="small"
                     format={() => `${creditUsed}%`}
                   />
                 </Card>
 
                 {/* Onboarding steps */}
-                <Card size="small" title="Onboarding Progress" style={{ border: `1px solid ${token.colorBorderSecondary}` }}>
+                <Card
+                  size="small"
+                  title="Onboarding Progress"
+                  style={{ border: `1px solid ${token.colorBorderSecondary}` }}
+                >
                   <Steps
                     size="small"
                     current={customer.onboardingStep}
@@ -590,10 +827,16 @@ function CustomerDrawer({
             key: "orders",
             label: "Orders",
             children: (
-              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              <div
+                style={{ display: "flex", flexDirection: "column", gap: 16 }}
+              >
                 <Row gutter={12}>
                   <Col xs={24} sm={12}>
-                    <Statistic title="Total Orders" value={customer.orders} prefix={<ShoppingOutlined />} />
+                    <Statistic
+                      title="Total Orders"
+                      value={customer.orders}
+                      prefix={<ShoppingOutlined />}
+                    />
                   </Col>
                   <Col xs={24} sm={12}>
                     <Statistic
@@ -610,14 +853,45 @@ function CustomerDrawer({
                   dataSource={MOCK_ORDERS}
                   pagination={false}
                   columns={[
-                    { title: "Order ID", dataIndex: "id", key: "id", render: (v) => <Text code style={{ fontSize: 11 }}>{v}</Text> },
-                    { title: "Date", dataIndex: "date", key: "date", render: (v) => dayjs(v).format("MMM D, YYYY") },
-                    { title: "Items", dataIndex: "items", key: "items", align: "center" },
-                    { title: "Total", dataIndex: "total", key: "total", render: (v) => `$${v.toLocaleString()}` },
                     {
-                      title: "Status", dataIndex: "status", key: "status",
-                      render: (v) => (
-                        <Tag color={v === "Delivered" ? "green" : "red"} style={{ fontSize: 11 }}>{v}</Tag>
+                      title: "Order ID",
+                      dataIndex: "id",
+                      key: "id",
+                      render: v => (
+                        <Text code style={{ fontSize: 11 }}>
+                          {v}
+                        </Text>
+                      ),
+                    },
+                    {
+                      title: "Date",
+                      dataIndex: "date",
+                      key: "date",
+                      render: v => dayjs(v).format("MMM D, YYYY"),
+                    },
+                    {
+                      title: "Items",
+                      dataIndex: "items",
+                      key: "items",
+                      align: "center",
+                    },
+                    {
+                      title: "Total",
+                      dataIndex: "total",
+                      key: "total",
+                      render: v => `$${v.toLocaleString()}`,
+                    },
+                    {
+                      title: "Status",
+                      dataIndex: "status",
+                      key: "status",
+                      render: v => (
+                        <Tag
+                          color={v === "Delivered" ? "green" : "red"}
+                          style={{ fontSize: 11 }}
+                        >
+                          {v}
+                        </Tag>
                       ),
                     },
                   ]}
@@ -630,15 +904,21 @@ function CustomerDrawer({
             label: "Activity",
             children: (
               <Timeline
-                items={activity.map((a) => ({
+                items={activity.map(a => ({
                   dot: ACTIVITY_ICONS[a.type],
                   children: (
                     <div>
-                      <Text strong style={{ fontSize: 13 }}>{a.action}</Text>
+                      <Text strong style={{ fontSize: 13 }}>
+                        {a.action}
+                      </Text>
                       <br />
-                      <Text type="secondary" style={{ fontSize: 12 }}>{a.detail}</Text>
+                      <Text type="secondary" style={{ fontSize: 12 }}>
+                        {a.detail}
+                      </Text>
                       <br />
-                      <Text type="secondary" style={{ fontSize: 11 }}>{dayjs(a.time).fromNow()}</Text>
+                      <Text type="secondary" style={{ fontSize: 11 }}>
+                        {dayjs(a.time).fromNow()}
+                      </Text>
                     </div>
                   ),
                 }))}
@@ -649,31 +929,56 @@ function CustomerDrawer({
             key: "notes",
             label: "Notes",
             children: (
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <div
+                style={{ display: "flex", flexDirection: "column", gap: 12 }}
+              >
                 <TextArea
                   rows={3}
                   placeholder="Add a note about this customer..."
                   value={noteText}
-                  onChange={(e) => setNoteText(e.target.value)}
+                  onChange={e => setNoteText(e.target.value)}
                   maxLength={300}
                   showCount
                 />
-                <Button type="primary" size="small" onClick={saveNote} icon={<PlusOutlined />}>
+                <Button
+                  type="primary"
+                  size="small"
+                  onClick={saveNote}
+                  icon={<PlusOutlined />}
+                >
                   Save Note
                 </Button>
                 <Divider style={{ margin: "8px 0" }} />
                 {savedNotes.length === 0 && !customer.notes ? (
-                  <Empty description="No notes yet" image={Empty.PRESENTED_IMAGE_SIMPLE} />
+                  <Empty
+                    description="No notes yet"
+                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                  />
                 ) : (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  <div
+                    style={{ display: "flex", flexDirection: "column", gap: 8 }}
+                  >
                     {savedNotes.map((n, i) => (
-                      <Card key={i} size="small" style={{ border: `1px solid ${token.colorBorderSecondary}` }}>
+                      <Card
+                        key={i}
+                        size="small"
+                        style={{
+                          border: `1px solid ${token.colorBorderSecondary}`,
+                        }}
+                      >
                         <Text style={{ fontSize: 12 }}>{n}</Text>
                       </Card>
                     ))}
                     {customer.notes && (
-                      <Card size="small" style={{ border: `1px solid ${token.colorBorderSecondary}` }}>
-                        <Text type="secondary" style={{ fontSize: 11 }}>System note</Text>
+                      <Card
+                        size="small"
+                        style={{
+                          border: `1px solid ${token.colorBorderSecondary}`,
+                        }}
+                      >
+                        <Text type="secondary" style={{ fontSize: 11 }}>
+                          System note
+                        </Text>
                         <br />
                         <Text style={{ fontSize: 12 }}>{customer.notes}</Text>
                       </Card>
@@ -759,48 +1064,86 @@ function CustomerFormModal({
               children: (
                 <Row gutter={16}>
                   <Col xs={24} sm={12}>
-                    <Form.Item name="name" label="Full Name" rules={[{ required: true, message: "Required" }]}>
-                      <Input prefix={<UserOutlined />} placeholder="Customer name" />
+                    <Form.Item
+                      name="name"
+                      label="Full Name"
+                      rules={[{ required: true, message: "Required" }]}
+                    >
+                      <Input
+                        prefix={<UserOutlined />}
+                        placeholder="Customer name"
+                      />
                     </Form.Item>
                   </Col>
                   <Col xs={24} sm={12}>
                     <Form.Item name="company" label="Company">
-                      <Input prefix={<BankOutlined />} placeholder="Company name" />
+                      <Input
+                        prefix={<BankOutlined />}
+                        placeholder="Company name"
+                      />
                     </Form.Item>
                   </Col>
                   <Col xs={24} sm={12}>
-                    <Form.Item name="email" label="Email" rules={[{ type: "email", message: "Invalid email" }, { required: true }]}>
-                      <Input prefix={<MailOutlined />} placeholder="email@example.com" />
+                    <Form.Item
+                      name="email"
+                      label="Email"
+                      rules={[
+                        { type: "email", message: "Invalid email" },
+                        { required: true },
+                      ]}
+                    >
+                      <Input
+                        prefix={<MailOutlined />}
+                        placeholder="email@example.com"
+                      />
                     </Form.Item>
                   </Col>
                   <Col xs={24} sm={12}>
                     <Form.Item name="phone" label="Phone">
                       <Space.Compact style={{ width: "100%" }}>
-                        <Select style={{ width: 90 }} defaultValue="+1" options={[
-                          { value: "+1", label: "🇺🇸 +1" },
-                          { value: "+44", label: "🇬🇧 +44" },
-                          { value: "+91", label: "🇮🇳 +91" },
-                          { value: "+86", label: "🇨🇳 +86" },
-                          { value: "+81", label: "🇯🇵 +81" },
-                          { value: "+234", label: "🇳🇬 +234" },
-                        ]} />
+                        <Select
+                          style={{ width: 90 }}
+                          defaultValue="+1"
+                          options={[
+                            { value: "+1", label: "🇺🇸 +1" },
+                            { value: "+44", label: "🇬🇧 +44" },
+                            { value: "+91", label: "🇮🇳 +91" },
+                            { value: "+86", label: "🇨🇳 +86" },
+                            { value: "+81", label: "🇯🇵 +81" },
+                            { value: "+234", label: "🇳🇬 +234" },
+                          ]}
+                        />
                         <Input placeholder="Phone number" />
                       </Space.Compact>
                     </Form.Item>
                   </Col>
                   <Col xs={24} sm={12}>
-                    <Form.Item name="group" label="Customer Group" rules={[{ required: true }]}>
+                    <Form.Item
+                      name="group"
+                      label="Customer Group"
+                      rules={[{ required: true }]}
+                    >
                       <Select
                         placeholder="Select group"
-                        options={Object.entries(GROUP_CFG).map(([v, cfg]) => ({ value: v, label: cfg.label }))}
+                        options={Object.entries(GROUP_CFG).map(([v, cfg]) => ({
+                          value: v,
+                          label: cfg.label,
+                        }))}
                       />
                     </Form.Item>
                   </Col>
                   <Col xs={24} sm={12}>
-                    <Form.Item name="status" label="Status" rules={[{ required: true }]}>
+                    <Form.Item
+                      name="status"
+                      label="Status"
+                      rules={[{ required: true }]}
+                    >
                       <Select
                         placeholder="Select status"
-                        options={Object.entries(STATUS_CFG).map(([v, cfg]) => ({ value: v, label: cfg.label }))}
+                        options={Object.entries(STATUS_CFG).map(([v, cfg]) => ({
+                          value: v,
+                          label: cfg.label,
+                        }))}
                       />
                     </Form.Item>
                   </Col>
@@ -809,7 +1152,19 @@ function CustomerFormModal({
                       <Select
                         mode="tags"
                         placeholder="Add tags (press Enter)"
-                        options={["Key Account", "Net-30", "Net-15", "Net-45", "Net-60", "Prepaid", "Priority", "Referral", "High Volume", "EU", "APAC"].map((t) => ({ value: t, label: t }))}
+                        options={[
+                          "Key Account",
+                          "Net-30",
+                          "Net-15",
+                          "Net-45",
+                          "Net-60",
+                          "Prepaid",
+                          "Priority",
+                          "Referral",
+                          "High Volume",
+                          "EU",
+                          "APAC",
+                        ].map(t => ({ value: t, label: t }))}
                         maxCount={6}
                       />
                     </Form.Item>
@@ -819,11 +1174,27 @@ function CustomerFormModal({
                       <Dragger
                         maxCount={1}
                         beforeUpload={() => false}
-                        style={{ background: token.colorFillAlter, borderColor: token.colorBorderSecondary }}
+                        style={{
+                          background: token.colorFillAlter,
+                          borderColor: token.colorBorderSecondary,
+                        }}
                       >
-                        <p><InboxOutlined style={{ fontSize: 24, color: token.colorPrimary }} /></p>
-                        <p style={{ fontSize: 12, margin: 0 }}>Click or drag a logo image</p>
-                        <p style={{ fontSize: 11, color: token.colorTextSecondary }}>PNG, JPG up to 2 MB</p>
+                        <p>
+                          <InboxOutlined
+                            style={{ fontSize: 24, color: token.colorPrimary }}
+                          />
+                        </p>
+                        <p style={{ fontSize: 12, margin: 0 }}>
+                          Click or drag a logo image
+                        </p>
+                        <p
+                          style={{
+                            fontSize: 11,
+                            color: token.colorTextSecondary,
+                          }}
+                        >
+                          PNG, JPG up to 2 MB
+                        </p>
                       </Dragger>
                     </Form.Item>
                   </Col>
@@ -840,24 +1211,53 @@ function CustomerFormModal({
                       <Select
                         showSearch
                         placeholder="Select country"
-                        options={["United States","United Kingdom","India","China","Nigeria","Mexico","Italy","Sweden","Kuwait","South Korea","Australia","Germany","France","Brazil","Canada"].map((c) => ({ value: c, label: c }))}
-                        filterOption={(input, option) => (option?.label as string)?.toLowerCase().includes(input.toLowerCase())}
+                        options={[
+                          "United States",
+                          "United Kingdom",
+                          "India",
+                          "China",
+                          "Nigeria",
+                          "Mexico",
+                          "Italy",
+                          "Sweden",
+                          "Kuwait",
+                          "South Korea",
+                          "Australia",
+                          "Germany",
+                          "France",
+                          "Brazil",
+                          "Canada",
+                        ].map(c => ({ value: c, label: c }))}
+                        filterOption={(input, option) =>
+                          (option?.label as string)
+                            ?.toLowerCase()
+                            .includes(input.toLowerCase())
+                        }
                       />
                     </Form.Item>
                   </Col>
                   <Col xs={24} sm={12}>
                     <Form.Item name="city" label="City">
-                      <Input prefix={<EnvironmentOutlined />} placeholder="City" />
+                      <Input
+                        prefix={<EnvironmentOutlined />}
+                        placeholder="City"
+                      />
                     </Form.Item>
                   </Col>
                   <Col span={24}>
                     <Form.Item name="billingAddress" label="Billing Address">
-                      <TextArea rows={2} placeholder="Street, district, postal code..." />
+                      <TextArea
+                        rows={2}
+                        placeholder="Street, district, postal code..."
+                      />
                     </Form.Item>
                   </Col>
                   <Col span={24}>
                     <Form.Item name="shippingAddress" label="Shipping Address">
-                      <TextArea rows={2} placeholder="Leave blank if same as billing" />
+                      <TextArea
+                        rows={2}
+                        placeholder="Leave blank if same as billing"
+                      />
                     </Form.Item>
                   </Col>
                 </Row>
@@ -881,14 +1281,32 @@ function CustomerFormModal({
                   <Col xs={24} sm={12}>
                     <Form.Item name="paymentTerms" label="Payment Terms">
                       <Select
-                        options={["Prepaid","Net 15","Net 30","Net 45","Net 60"].map((t) => ({ value: t, label: t }))}
+                        options={[
+                          "Prepaid",
+                          "Net 15",
+                          "Net 30",
+                          "Net 45",
+                          "Net 60",
+                        ].map(t => ({ value: t, label: t }))}
                       />
                     </Form.Item>
                   </Col>
                   <Col xs={24} sm={12}>
                     <Form.Item name="currency" label="Currency">
                       <Select
-                        options={["USD","EUR","GBP","AUD","INR","JPY","CNY","NGN","MXN","KWD","KRW"].map((c) => ({ value: c, label: c }))}
+                        options={[
+                          "USD",
+                          "EUR",
+                          "GBP",
+                          "AUD",
+                          "INR",
+                          "JPY",
+                          "CNY",
+                          "NGN",
+                          "MXN",
+                          "KWD",
+                          "KRW",
+                        ].map(c => ({ value: c, label: c }))}
                       />
                     </Form.Item>
                   </Col>
@@ -899,12 +1317,20 @@ function CustomerFormModal({
                   </Col>
                   <Col xs={24} sm={12}>
                     <Form.Item name="joinDate" label="Member Since">
-                      <DatePicker style={{ width: "100%" }} format="MMM DD, YYYY" />
+                      <DatePicker
+                        style={{ width: "100%" }}
+                        format="MMM DD, YYYY"
+                      />
                     </Form.Item>
                   </Col>
                   <Col span={24}>
                     <Form.Item name="notes" label="Internal Notes">
-                      <TextArea rows={3} placeholder="Internal notes (not visible to customer)" maxLength={500} showCount />
+                      <TextArea
+                        rows={3}
+                        placeholder="Internal notes (not visible to customer)"
+                        maxLength={500}
+                        showCount
+                      />
                     </Form.Item>
                   </Col>
                 </Row>
@@ -923,18 +1349,18 @@ function CustomersContent() {
   const { token } = antTheme.useToken();
   const screens = Grid.useBreakpoint();
   const isMobile = !screens.md;
-  const [search, setSearch]           = useState("");
+  const [search, setSearch] = useState("");
   const [groupFilter, setGroupFilter] = useState<string>("all");
-  const [statusFilter, setStatus]     = useState<string>("all");
-  const [viewMode, setViewMode]       = useState<"table" | "grid">("table");
+  const [statusFilter, setStatus] = useState<string>("all");
+  const [viewMode, setViewMode] = useState<"table" | "grid">("table");
   const [selectedKeys, setSelectedKeys] = useState<React.Key[]>([]);
   const [drawerCustomer, setDrawerCustomer] = useState<Customer | null>(null);
-  const [modalCustomer, setModalCustomer]   = useState<Customer | null>(null);
-  const [modalOpen, setModalOpen]           = useState(false);
-  const [deleteId, setDeleteId]             = useState<string | null>(null);
+  const [modalCustomer, setModalCustomer] = useState<Customer | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
-    return CUSTOMERS.filter((c) => {
+    return CUSTOMERS.filter(c => {
       const q = search.toLowerCase();
       const matchQ =
         !q ||
@@ -942,16 +1368,20 @@ function CustomersContent() {
         c.company.toLowerCase().includes(q) ||
         c.email.toLowerCase().includes(q) ||
         c.id.toLowerCase().includes(q);
-      const matchGroup  = groupFilter === "all" || c.group === groupFilter;
+      const matchGroup = groupFilter === "all" || c.group === groupFilter;
       const matchStatus = statusFilter === "all" || c.status === statusFilter;
       return matchQ && matchGroup && matchStatus;
     });
   }, [search, groupFilter, statusFilter]);
 
-  const totalRevenue    = CUSTOMERS.reduce((s, c) => s + c.revenue, 0);
-  const totalOrders     = CUSTOMERS.reduce((s, c) => s + c.orders, 0);
-  const activeCount     = CUSTOMERS.filter((c) => c.status === "active" || c.status === "vip").length;
-  const avgRating       = (CUSTOMERS.reduce((s, c) => s + c.rating, 0) / CUSTOMERS.length).toFixed(1);
+  const totalRevenue = CUSTOMERS.reduce((s, c) => s + c.revenue, 0);
+  const totalOrders = CUSTOMERS.reduce((s, c) => s + c.orders, 0);
+  const activeCount = CUSTOMERS.filter(
+    c => c.status === "active" || c.status === "vip"
+  ).length;
+  const avgRating = (
+    CUSTOMERS.reduce((s, c) => s + c.rating, 0) / CUSTOMERS.length
+  ).toFixed(1);
 
   function openEdit(c: Customer) {
     setModalCustomer(c);
@@ -968,23 +1398,43 @@ function CustomersContent() {
   }
 
   function exportCsv() {
-    message.loading({ content: "Preparing export...", key: "export", duration: 1.5 });
-    setTimeout(() => message.success({ content: "CSV downloaded", key: "export" }), 1500);
+    message.loading({
+      content: "Preparing export...",
+      key: "export",
+      duration: 1.5,
+    });
+    setTimeout(
+      () => message.success({ content: "CSV downloaded", key: "export" }),
+      1500
+    );
   }
 
   const rowMenu = (c: Customer) => ({
     items: [
-      { key: "view",    label: "View Details", icon: <EyeOutlined />  },
-      { key: "edit",    label: "Edit",         icon: <EditOutlined /> },
-      { key: "email",   label: "Send Email",   icon: <MailOutlined /> },
+      { key: "view", label: "View Details", icon: <EyeOutlined /> },
+      { key: "edit", label: "Edit", icon: <EditOutlined /> },
+      { key: "email", label: "Send Email", icon: <MailOutlined /> },
       { type: "divider" as const },
-      { key: "delete",  label: <Text type="danger">Delete</Text>, icon: <DeleteOutlined style={{ color: "#EF4444" }} />, danger: true },
+      {
+        key: "delete",
+        label: <Text type="danger">Delete</Text>,
+        icon: <DeleteOutlined style={{ color: "#EF4444" }} />,
+        danger: true,
+      },
     ],
     onClick: ({ key }: { key: string }) => {
-      if (key === "view")   { setDrawerCustomer(c); }
-      if (key === "edit")   { openEdit(c); }
-      if (key === "email")  { message.info(`Opening email to ${c.email}`); }
-      if (key === "delete") { confirmDelete(c.id); }
+      if (key === "view") {
+        setDrawerCustomer(c);
+      }
+      if (key === "edit") {
+        openEdit(c);
+      }
+      if (key === "email") {
+        message.info(`Opening email to ${c.email}`);
+      }
+      if (key === "delete") {
+        confirmDelete(c.id);
+      }
     },
   });
 
@@ -997,14 +1447,35 @@ function CustomersContent() {
       sorter: (a, b) => a.name.localeCompare(b.name),
       render: (_, c) => (
         <Space size={10}>
-          <Badge dot status={c.status === "active" || c.status === "vip" ? "success" : c.status === "suspended" ? "error" : "default"}>
-            <Avatar size={36} style={{ background: avatarColor(c.name), fontWeight: 700, fontSize: 13, flexShrink: 0 }}>
+          <Badge
+            dot
+            status={
+              c.status === "active" || c.status === "vip"
+                ? "success"
+                : c.status === "suspended"
+                  ? "error"
+                  : "default"
+            }
+          >
+            <Avatar
+              size={36}
+              style={{
+                background: avatarColor(c.name),
+                fontWeight: 700,
+                fontSize: 13,
+                flexShrink: 0,
+              }}
+            >
               {initials(c.name)}
             </Avatar>
           </Badge>
           <div>
-            <div style={{ fontWeight: 600, fontSize: 13, lineHeight: 1.3 }}>{c.name}</div>
-            <Text type="secondary" style={{ fontSize: 12 }}>{c.company}</Text>
+            <div style={{ fontWeight: 600, fontSize: 13, lineHeight: 1.3 }}>
+              {c.name}
+            </div>
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              {c.company}
+            </Text>
           </div>
         </Space>
       ),
@@ -1014,12 +1485,24 @@ function CustomersContent() {
       dataIndex: "status",
       key: "status",
       width: 110,
-      filters: Object.entries(STATUS_CFG).map(([v, cfg]) => ({ text: cfg.label, value: v })),
+      filters: Object.entries(STATUS_CFG).map(([v, cfg]) => ({
+        text: cfg.label,
+        value: v,
+      })),
       onFilter: (v, r) => r.status === v,
       render: (v: Customer["status"]) => {
         const sc = STATUS_CFG[v];
         return (
-          <Tag icon={sc.icon} style={{ color: sc.color, background: sc.bg, border: "none", fontWeight: 500, fontSize: 11 }}>
+          <Tag
+            icon={sc.icon}
+            style={{
+              color: sc.color,
+              background: sc.bg,
+              border: "none",
+              fontWeight: 500,
+              fontSize: 11,
+            }}
+          >
             {sc.label}
           </Tag>
         );
@@ -1030,7 +1513,9 @@ function CustomersContent() {
       dataIndex: "group",
       key: "group",
       width: 110,
-      render: (v: Customer["group"]) => <Tag color={GROUP_CFG[v].color}>{GROUP_CFG[v].label}</Tag>,
+      render: (v: Customer["group"]) => (
+        <Tag color={GROUP_CFG[v].color}>{GROUP_CFG[v].label}</Tag>
+      ),
     },
     {
       title: "Revenue",
@@ -1039,8 +1524,10 @@ function CustomersContent() {
       width: 120,
       sorter: (a, b) => a.revenue - b.revenue,
       defaultSortOrder: "descend",
-      render: (v) => (
-        <Text strong style={{ color: "#10B981" }}>${v.toLocaleString()}</Text>
+      render: v => (
+        <Text strong style={{ color: "#10B981" }}>
+          ${v.toLocaleString()}
+        </Text>
       ),
     },
     {
@@ -1057,10 +1544,16 @@ function CustomersContent() {
       key: "balance",
       width: 120,
       sorter: (a, b) => a.balance - b.balance,
-      render: (v) => (
+      render: v => (
         <Space size={4}>
-          {v > 0 ? <RiseOutlined style={{ color: "#10B981" }} /> : v < 0 ? <FallOutlined style={{ color: "#EF4444" }} /> : null}
-          <Text style={{ color: v >= 0 ? "#10B981" : "#EF4444", fontWeight: 500 }}>
+          {v > 0 ? (
+            <RiseOutlined style={{ color: "#10B981" }} />
+          ) : v < 0 ? (
+            <FallOutlined style={{ color: "#EF4444" }} />
+          ) : null}
+          <Text
+            style={{ color: v >= 0 ? "#10B981" : "#EF4444", fontWeight: 500 }}
+          >
             ${Math.abs(v).toLocaleString()}
           </Text>
         </Space>
@@ -1072,7 +1565,7 @@ function CustomersContent() {
       key: "rating",
       width: 130,
       sorter: (a, b) => a.rating - b.rating,
-      render: (v) => <Rate disabled value={v} style={{ fontSize: 13 }} />,
+      render: v => <Rate disabled value={v} style={{ fontSize: 13 }} />,
     },
     {
       title: "Last Order",
@@ -1080,9 +1573,11 @@ function CustomersContent() {
       key: "lastOrder",
       width: 130,
       sorter: (a, b) => dayjs(a.lastOrder).unix() - dayjs(b.lastOrder).unix(),
-      render: (v) => (
+      render: v => (
         <Tooltip title={dayjs(v).format("MMMM D, YYYY")}>
-          <Text type="secondary" style={{ fontSize: 12 }}>{dayjs(v).fromNow()}</Text>
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            {dayjs(v).fromNow()}
+          </Text>
         </Tooltip>
       ),
     },
@@ -1093,8 +1588,14 @@ function CustomersContent() {
       width: 200,
       render: (tags: string[]) => (
         <Space wrap size={4}>
-          {tags.slice(0, 2).map((t) => <Tag key={t} style={{ fontSize: 11 }}>{t}</Tag>)}
-          {tags.length > 2 && <Tag style={{ fontSize: 11 }}>+{tags.length - 2}</Tag>}
+          {tags.slice(0, 2).map(t => (
+            <Tag key={t} style={{ fontSize: 11 }}>
+              {t}
+            </Tag>
+          ))}
+          {tags.length > 2 && (
+            <Tag style={{ fontSize: 11 }}>+{tags.length - 2}</Tag>
+          )}
         </Space>
       ),
     },
@@ -1115,24 +1616,41 @@ function CustomersContent() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-
       {/* Page header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          flexWrap: "wrap",
+          gap: 12,
+        }}
+      >
         <div>
-          <Title level={4} style={{ margin: 0 }}>Customers</Title>
+          <Title level={4} style={{ margin: 0 }}>
+            Customers
+          </Title>
           <Text type="secondary" style={{ fontSize: 13 }}>
             {CUSTOMERS.length} total · {activeCount} active
           </Text>
         </div>
         <Space>
           <Tooltip title="Refresh">
-            <Button icon={<ReloadOutlined />} onClick={() => message.info("Refreshed")} />
+            <Button
+              icon={<ReloadOutlined />}
+              onClick={() => message.info("Refreshed")}
+            />
           </Tooltip>
-          <Button icon={<DownloadOutlined />} onClick={exportCsv}>Export CSV</Button>
+          <Button icon={<DownloadOutlined />} onClick={exportCsv}>
+            Export CSV
+          </Button>
           <Button
             type="primary"
             icon={<PlusOutlined />}
-            onClick={() => { setModalCustomer(null); setModalOpen(true); }}
+            onClick={() => {
+              setModalCustomer(null);
+              setModalOpen(true);
+            }}
           >
             Add Customer
           </Button>
@@ -1142,26 +1660,77 @@ function CustomersContent() {
       {/* KPI cards */}
       <Row gutter={16}>
         {[
-          { label: "Total Revenue",   value: `$${(totalRevenue / 1000).toFixed(0)}k`,   suffix: "", icon: <DollarOutlined />,  color: "#10B981", bg: "#D1FAE5" },
-          { label: "Total Orders",    value: totalOrders,                                 suffix: "", icon: <ShoppingOutlined />, color: "#3B82F6", bg: "#DBEAFE" },
-          { label: "Active Clients",  value: activeCount,                                 suffix: `/${CUSTOMERS.length}`, icon: <TeamOutlined />,    color: "#8B5CF6", bg: "#EDE9FE" },
-          { label: "Avg. Rating",     value: avgRating,                                   suffix: "/5", icon: <StarOutlined />,    color: "#F59E0B", bg: "#FEF3C7" },
-        ].map((k) => (
+          {
+            label: "Total Revenue",
+            value: `$${(totalRevenue / 1000).toFixed(0)}k`,
+            suffix: "",
+            icon: <DollarOutlined />,
+            color: "#10B981",
+            bg: "#D1FAE5",
+          },
+          {
+            label: "Total Orders",
+            value: totalOrders,
+            suffix: "",
+            icon: <ShoppingOutlined />,
+            color: "#3B82F6",
+            bg: "#DBEAFE",
+          },
+          {
+            label: "Active Clients",
+            value: activeCount,
+            suffix: `/${CUSTOMERS.length}`,
+            icon: <TeamOutlined />,
+            color: "#8B5CF6",
+            bg: "#EDE9FE",
+          },
+          {
+            label: "Avg. Rating",
+            value: avgRating,
+            suffix: "/5",
+            icon: <StarOutlined />,
+            color: "#F59E0B",
+            bg: "#FEF3C7",
+          },
+        ].map(k => (
           <Col xs={12} sm={12} md={6} key={k.label}>
-            <Card style={{ border: cardBorder }} bodyStyle={{ padding: "16px 20px" }}>
+            <Card
+              style={{ border: cardBorder }}
+              bodyStyle={{ padding: "16px 20px" }}
+            >
               <Space size={14} align="start">
-                <div style={{
-                  width: 44, height: 44, borderRadius: 10,
-                  background: k.bg, display: "flex", alignItems: "center",
-                  justifyContent: "center", fontSize: 20, color: k.color, flexShrink: 0,
-                }}>
+                <div
+                  style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: 10,
+                    background: k.bg,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 20,
+                    color: k.color,
+                    flexShrink: 0,
+                  }}
+                >
                   {k.icon}
                 </div>
                 <div>
-                  <Text type="secondary" style={{ fontSize: 12 }}>{k.label}</Text>
+                  <Text type="secondary" style={{ fontSize: 12 }}>
+                    {k.label}
+                  </Text>
                   <div>
-                    <Text strong style={{ fontSize: 22 }}>{k.value}</Text>
-                    {k.suffix && <Text type="secondary" style={{ fontSize: 13, marginLeft: 2 }}>{k.suffix}</Text>}
+                    <Text strong style={{ fontSize: 22 }}>
+                      {k.value}
+                    </Text>
+                    {k.suffix && (
+                      <Text
+                        type="secondary"
+                        style={{ fontSize: 13, marginLeft: 2 }}
+                      >
+                        {k.suffix}
+                      </Text>
+                    )}
                   </div>
                 </div>
               </Space>
@@ -1172,13 +1741,22 @@ function CustomersContent() {
 
       {/* Toolbar */}
       <Card style={{ border: cardBorder }} bodyStyle={{ padding: "12px 16px" }}>
-        <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+        <div
+          style={{
+            display: "flex",
+            gap: 12,
+            alignItems: "center",
+            flexWrap: "wrap",
+          }}
+        >
           <Input
-            prefix={<SearchOutlined style={{ color: token.colorTextQuaternary }} />}
+            prefix={
+              <SearchOutlined style={{ color: token.colorTextQuaternary }} />
+            }
             placeholder="Search by name, company, email, ID..."
             style={{ flex: 1, minWidth: 220 }}
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={e => setSearch(e.target.value)}
             allowClear
           />
           <Select
@@ -1188,7 +1766,10 @@ function CustomersContent() {
             onChange={setGroupFilter}
             options={[
               { value: "all", label: "All Groups" },
-              ...Object.entries(GROUP_CFG).map(([v, c]) => ({ value: v, label: c.label })),
+              ...Object.entries(GROUP_CFG).map(([v, c]) => ({
+                value: v,
+                label: c.label,
+              })),
             ]}
           />
           <Select
@@ -1197,15 +1778,18 @@ function CustomersContent() {
             onChange={setStatus}
             options={[
               { value: "all", label: "All Statuses" },
-              ...Object.entries(STATUS_CFG).map(([v, c]) => ({ value: v, label: c.label })),
+              ...Object.entries(STATUS_CFG).map(([v, c]) => ({
+                value: v,
+                label: c.label,
+              })),
             ]}
           />
           <Segmented
             value={viewMode}
-            onChange={(v) => setViewMode(v as "table" | "grid")}
+            onChange={v => setViewMode(v as "table" | "grid")}
             options={[
               { value: "table", label: "Table" },
-              { value: "grid",  label: "Grid" },
+              { value: "grid", label: "Grid" },
             ]}
           />
         </div>
@@ -1217,11 +1801,42 @@ function CustomersContent() {
           type="info"
           message={
             <Space>
-              <Text strong>{selectedKeys.length} customer{selectedKeys.length > 1 ? "s" : ""} selected</Text>
-              <Button size="small" icon={<MailOutlined />} onClick={() => message.info("Sending bulk email...")}>Email All</Button>
-              <Button size="small" icon={<ExportOutlined />} onClick={() => message.info("Exporting selection...")}>Export</Button>
-              <Button size="small" danger icon={<DeleteOutlined />} onClick={() => { message.success(`${selectedKeys.length} customers removed`); setSelectedKeys([]); }}>Delete</Button>
-              <Button size="small" type="link" onClick={() => setSelectedKeys([])}>Clear</Button>
+              <Text strong>
+                {selectedKeys.length} customer
+                {selectedKeys.length > 1 ? "s" : ""} selected
+              </Text>
+              <Button
+                size="small"
+                icon={<MailOutlined />}
+                onClick={() => message.info("Sending bulk email...")}
+              >
+                Email All
+              </Button>
+              <Button
+                size="small"
+                icon={<ExportOutlined />}
+                onClick={() => message.info("Exporting selection...")}
+              >
+                Export
+              </Button>
+              <Button
+                size="small"
+                danger
+                icon={<DeleteOutlined />}
+                onClick={() => {
+                  message.success(`${selectedKeys.length} customers removed`);
+                  setSelectedKeys([]);
+                }}
+              >
+                Delete
+              </Button>
+              <Button
+                size="small"
+                type="link"
+                onClick={() => setSelectedKeys([])}
+              >
+                Clear
+              </Button>
             </Space>
           }
           style={{ borderRadius: 8 }}
@@ -1240,28 +1855,39 @@ function CustomersContent() {
               selectedRowKeys: selectedKeys,
               onChange: setSelectedKeys,
             }}
-            onRow={(c) => ({
+            onRow={c => ({
               onDoubleClick: () => setDrawerCustomer(c),
               style: { cursor: "pointer" },
             })}
             pagination={{
               pageSize: 8,
               showSizeChanger: true,
-              showTotal: (total, range) => `${range[0]}–${range[1]} of ${total}`,
+              showTotal: (total, range) =>
+                `${range[0]}–${range[1]} of ${total}`,
               pageSizeOptions: ["8", "15", "25"],
             }}
-            locale={{ emptyText: <Empty description="No customers match your filters" image={Empty.PRESENTED_IMAGE_SIMPLE} /> }}
+            locale={{
+              emptyText: (
+                <Empty
+                  description="No customers match your filters"
+                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                />
+              ),
+            }}
           />
         </Card>
       ) : (
         <div>
           {filtered.length === 0 ? (
             <Card style={{ border: cardBorder }}>
-              <Empty description="No customers match your filters" image={Empty.PRESENTED_IMAGE_SIMPLE} />
+              <Empty
+                description="No customers match your filters"
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+              />
             </Card>
           ) : (
             <Row gutter={[16, 16]}>
-              {filtered.map((c) => {
+              {filtered.map(c => {
                 const sc = STATUS_CFG[c.status];
                 return (
                   <Col key={c.id} xs={24} sm={12} lg={8} xl={6}>
@@ -1271,23 +1897,71 @@ function CustomersContent() {
                       bodyStyle={{ padding: 16 }}
                       onClick={() => setDrawerCustomer(c)}
                       actions={[
-                        <Tooltip title="View Details" key="view"><EyeOutlined onClick={(e) => { e.stopPropagation(); setDrawerCustomer(c); }} /></Tooltip>,
-                        <Tooltip title="Edit" key="edit"><EditOutlined onClick={(e) => { e.stopPropagation(); openEdit(c); }} /></Tooltip>,
-                        <Tooltip title="Email" key="email"><MailOutlined onClick={(e) => { e.stopPropagation(); message.info(`Email: ${c.email}`); }} /></Tooltip>,
+                        <Tooltip title="View Details" key="view">
+                          <EyeOutlined
+                            onClick={e => {
+                              e.stopPropagation();
+                              setDrawerCustomer(c);
+                            }}
+                          />
+                        </Tooltip>,
+                        <Tooltip title="Edit" key="edit">
+                          <EditOutlined
+                            onClick={e => {
+                              e.stopPropagation();
+                              openEdit(c);
+                            }}
+                          />
+                        </Tooltip>,
+                        <Tooltip title="Email" key="email">
+                          <MailOutlined
+                            onClick={e => {
+                              e.stopPropagation();
+                              message.info(`Email: ${c.email}`);
+                            }}
+                          />
+                        </Tooltip>,
                       ]}
                     >
-                      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 12 }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "flex-start",
+                          justifyContent: "space-between",
+                          marginBottom: 12,
+                        }}
+                      >
                         <Space size={10}>
-                          <Avatar size={42} style={{ background: avatarColor(c.name), fontWeight: 700, fontSize: 15, flexShrink: 0 }}>
+                          <Avatar
+                            size={42}
+                            style={{
+                              background: avatarColor(c.name),
+                              fontWeight: 700,
+                              fontSize: 15,
+                              flexShrink: 0,
+                            }}
+                          >
                             {initials(c.name)}
                           </Avatar>
                           <div>
-                            <Text strong style={{ fontSize: 13 }}>{c.name}</Text>
+                            <Text strong style={{ fontSize: 13 }}>
+                              {c.name}
+                            </Text>
                             <br />
-                            <Text type="secondary" style={{ fontSize: 12 }}>{c.company}</Text>
+                            <Text type="secondary" style={{ fontSize: 12 }}>
+                              {c.company}
+                            </Text>
                           </div>
                         </Space>
-                        <Tag icon={sc.icon} style={{ color: sc.color, background: sc.bg, border: "none", fontSize: 11 }}>
+                        <Tag
+                          icon={sc.icon}
+                          style={{
+                            color: sc.color,
+                            background: sc.bg,
+                            border: "none",
+                            fontSize: 11,
+                          }}
+                        >
                           {sc.label}
                         </Tag>
                       </div>
@@ -1296,31 +1970,78 @@ function CustomersContent() {
 
                       <Row gutter={8}>
                         <Col xs={24} sm={12}>
-                          <Text type="secondary" style={{ fontSize: 11 }}>Revenue</Text>
-                          <div style={{ fontWeight: 700, color: "#10B981", fontSize: 14 }}>{fmt(c.revenue)}</div>
+                          <Text type="secondary" style={{ fontSize: 11 }}>
+                            Revenue
+                          </Text>
+                          <div
+                            style={{
+                              fontWeight: 700,
+                              color: "#10B981",
+                              fontSize: 14,
+                            }}
+                          >
+                            {fmt(c.revenue)}
+                          </div>
                         </Col>
                         <Col xs={24} sm={12}>
-                          <Text type="secondary" style={{ fontSize: 11 }}>Orders</Text>
-                          <div style={{ fontWeight: 700, fontSize: 14 }}>{c.orders}</div>
+                          <Text type="secondary" style={{ fontSize: 11 }}>
+                            Orders
+                          </Text>
+                          <div style={{ fontWeight: 700, fontSize: 14 }}>
+                            {c.orders}
+                          </div>
                         </Col>
                       </Row>
 
                       <div style={{ marginTop: 10 }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                          <Text type="secondary" style={{ fontSize: 11 }}>Credit</Text>
-                          <Text type="secondary" style={{ fontSize: 11 }}>{Math.min(100, Math.round((c.balance / c.creditLimit) * 100))}%</Text>
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            marginBottom: 4,
+                          }}
+                        >
+                          <Text type="secondary" style={{ fontSize: 11 }}>
+                            Credit
+                          </Text>
+                          <Text type="secondary" style={{ fontSize: 11 }}>
+                            {Math.min(
+                              100,
+                              Math.round((c.balance / c.creditLimit) * 100)
+                            )}
+                            %
+                          </Text>
                         </div>
                         <Progress
-                          percent={Math.min(100, Math.max(0, (c.balance / c.creditLimit) * 100))}
+                          percent={Math.min(
+                            100,
+                            Math.max(0, (c.balance / c.creditLimit) * 100)
+                          )}
                           showInfo={false}
                           size="small"
                           strokeColor={c.balance < 0 ? "#EF4444" : "#10B981"}
                         />
                       </div>
 
-                      <div style={{ marginTop: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <Rate disabled value={c.rating} style={{ fontSize: 11 }} />
-                        <Tag color={GROUP_CFG[c.group].color} style={{ fontSize: 11 }}>{GROUP_CFG[c.group].label}</Tag>
+                      <div
+                        style={{
+                          marginTop: 10,
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Rate
+                          disabled
+                          value={c.rating}
+                          style={{ fontSize: 11 }}
+                        />
+                        <Tag
+                          color={GROUP_CFG[c.group].color}
+                          style={{ fontSize: 11 }}
+                        >
+                          {GROUP_CFG[c.group].label}
+                        </Tag>
                       </div>
                     </Card>
                   </Col>
@@ -1336,20 +2057,30 @@ function CustomersContent() {
         customer={drawerCustomer}
         open={!!drawerCustomer}
         onClose={() => setDrawerCustomer(null)}
-        onEdit={(c) => { setDrawerCustomer(null); openEdit(c); }}
+        onEdit={c => {
+          setDrawerCustomer(null);
+          openEdit(c);
+        }}
       />
 
       {/* Form Modal */}
       <CustomerFormModal
         open={modalOpen}
         customer={modalCustomer}
-        onClose={() => { setModalOpen(false); setModalCustomer(null); }}
+        onClose={() => {
+          setModalOpen(false);
+          setModalCustomer(null);
+        }}
       />
 
       {/* Delete Confirm */}
       <Modal
         open={!!deleteId}
-        title={<Space><DeleteOutlined style={{ color: "#EF4444" }} /> Delete Customer</Space>}
+        title={
+          <Space>
+            <DeleteOutlined style={{ color: "#EF4444" }} /> Delete Customer
+          </Space>
+        }
         onOk={handleDelete}
         onCancel={() => setDeleteId(null)}
         okText="Delete"
@@ -1358,7 +2089,8 @@ function CustomersContent() {
         width={isMobile ? "95vw" : 420}
       >
         <Paragraph>
-          Are you sure you want to delete customer <Text strong>{deleteId}</Text>? This action cannot be undone.
+          Are you sure you want to delete customer{" "}
+          <Text strong>{deleteId}</Text>? This action cannot be undone.
         </Paragraph>
         <Alert
           type="warning"
@@ -1367,7 +2099,6 @@ function CustomersContent() {
           style={{ marginTop: 12 }}
         />
       </Modal>
-
     </div>
   );
 }

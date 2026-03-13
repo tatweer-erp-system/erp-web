@@ -1,4 +1,9 @@
-export type OrderStatus = "Pending" | "Processing" | "Completed" | "Cancelled" | "Refunded";
+export type OrderStatus =
+  | "Pending"
+  | "Processing"
+  | "Completed"
+  | "Cancelled"
+  | "Refunded";
 export type InvoiceStatus = "Draft" | "Sent" | "Paid" | "Overdue" | "Cancelled";
 
 export interface Customer {

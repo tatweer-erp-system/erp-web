@@ -4,8 +4,8 @@ import type { UserRole } from "@/types/auth";
 
 export const rolesService = {
   list: () =>
-    apiClient.get<ApiResponse<UserRole[]>>("/roles").then((r) => r.data),
+    apiClient.get<ApiResponse<UserRole[]>>("/roles").then(r => r.data),
 
   get: (id: string) =>
-    apiClient.get<ApiResponse<UserRole>>(`/roles/${id}`).then((r) => r.data),
+    apiClient.get<ApiResponse<UserRole>>(`/roles/${id}`).then(r => r.data),
 };

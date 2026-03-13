@@ -197,7 +197,12 @@ function DrawerForm({
   isMobile: boolean;
 }) {
   const { token } = antTheme.useToken();
-  const initials = entityLabel.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+  const initials = entityLabel
+    .split(" ")
+    .map(w => w[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 
   return (
     <Drawer
@@ -206,7 +211,12 @@ function DrawerForm({
       placement={isRTL ? "left" : "right"}
       width={isMobile ? "100%" : 460}
       styles={{
-        body: { padding: 0, background: token.colorBgLayout, display: "flex", flexDirection: "column" },
+        body: {
+          padding: 0,
+          background: token.colorBgLayout,
+          display: "flex",
+          flexDirection: "column",
+        },
         mask: { backdropFilter: "blur(2px)", background: "rgba(0,0,0,0.35)" },
       }}
       title={null}
@@ -214,34 +224,64 @@ function DrawerForm({
       destroyOnClose
     >
       {/* ── Header ─────────────────────────────────────────────────────── */}
-      <div style={{ position: "relative", overflow: "hidden", flexShrink: 0, direction: isRTL ? "rtl" : "ltr" }}>
+      <div
+        style={{
+          position: "relative",
+          overflow: "hidden",
+          flexShrink: 0,
+          direction: isRTL ? "rtl" : "ltr",
+        }}
+      >
         {/* gradient bg */}
-        <div style={{
-          background: `linear-gradient(135deg, ${token.colorPrimary} 0%, ${token.colorPrimaryActive ?? token.colorPrimary}dd 100%)`,
-          padding: "22px 24px 60px",
-        }}>
+        <div
+          style={{
+            background: `linear-gradient(135deg, ${token.colorPrimary} 0%, ${token.colorPrimaryActive ?? token.colorPrimary}dd 100%)`,
+            padding: "22px 24px 60px",
+          }}
+        >
           {/* top bar */}
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
-            <div style={{
-              background: "rgba(255,255,255,0.18)",
-              borderRadius: 6,
-              padding: "3px 10px",
-              fontSize: 11,
-              fontWeight: 700,
-              color: "#fff",
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-            }}>
-              {isEdit ? (isRTL ? "تعديل" : "Edit Mode") : (isRTL ? "إضافة" : "New Record")}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 18,
+            }}
+          >
+            <div
+              style={{
+                background: "rgba(255,255,255,0.18)",
+                borderRadius: 6,
+                padding: "3px 10px",
+                fontSize: 11,
+                fontWeight: 700,
+                color: "#fff",
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+              }}
+            >
+              {isEdit
+                ? isRTL
+                  ? "تعديل"
+                  : "Edit Mode"
+                : isRTL
+                  ? "إضافة"
+                  : "New Record"}
             </div>
             <button
               onClick={onClose}
               style={{
-                width: 30, height: 30, borderRadius: 8,
+                width: 30,
+                height: 30,
+                borderRadius: 8,
                 background: "rgba(255,255,255,0.18)",
-                border: "none", cursor: "pointer",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                color: "#fff", fontSize: 13,
+                border: "none",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#fff",
+                fontSize: 13,
                 transition: "background 0.15s",
               }}
             >
@@ -250,37 +290,75 @@ function DrawerForm({
           </div>
           {/* entity info */}
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-            <div style={{
-              width: 48, height: 48, borderRadius: 14,
-              background: "rgba(255,255,255,0.22)",
-              border: "2px solid rgba(255,255,255,0.35)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 17, fontWeight: 800, color: "#fff",
-              flexShrink: 0,
-            }}>
+            <div
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: 14,
+                background: "rgba(255,255,255,0.22)",
+                border: "2px solid rgba(255,255,255,0.35)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 17,
+                fontWeight: 800,
+                color: "#fff",
+                flexShrink: 0,
+              }}
+            >
               {isEdit ? <EditOutlined /> : initials}
             </div>
             <div>
-              <div style={{ fontSize: 20, fontWeight: 800, color: "#fff", lineHeight: 1.2 }}>
-                {isEdit ? (isRTL ? "تعديل السجل" : "Edit Record") : (isRTL ? "إضافة جديد" : "Add New")}
+              <div
+                style={{
+                  fontSize: 20,
+                  fontWeight: 800,
+                  color: "#fff",
+                  lineHeight: 1.2,
+                }}
+              >
+                {isEdit
+                  ? isRTL
+                    ? "تعديل السجل"
+                    : "Edit Record"
+                  : isRTL
+                    ? "إضافة جديد"
+                    : "Add New"}
               </div>
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,0.72)", marginTop: 3 }}>
-                {entityLabel} &nbsp;·&nbsp; {fields.length + 1} {isRTL ? "حقل" : "fields"}
+              <div
+                style={{
+                  fontSize: 12,
+                  color: "rgba(255,255,255,0.72)",
+                  marginTop: 3,
+                }}
+              >
+                {entityLabel} &nbsp;·&nbsp; {fields.length + 1}{" "}
+                {isRTL ? "حقل" : "fields"}
               </div>
             </div>
           </div>
         </div>
         {/* curved bottom mask */}
-        <div style={{
-          position: "absolute", bottom: 0, left: 0, right: 0, height: 28,
-          background: token.colorBgLayout,
-          borderRadius: "24px 24px 0 0",
-        }} />
+        <div
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: 28,
+            background: token.colorBgLayout,
+            borderRadius: "24px 24px 0 0",
+          }}
+        />
       </div>
 
       {/* ── Scrollable form body ────────────────────────────────────────── */}
       <div style={{ flex: 1, overflowY: "auto", padding: "4px 20px 20px" }}>
-        <Form form={form} layout="vertical" style={{ direction: isRTL ? "rtl" : "ltr" }}>
+        <Form
+          form={form}
+          layout="vertical"
+          style={{ direction: isRTL ? "rtl" : "ltr" }}
+        >
           {fields.map((field, idx) => (
             <div
               key={field.key}
@@ -296,21 +374,43 @@ function DrawerForm({
               <Form.Item
                 name={field.key}
                 label={
-                  <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: token.colorText, letterSpacing: "0.01em" }}>
+                  <div
+                    style={{ display: "flex", alignItems: "baseline", gap: 6 }}
+                  >
+                    <span
+                      style={{
+                        fontSize: 12,
+                        fontWeight: 700,
+                        color: token.colorText,
+                        letterSpacing: "0.01em",
+                      }}
+                    >
                       {field.label}
                     </span>
                     {field.required !== false && field.type !== "switch" && (
-                      <span style={{
-                        fontSize: 9, fontWeight: 700, color: token.colorError,
-                        background: `${token.colorError}14`, borderRadius: 4,
-                        padding: "1px 5px", textTransform: "uppercase", letterSpacing: "0.05em",
-                      }}>
+                      <span
+                        style={{
+                          fontSize: 9,
+                          fontWeight: 700,
+                          color: token.colorError,
+                          background: `${token.colorError}14`,
+                          borderRadius: 4,
+                          padding: "1px 5px",
+                          textTransform: "uppercase",
+                          letterSpacing: "0.05em",
+                        }}
+                      >
                         {isRTL ? "مطلوب" : "req"}
                       </span>
                     )}
                     {field.hint && (
-                      <span style={{ fontSize: 11, color: token.colorTextTertiary, fontWeight: 400 }}>
+                      <span
+                        style={{
+                          fontSize: 11,
+                          color: token.colorTextTertiary,
+                          fontWeight: 400,
+                        }}
+                      >
                         — {field.hint}
                       </span>
                     )}
@@ -318,7 +418,12 @@ function DrawerForm({
                 }
                 rules={
                   field.required !== false && field.type !== "switch"
-                    ? [{ required: true, message: `${field.label} is required` }]
+                    ? [
+                        {
+                          required: true,
+                          message: `${field.label} is required`,
+                        },
+                      ]
                     : []
                 }
                 valuePropName={field.type === "switch" ? "checked" : "value"}
@@ -344,17 +449,49 @@ function DrawerForm({
             }}
           >
             <div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 2 }}>
-                <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#10B981" }} />
-                <span style={{ fontSize: 13, fontWeight: 700, color: token.colorText }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  marginBottom: 2,
+                }}
+              >
+                <div
+                  style={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: "50%",
+                    background: "#10B981",
+                  }}
+                />
+                <span
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 700,
+                    color: token.colorText,
+                  }}
+                >
                   {isRTL ? "نشط" : "Active Status"}
                 </span>
               </div>
-              <div style={{ fontSize: 11, color: token.colorTextSecondary, paddingInlineStart: 16 }}>
-                {isRTL ? "تفعيل أو إلغاء تفعيل هذا السجل" : "Toggle to enable or disable this record"}
+              <div
+                style={{
+                  fontSize: 11,
+                  color: token.colorTextSecondary,
+                  paddingInlineStart: 16,
+                }}
+              >
+                {isRTL
+                  ? "تفعيل أو إلغاء تفعيل هذا السجل"
+                  : "Toggle to enable or disable this record"}
               </div>
             </div>
-            <Form.Item name="is_active" valuePropName="checked" style={{ margin: 0 }}>
+            <Form.Item
+              name="is_active"
+              valuePropName="checked"
+              style={{ margin: 0 }}
+            >
               <Switch />
             </Form.Item>
           </div>
@@ -362,15 +499,17 @@ function DrawerForm({
       </div>
 
       {/* ── Sticky footer ───────────────────────────────────────────────── */}
-      <div style={{
-        background: token.colorBgContainer,
-        borderTop: `1px solid ${token.colorBorderSecondary}`,
-        padding: "14px 20px",
-        display: "flex",
-        gap: 10,
-        flexShrink: 0,
-        direction: isRTL ? "rtl" : "ltr",
-      }}>
+      <div
+        style={{
+          background: token.colorBgContainer,
+          borderTop: `1px solid ${token.colorBorderSecondary}`,
+          padding: "14px 20px",
+          display: "flex",
+          gap: 10,
+          flexShrink: 0,
+          direction: isRTL ? "rtl" : "ltr",
+        }}
+      >
         <Button
           type="primary"
           icon={<SaveOutlined />}
@@ -430,31 +569,60 @@ function ModalForm({
 }) {
   const { token } = antTheme.useToken();
 
-  const normalFields = fields.filter((f) => !["switch", "textarea"].includes(f.type) && !f.fullWidth);
-  const wideFields = fields.filter((f) => ["switch", "textarea"].includes(f.type) || f.fullWidth);
-  const nameFields = fields.filter((f) => f.key === "name_en" || f.key === "name_ar");
-  const detailFields = fields.filter((f) => f.key !== "name_en" && f.key !== "name_ar");
+  const normalFields = fields.filter(
+    f => !["switch", "textarea"].includes(f.type) && !f.fullWidth
+  );
+  const wideFields = fields.filter(
+    f => ["switch", "textarea"].includes(f.type) || f.fullWidth
+  );
+  const nameFields = fields.filter(
+    f => f.key === "name_en" || f.key === "name_ar"
+  );
+  const detailFields = fields.filter(
+    f => f.key !== "name_en" && f.key !== "name_ar"
+  );
 
   // Shared field item renderer with card wrapper
-  const FieldCard = ({ field, fullWidth = false }: { field: FieldDef; fullWidth?: boolean }) => (
+  const FieldCard = ({
+    field,
+    fullWidth = false,
+  }: {
+    field: FieldDef;
+    fullWidth?: boolean;
+  }) => (
     <Form.Item
       name={field.key}
       label={
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ fontSize: 12, fontWeight: 700, color: token.colorText }}>
+          <span
+            style={{ fontSize: 12, fontWeight: 700, color: token.colorText }}
+          >
             {field.label}
           </span>
           {field.required !== false && field.type !== "switch" && (
-            <span style={{
-              fontSize: 9, fontWeight: 700, color: token.colorError,
-              background: `${token.colorError}12`, borderRadius: 4,
-              padding: "1px 5px", textTransform: "uppercase" as const, letterSpacing: "0.04em",
-            }}>
+            <span
+              style={{
+                fontSize: 9,
+                fontWeight: 700,
+                color: token.colorError,
+                background: `${token.colorError}12`,
+                borderRadius: 4,
+                padding: "1px 5px",
+                textTransform: "uppercase" as const,
+                letterSpacing: "0.04em",
+              }}
+            >
               {isRTL ? "مطلوب" : "req"}
             </span>
           )}
           {field.hint && (
-            <span style={{ fontSize: 11, color: token.colorTextTertiary, fontWeight: 400 }}>
+            <span
+              style={{
+                fontSize: 11,
+                color: token.colorTextTertiary,
+                fontWeight: 400,
+              }}
+            >
               — {field.hint}
             </span>
           )}
@@ -472,17 +640,49 @@ function ModalForm({
     </Form.Item>
   );
 
-  const SectionLabel = ({ label, color, num }: { label: string; color: string; num: number }) => (
-    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-      <div style={{
-        width: 22, height: 22, borderRadius: 6,
-        background: color, color: "#fff",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        fontSize: 11, fontWeight: 800, flexShrink: 0,
-      }}>
+  const SectionLabel = ({
+    label,
+    color,
+    num,
+  }: {
+    label: string;
+    color: string;
+    num: number;
+  }) => (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+        marginBottom: 12,
+      }}
+    >
+      <div
+        style={{
+          width: 22,
+          height: 22,
+          borderRadius: 6,
+          background: color,
+          color: "#fff",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: 11,
+          fontWeight: 800,
+          flexShrink: 0,
+        }}
+      >
         {num}
       </div>
-      <span style={{ fontSize: 12, fontWeight: 700, color, textTransform: "uppercase" as const, letterSpacing: "0.07em" }}>
+      <span
+        style={{
+          fontSize: 12,
+          fontWeight: 700,
+          color,
+          textTransform: "uppercase" as const,
+          letterSpacing: "0.07em",
+        }}
+      >
         {label}
       </span>
       <div style={{ flex: 1, height: 1, background: `${color}30` }} />
@@ -498,45 +698,95 @@ function ModalForm({
       width={isMobile ? "95vw" : sectioned ? 700 : 640}
       destroyOnClose
       styles={{
-        content: { padding: 0, overflow: "hidden", borderRadius: token.borderRadiusLG },
+        content: {
+          padding: 0,
+          overflow: "hidden",
+          borderRadius: token.borderRadiusLG,
+        },
         mask: { backdropFilter: "blur(2px)", background: "rgba(0,0,0,0.4)" },
       }}
     >
       {/* ── Gradient header ──────────────────────────────────────────── */}
-      <div style={{ position: "relative", overflow: "hidden", direction: isRTL ? "rtl" : "ltr" }}>
-        <div style={{
-          background: `linear-gradient(135deg, ${token.colorPrimary} 0%, ${token.colorPrimaryActive ?? token.colorPrimary}cc 100%)`,
-          padding: "20px 24px 52px",
-        }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+      <div
+        style={{
+          position: "relative",
+          overflow: "hidden",
+          direction: isRTL ? "rtl" : "ltr",
+        }}
+      >
+        <div
+          style={{
+            background: `linear-gradient(135deg, ${token.colorPrimary} 0%, ${token.colorPrimaryActive ?? token.colorPrimary}cc 100%)`,
+            padding: "20px 24px 52px",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-start",
+            }}
+          >
             <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-              <div style={{
-                width: 44, height: 44, borderRadius: 12,
-                background: "rgba(255,255,255,0.2)",
-                border: "2px solid rgba(255,255,255,0.35)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 18, color: "#fff",
-              }}>
+              <div
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: 12,
+                  background: "rgba(255,255,255,0.2)",
+                  border: "2px solid rgba(255,255,255,0.35)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 18,
+                  color: "#fff",
+                }}
+              >
                 {isEdit ? <EditOutlined /> : <PlusOutlined />}
               </div>
               <div>
-                <div style={{ fontSize: 18, fontWeight: 800, color: "#fff", lineHeight: 1.2 }}>
+                <div
+                  style={{
+                    fontSize: 18,
+                    fontWeight: 800,
+                    color: "#fff",
+                    lineHeight: 1.2,
+                  }}
+                >
                   {isEdit
-                    ? isRTL ? "تعديل السجل" : "Edit Record"
-                    : isRTL ? `إضافة ${entityLabel}` : `Add ${entityLabel}`}
+                    ? isRTL
+                      ? "تعديل السجل"
+                      : "Edit Record"
+                    : isRTL
+                      ? `إضافة ${entityLabel}`
+                      : `Add ${entityLabel}`}
                 </div>
-                <div style={{ fontSize: 12, color: "rgba(255,255,255,0.7)", marginTop: 3 }}>
-                  {entityLabel} &nbsp;·&nbsp; {fields.length + 1} {isRTL ? "حقل" : "fields"}
+                <div
+                  style={{
+                    fontSize: 12,
+                    color: "rgba(255,255,255,0.7)",
+                    marginTop: 3,
+                  }}
+                >
+                  {entityLabel} &nbsp;·&nbsp; {fields.length + 1}{" "}
+                  {isRTL ? "حقل" : "fields"}
                 </div>
               </div>
             </div>
             <button
               onClick={onClose}
               style={{
-                width: 30, height: 30, borderRadius: 8,
-                background: "rgba(255,255,255,0.18)", border: "none",
-                cursor: "pointer", color: "#fff", fontSize: 13,
-                display: "flex", alignItems: "center", justifyContent: "center",
+                width: 30,
+                height: 30,
+                borderRadius: 8,
+                background: "rgba(255,255,255,0.18)",
+                border: "none",
+                cursor: "pointer",
+                color: "#fff",
+                fontSize: 13,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
               <CloseOutlined />
@@ -544,38 +794,60 @@ function ModalForm({
           </div>
         </div>
         {/* curved bottom */}
-        <div style={{
-          position: "absolute", bottom: 0, left: 0, right: 0, height: 28,
-          background: token.colorBgLayout,
-          borderRadius: "20px 20px 0 0",
-        }} />
+        <div
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: 28,
+            background: token.colorBgLayout,
+            borderRadius: "20px 20px 0 0",
+          }}
+        />
       </div>
 
       {/* ── Form body ────────────────────────────────────────────────── */}
-      <div style={{
-        background: token.colorBgLayout,
-        padding: "8px 24px 20px",
-        maxHeight: "60vh",
-        overflowY: "auto",
-        direction: isRTL ? "rtl" : "ltr",
-      }}>
-        <Form form={form} layout="vertical" style={{ direction: isRTL ? "rtl" : "ltr" }}>
+      <div
+        style={{
+          background: token.colorBgLayout,
+          padding: "8px 24px 20px",
+          maxHeight: "60vh",
+          overflowY: "auto",
+          direction: isRTL ? "rtl" : "ltr",
+        }}
+      >
+        <Form
+          form={form}
+          layout="vertical"
+          style={{ direction: isRTL ? "rtl" : "ltr" }}
+        >
           {sectioned ? (
             <>
               {/* Section 1 — Core Info */}
-              <div style={{
-                background: token.colorBgContainer,
-                border: `1px solid ${token.colorBorderSecondary}`,
-                borderRadius: 12, padding: "16px 18px", marginBottom: 12,
-                boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
-              }}>
+              <div
+                style={{
+                  background: token.colorBgContainer,
+                  border: `1px solid ${token.colorBorderSecondary}`,
+                  borderRadius: 12,
+                  padding: "16px 18px",
+                  marginBottom: 12,
+                  boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
+                }}
+              >
                 <SectionLabel
                   num={1}
                   label={isRTL ? "المعلومات الأساسية" : "Core Information"}
                   color={token.colorPrimary}
                 />
-                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: "0 18px" }}>
-                  {nameFields.map((field) => (
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
+                    gap: "0 18px",
+                  }}
+                >
+                  {nameFields.map(field => (
                     <FieldCard key={field.key} field={field} />
                   ))}
                 </div>
@@ -583,14 +855,22 @@ function ModalForm({
 
               {/* Section 2 — Details */}
               {detailFields.length > 0 && (
-                <div style={{
-                  background: token.colorBgContainer,
-                  border: `1px solid ${token.colorBorderSecondary}`,
-                  borderRadius: 12, padding: "16px 18px", marginBottom: 12,
-                  boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
-                }}>
-                  <SectionLabel num={2} label={isRTL ? "التفاصيل" : "Details"} color="#7C3AED" />
-                  {detailFields.map((field) => (
+                <div
+                  style={{
+                    background: token.colorBgContainer,
+                    border: `1px solid ${token.colorBorderSecondary}`,
+                    borderRadius: 12,
+                    padding: "16px 18px",
+                    marginBottom: 12,
+                    boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
+                  }}
+                >
+                  <SectionLabel
+                    num={2}
+                    label={isRTL ? "التفاصيل" : "Details"}
+                    color="#7C3AED"
+                  />
+                  {detailFields.map(field => (
                     <div key={field.key} style={{ marginBottom: 14 }}>
                       <FieldCard field={field} />
                     </div>
@@ -599,21 +879,48 @@ function ModalForm({
               )}
 
               {/* Section 3 — Status */}
-              <div style={{
-                background: token.colorBgContainer,
-                border: `1px solid ${token.colorBorderSecondary}`,
-                borderRadius: 12, padding: "16px 18px",
-                boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
-              }}>
-                <SectionLabel num={3} label={isRTL ? "الحالة" : "Status"} color="#10B981" />
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div
+                style={{
+                  background: token.colorBgContainer,
+                  border: `1px solid ${token.colorBorderSecondary}`,
+                  borderRadius: 12,
+                  padding: "16px 18px",
+                  boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
+                }}
+              >
+                <SectionLabel
+                  num={3}
+                  label={isRTL ? "الحالة" : "Status"}
+                  color="#10B981"
+                />
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
                   <div>
-                    <div style={{ fontWeight: 700, fontSize: 13 }}>{isRTL ? "نشط" : "Active"}</div>
-                    <div style={{ fontSize: 11, color: token.colorTextSecondary, marginTop: 2 }}>
-                      {isRTL ? "تحديد ما إذا كان هذا السجل مفعلاً" : "Toggle to enable or disable this record"}
+                    <div style={{ fontWeight: 700, fontSize: 13 }}>
+                      {isRTL ? "نشط" : "Active"}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 11,
+                        color: token.colorTextSecondary,
+                        marginTop: 2,
+                      }}
+                    >
+                      {isRTL
+                        ? "تحديد ما إذا كان هذا السجل مفعلاً"
+                        : "Toggle to enable or disable this record"}
                     </div>
                   </div>
-                  <Form.Item name="is_active" valuePropName="checked" style={{ margin: 0 }}>
+                  <Form.Item
+                    name="is_active"
+                    valuePropName="checked"
+                    style={{ margin: 0 }}
+                  >
                     <Switch />
                   </Form.Item>
                 </div>
@@ -622,20 +929,30 @@ function ModalForm({
           ) : (
             <>
               {/* Main fields card */}
-              <div style={{
-                background: token.colorBgContainer,
-                border: `1px solid ${token.colorBorderSecondary}`,
-                borderRadius: 12, padding: "16px 18px", marginBottom: 12,
-                boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
-              }}>
-                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: "0 18px" }}>
-                  {normalFields.map((field) => (
+              <div
+                style={{
+                  background: token.colorBgContainer,
+                  border: `1px solid ${token.colorBorderSecondary}`,
+                  borderRadius: 12,
+                  padding: "16px 18px",
+                  marginBottom: 12,
+                  boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
+                }}
+              >
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
+                    gap: "0 18px",
+                  }}
+                >
+                  {normalFields.map(field => (
                     <div key={field.key} style={{ marginBottom: 14 }}>
                       <FieldCard field={field} />
                     </div>
                   ))}
                 </div>
-                {wideFields.map((field) => (
+                {wideFields.map(field => (
                   <div key={field.key} style={{ marginBottom: 14 }}>
                     <FieldCard field={field} fullWidth />
                   </div>
@@ -643,23 +960,45 @@ function ModalForm({
               </div>
 
               {/* Status card */}
-              <div style={{
-                background: token.colorBgContainer,
-                border: `1px solid ${token.colorBorderSecondary}`,
-                borderRadius: 12, padding: "14px 18px",
-                display: "flex", alignItems: "center", justifyContent: "space-between",
-                boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
-              }}>
+              <div
+                style={{
+                  background: token.colorBgContainer,
+                  border: `1px solid ${token.colorBorderSecondary}`,
+                  borderRadius: 12,
+                  padding: "14px 18px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
+                }}
+              >
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#10B981" }} />
+                  <div
+                    style={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: "50%",
+                      background: "#10B981",
+                    }}
+                  />
                   <div>
-                    <div style={{ fontSize: 13, fontWeight: 700 }}>{isRTL ? "نشط" : "Active Status"}</div>
-                    <div style={{ fontSize: 11, color: token.colorTextSecondary }}>
-                      {isRTL ? "تفعيل أو إلغاء تفعيل هذا السجل" : "Enable or disable this record"}
+                    <div style={{ fontSize: 13, fontWeight: 700 }}>
+                      {isRTL ? "نشط" : "Active Status"}
+                    </div>
+                    <div
+                      style={{ fontSize: 11, color: token.colorTextSecondary }}
+                    >
+                      {isRTL
+                        ? "تفعيل أو إلغاء تفعيل هذا السجل"
+                        : "Enable or disable this record"}
                     </div>
                   </div>
                 </div>
-                <Form.Item name="is_active" valuePropName="checked" style={{ margin: 0 }}>
+                <Form.Item
+                  name="is_active"
+                  valuePropName="checked"
+                  style={{ margin: 0 }}
+                >
                   <Switch />
                 </Form.Item>
               </div>
@@ -669,15 +1008,17 @@ function ModalForm({
       </div>
 
       {/* ── Footer ───────────────────────────────────────────────────── */}
-      <div style={{
-        background: token.colorBgContainer,
-        borderTop: `1px solid ${token.colorBorderSecondary}`,
-        padding: "14px 24px",
-        display: "flex",
-        alignItems: "center",
-        gap: 10,
-        direction: isRTL ? "rtl" : "ltr",
-      }}>
+      <div
+        style={{
+          background: token.colorBgContainer,
+          borderTop: `1px solid ${token.colorBorderSecondary}`,
+          padding: "14px 24px",
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          direction: isRTL ? "rtl" : "ltr",
+        }}
+      >
         {/* In RTL: Save (right) → Cancel → required text (left, auto margin pushes it away) */}
         <Button
           type="primary"
@@ -694,13 +1035,16 @@ function ModalForm({
         >
           {isRTL ? "حفظ" : "Save Record"}
         </Button>
-        <Button
-          onClick={onClose}
-          style={{ fontWeight: 600, minWidth: 90 }}
-        >
+        <Button onClick={onClose} style={{ fontWeight: 600, minWidth: 90 }}>
           {isRTL ? "إلغاء" : "Cancel"}
         </Button>
-        <Text style={{ fontSize: 11, color: token.colorTextTertiary, marginInlineStart: "auto" }}>
+        <Text
+          style={{
+            fontSize: 11,
+            color: token.colorTextTertiary,
+            marginInlineStart: "auto",
+          }}
+        >
           {isRTL ? "* الحقول المطلوبة" : "* Required fields"}
         </Text>
       </div>
@@ -737,10 +1081,12 @@ function DefinitionsTab({
     const q = search.toLowerCase().trim();
     if (!q) return data;
     return data.filter(
-      (r) =>
+      r =>
         r.name_en?.toLowerCase().includes(q) ||
         r.name_ar?.toLowerCase().includes(q) ||
-        Object.values(r).some((v) => typeof v === "string" && v.toLowerCase().includes(q))
+        Object.values(r).some(
+          v => typeof v === "string" && v.toLowerCase().includes(q)
+        )
     );
   }, [data, search]);
 
@@ -752,8 +1098,9 @@ function DefinitionsTab({
   const openAdd = useCallback(() => {
     setEditRecord(null);
     form.resetFields();
-    tab.fields.forEach((f) => {
-      if (f.defaultValue !== undefined) form.setFieldValue(f.key, f.defaultValue);
+    tab.fields.forEach(f => {
+      if (f.defaultValue !== undefined)
+        form.setFieldValue(f.key, f.defaultValue);
     });
     form.setFieldValue("is_active", true);
     setFormOpen(true);
@@ -763,9 +1110,11 @@ function DefinitionsTab({
     (record: EntityRecord) => {
       setEditRecord(record);
       const values: Record<string, any> = { ...record };
-      tab.fields.forEach((f) => {
-        if (f.type === "date" && values[f.key]) values[f.key] = dayjs(values[f.key]);
-        if (f.type === "time" && values[f.key]) values[f.key] = dayjs(values[f.key], "HH:mm");
+      tab.fields.forEach(f => {
+        if (f.type === "date" && values[f.key])
+          values[f.key] = dayjs(values[f.key]);
+        if (f.type === "time" && values[f.key])
+          values[f.key] = dayjs(values[f.key], "HH:mm");
       });
       form.setFieldsValue(values);
       setFormOpen(true);
@@ -783,9 +1132,9 @@ function DefinitionsTab({
     try {
       const values = await form.validateFields();
       setSubmitting(true);
-      await new Promise((r) => setTimeout(r, 350));
+      await new Promise(r => setTimeout(r, 350));
 
-      tab.fields.forEach((f) => {
+      tab.fields.forEach(f => {
         if ((f.type === "date" || f.type === "time") && values[f.key]?.format) {
           values[f.key] =
             f.type === "date"
@@ -795,15 +1144,24 @@ function DefinitionsTab({
       });
 
       if (editRecord) {
-        setData((prev) => prev.map((r) => (r.id === editRecord.id ? { ...r, ...values } : r)));
+        setData(prev =>
+          prev.map(r => (r.id === editRecord.id ? { ...r, ...values } : r))
+        );
         message.success(isRTL ? "تم التحديث بنجاح" : "Updated successfully");
       } else {
-        setData((prev) => [{ ...values, id: `${tab.key}-${Date.now()}` }, ...prev]);
+        setData(prev => [
+          { ...values, id: `${tab.key}-${Date.now()}` },
+          ...prev,
+        ]);
         message.success(isRTL ? "تمت الإضافة بنجاح" : "Added successfully");
       }
       handleClose();
     } catch {
-      message.error(isRTL ? "يرجى ملء جميع الحقول المطلوبة" : "Please fill all required fields");
+      message.error(
+        isRTL
+          ? "يرجى ملء جميع الحقول المطلوبة"
+          : "Please fill all required fields"
+      );
     } finally {
       setSubmitting(false);
     }
@@ -812,13 +1170,17 @@ function DefinitionsTab({
   const handleToggleActive = useCallback(
     (record: EntityRecord) => {
       const next = !record.is_active;
-      setData((prev) =>
-        prev.map((r) => (r.id === record.id ? { ...r, is_active: next } : r))
+      setData(prev =>
+        prev.map(r => (r.id === record.id ? { ...r, is_active: next } : r))
       );
       message.success(
         next
-          ? (isRTL ? "تم التفعيل" : "Activated successfully")
-          : (isRTL ? "تم إلغاء التفعيل" : "Deactivated successfully")
+          ? isRTL
+            ? "تم التفعيل"
+            : "Activated successfully"
+          : isRTL
+            ? "تم إلغاء التفعيل"
+            : "Deactivated successfully"
       );
     },
     [isRTL]
@@ -826,20 +1188,22 @@ function DefinitionsTab({
 
   const handleDelete = useCallback(
     (record: EntityRecord) => {
-      setData((prev) => prev.filter((r) => r.id !== record.id));
+      setData(prev => prev.filter(r => r.id !== record.id));
       message.success(isRTL ? "تم الحذف بنجاح" : "Deleted successfully");
     },
     [isRTL]
   );
 
   const tableColumns: ColumnsType<EntityRecord> = [
-    ...tab.columns.map((col) => ({
+    ...tab.columns.map(col => ({
       key: col.key,
       dataIndex: col.key,
       title: col.title,
       width: col.width,
       ellipsis: true,
-      render: col.render ? (val: any, record: EntityRecord) => col.render!(val, record) : undefined,
+      render: col.render
+        ? (val: any, record: EntityRecord) => col.render!(val, record)
+        : undefined,
     })),
     {
       key: "is_active",
@@ -848,9 +1212,13 @@ function DefinitionsTab({
       width: 100,
       render: (val: boolean) =>
         val ? (
-          <Tag icon={<CheckCircleOutlined />} color="success">{isRTL ? "نشط" : "Active"}</Tag>
+          <Tag icon={<CheckCircleOutlined />} color="success">
+            {isRTL ? "نشط" : "Active"}
+          </Tag>
         ) : (
-          <Tag icon={<CloseCircleOutlined />} color="default">{isRTL ? "غير نشط" : "Inactive"}</Tag>
+          <Tag icon={<CloseCircleOutlined />} color="default">
+            {isRTL ? "غير نشط" : "Inactive"}
+          </Tag>
         ),
     },
     {
@@ -862,39 +1230,75 @@ function DefinitionsTab({
         <Space size={2}>
           {/* Edit */}
           <Tooltip title={isRTL ? "تعديل" : "Edit"}>
-            <Button type="text" size="small" icon={<EditOutlined />} onClick={() => openEdit(record)} />
+            <Button
+              type="text"
+              size="small"
+              icon={<EditOutlined />}
+              onClick={() => openEdit(record)}
+            />
           </Tooltip>
 
           {/* Toggle Active / Inactive */}
           <Popconfirm
-            title={record.is_active
-              ? (isRTL ? "هل تريد إلغاء تفعيل هذا السجل؟" : "Deactivate this record?")
-              : (isRTL ? "هل تريد تفعيل هذا السجل؟" : "Activate this record?")}
+            title={
+              record.is_active
+                ? isRTL
+                  ? "هل تريد إلغاء تفعيل هذا السجل؟"
+                  : "Deactivate this record?"
+                : isRTL
+                  ? "هل تريد تفعيل هذا السجل؟"
+                  : "Activate this record?"
+            }
             okText={isRTL ? "نعم" : "Yes"}
             cancelText={isRTL ? "لا" : "No"}
             okButtonProps={{ danger: record.is_active, type: "primary" }}
             onConfirm={() => handleToggleActive(record)}
           >
-            <Tooltip title={record.is_active ? (isRTL ? "إلغاء التفعيل" : "Deactivate") : (isRTL ? "تفعيل" : "Activate")}>
+            <Tooltip
+              title={
+                record.is_active
+                  ? isRTL
+                    ? "إلغاء التفعيل"
+                    : "Deactivate"
+                  : isRTL
+                    ? "تفعيل"
+                    : "Activate"
+              }
+            >
               <Button
                 type="text"
                 size="small"
-                icon={record.is_active ? <StopOutlined /> : <CheckCircleOutlined />}
-                style={{ color: record.is_active ? token.colorWarning : token.colorSuccess }}
+                icon={
+                  record.is_active ? <StopOutlined /> : <CheckCircleOutlined />
+                }
+                style={{
+                  color: record.is_active
+                    ? token.colorWarning
+                    : token.colorSuccess,
+                }}
               />
             </Tooltip>
           </Popconfirm>
 
           {/* Delete */}
           <Popconfirm
-            title={isRTL ? "حذف هذا السجل نهائياً؟" : "Permanently delete this record?"}
+            title={
+              isRTL
+                ? "حذف هذا السجل نهائياً؟"
+                : "Permanently delete this record?"
+            }
             okText={isRTL ? "حذف" : "Delete"}
             cancelText={isRTL ? "إلغاء" : "Cancel"}
             okButtonProps={{ danger: true }}
             onConfirm={() => handleDelete(record)}
           >
             <Tooltip title={isRTL ? "حذف" : "Delete"}>
-              <Button type="text" size="small" danger icon={<DeleteOutlined />} />
+              <Button
+                type="text"
+                size="small"
+                danger
+                icon={<DeleteOutlined />}
+              />
             </Tooltip>
           </Popconfirm>
         </Space>
@@ -918,12 +1322,26 @@ function DefinitionsTab({
   return (
     <div>
       {/* Toolbar */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, gap: 12, flexWrap: "wrap" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 16,
+          gap: 12,
+          flexWrap: "wrap",
+        }}
+      >
         <Input
-          prefix={<SearchOutlined style={{ color: token.colorTextQuaternary }} />}
+          prefix={
+            <SearchOutlined style={{ color: token.colorTextQuaternary }} />
+          }
           placeholder={isRTL ? "بحث..." : "Search..."}
           value={search}
-          onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+          onChange={e => {
+            setSearch(e.target.value);
+            setPage(1);
+          }}
           allowClear
           style={{ width: isMobile ? "100%" : 280 }}
         />
@@ -939,39 +1357,53 @@ function DefinitionsTab({
         rowKey="id"
         size="small"
         pagination={false}
-        rowClassName={(record) => (!record.is_active ? "opacity-50" : "")}
+        rowClassName={record => (!record.is_active ? "opacity-50" : "")}
       />
 
       {/* ── Pagination Bar ─────────────────────────────────────────────── */}
       {filtered.length > 0 && (
-        <div style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          flexWrap: "wrap",
-          gap: 10,
-          marginTop: 14,
-          paddingTop: 14,
-          borderTop: `1px solid ${token.colorBorderSecondary}`,
-          direction: isRTL ? "rtl" : "ltr",
-        }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: 10,
+            marginTop: 14,
+            paddingTop: 14,
+            borderTop: `1px solid ${token.colorBorderSecondary}`,
+            direction: isRTL ? "rtl" : "ltr",
+          }}
+        >
           {/* Record count badge */}
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <div style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 6,
-              background: token.colorFillAlter,
-              border: `1px solid ${token.colorBorderSecondary}`,
-              borderRadius: 20,
-              padding: "3px 10px 3px 6px",
-            }}>
-              <div style={{
-                width: 6, height: 6, borderRadius: "50%",
-                background: token.colorPrimary,
-                flexShrink: 0,
-              }} />
-              <Text style={{ fontSize: 12, color: token.colorTextSecondary, lineHeight: 1 }}>
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                background: token.colorFillAlter,
+                border: `1px solid ${token.colorBorderSecondary}`,
+                borderRadius: 20,
+                padding: "3px 10px 3px 6px",
+              }}
+            >
+              <div
+                style={{
+                  width: 6,
+                  height: 6,
+                  borderRadius: "50%",
+                  background: token.colorPrimary,
+                  flexShrink: 0,
+                }}
+              />
+              <Text
+                style={{
+                  fontSize: 12,
+                  color: token.colorTextSecondary,
+                  lineHeight: 1,
+                }}
+              >
                 {isRTL
                   ? `${Math.min((page - 1) * pageSize + 1, filtered.length)}–${Math.min(page * pageSize, filtered.length)} من ${filtered.length} سجل`
                   : `${Math.min((page - 1) * pageSize + 1, filtered.length)}–${Math.min(page * pageSize, filtered.length)} of ${filtered.length} records`}
@@ -985,7 +1417,10 @@ function DefinitionsTab({
             pageSize={pageSize}
             total={filtered.length}
             showSizeChanger
-            onChange={(p, ps) => { setPage(p); setPageSize(ps); }}
+            onChange={(p, ps) => {
+              setPage(p);
+              setPageSize(ps);
+            }}
             pageSizeOptions={["10", "20", "50"]}
             size="small"
           />
@@ -1018,7 +1453,7 @@ export function DefinitionsPage({
 
   const [activeTab, setActiveTab] = useState(tabs[0]?.key ?? "");
 
-  const activeTabDef = tabs.find((t) => t.key === activeTab) ?? tabs[0];
+  const activeTabDef = tabs.find(t => t.key === activeTab) ?? tabs[0];
 
   const fadeStyle = {
     animation: "def-tab-fadein 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
@@ -1031,9 +1466,23 @@ export function DefinitionsPage({
         <style>{`@keyframes def-tab-fadein { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }`}</style>
         {/* Page header */}
         <div style={{ marginBottom: 20 }}>
-          <Text style={{ fontSize: 22, fontWeight: 700, color: token.colorText, display: "block" }}>
+          <Text
+            style={{
+              fontSize: 22,
+              fontWeight: 700,
+              color: token.colorText,
+              display: "block",
+            }}
+          >
             {isRTL ? moduleNameAr : moduleName}
-            <span style={{ color: token.colorTextSecondary, fontSize: 13, fontWeight: 400, marginInlineStart: 10 }}>
+            <span
+              style={{
+                color: token.colorTextSecondary,
+                fontSize: 13,
+                fontWeight: 400,
+                marginInlineStart: 10,
+              }}
+            >
               {isRTL ? moduleName : moduleNameAr}
             </span>
           </Text>
@@ -1045,60 +1494,131 @@ export function DefinitionsPage({
         </div>
 
         {/* Two-card layout */}
-        <div style={{ display: "flex", gap: 16, alignItems: "flex-start", flexDirection: isMobile ? "column" : "row" }}>
+        <div
+          style={{
+            display: "flex",
+            gap: 16,
+            alignItems: "flex-start",
+            flexDirection: isMobile ? "column" : "row",
+          }}
+        >
           {/* Left nav card (top on mobile) */}
           <Card
             style={{ width: isMobile ? "100%" : 220, flexShrink: 0 }}
             styles={{ body: { padding: isMobile ? "4px 8px" : "8px 0" } }}
           >
-            <div style={isMobile ? { display: "flex", gap: 4, flexWrap: "wrap", padding: "4px 0" } : {}}>
-            {tabs.map((tab) => {
-              const isActive = activeTab === tab.key;
-              return (
-                <button
-                  key={tab.key}
-                  onClick={() => setActiveTab(tab.key)}
-                  style={isMobile ? {
-                    display: "flex", alignItems: "center", gap: 6,
-                    padding: "6px 14px", border: "none",
-                    borderRadius: token.borderRadius,
-                    background: isActive ? token.colorPrimaryBg : "transparent",
-                    color: isActive ? token.colorPrimary : token.colorText,
-                    cursor: "pointer", fontSize: 13,
-                    fontWeight: isActive ? 600 : 400,
-                    borderBottom: isActive ? `2px solid ${token.colorPrimary}` : "2px solid transparent",
-                    transition: "all 0.15s", whiteSpace: "nowrap",
-                  } : {
-                    display: "flex", alignItems: "center", gap: 10,
-                    width: "100%", padding: "10px 16px",
-                    border: "none", borderRadius: 0,
-                    background: isActive ? token.colorPrimaryBg : "transparent",
-                    color: isActive ? token.colorPrimary : token.colorText,
-                    cursor: "pointer", fontSize: 13,
-                    fontWeight: isActive ? 600 : 400,
-                    borderInlineStart: isActive ? `3px solid ${token.colorPrimary}` : "3px solid transparent",
-                    textAlign: "start", transition: "all 0.15s",
-                  }}
-                >
-                  <UnorderedListOutlined style={{ fontSize: 14, flexShrink: 0 }} />
-                  <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    {isRTL ? tab.labelAr : tab.label}
-                  </span>
-                </button>
-              );
-            })}
+            <div
+              style={
+                isMobile
+                  ? {
+                      display: "flex",
+                      gap: 4,
+                      flexWrap: "wrap",
+                      padding: "4px 0",
+                    }
+                  : {}
+              }
+            >
+              {tabs.map(tab => {
+                const isActive = activeTab === tab.key;
+                return (
+                  <button
+                    key={tab.key}
+                    onClick={() => setActiveTab(tab.key)}
+                    style={
+                      isMobile
+                        ? {
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 6,
+                            padding: "6px 14px",
+                            border: "none",
+                            borderRadius: token.borderRadius,
+                            background: isActive
+                              ? token.colorPrimaryBg
+                              : "transparent",
+                            color: isActive
+                              ? token.colorPrimary
+                              : token.colorText,
+                            cursor: "pointer",
+                            fontSize: 13,
+                            fontWeight: isActive ? 600 : 400,
+                            borderBottom: isActive
+                              ? `2px solid ${token.colorPrimary}`
+                              : "2px solid transparent",
+                            transition: "all 0.15s",
+                            whiteSpace: "nowrap",
+                          }
+                        : {
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 10,
+                            width: "100%",
+                            padding: "10px 16px",
+                            border: "none",
+                            borderRadius: 0,
+                            background: isActive
+                              ? token.colorPrimaryBg
+                              : "transparent",
+                            color: isActive
+                              ? token.colorPrimary
+                              : token.colorText,
+                            cursor: "pointer",
+                            fontSize: 13,
+                            fontWeight: isActive ? 600 : 400,
+                            borderInlineStart: isActive
+                              ? `3px solid ${token.colorPrimary}`
+                              : "3px solid transparent",
+                            textAlign: "start",
+                            transition: "all 0.15s",
+                          }
+                    }
+                  >
+                    <UnorderedListOutlined
+                      style={{ fontSize: 14, flexShrink: 0 }}
+                    />
+                    <span
+                      style={{
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {isRTL ? tab.labelAr : tab.label}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </Card>
 
           {/* Right content card */}
-          <Card style={{ flex: 1, minWidth: 0 }} styles={{ body: { padding: 24 } }}>
+          <Card
+            style={{ flex: 1, minWidth: 0 }}
+            styles={{ body: { padding: 24 } }}
+          >
             {activeTabDef && (
               <div key={activeTabDef.key} style={fadeStyle}>
-                <div style={{ marginBottom: 20, paddingBottom: 14, borderBottom: `1px solid ${token.colorBorderSecondary}` }}>
-                  <Text style={{ fontSize: 16, fontWeight: 700, color: token.colorText, display: "block" }}>
+                <div
+                  style={{
+                    marginBottom: 20,
+                    paddingBottom: 14,
+                    borderBottom: `1px solid ${token.colorBorderSecondary}`,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontWeight: 700,
+                      color: token.colorText,
+                      display: "block",
+                    }}
+                  >
                     {isRTL ? activeTabDef.labelAr : activeTabDef.label}
                   </Text>
-                  <Text style={{ fontSize: 12, color: token.colorTextSecondary }}>
+                  <Text
+                    style={{ fontSize: 12, color: token.colorTextSecondary }}
+                  >
                     {isRTL
                       ? `إدارة ${activeTabDef.labelAr}`
                       : `Manage ${activeTabDef.label}`}
@@ -1127,9 +1647,23 @@ export function DefinitionsPage({
       <style>{`@keyframes def-tab-fadein { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }`}</style>
       {/* Page header */}
       <div style={{ marginBottom: 20 }}>
-        <Text style={{ fontSize: 22, fontWeight: 700, color: token.colorText, display: "block" }}>
+        <Text
+          style={{
+            fontSize: 22,
+            fontWeight: 700,
+            color: token.colorText,
+            display: "block",
+          }}
+        >
           {isRTL ? moduleNameAr : moduleName}
-          <span style={{ color: token.colorTextSecondary, fontSize: 13, fontWeight: 400, marginInlineStart: 10 }}>
+          <span
+            style={{
+              color: token.colorTextSecondary,
+              fontSize: 13,
+              fontWeight: 400,
+              marginInlineStart: 10,
+            }}
+          >
             {isRTL ? moduleName : moduleNameAr}
           </span>
         </Text>
@@ -1146,7 +1680,7 @@ export function DefinitionsPage({
         styles={{ body: { padding: "4px 8px" } }}
       >
         <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-          {tabs.map((tab) => {
+          {tabs.map(tab => {
             const isActive = activeTab === tab.key;
             return (
               <button
@@ -1164,7 +1698,9 @@ export function DefinitionsPage({
                   cursor: "pointer",
                   fontSize: 13,
                   fontWeight: isActive ? 600 : 400,
-                  borderBottom: isActive ? `2px solid ${token.colorPrimary}` : "2px solid transparent",
+                  borderBottom: isActive
+                    ? `2px solid ${token.colorPrimary}`
+                    : "2px solid transparent",
                   transition: "all 0.15s",
                   whiteSpace: "nowrap",
                 }}
@@ -1181,12 +1717,27 @@ export function DefinitionsPage({
       <Card styles={{ body: { padding: 24 } }}>
         {activeTabDef && (
           <div key={activeTabDef.key} style={fadeStyle}>
-            <div style={{ marginBottom: 20, paddingBottom: 14, borderBottom: `1px solid ${token.colorBorderSecondary}` }}>
-              <Text style={{ fontSize: 16, fontWeight: 700, color: token.colorText, display: "block" }}>
+            <div
+              style={{
+                marginBottom: 20,
+                paddingBottom: 14,
+                borderBottom: `1px solid ${token.colorBorderSecondary}`,
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: 700,
+                  color: token.colorText,
+                  display: "block",
+                }}
+              >
                 {isRTL ? activeTabDef.labelAr : activeTabDef.label}
               </Text>
               <Text style={{ fontSize: 12, color: token.colorTextSecondary }}>
-                {isRTL ? `إدارة ${activeTabDef.labelAr}` : `Manage ${activeTabDef.label}`}
+                {isRTL
+                  ? `إدارة ${activeTabDef.labelAr}`
+                  : `Manage ${activeTabDef.label}`}
               </Text>
             </div>
             {activeTabDef.customContent ?? (

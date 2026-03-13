@@ -55,14 +55,14 @@ export function DataTable<T extends object>({
     header: ({ table }) => (
       <Checkbox
         checked={table.getIsAllPageRowsSelected()}
-        onCheckedChange={(v) => table.toggleAllPageRowsSelected(!!v)}
+        onCheckedChange={v => table.toggleAllPageRowsSelected(!!v)}
       />
     ),
     cell: ({ row }) => (
       <Checkbox
         checked={row.getIsSelected()}
-        onCheckedChange={(v) => row.toggleSelected(!!v)}
-        onClick={(e) => e.stopPropagation()}
+        onCheckedChange={v => row.toggleSelected(!!v)}
+        onClick={e => e.stopPropagation()}
       />
     ),
     enableSorting: false,
@@ -74,7 +74,7 @@ export function DataTable<T extends object>({
     data,
     columns: selectable ? [selectionColumn, ...columns] : columns,
     state: { sorting, rowSelection },
-    onSortingChange: (updater) => {
+    onSortingChange: updater => {
       const next = typeof updater === "function" ? updater(sorting) : updater;
       setSorting(next);
       onSortingChange?.(next);
@@ -98,26 +98,41 @@ export function DataTable<T extends object>({
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            {table.getHeaderGroups().map((hg) => (
+            {table.getHeaderGroups().map(hg => (
               <tr key={hg.id}>
-                {hg.headers.map((header) => (
+                {hg.headers.map(header => (
                   <th
                     key={header.id}
                     className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b border-border bg-muted/50"
-                    style={{ width: header.getSize() !== 150 ? header.getSize() : undefined }}
+                    style={{
+                      width:
+                        header.getSize() !== 150 ? header.getSize() : undefined,
+                    }}
                   >
                     {header.isPlaceholder ? null : header.column.getCanSort() ? (
                       <button
                         onClick={header.column.getToggleSortingHandler()}
                         className="flex items-center gap-1 hover:text-foreground transition-colors"
                       >
-                        {flexRender(header.column.columnDef.header, header.getContext())}
-                        {header.column.getIsSorted() === "asc" && <ArrowUp size={12} />}
-                        {header.column.getIsSorted() === "desc" && <ArrowDown size={12} />}
-                        {!header.column.getIsSorted() && <ArrowUpDown size={12} className="opacity-40" />}
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                        {header.column.getIsSorted() === "asc" && (
+                          <ArrowUp size={12} />
+                        )}
+                        {header.column.getIsSorted() === "desc" && (
+                          <ArrowDown size={12} />
+                        )}
+                        {!header.column.getIsSorted() && (
+                          <ArrowUpDown size={12} className="opacity-40" />
+                        )}
                       </button>
                     ) : (
-                      flexRender(header.column.columnDef.header, header.getContext())
+                      flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )
                     )}
                   </th>
                 ))}
@@ -127,25 +142,41 @@ export function DataTable<T extends object>({
           <tbody>
             {isLoading ? (
               <tr>
-                <td colSpan={columns.length + (selectable ? 1 : 0)} className="p-0">
-                  <LoadingSkeleton rows={pagination.pageSize} columns={columns.length} showHeader={false} />
+                <td
+                  colSpan={columns.length + (selectable ? 1 : 0)}
+                  className="p-0"
+                >
+                  <LoadingSkeleton
+                    rows={pagination.pageSize}
+                    columns={columns.length}
+                    showHeader={false}
+                  />
                 </td>
               </tr>
             ) : table.getRowModel().rows.length === 0 ? (
               <tr>
-                <td colSpan={columns.length + (selectable ? 1 : 0)} className="py-8">
-                  <EmptyState title={emptyTitle} description={emptyDescription} />
+                <td
+                  colSpan={columns.length + (selectable ? 1 : 0)}
+                  className="py-8"
+                >
+                  <EmptyState
+                    title={emptyTitle}
+                    description={emptyDescription}
+                  />
                 </td>
               </tr>
             ) : (
-              table.getRowModel().rows.map((row) => (
+              table.getRowModel().rows.map(row => (
                 <tr
                   key={row.id}
                   className={`border-b border-border transition-colors hover:bg-muted/30 ${row.getIsSelected() ? "bg-primary/5" : ""}`}
                 >
-                  {row.getVisibleCells().map((cell) => (
+                  {row.getVisibleCells().map(cell => (
                     <td key={cell.id} className="px-4 py-3 text-foreground">
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
                     </td>
                   ))}
                 </tr>

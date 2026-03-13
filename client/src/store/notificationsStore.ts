@@ -1,7 +1,13 @@
 import { create } from "zustand";
 
-export type NotifType   = "success" | "warning" | "info" | "error";
-export type NotifModule = "Orders" | "Inventory" | "Finance" | "HR" | "POS" | "System";
+export type NotifType = "success" | "warning" | "info" | "error";
+export type NotifModule =
+  | "Orders"
+  | "Inventory"
+  | "Finance"
+  | "HR"
+  | "POS"
+  | "System";
 
 export interface NotificationMeta {
   notifKind?: string;
@@ -41,11 +47,17 @@ const INITIAL: Notification[] = [
     type: "warning",
     module: "Inventory",
     title: "Low Stock Alert",
-    message: "Wireless Headphones (SKU-001) has only 3 units remaining (reorder point: 15).",
+    message:
+      "Wireless Headphones (SKU-001) has only 3 units remaining (reorder point: 15).",
     timestamp: new Date(now - 18 * 60000),
     read: false,
     href: "/product-details?id=2",
-    meta: { notifKind: "inventory.low_stock", productName: "Wireless Headphones", currentQty: 3, reorderPoint: 15 },
+    meta: {
+      notifKind: "inventory.low_stock",
+      productName: "Wireless Headphones",
+      currentQty: 3,
+      reorderPoint: 15,
+    },
   },
   {
     id: "3",
@@ -62,7 +74,8 @@ const INITIAL: Notification[] = [
     type: "info",
     module: "HR",
     title: "Leave Request",
-    message: "Ahmed Al-Rashid submitted a leave request for 3 days (Mar 15–17).",
+    message:
+      "Ahmed Al-Rashid submitted a leave request for 3 days (Mar 15–17).",
     timestamp: new Date(now - 2 * 3600000),
     read: false,
     href: "/leave",
@@ -72,7 +85,8 @@ const INITIAL: Notification[] = [
     type: "success",
     module: "POS",
     title: "Daily Report Ready",
-    message: "Today's POS session closed with $8,420 in total sales across 47 transactions.",
+    message:
+      "Today's POS session closed with $8,420 in total sales across 47 transactions.",
     timestamp: new Date(now - 3 * 3600000),
     read: true,
     href: "/pos/loyalty-report",
@@ -92,7 +106,8 @@ const INITIAL: Notification[] = [
     type: "info",
     module: "System",
     title: "System Maintenance",
-    message: "Scheduled maintenance tonight at 02:00–04:00 UTC. Services may be briefly unavailable.",
+    message:
+      "Scheduled maintenance tonight at 02:00–04:00 UTC. Services may be briefly unavailable.",
     timestamp: new Date(now - 26 * 3600000),
     read: true,
   },
@@ -101,7 +116,8 @@ const INITIAL: Notification[] = [
     type: "success",
     module: "Inventory",
     title: "Stock Replenished",
-    message: "Purchase order PO-2091 received — 200 units of USB-C Hub added to warehouse.",
+    message:
+      "Purchase order PO-2091 received — 200 units of USB-C Hub added to warehouse.",
     timestamp: new Date(now - 28 * 3600000),
     read: true,
     href: "/products",
@@ -111,7 +127,8 @@ const INITIAL: Notification[] = [
     type: "error",
     module: "System",
     title: "Backup Failed",
-    message: "Nightly database backup failed at 02:00. Manual backup recommended.",
+    message:
+      "Nightly database backup failed at 02:00. Manual backup recommended.",
     timestamp: new Date(now - 2 * 86400000),
     read: true,
   },
@@ -120,7 +137,8 @@ const INITIAL: Notification[] = [
     type: "info",
     module: "HR",
     title: "New Employee Onboarded",
-    message: "Sara Ali has been added to the Finance department and is ready for system access.",
+    message:
+      "Sara Ali has been added to the Finance department and is ready for system access.",
     timestamp: new Date(now - 3 * 86400000),
     read: true,
     href: "/employees",
@@ -136,26 +154,30 @@ interface NotificationsState {
   unreadCount: () => number;
 }
 
-export const useNotificationsStore = create<NotificationsState>()((set, get) => ({
-  items: INITIAL,
+export const useNotificationsStore = create<NotificationsState>()(
+  (set, get) => ({
+    items: INITIAL,
 
-  markRead(id) {
-    set((s) => ({ items: s.items.map((n) => (n.id === id ? { ...n, read: true } : n)) }));
-  },
+    markRead(id) {
+      set(s => ({
+        items: s.items.map(n => (n.id === id ? { ...n, read: true } : n)),
+      }));
+    },
 
-  markAllRead() {
-    set((s) => ({ items: s.items.map((n) => ({ ...n, read: true })) }));
-  },
+    markAllRead() {
+      set(s => ({ items: s.items.map(n => ({ ...n, read: true })) }));
+    },
 
-  remove(id) {
-    set((s) => ({ items: s.items.filter((n) => n.id !== id) }));
-  },
+    remove(id) {
+      set(s => ({ items: s.items.filter(n => n.id !== id) }));
+    },
 
-  clearAll() {
-    set({ items: [] });
-  },
+    clearAll() {
+      set({ items: [] });
+    },
 
-  unreadCount() {
-    return get().items.filter((n) => !n.read).length;
-  },
-}));
+    unreadCount() {
+      return get().items.filter(n => !n.read).length;
+    },
+  })
+);

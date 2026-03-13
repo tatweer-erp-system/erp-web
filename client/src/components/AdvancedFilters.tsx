@@ -1,9 +1,25 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { SlidersHorizontal, X, Save, RotateCcw, ChevronDown } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  SlidersHorizontal,
+  X,
+  Save,
+  RotateCcw,
+  ChevronDown,
+} from "lucide-react";
 
 interface FilterPreset {
   name: string;
@@ -32,7 +48,7 @@ export default function AdvancedFilters({
   const activeCount = Object.values(filters).filter(Boolean).length;
 
   const handleFilterChange = (key: string, value: string) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
+    setFilters(prev => ({ ...prev, [key]: value }));
   };
 
   const handleApply = () => {
@@ -108,8 +124,10 @@ export default function AdvancedFilters({
           {/* Presets */}
           {presets.length > 0 && (
             <div className="flex flex-wrap items-center gap-1.5">
-              <span className="text-[11px] text-muted-foreground me-0.5 font-medium">Presets:</span>
-              {presets.map((preset) => (
+              <span className="text-[11px] text-muted-foreground me-0.5 font-medium">
+                Presets:
+              </span>
+              {presets.map(preset => (
                 <button
                   key={preset.name}
                   onClick={() => handleLoadPreset(preset)}
@@ -130,14 +148,14 @@ export default function AdvancedFilters({
                 </label>
                 <Select
                   value={filters[key] || ""}
-                  onValueChange={(v) => handleFilterChange(key, v)}
+                  onValueChange={v => handleFilterChange(key, v)}
                 >
                   <SelectTrigger className="h-8 text-sm bg-secondary border-0 rounded-lg">
                     <SelectValue placeholder="Any" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="__any__">Any</SelectItem>
-                    {options.map((opt) => (
+                    {options.map(opt => (
                       <SelectItem key={opt} value={opt}>
                         {opt}
                       </SelectItem>
@@ -153,8 +171,8 @@ export default function AdvancedFilters({
             <Input
               placeholder="Save current filters as preset..."
               value={presetName}
-              onChange={(e) => setPresetName(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSavePreset()}
+              onChange={e => setPresetName(e.target.value)}
+              onKeyDown={e => e.key === "Enter" && handleSavePreset()}
               className="h-8 text-xs bg-secondary border-0 flex-1"
             />
             <Button

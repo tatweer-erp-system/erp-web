@@ -97,11 +97,31 @@ const employee = {
     { type: "Emergency Leave", total: 5, used: 0, remaining: 5 },
   ],
   attendanceRecent: [
-    { date: "04 Mar 2026", checkIn: "08:55 AM", checkOut: "06:05 PM", status: "present" },
-    { date: "03 Mar 2026", checkIn: "09:02 AM", checkOut: "06:00 PM", status: "present" },
+    {
+      date: "04 Mar 2026",
+      checkIn: "08:55 AM",
+      checkOut: "06:05 PM",
+      status: "present",
+    },
+    {
+      date: "03 Mar 2026",
+      checkIn: "09:02 AM",
+      checkOut: "06:00 PM",
+      status: "present",
+    },
     { date: "02 Mar 2026", checkIn: "-", checkOut: "-", status: "absent" },
-    { date: "01 Mar 2026", checkIn: "08:50 AM", checkOut: "03:30 PM", status: "half-day" },
-    { date: "28 Feb 2026", checkIn: "09:00 AM", checkOut: "06:00 PM", status: "present" },
+    {
+      date: "01 Mar 2026",
+      checkIn: "08:50 AM",
+      checkOut: "03:30 PM",
+      status: "half-day",
+    },
+    {
+      date: "28 Feb 2026",
+      checkIn: "09:00 AM",
+      checkOut: "06:00 PM",
+      status: "present",
+    },
   ],
   payroll: {
     basicSalary: "$5,000",
@@ -160,7 +180,9 @@ function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between py-2 border-b border-border last:border-0">
       <span className="text-sm text-muted-foreground">{label}</span>
-      <span className="text-sm font-medium text-foreground text-right">{value}</span>
+      <span className="text-sm font-medium text-foreground text-right">
+        {value}
+      </span>
     </div>
   );
 }
@@ -191,13 +213,18 @@ export default function EmployeeDetails() {
       {/* Page Header */}
       <div className={`flex items-center justify-between mb-6`}>
         <div>
-          <h1 className="text-xl font-bold text-foreground">Employee Details</h1>
+          <h1 className="text-xl font-bold text-foreground">
+            Employee Details
+          </h1>
           <p className="text-sm text-muted-foreground">
             Dashboard / HR / Employee Details
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" className="border-border flex items-center gap-2">
+          <Button
+            variant="outline"
+            className="border-border flex items-center gap-2"
+          >
             <Users size={16} />
             All Employees
           </Button>
@@ -229,7 +256,9 @@ export default function EmployeeDetails() {
             >
               {employee.status === "active" ? "Active" : employee.status}
             </span>
-            <h2 className="text-base font-bold text-foreground">{employee.name}</h2>
+            <h2 className="text-base font-bold text-foreground">
+              {employee.name}
+            </h2>
             <span className="inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
               {employee.id}
             </span>
@@ -243,7 +272,9 @@ export default function EmployeeDetails() {
 
           {/* Basic Information */}
           <Card className="dark:bg-card bg-card shadow-sm border-0 p-5">
-            <h3 className="text-sm font-semibold text-foreground mb-3">Basic Information</h3>
+            <h3 className="text-sm font-semibold text-foreground mb-3">
+              Basic Information
+            </h3>
             <InfoRow label="Gender" value={employee.gender} />
             <InfoRow label="Date of Birth" value={employee.dob} />
             <InfoRow label="Blood Group" value={employee.bloodGroup} />
@@ -255,14 +286,18 @@ export default function EmployeeDetails() {
 
           {/* Primary Contact */}
           <Card className="dark:bg-card bg-card shadow-sm border-0 p-5">
-            <h3 className="text-sm font-semibold text-foreground mb-3">Primary Contact</h3>
+            <h3 className="text-sm font-semibold text-foreground mb-3">
+              Primary Contact
+            </h3>
             <div className="flex items-center gap-3 mb-3">
               <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                 <Phone size={14} className="text-primary" />
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Phone Number</p>
-                <p className="text-sm font-medium text-foreground">{employee.phone}</p>
+                <p className="text-sm font-medium text-foreground">
+                  {employee.phone}
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -271,7 +306,9 @@ export default function EmployeeDetails() {
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Email Address</p>
-                <p className="text-sm font-medium text-foreground break-all">{employee.email}</p>
+                <p className="text-sm font-medium text-foreground break-all">
+                  {employee.email}
+                </p>
               </div>
             </div>
           </Card>
@@ -310,17 +347,23 @@ export default function EmployeeDetails() {
                               <p className="text-sm font-semibold text-foreground">
                                 {contact.name}
                               </p>
-                              <p className="text-xs text-primary">{contact.relation}</p>
+                              <p className="text-xs text-primary">
+                                {contact.relation}
+                              </p>
                             </div>
                           </div>
                           <div className="text-center">
-                            <p className="text-xs text-muted-foreground">Phone</p>
+                            <p className="text-xs text-muted-foreground">
+                              Phone
+                            </p>
                             <p className="text-sm font-medium text-foreground">
                               {contact.phone}
                             </p>
                           </div>
                           <div className="text-center">
-                            <p className="text-xs text-muted-foreground">Email</p>
+                            <p className="text-xs text-muted-foreground">
+                              Email
+                            </p>
                             <p className="text-sm font-medium text-foreground">
                               {contact.email}
                             </p>
@@ -336,7 +379,9 @@ export default function EmployeeDetails() {
                   {/* Documents + Address */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <section>
-                      <h3 className="text-sm font-semibold text-foreground mb-4">Documents</h3>
+                      <h3 className="text-sm font-semibold text-foreground mb-4">
+                        Documents
+                      </h3>
                       <div className="space-y-2">
                         {employee.documents.map((doc, i) => (
                           <div
@@ -344,13 +389,24 @@ export default function EmployeeDetails() {
                             className="flex items-center justify-between p-3 rounded-xl border border-border bg-secondary/30"
                           >
                             <div className="flex items-center gap-2">
-                              <FileText size={16} className="text-muted-foreground" />
+                              <FileText
+                                size={16}
+                                className="text-muted-foreground"
+                              />
                               <div>
-                                <p className="text-sm font-medium text-foreground">{doc.name}</p>
-                                <p className="text-xs text-muted-foreground">{doc.size}</p>
+                                <p className="text-sm font-medium text-foreground">
+                                  {doc.name}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  {doc.size}
+                                </p>
                               </div>
                             </div>
-                            <Button variant="ghost" size="sm" className="text-primary">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-primary"
+                            >
                               <Download size={16} />
                             </Button>
                           </div>
@@ -359,19 +415,29 @@ export default function EmployeeDetails() {
                     </section>
 
                     <section>
-                      <h3 className="text-sm font-semibold text-foreground mb-4">Address</h3>
+                      <h3 className="text-sm font-semibold text-foreground mb-4">
+                        Address
+                      </h3>
                       <div className="space-y-4">
                         <div className="flex items-start gap-3 p-3 rounded-xl border border-border bg-secondary/30">
-                          <MapPin size={16} className="text-primary mt-0.5 shrink-0" />
+                          <MapPin
+                            size={16}
+                            className="text-primary mt-0.5 shrink-0"
+                          />
                           <div>
                             <p className="text-xs font-medium text-muted-foreground mb-0.5">
                               Current Address
                             </p>
-                            <p className="text-sm text-foreground">{employee.currentAddress}</p>
+                            <p className="text-sm text-foreground">
+                              {employee.currentAddress}
+                            </p>
                           </div>
                         </div>
                         <div className="flex items-start gap-3 p-3 rounded-xl border border-border bg-secondary/30">
-                          <MapPin size={16} className="text-muted-foreground mt-0.5 shrink-0" />
+                          <MapPin
+                            size={16}
+                            className="text-muted-foreground mt-0.5 shrink-0"
+                          />
                           <div>
                             <p className="text-xs font-medium text-muted-foreground mb-0.5">
                               Permanent Address
@@ -400,17 +466,25 @@ export default function EmployeeDetails() {
                         </div>
                         <div className="grid grid-cols-2 gap-3 text-sm">
                           <div>
-                            <p className="text-muted-foreground text-xs">Branch</p>
-                            <p className="font-medium text-foreground">{employee.bank.branch}</p>
+                            <p className="text-muted-foreground text-xs">
+                              Branch
+                            </p>
+                            <p className="font-medium text-foreground">
+                              {employee.bank.branch}
+                            </p>
                           </div>
                           <div>
-                            <p className="text-muted-foreground text-xs">Account No.</p>
+                            <p className="text-muted-foreground text-xs">
+                              Account No.
+                            </p>
                             <p className="font-medium text-foreground">
                               {employee.bank.accountNo}
                             </p>
                           </div>
                           <div>
-                            <p className="text-muted-foreground text-xs">Routing No.</p>
+                            <p className="text-muted-foreground text-xs">
+                              Routing No.
+                            </p>
                             <p className="font-medium text-foreground">
                               {employee.bank.routingNo}
                             </p>
@@ -432,13 +506,17 @@ export default function EmployeeDetails() {
                         </div>
                         <div className="space-y-2 text-sm">
                           <div className="flex justify-between">
-                            <span className="text-muted-foreground">Blood Group</span>
+                            <span className="text-muted-foreground">
+                              Blood Group
+                            </span>
                             <span className="font-medium text-foreground">
                               {employee.medicalHistory.bloodGroup}
                             </span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-muted-foreground">Known Allergies</span>
+                            <span className="text-muted-foreground">
+                              Known Allergies
+                            </span>
                             <div className="flex gap-1">
                               {employee.medicalHistory.allergies.map((a, i) => (
                                 <span
@@ -451,7 +529,9 @@ export default function EmployeeDetails() {
                             </div>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-muted-foreground">Medications</span>
+                            <span className="text-muted-foreground">
+                              Medications
+                            </span>
                             <span className="font-medium text-foreground">
                               {employee.medicalHistory.medications}
                             </span>
@@ -469,14 +549,36 @@ export default function EmployeeDetails() {
               {/* ── Schedule ── */}
               {activeTab === "schedule" && (
                 <section>
-                  <h3 className="text-sm font-semibold text-foreground mb-4">Work Schedule</h3>
+                  <h3 className="text-sm font-semibold text-foreground mb-4">
+                    Work Schedule
+                  </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {[
-                      { label: "Shift", value: employee.schedule.shift, icon: Briefcase },
-                      { label: "Work Days", value: employee.schedule.workDays, icon: Calendar },
-                      { label: "Start Time", value: employee.schedule.startTime, icon: Clock },
-                      { label: "End Time", value: employee.schedule.endTime, icon: Clock },
-                      { label: "Break Duration", value: employee.schedule.breakDuration, icon: Clock },
+                      {
+                        label: "Shift",
+                        value: employee.schedule.shift,
+                        icon: Briefcase,
+                      },
+                      {
+                        label: "Work Days",
+                        value: employee.schedule.workDays,
+                        icon: Calendar,
+                      },
+                      {
+                        label: "Start Time",
+                        value: employee.schedule.startTime,
+                        icon: Clock,
+                      },
+                      {
+                        label: "End Time",
+                        value: employee.schedule.endTime,
+                        icon: Clock,
+                      },
+                      {
+                        label: "Break Duration",
+                        value: employee.schedule.breakDuration,
+                        icon: Clock,
+                      },
                     ].map(({ label, value, icon: Icon }) => (
                       <Card
                         key={label}
@@ -484,9 +586,13 @@ export default function EmployeeDetails() {
                       >
                         <div className="flex items-center gap-2 mb-2">
                           <Icon size={16} className="text-primary" />
-                          <span className="text-xs text-muted-foreground">{label}</span>
+                          <span className="text-xs text-muted-foreground">
+                            {label}
+                          </span>
                         </div>
-                        <p className="text-base font-semibold text-foreground">{value}</p>
+                        <p className="text-base font-semibold text-foreground">
+                          {value}
+                        </p>
                       </Card>
                     ))}
                   </div>
@@ -498,14 +604,18 @@ export default function EmployeeDetails() {
                 <>
                   {/* Leave Balance */}
                   <section>
-                    <h3 className="text-sm font-semibold text-foreground mb-4">Leave Balance</h3>
+                    <h3 className="text-sm font-semibold text-foreground mb-4">
+                      Leave Balance
+                    </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      {employee.leaveBalance.map((leave) => (
+                      {employee.leaveBalance.map(leave => (
                         <Card
                           key={leave.type}
                           className="p-4 border border-border bg-secondary/20 shadow-none"
                         >
-                          <p className="text-xs text-muted-foreground mb-2">{leave.type}</p>
+                          <p className="text-xs text-muted-foreground mb-2">
+                            {leave.type}
+                          </p>
                           <div className="flex items-end gap-1 mb-2">
                             <span className="text-2xl font-bold text-foreground">
                               {leave.remaining}
@@ -539,10 +649,18 @@ export default function EmployeeDetails() {
                       <table className="w-full text-sm">
                         <thead>
                           <tr className="border-b border-border bg-secondary/30">
-                            <th className="px-4 py-3 text-left font-semibold text-foreground">Date</th>
-                            <th className="px-4 py-3 text-left font-semibold text-foreground">Check In</th>
-                            <th className="px-4 py-3 text-left font-semibold text-foreground">Check Out</th>
-                            <th className="px-4 py-3 text-left font-semibold text-foreground">Status</th>
+                            <th className="px-4 py-3 text-left font-semibold text-foreground">
+                              Date
+                            </th>
+                            <th className="px-4 py-3 text-left font-semibold text-foreground">
+                              Check In
+                            </th>
+                            <th className="px-4 py-3 text-left font-semibold text-foreground">
+                              Check Out
+                            </th>
+                            <th className="px-4 py-3 text-left font-semibold text-foreground">
+                              Status
+                            </th>
                           </tr>
                         </thead>
                         <tbody>
@@ -551,9 +669,15 @@ export default function EmployeeDetails() {
                               key={i}
                               className="border-b border-border last:border-0 hover:bg-secondary/30 transition-colors"
                             >
-                              <td className="px-4 py-3 text-foreground">{row.date}</td>
-                              <td className="px-4 py-3 text-muted-foreground">{row.checkIn}</td>
-                              <td className="px-4 py-3 text-muted-foreground">{row.checkOut}</td>
+                              <td className="px-4 py-3 text-foreground">
+                                {row.date}
+                              </td>
+                              <td className="px-4 py-3 text-muted-foreground">
+                                {row.checkIn}
+                              </td>
+                              <td className="px-4 py-3 text-muted-foreground">
+                                {row.checkOut}
+                              </td>
                               <td className="px-4 py-3">
                                 <span
                                   className={`px-2 py-0.5 rounded-full text-xs font-medium capitalize ${statusBadge(row.status)}`}
@@ -585,26 +709,36 @@ export default function EmployeeDetails() {
                         </h4>
                         <div className="space-y-2 text-sm">
                           <div className="flex justify-between">
-                            <span className="text-muted-foreground">Basic Salary</span>
+                            <span className="text-muted-foreground">
+                              Basic Salary
+                            </span>
                             <span className="font-medium text-foreground">
                               {employee.payroll.basicSalary}
                             </span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-muted-foreground">Housing Allowance</span>
+                            <span className="text-muted-foreground">
+                              Housing Allowance
+                            </span>
                             <span className="font-medium text-foreground">
                               {employee.payroll.housingAllowance}
                             </span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-muted-foreground">Transport Allowance</span>
+                            <span className="text-muted-foreground">
+                              Transport Allowance
+                            </span>
                             <span className="font-medium text-foreground">
                               {employee.payroll.transportAllowance}
                             </span>
                           </div>
                           <div className="flex justify-between pt-2 border-t border-border font-semibold">
-                            <span className="text-foreground">Gross Salary</span>
-                            <span className="text-primary">{employee.payroll.grossSalary}</span>
+                            <span className="text-foreground">
+                              Gross Salary
+                            </span>
+                            <span className="text-primary">
+                              {employee.payroll.grossSalary}
+                            </span>
                           </div>
                         </div>
                       </Card>
@@ -614,26 +748,34 @@ export default function EmployeeDetails() {
                         </h4>
                         <div className="space-y-2 text-sm">
                           <div className="flex justify-between">
-                            <span className="text-muted-foreground">Tax Deduction</span>
+                            <span className="text-muted-foreground">
+                              Tax Deduction
+                            </span>
                             <span className="font-medium text-red-500">
                               -{employee.payroll.taxDeduction}
                             </span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-muted-foreground">Payment Method</span>
+                            <span className="text-muted-foreground">
+                              Payment Method
+                            </span>
                             <span className="font-medium text-foreground">
                               {employee.payroll.paymentMethod}
                             </span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-muted-foreground">Last Pay Date</span>
+                            <span className="text-muted-foreground">
+                              Last Pay Date
+                            </span>
                             <span className="font-medium text-foreground">
                               {employee.payroll.lastPayDate}
                             </span>
                           </div>
                           <div className="flex justify-between pt-2 border-t border-border font-semibold">
                             <span className="text-foreground">Net Salary</span>
-                            <span className="text-green-600">{employee.payroll.netSalary}</span>
+                            <span className="text-green-600">
+                              {employee.payroll.netSalary}
+                            </span>
                           </div>
                         </div>
                       </Card>
@@ -656,15 +798,23 @@ export default function EmployeeDetails() {
                               <DollarSign size={16} className="text-primary" />
                             </div>
                             <div>
-                              <p className="text-sm font-medium text-foreground">{slip.period}</p>
-                              <p className="text-xs text-muted-foreground">Paid on {slip.date}</p>
+                              <p className="text-sm font-medium text-foreground">
+                                {slip.period}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                Paid on {slip.date}
+                              </p>
                             </div>
                           </div>
                           <div className="flex items-center gap-3">
                             <span className="text-sm font-semibold text-foreground">
                               {slip.amount}
                             </span>
-                            <Button variant="ghost" size="sm" className="text-primary">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-primary"
+                            >
                               <Download size={16} />
                             </Button>
                           </div>
@@ -690,14 +840,20 @@ export default function EmployeeDetails() {
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                       <Card className="p-4 border border-border bg-secondary/20 shadow-none col-span-1">
-                        <p className="text-xs text-muted-foreground mb-1">Overall Rating</p>
+                        <p className="text-xs text-muted-foreground mb-1">
+                          Overall Rating
+                        </p>
                         <p className="text-4xl font-bold text-primary">
                           {employee.performance.overallRating}
                         </p>
-                        <p className="text-xs text-muted-foreground mt-1">out of 5.0</p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          out of 5.0
+                        </p>
                       </Card>
                       <Card className="p-4 border border-border bg-secondary/20 shadow-none">
-                        <p className="text-xs text-muted-foreground mb-1">Last Review</p>
+                        <p className="text-xs text-muted-foreground mb-1">
+                          Last Review
+                        </p>
                         <p className="text-sm font-semibold text-foreground">
                           {employee.performance.lastReviewDate}
                         </p>
@@ -706,18 +862,24 @@ export default function EmployeeDetails() {
                         </p>
                       </Card>
                       <Card className="p-4 border border-border bg-secondary/20 shadow-none">
-                        <p className="text-xs text-muted-foreground mb-1">Next Review</p>
+                        <p className="text-xs text-muted-foreground mb-1">
+                          Next Review
+                        </p>
                         <p className="text-sm font-semibold text-foreground">
                           {employee.performance.nextReviewDate}
                         </p>
-                        <p className="text-xs text-muted-foreground mt-1">Scheduled</p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Scheduled
+                        </p>
                       </Card>
                     </div>
                   </section>
 
                   {/* KPIs */}
                   <section>
-                    <h3 className="text-sm font-semibold text-foreground mb-4">KPI Results</h3>
+                    <h3 className="text-sm font-semibold text-foreground mb-4">
+                      KPI Results
+                    </h3>
                     <div className="space-y-3">
                       {employee.performance.kpis.map((kpi, i) => (
                         <div
@@ -728,14 +890,24 @@ export default function EmployeeDetails() {
                             {kpi.status === "excellent" ? (
                               <CheckCircle size={18} className="text-primary" />
                             ) : kpi.status === "good" ? (
-                              <CheckCircle size={18} className="text-green-500" />
+                              <CheckCircle
+                                size={18}
+                                className="text-green-500"
+                              />
                             ) : (
-                              <AlertCircle size={18} className="text-yellow-500" />
+                              <AlertCircle
+                                size={18}
+                                className="text-yellow-500"
+                              />
                             )}
-                            <span className="text-sm font-medium text-foreground">{kpi.label}</span>
+                            <span className="text-sm font-medium text-foreground">
+                              {kpi.label}
+                            </span>
                           </div>
                           <div className="flex items-center gap-3">
-                            <span className="text-sm font-bold text-foreground">{kpi.achieved}</span>
+                            <span className="text-sm font-bold text-foreground">
+                              {kpi.achieved}
+                            </span>
                             <span
                               className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusBadge(kpi.status)}`}
                             >
@@ -755,20 +927,31 @@ export default function EmployeeDetails() {
 
       {/* Cross-Module Navigation Links */}
       <Card className="p-4 dark:bg-card bg-card shadow-sm border-0 mt-6">
-        <h3 className="text-sm font-semibold text-foreground mb-3">Related Modules</h3>
+        <h3 className="text-sm font-semibold text-foreground mb-3">
+          Related Modules
+        </h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <button
-            onClick={() => navigate(`/leave-management?employeeId=${employee.id}`)}
+            onClick={() =>
+              navigate(`/leave-management?employeeId=${employee.id}`)
+            }
             className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-secondary/50 transition-colors text-left group"
           >
             <div className="w-9 h-9 rounded-lg bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center shrink-0">
               <Calendar size={16} className="text-orange-600" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-foreground">Leave Requests</p>
-              <p className="text-xs text-muted-foreground">View leave requests for this employee</p>
+              <p className="text-sm font-medium text-foreground">
+                Leave Requests
+              </p>
+              <p className="text-xs text-muted-foreground">
+                View leave requests for this employee
+              </p>
             </div>
-            <ExternalLink size={14} className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+            <ExternalLink
+              size={14}
+              className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity"
+            />
           </button>
           <button
             onClick={() => navigate(`/employees?assignedTo=${employee.id}`)}
@@ -778,10 +961,17 @@ export default function EmployeeDetails() {
               <ClipboardList size={16} className="text-blue-600" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-foreground">Assigned Tasks</p>
-              <p className="text-xs text-muted-foreground">View tasks assigned to this employee</p>
+              <p className="text-sm font-medium text-foreground">
+                Assigned Tasks
+              </p>
+              <p className="text-xs text-muted-foreground">
+                View tasks assigned to this employee
+              </p>
             </div>
-            <ExternalLink size={14} className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+            <ExternalLink
+              size={14}
+              className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity"
+            />
           </button>
           <button
             onClick={() => navigate("/users")}
@@ -791,10 +981,17 @@ export default function EmployeeDetails() {
               <UserCog size={16} className="text-purple-600" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-foreground">User Account</p>
-              <p className="text-xs text-muted-foreground">Manage user profile and permissions</p>
+              <p className="text-sm font-medium text-foreground">
+                User Account
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Manage user profile and permissions
+              </p>
             </div>
-            <ExternalLink size={14} className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+            <ExternalLink
+              size={14}
+              className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity"
+            />
           </button>
         </div>
       </Card>
@@ -808,14 +1005,16 @@ export default function EmployeeDetails() {
         <div className="space-y-4">
           {/* Employee Number - read-only */}
           <div>
-            <label className="block text-sm font-medium text-foreground mb-2">{t("employeeNumber", language)}</label>
+            <label className="block text-sm font-medium text-foreground mb-2">
+              {t("employeeNumber", language)}
+            </label>
             <div className="px-3 py-2 bg-secondary/50 border border-border rounded-lg text-sm text-primary font-medium">
               {employee.id}
             </div>
           </div>
           <BranchSelector
             value={editForm.branchId}
-            onChange={(branchId) => setEditForm({ ...editForm, branchId })}
+            onChange={branchId => setEditForm({ ...editForm, branchId })}
           />
           {(
             [
@@ -827,11 +1026,15 @@ export default function EmployeeDetails() {
             ] as const
           ).map(({ label, key, type }) => (
             <div key={key}>
-              <label className="block text-sm font-medium text-foreground mb-2">{label}</label>
+              <label className="block text-sm font-medium text-foreground mb-2">
+                {label}
+              </label>
               <Input
                 type={type}
                 value={editForm[key]}
-                onChange={(e) => setEditForm({ ...editForm, [key]: e.target.value })}
+                onChange={e =>
+                  setEditForm({ ...editForm, [key]: e.target.value })
+                }
                 placeholder={label}
               />
             </div>

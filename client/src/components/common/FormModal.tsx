@@ -17,7 +17,7 @@ interface FormModalProps<T extends FieldValues> {
   onOpenChange: (open: boolean) => void;
   title: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  schema: any;   // ZodType — typed loosely to work across zod v3/v4
+  schema: any; // ZodType — typed loosely to work across zod v3/v4
   defaultValues: DefaultValues<T>;
   onSubmit: (data: T) => Promise<void>;
   isLoading?: boolean;
@@ -42,7 +42,7 @@ export function FormModal<T extends FieldValues>({
     defaultValues,
   });
 
-  const handleSubmit = form.handleSubmit(async (data) => {
+  const handleSubmit = form.handleSubmit(async data => {
     try {
       await onSubmit(data);
       toast.success(isEdit ? "Updated successfully" : "Created successfully");
@@ -55,7 +55,13 @@ export function FormModal<T extends FieldValues>({
   });
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { onOpenChange(v); if (!v) form.reset(); }}>
+    <Dialog
+      open={open}
+      onOpenChange={v => {
+        onOpenChange(v);
+        if (!v) form.reset();
+      }}
+    >
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
@@ -79,7 +85,11 @@ export function FormModal<T extends FieldValues>({
                   <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   {isEdit ? "Saving..." : "Creating..."}
                 </span>
-              ) : isEdit ? "Save Changes" : "Create"}
+              ) : isEdit ? (
+                "Save Changes"
+              ) : (
+                "Create"
+              )}
             </Button>
           </DialogFooter>
         </form>

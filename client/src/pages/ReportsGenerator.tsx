@@ -3,7 +3,15 @@ import DashboardLayout from "@/components/DashboardLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Download, Eye, Trash2, Calendar, Filter, Settings } from "lucide-react";
+import {
+  Plus,
+  Download,
+  Eye,
+  Trash2,
+  Calendar,
+  Filter,
+  Settings,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -100,8 +108,12 @@ export default function ReportsGenerator() {
         {/* Header */}
         <div className={`flex items-center justify-between`}>
           <div className={isRTL ? "text-right" : ""}>
-            <h2 className="font-display font-bold text-2xl text-foreground">Reports Generator</h2>
-            <p className="text-sm text-muted-foreground mt-1">Create and manage custom business reports</p>
+            <h2 className="font-display font-bold text-2xl text-foreground">
+              Reports Generator
+            </h2>
+            <p className="text-sm text-muted-foreground mt-1">
+              Create and manage custom business reports
+            </p>
           </div>
           <Button className="bg-primary hover:bg-blue-700 text-white">
             <Plus size={16} className="mr-2" />
@@ -111,7 +123,7 @@ export default function ReportsGenerator() {
 
         {/* Tabs */}
         <div className={`flex gap-4 border-b border-border`}>
-          {["saved", "templates"].map((tab) => (
+          {["saved", "templates"].map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -130,27 +142,46 @@ export default function ReportsGenerator() {
         {activeTab === "saved" && (
           <div className="space-y-4">
             {savedReports.length > 0 ? (
-              savedReports.map((report) => (
-                <Card key={report.id} className="dark:bg-card bg-card shadow-sm border-0 p-6 hover:shadow-md transition-shadow">
+              savedReports.map(report => (
+                <Card
+                  key={report.id}
+                  className="dark:bg-card bg-card shadow-sm border-0 p-6 hover:shadow-md transition-shadow"
+                >
                   <div className={`flex items-center justify-between`}>
                     <div className={`flex-1 ${isRTL ? "text-right" : ""}`}>
-                      <h3 className="font-semibold text-foreground text-lg">{report.name}</h3>
-                      <div className={`flex items-center gap-4 mt-2 text-sm text-muted-foregroundjustify-end`}>
+                      <h3 className="font-semibold text-foreground text-lg">
+                        {report.name}
+                      </h3>
+                      <div
+                        className={`flex items-center gap-4 mt-2 text-sm text-muted-foregroundjustify-end`}
+                      >
                         <span>Type: {report.type}</span>
                         <span>Format: {report.format}</span>
                         <span>Modified: {report.lastModified}</span>
                       </div>
                     </div>
                     <div className={`flex gap-2`}>
-                      <Button variant="outline" size="sm" className="border-border">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-border"
+                      >
                         <Eye size={16} />
                       </Button>
-                      <Button variant="outline" size="sm" className="border-border">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-border"
+                      >
                         <Download size={16} />
                       </Button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="outline" size="sm" className="border-border">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="border-border"
+                          >
                             ⋮
                           </Button>
                         </DropdownMenuTrigger>
@@ -159,7 +190,9 @@ export default function ReportsGenerator() {
                           <DropdownMenuItem>Duplicate</DropdownMenuItem>
                           <DropdownMenuItem>Schedule</DropdownMenuItem>
                           <DropdownMenuItem>Share</DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
+                          <DropdownMenuItem className="text-destructive">
+                            Delete
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
@@ -168,7 +201,9 @@ export default function ReportsGenerator() {
               ))
             ) : (
               <Card className="bg-secondary p-12 text-center">
-                <p className="text-muted-foreground">No saved reports yet. Create one to get started!</p>
+                <p className="text-muted-foreground">
+                  No saved reports yet. Create one to get started!
+                </p>
               </Card>
             )}
           </div>
@@ -176,18 +211,25 @@ export default function ReportsGenerator() {
 
         {activeTab === "templates" && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {reportTemplates.map((template) => (
-              <Card key={template.id} className="dark:bg-card bg-card shadow-sm border-0 p-6 hover:shadow-md transition-shadow cursor-pointer group">
+            {reportTemplates.map(template => (
+              <Card
+                key={template.id}
+                className="dark:bg-card bg-card shadow-sm border-0 p-6 hover:shadow-md transition-shadow cursor-pointer group"
+              >
                 <div className={`flex items-start justify-between mb-4`}>
                   <div className="text-4xl">{template.icon}</div>
                   <span className="text-xs font-semibold px-2 py-1 bg-secondary rounded text-foreground">
                     {template.category}
                   </span>
                 </div>
-                <h3 className={`font-semibold text-foreground text-lg mb-2 ${isRTL ? "text-right" : ""}`}>
+                <h3
+                  className={`font-semibold text-foreground text-lg mb-2 ${isRTL ? "text-right" : ""}`}
+                >
                   {template.name}
                 </h3>
-                <p className={`text-sm text-muted-foreground mb-4 ${isRTL ? "text-right" : ""}`}>
+                <p
+                  className={`text-sm text-muted-foreground mb-4 ${isRTL ? "text-right" : ""}`}
+                >
                   {template.description}
                 </p>
                 <Button className="w-full bg-primary hover:bg-blue-700 text-white group-hover:shadow-lg transition-shadow">
@@ -201,13 +243,17 @@ export default function ReportsGenerator() {
 
         {/* Report Builder Preview */}
         <Card className="dark:bg-card bg-card shadow-sm border-0 p-6">
-          <h3 className={`font-display font-bold text-lg text-foreground mb-6 ${isRTL ? "text-right" : ""}`}>
+          <h3
+            className={`font-display font-bold text-lg text-foreground mb-6 ${isRTL ? "text-right" : ""}`}
+          >
             Quick Report Builder
           </h3>
           <div className="space-y-6">
             {/* Report Type */}
             <div>
-              <label className={`text-sm font-medium text-foreground block mb-2 ${isRTL ? "text-right" : ""}`}>
+              <label
+                className={`text-sm font-medium text-foreground block mb-2 ${isRTL ? "text-right" : ""}`}
+              >
                 Report Type
               </label>
               <select className="w-full px-4 py-2 border border-border rounded-lg dark:bg-card bg-card text-foreground">
@@ -221,13 +267,17 @@ export default function ReportsGenerator() {
             {/* Date Range */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className={`text-sm font-medium text-foreground block mb-2 ${isRTL ? "text-right" : ""}`}>
+                <label
+                  className={`text-sm font-medium text-foreground block mb-2 ${isRTL ? "text-right" : ""}`}
+                >
                   From Date
                 </label>
                 <Input type="date" className="bg-secondary border-0" />
               </div>
               <div>
-                <label className={`text-sm font-medium text-foreground block mb-2 ${isRTL ? "text-right" : ""}`}>
+                <label
+                  className={`text-sm font-medium text-foreground block mb-2 ${isRTL ? "text-right" : ""}`}
+                >
                   To Date
                 </label>
                 <Input type="date" className="bg-secondary border-0" />
@@ -236,11 +286,22 @@ export default function ReportsGenerator() {
 
             {/* Columns Selection */}
             <div>
-              <label className={`text-sm font-medium text-foreground block mb-2 ${isRTL ? "text-right" : ""}`}>
+              <label
+                className={`text-sm font-medium text-foreground block mb-2 ${isRTL ? "text-right" : ""}`}
+              >
                 Include Columns
               </label>
-              <div className={`grid grid-cols-2 gap-3 ${isRTL ? "text-right" : ""}`}>
-                {["Order ID", "Date", "Amount", "Status", "Customer", "Region"].map((col) => (
+              <div
+                className={`grid grid-cols-2 gap-3 ${isRTL ? "text-right" : ""}`}
+              >
+                {[
+                  "Order ID",
+                  "Date",
+                  "Amount",
+                  "Status",
+                  "Customer",
+                  "Region",
+                ].map(col => (
                   <label key={col} className="flex items-center gap-2">
                     <input type="checkbox" defaultChecked className="rounded" />
                     <span className="text-sm text-foreground">{col}</span>
@@ -251,13 +312,19 @@ export default function ReportsGenerator() {
 
             {/* Export Format */}
             <div>
-              <label className={`text-sm font-medium text-foreground block mb-2 ${isRTL ? "text-right" : ""}`}>
+              <label
+                className={`text-sm font-medium text-foreground block mb-2 ${isRTL ? "text-right" : ""}`}
+              >
                 Export Format
               </label>
               <div className={`flex gap-3`}>
-                {["PDF", "Excel", "CSV"].map((format) => (
+                {["PDF", "Excel", "CSV"].map(format => (
                   <label key={format} className="flex items-center gap-2">
-                    <input type="radio" name="format" defaultChecked={format === "PDF"} />
+                    <input
+                      type="radio"
+                      name="format"
+                      defaultChecked={format === "PDF"}
+                    />
                     <span className="text-sm text-foreground">{format}</span>
                   </label>
                 ))}

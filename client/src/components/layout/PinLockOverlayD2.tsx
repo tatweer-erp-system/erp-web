@@ -1,7 +1,11 @@
 import { useEffect } from "react";
 import { LockOutlined, UserOutlined, SafetyOutlined } from "@ant-design/icons";
 import { Avatar, Spin, theme as antTheme, Typography, Divider } from "antd";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
 import { usePinOverlayLogic } from "@/hooks/usePinOverlayLogic";
 
 const { Text, Title } = Typography;
@@ -9,8 +13,17 @@ const { Text, Title } = Typography;
 // ─── Design 2: Full-Screen Split Panel ───────────────────────────────────────
 export function PinLockOverlayD2() {
   const { token } = antTheme.useToken();
-  const { isLocked, pin, setPin, error, setError, loading, handleComplete, title, subtitle } =
-    usePinOverlayLogic();
+  const {
+    isLocked,
+    pin,
+    setPin,
+    error,
+    setError,
+    loading,
+    handleComplete,
+    title,
+    subtitle,
+  } = usePinOverlayLogic();
 
   useEffect(() => {
     if (pin.length === 4) handleComplete(pin);
@@ -34,8 +47,8 @@ export function PinLockOverlayD2() {
         justifyContent: "center",
         padding: 24,
       }}
-      onMouseDown={(e) => e.stopPropagation()}
-      onPointerDown={(e) => e.stopPropagation()}
+      onMouseDown={e => e.stopPropagation()}
+      onPointerDown={e => e.stopPropagation()}
     >
       <div
         style={{
@@ -107,14 +120,43 @@ export function PinLockOverlayD2() {
 
           {/* Bottom text */}
           <div>
-            <Title level={2} style={{ color: "#fff", margin: 0, fontWeight: 700, lineHeight: 1.2 }}>
-              Session<br />Locked
+            <Title
+              level={2}
+              style={{
+                color: "#fff",
+                margin: 0,
+                fontWeight: 700,
+                lineHeight: 1.2,
+              }}
+            >
+              Session
+              <br />
+              Locked
             </Title>
-            <Text style={{ color: "rgba(255,255,255,0.75)", fontSize: 13, display: "block", marginTop: 12, lineHeight: 1.6 }}>
-              Your session has been locked<br />for security purposes.
+            <Text
+              style={{
+                color: "rgba(255,255,255,0.75)",
+                fontSize: 13,
+                display: "block",
+                marginTop: 12,
+                lineHeight: 1.6,
+              }}
+            >
+              Your session has been locked
+              <br />
+              for security purposes.
             </Text>
-            <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 24 }}>
-              <SafetyOutlined style={{ color: "rgba(255,255,255,0.6)", fontSize: 13 }} />
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                marginTop: 24,
+              }}
+            >
+              <SafetyOutlined
+                style={{ color: "rgba(255,255,255,0.6)", fontSize: 13 }}
+              />
               <Text style={{ color: "rgba(255,255,255,0.6)", fontSize: 12 }}>
                 Tatweer ERP — Secured
               </Text>
@@ -136,7 +178,14 @@ export function PinLockOverlayD2() {
           }}
         >
           {/* Avatar + greeting */}
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 8,
+            }}
+          >
             <Avatar
               size={64}
               icon={<UserOutlined />}
@@ -147,27 +196,49 @@ export function PinLockOverlayD2() {
                 boxShadow: `0 6px 16px ${token.colorPrimary}40`,
               }}
             />
-            <Text strong style={{ fontSize: 17, marginTop: 4 }}>Welcome back, John</Text>
-            <Text type="secondary" style={{ fontSize: 12 }}>admin@tatweer.io</Text>
+            <Text strong style={{ fontSize: 17, marginTop: 4 }}>
+              Welcome back, John
+            </Text>
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              admin@tatweer.io
+            </Text>
           </div>
 
           <Divider style={{ margin: "4px 0" }} />
 
           {/* Form */}
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 20, width: "100%" }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 20,
+              width: "100%",
+            }}
+          >
             <div style={{ textAlign: "center" }}>
-              <Text strong style={{ fontSize: 16, display: "block", marginBottom: 4 }}>{title}</Text>
-              <Text type="secondary" style={{ fontSize: 12 }}>{subtitle}</Text>
+              <Text
+                strong
+                style={{ fontSize: 16, display: "block", marginBottom: 4 }}
+              >
+                {title}
+              </Text>
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                {subtitle}
+              </Text>
             </div>
 
             <Spin spinning={loading}>
               <InputOTP
                 maxLength={4}
                 value={pin}
-                onChange={(v) => { setPin(v); setError(""); }}
+                onChange={v => {
+                  setPin(v);
+                  setError("");
+                }}
               >
                 <InputOTPGroup style={{ gap: 14 }}>
-                  {[0, 1, 2, 3].map((i) => (
+                  {[0, 1, 2, 3].map(i => (
                     <InputOTPSlot
                       key={i}
                       index={i}

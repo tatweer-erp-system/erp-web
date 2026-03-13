@@ -2,7 +2,10 @@ import { useState } from "react";
 import { Database, Globe, Clock, CalendarDays, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
 export default function SystemSettings() {
@@ -22,8 +25,12 @@ export default function SystemSettings() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="font-display font-bold text-2xl text-foreground">System Settings</h2>
-        <p className="text-sm text-muted-foreground mt-1">Configure system-wide preferences and regional settings</p>
+        <h2 className="font-display font-bold text-2xl text-foreground">
+          System Settings
+        </h2>
+        <p className="text-sm text-muted-foreground mt-1">
+          Configure system-wide preferences and regional settings
+        </p>
       </div>
 
       <div className="bg-card rounded-xl border border-border shadow-sm p-6 space-y-6">
@@ -32,8 +39,12 @@ export default function SystemSettings() {
             <Database size={18} className="text-primary" />
           </div>
           <div>
-            <h3 className="font-semibold text-sm text-foreground">Regional & Localization</h3>
-            <p className="text-xs text-muted-foreground">Configure timezone, date format, and default currency</p>
+            <h3 className="font-semibold text-sm text-foreground">
+              Regional & Localization
+            </h3>
+            <p className="text-xs text-muted-foreground">
+              Configure timezone, date format, and default currency
+            </p>
           </div>
         </div>
 
@@ -44,13 +55,16 @@ export default function SystemSettings() {
           </label>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="w-full justify-between font-normal text-sm h-9">
+              <Button
+                variant="outline"
+                className="w-full justify-between font-normal text-sm h-9"
+              >
                 {timezone}
                 <Globe size={14} className="text-muted-foreground" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-72">
-              {timezones.map((tz) => (
+              {timezones.map(tz => (
                 <DropdownMenuItem key={tz} onClick={() => setTimezone(tz)}>
                   {tz}
                 </DropdownMenuItem>
@@ -62,11 +76,12 @@ export default function SystemSettings() {
         {/* Date format */}
         <div>
           <label className="block text-sm font-medium text-foreground mb-1.5 flex items-center gap-1.5">
-            <CalendarDays size={13} className="text-muted-foreground" /> Date Format
+            <CalendarDays size={13} className="text-muted-foreground" /> Date
+            Format
           </label>
           <select
             value={dateFormat}
-            onChange={(e) => setDateFormat(e.target.value)}
+            onChange={e => setDateFormat(e.target.value)}
             className="w-full h-9 px-3 border border-border rounded-lg bg-background text-foreground text-sm focus:ring-2 focus:ring-primary outline-none"
           >
             <option>DD/MM/YYYY</option>
@@ -82,7 +97,7 @@ export default function SystemSettings() {
           </label>
           <select
             value={currency}
-            onChange={(e) => setCurrency(e.target.value)}
+            onChange={e => setCurrency(e.target.value)}
             className="w-full h-9 px-3 border border-border rounded-lg bg-background text-foreground text-sm focus:ring-2 focus:ring-primary outline-none"
           >
             <option>SAR — Saudi Riyal</option>

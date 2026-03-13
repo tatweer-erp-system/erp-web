@@ -46,18 +46,33 @@ const { Option } = Select;
 
 // ── Shared sub-components ────────────────────────────────────────────────────
 
-function Section({ title, children }: { title?: string; children: React.ReactNode }) {
+function Section({
+  title,
+  children,
+}: {
+  title?: string;
+  children: React.ReactNode;
+}) {
   const { token } = antTheme.useToken();
   return (
-    <div style={{
-      background: token.colorBgContainer,
-      border: `1px solid ${token.colorBorderSecondary}`,
-      borderRadius: token.borderRadiusLG,
-      overflow: "hidden",
-    }}>
+    <div
+      style={{
+        background: token.colorBgContainer,
+        border: `1px solid ${token.colorBorderSecondary}`,
+        borderRadius: token.borderRadiusLG,
+        overflow: "hidden",
+      }}
+    >
       {title && (
-        <div style={{ padding: "14px 20px", borderBottom: `1px solid ${token.colorBorderSecondary}` }}>
-          <Text strong style={{ fontSize: 13 }}>{title}</Text>
+        <div
+          style={{
+            padding: "14px 20px",
+            borderBottom: `1px solid ${token.colorBorderSecondary}`,
+          }}
+        >
+          <Text strong style={{ fontSize: 13 }}>
+            {title}
+          </Text>
         </div>
       )}
       <div style={{ padding: "20px" }}>{children}</div>
@@ -66,19 +81,35 @@ function Section({ title, children }: { title?: string; children: React.ReactNod
 }
 
 function SettingRow({
-  label, sublabel, control, last = false,
-}: { label: string; sublabel: string; control: React.ReactNode; last?: boolean }) {
+  label,
+  sublabel,
+  control,
+  last = false,
+}: {
+  label: string;
+  sublabel: string;
+  control: React.ReactNode;
+  last?: boolean;
+}) {
   const { token } = antTheme.useToken();
   return (
-    <div style={{
-      display: "flex", alignItems: "center", justifyContent: "space-between",
-      padding: "14px 0",
-      borderBottom: last ? "none" : `1px solid ${token.colorBorderSecondary}`,
-    }}>
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        padding: "14px 0",
+        borderBottom: last ? "none" : `1px solid ${token.colorBorderSecondary}`,
+      }}
+    >
       <div>
-        <Text strong style={{ fontSize: 13 }}>{label}</Text>
+        <Text strong style={{ fontSize: 13 }}>
+          {label}
+        </Text>
         <br />
-        <Text type="secondary" style={{ fontSize: 12 }}>{sublabel}</Text>
+        <Text type="secondary" style={{ fontSize: 12 }}>
+          {sublabel}
+        </Text>
       </div>
       {control}
     </div>
@@ -88,21 +119,21 @@ function SettingRow({
 // ── Nav items ────────────────────────────────────────────────────────────────
 
 const NAV_ITEMS = [
-  { key: "general",     icon: <SettingOutlined />,     label: "General"               },
-  { key: "pos-session", icon: <ClockCircleOutlined />, label: "POS Session"           },
-  { key: "security",    icon: <LockOutlined />,        label: "Session Security"      },
-  { key: "register",    icon: <PrinterOutlined />,     label: "Register & Hardware"   },
-  { key: "receipt",     icon: <FileTextOutlined />,    label: "Receipt"               },
-  { key: "payment",     icon: <CreditCardOutlined />,  label: "Payment & Tax"         },
-  { key: "discounts",   icon: <PercentageOutlined />,  label: "Discounts"             },
-  { key: "checkout",    icon: <ShoppingOutlined />,    label: "Checkout Rules"        },
-  { key: "shift",       icon: <DollarOutlined />,      label: "Shift & Cash"          },
-  { key: "loyalty",     icon: <TrophyOutlined />,      label: "Loyalty"               },
-  { key: "vouchers",    icon: <GiftOutlined />,        label: "Vouchers & Gift Cards" },
-  { key: "customer",    icon: <TeamOutlined />,        label: "Customer & Display"    },
-  { key: "offline",     icon: <WifiOutlined />,        label: "Offline Mode"          },
-  { key: "restaurant",  icon: <ShopOutlined />,        label: "Restaurant"            },
-  { key: "returns",     icon: <RollbackOutlined />,    label: "Returns & Refunds"     },
+  { key: "general", icon: <SettingOutlined />, label: "General" },
+  { key: "pos-session", icon: <ClockCircleOutlined />, label: "POS Session" },
+  { key: "security", icon: <LockOutlined />, label: "Session Security" },
+  { key: "register", icon: <PrinterOutlined />, label: "Register & Hardware" },
+  { key: "receipt", icon: <FileTextOutlined />, label: "Receipt" },
+  { key: "payment", icon: <CreditCardOutlined />, label: "Payment & Tax" },
+  { key: "discounts", icon: <PercentageOutlined />, label: "Discounts" },
+  { key: "checkout", icon: <ShoppingOutlined />, label: "Checkout Rules" },
+  { key: "shift", icon: <DollarOutlined />, label: "Shift & Cash" },
+  { key: "loyalty", icon: <TrophyOutlined />, label: "Loyalty" },
+  { key: "vouchers", icon: <GiftOutlined />, label: "Vouchers & Gift Cards" },
+  { key: "customer", icon: <TeamOutlined />, label: "Customer & Display" },
+  { key: "offline", icon: <WifiOutlined />, label: "Offline Mode" },
+  { key: "restaurant", icon: <ShopOutlined />, label: "Restaurant" },
+  { key: "returns", icon: <RollbackOutlined />, label: "Returns & Refunds" },
 ];
 
 // ── Main component ───────────────────────────────────────────────────────────
@@ -116,8 +147,12 @@ export default function POSSettings() {
   const [isDirty, setIsDirty] = useState(false);
   const [pendingTab, setPendingTab] = useState<string | null>(null);
 
-  function mark() { setIsDirty(true); }
-  function saved() { setIsDirty(false); }
+  function mark() {
+    setIsDirty(true);
+  }
+  function saved() {
+    setIsDirty(false);
+  }
 
   function handleTabClick(key: string) {
     if (key === activeTab) return;
@@ -144,25 +179,31 @@ export default function POSSettings() {
   }
 
   // ── Store-backed state ────────────────────────────────────────────────────
-  const maxOrders             = usePOSStore((s) => s.maxOrders);
-  const setMaxOrders          = usePOSStore((s) => s.setMaxOrders);
-  const posSessionSettings    = usePOSStore((s) => s.posSessionSettings);
-  const setPOSSessionSettings = usePOSStore((s) => s.setPOSSessionSettings);
+  const maxOrders = usePOSStore(s => s.maxOrders);
+  const setMaxOrders = usePOSStore(s => s.setMaxOrders);
+  const posSessionSettings = usePOSStore(s => s.posSessionSettings);
+  const setPOSSessionSettings = usePOSStore(s => s.setPOSSessionSettings);
 
-  const restaurantMode             = usePOSStore((s) => s.restaurantMode);
-  const setRestaurantMode          = usePOSStore((s) => s.setRestaurantMode);
-  const tableManagementEnabled     = usePOSStore((s) => s.tableManagementEnabled);
-  const setTableManagementEnabled  = usePOSStore((s) => s.setTableManagementEnabled);
-  const courseManagementEnabled    = usePOSStore((s) => s.courseManagementEnabled);
-  const setCourseManagementEnabled = usePOSStore((s) => s.setCourseManagementEnabled);
-  const kitchenPrintingEnabled     = usePOSStore((s) => s.kitchenPrintingEnabled);
-  const setKitchenPrintingEnabled  = usePOSStore((s) => s.setKitchenPrintingEnabled);
-  const autoSendKitchen            = usePOSStore((s) => s.autoSendKitchen);
-  const setAutoSendKitchen         = usePOSStore((s) => s.setAutoSendKitchen);
-  const allowTakeAway              = usePOSStore((s) => s.allowTakeAway);
-  const setAllowTakeAway           = usePOSStore((s) => s.setAllowTakeAway);
-  const defaultGuests              = usePOSStore((s) => s.defaultGuests);
-  const setDefaultGuests           = usePOSStore((s) => s.setDefaultGuests);
+  const restaurantMode = usePOSStore(s => s.restaurantMode);
+  const setRestaurantMode = usePOSStore(s => s.setRestaurantMode);
+  const tableManagementEnabled = usePOSStore(s => s.tableManagementEnabled);
+  const setTableManagementEnabled = usePOSStore(
+    s => s.setTableManagementEnabled
+  );
+  const courseManagementEnabled = usePOSStore(s => s.courseManagementEnabled);
+  const setCourseManagementEnabled = usePOSStore(
+    s => s.setCourseManagementEnabled
+  );
+  const kitchenPrintingEnabled = usePOSStore(s => s.kitchenPrintingEnabled);
+  const setKitchenPrintingEnabled = usePOSStore(
+    s => s.setKitchenPrintingEnabled
+  );
+  const autoSendKitchen = usePOSStore(s => s.autoSendKitchen);
+  const setAutoSendKitchen = usePOSStore(s => s.setAutoSendKitchen);
+  const allowTakeAway = usePOSStore(s => s.allowTakeAway);
+  const setAllowTakeAway = usePOSStore(s => s.setAllowTakeAway);
+  const defaultGuests = usePOSStore(s => s.defaultGuests);
+  const setDefaultGuests = usePOSStore(s => s.setDefaultGuests);
 
   // ── General tab ───────────────────────────────────────────────────────────
   const [defaultCurrency, setDefaultCurrency] = useState("USD");
@@ -171,95 +212,109 @@ export default function POSSettings() {
   const [generalReceiptCopies, setGeneralReceiptCopies] = useState(1);
 
   // ── Register & Hardware tab ───────────────────────────────────────────────
-  const [autoPrintReceipt,    setAutoPrintReceipt]    = useState(true);
-  const [receiptCopies,       setReceiptCopies]        = useState(1);
-  const [printerPaperSize,    setPrinterPaperSize]     = useState<"80mm" | "58mm">("80mm");
-  const [openDrawerOnCash,    setOpenDrawerOnCash]     = useState(true);
-  const [openDrawerOnReceipt, setOpenDrawerOnReceipt]  = useState(false);
-  const [soundOnScan,         setSoundOnScan]          = useState(true);
-  const [soundOnPayment,      setSoundOnPayment]       = useState(true);
-  const [idleScreenTimeout,   setIdleScreenTimeout]    = useState(5);
-  const [scannerMode,         setScannerMode]          = useState<"keyboard" | "serial">("keyboard");
+  const [autoPrintReceipt, setAutoPrintReceipt] = useState(true);
+  const [receiptCopies, setReceiptCopies] = useState(1);
+  const [printerPaperSize, setPrinterPaperSize] = useState<"80mm" | "58mm">(
+    "80mm"
+  );
+  const [openDrawerOnCash, setOpenDrawerOnCash] = useState(true);
+  const [openDrawerOnReceipt, setOpenDrawerOnReceipt] = useState(false);
+  const [soundOnScan, setSoundOnScan] = useState(true);
+  const [soundOnPayment, setSoundOnPayment] = useState(true);
+  const [idleScreenTimeout, setIdleScreenTimeout] = useState(5);
+  const [scannerMode, setScannerMode] = useState<"keyboard" | "serial">(
+    "keyboard"
+  );
 
   // ── Receipt tab ───────────────────────────────────────────────────────────
-  const [receiptTemplate,    setReceiptTemplate]    = useState<"full" | "compact" | "minimal">("full");
+  const [receiptTemplate, setReceiptTemplate] = useState<
+    "full" | "compact" | "minimal"
+  >("full");
   const [showBarcodeOnReceipt, setShowBarcodeOnReceipt] = useState(true);
-  const [showCustomerName,   setShowCustomerName]   = useState(true);
-  const [receiptFooterMsg,   setReceiptFooterMsg]   = useState("Thank you for your business!");
+  const [showCustomerName, setShowCustomerName] = useState(true);
+  const [receiptFooterMsg, setReceiptFooterMsg] = useState(
+    "Thank you for your business!"
+  );
 
   // ── Payment & Tax tab ─────────────────────────────────────────────────────
-  const [defaultTaxRate,      setDefaultTaxRate]       = useState(15);
-  const [taxInclusive,        setTaxInclusive]         = useState(false);
-  const [showTaxBreakdown,    setShowTaxBreakdown]     = useState(true);
-  const [tipsEnabled,         setTipsEnabled]          = useState(false);
-  const [tipPresets,          setTipPresets]           = useState<number[]>([10, 15, 18, 20]);
-  const [autoGratuityEnabled, setAutoGratuityEnabled]  = useState(false);
-  const [autoGratuityPct,     setAutoGratuityPct]      = useState(18);
+  const [defaultTaxRate, setDefaultTaxRate] = useState(15);
+  const [taxInclusive, setTaxInclusive] = useState(false);
+  const [showTaxBreakdown, setShowTaxBreakdown] = useState(true);
+  const [tipsEnabled, setTipsEnabled] = useState(false);
+  const [tipPresets, setTipPresets] = useState<number[]>([10, 15, 18, 20]);
+  const [autoGratuityEnabled, setAutoGratuityEnabled] = useState(false);
+  const [autoGratuityPct, setAutoGratuityPct] = useState(18);
   const [autoGratuityPartySize, setAutoGratuityPartySize] = useState(6);
-  const [roundingRule,        setRoundingRule]         = useState<"none" | "0.05" | "0.10" | "1.00">("none");
-  const [cashEnabled,         setCashEnabled]          = useState(true);
-  const [cardEnabled,         setCardEnabled]          = useState(true);
-  const [splitEnabled,        setSplitEnabled]         = useState(true);
-  const [giftCardEnabled,     setGiftCardEnabled]      = useState(true);
-  const [voucherEnabled,      setVoucherEnabled]       = useState(true);
-  const [allowPartialPayment, setAllowPartialPayment]  = useState(false);
-  const [minCardAmount,       setMinCardAmount]        = useState(0);
+  const [roundingRule, setRoundingRule] = useState<
+    "none" | "0.05" | "0.10" | "1.00"
+  >("none");
+  const [cashEnabled, setCashEnabled] = useState(true);
+  const [cardEnabled, setCardEnabled] = useState(true);
+  const [splitEnabled, setSplitEnabled] = useState(true);
+  const [giftCardEnabled, setGiftCardEnabled] = useState(true);
+  const [voucherEnabled, setVoucherEnabled] = useState(true);
+  const [allowPartialPayment, setAllowPartialPayment] = useState(false);
+  const [minCardAmount, setMinCardAmount] = useState(0);
 
   // ── Discounts tab ─────────────────────────────────────────────────────────
-  const [allowItemDiscount,   setAllowItemDiscount]   = useState(true);
-  const [allowOrderDiscount,  setAllowOrderDiscount]  = useState(true);
-  const [maxDiscountPercent,  setMaxDiscountPercent]  = useState(50);
+  const [allowItemDiscount, setAllowItemDiscount] = useState(true);
+  const [allowOrderDiscount, setAllowOrderDiscount] = useState(true);
+  const [maxDiscountPercent, setMaxDiscountPercent] = useState(50);
   const [requireManagerAbove, setRequireManagerAbove] = useState(20);
 
   // ── Returns & Refunds tab ─────────────────────────────────────────────────
-  const [returnWindowDays,    setReturnWindowDays]     = useState(30);
+  const [returnWindowDays, setReturnWindowDays] = useState(30);
   const [requireManagerRefund, setRequireManagerRefund] = useState(true);
-  const [restockingFeePct,    setRestockingFeePct]     = useState(0);
-  const [allowCashRefund,     setAllowCashRefund]      = useState(true);
-  const [allowOriginalRefund, setAllowOriginalRefund]  = useState(true);
-  const [allowCreditRefund,   setAllowCreditRefund]    = useState(true);
-  const [refundNoteRequired,  setRefundNoteRequired]   = useState(true);
+  const [restockingFeePct, setRestockingFeePct] = useState(0);
+  const [allowCashRefund, setAllowCashRefund] = useState(true);
+  const [allowOriginalRefund, setAllowOriginalRefund] = useState(true);
+  const [allowCreditRefund, setAllowCreditRefund] = useState(true);
+  const [refundNoteRequired, setRefundNoteRequired] = useState(true);
 
   // ── Checkout Rules tab ────────────────────────────────────────────────────
-  const [allowPriceOverride,  setAllowPriceOverride]   = useState(false);
-  const [requireVoidReason,   setRequireVoidReason]    = useState(true);
-  const [requireRefundReason, setRequireRefundReason]  = useState(true);
-  const [minSaleAmount,       setMinSaleAmount]        = useState(0);
-  const [maxSaleAmount,       setMaxSaleAmount]        = useState(0);
-  const [holdTimeout,         setHoldTimeout]          = useState(60);
-  const [allowNegativeStock,  setAllowNegativeStock]   = useState(false);
+  const [allowPriceOverride, setAllowPriceOverride] = useState(false);
+  const [requireVoidReason, setRequireVoidReason] = useState(true);
+  const [requireRefundReason, setRequireRefundReason] = useState(true);
+  const [minSaleAmount, setMinSaleAmount] = useState(0);
+  const [maxSaleAmount, setMaxSaleAmount] = useState(0);
+  const [holdTimeout, setHoldTimeout] = useState(60);
+  const [allowNegativeStock, setAllowNegativeStock] = useState(false);
 
   // ── Shift & Cash tab ──────────────────────────────────────────────────────
-  const [requireOpeningFloat,  setRequireOpeningFloat]  = useState(true);
-  const [allowCashierClose,    setAllowCashierClose]    = useState(false);
-  const [autoCloseEnabled,     setAutoCloseEnabled]     = useState(false);
-  const [autoCloseTime,        setAutoCloseTime]        = useState<dayjs.Dayjs>(dayjs("23:00", "HH:mm"));
-  const [requireOpeningCount,  setRequireOpeningCount]  = useState(true);
-  const [requireClosingCount,  setRequireClosingCount]  = useState(true);
+  const [requireOpeningFloat, setRequireOpeningFloat] = useState(true);
+  const [allowCashierClose, setAllowCashierClose] = useState(false);
+  const [autoCloseEnabled, setAutoCloseEnabled] = useState(false);
+  const [autoCloseTime, setAutoCloseTime] = useState<dayjs.Dayjs>(
+    dayjs("23:00", "HH:mm")
+  );
+  const [requireOpeningCount, setRequireOpeningCount] = useState(true);
+  const [requireClosingCount, setRequireClosingCount] = useState(true);
   const [discrepancyThreshold, setDiscrepancyThreshold] = useState(5);
-  const [eodFloatTarget,       setEodFloatTarget]       = useState(200);
-  const [alertOnDiscrepancy,   setAlertOnDiscrepancy]   = useState(true);
+  const [eodFloatTarget, setEodFloatTarget] = useState(200);
+  const [alertOnDiscrepancy, setAlertOnDiscrepancy] = useState(true);
 
   // ── Loyalty tab ───────────────────────────────────────────────────────────
-  const [loyaltyEnabled,         setLoyaltyEnabled]         = useState(true);
-  const [pointsExpiryDays,       setPointsExpiryDays]       = useState(365);
-  const [minRedemptionPoints,    setMinRedemptionPoints]    = useState(100);
+  const [loyaltyEnabled, setLoyaltyEnabled] = useState(true);
+  const [pointsExpiryDays, setPointsExpiryDays] = useState(365);
+  const [minRedemptionPoints, setMinRedemptionPoints] = useState(100);
   const [allowPartialRedemption, setAllowPartialRedemption] = useState(true);
-  const [showLoyaltyOnReceipt,   setShowLoyaltyOnReceipt]   = useState(true);
+  const [showLoyaltyOnReceipt, setShowLoyaltyOnReceipt] = useState(true);
 
   // ── Vouchers & Gift Cards tab ─────────────────────────────────────────────
-  const [allowVoucherRedemption,  setAllowVoucherRedemption]  = useState(true);
+  const [allowVoucherRedemption, setAllowVoucherRedemption] = useState(true);
   const [allowGiftCardRedemption, setAllowGiftCardRedemption] = useState(true);
-  const [allowGiftCardIssuance,   setAllowGiftCardIssuance]   = useState(true);
-  const [giftCardExpiryDays,      setGiftCardExpiryDays]      = useState(365);
-  const [allowMultipleGiftCards,  setAllowMultipleGiftCards]  = useState(true);
+  const [allowGiftCardIssuance, setAllowGiftCardIssuance] = useState(true);
+  const [giftCardExpiryDays, setGiftCardExpiryDays] = useState(365);
+  const [allowMultipleGiftCards, setAllowMultipleGiftCards] = useState(true);
 
   // ── Customer & Display tab ────────────────────────────────────────────────
-  const [autoAttachCustomer,    setAutoAttachCustomer]    = useState(false);
-  const [promptAddCustomer,     setPromptAddCustomer]     = useState(false);
+  const [autoAttachCustomer, setAutoAttachCustomer] = useState(false);
+  const [promptAddCustomer, setPromptAddCustomer] = useState(false);
   const [showLoyaltyAtCheckout, setShowLoyaltyAtCheckout] = useState(true);
-  const [defaultProductSort,    setDefaultProductSort]    = useState<"name" | "price_asc" | "price_desc" | "category">("name");
-  const [hideOutOfStock,        setHideOutOfStock]        = useState(false);
+  const [defaultProductSort, setDefaultProductSort] = useState<
+    "name" | "price_asc" | "price_desc" | "category"
+  >("name");
+  const [hideOutOfStock, setHideOutOfStock] = useState(false);
 
   // ── Save helpers ──────────────────────────────────────────────────────────
 
@@ -277,7 +332,14 @@ export default function POSSettings() {
           label="Default Currency"
           sublabel="Currency used in all POS transactions and receipts"
           control={
-            <Select value={defaultCurrency} onChange={(v) => { setDefaultCurrency(v); mark(); }} style={{ width: 140 }}>
+            <Select
+              value={defaultCurrency}
+              onChange={v => {
+                setDefaultCurrency(v);
+                mark();
+              }}
+              style={{ width: 140 }}
+            >
               <Option value="USD">USD – US Dollar</Option>
               <Option value="EUR">EUR – Euro</Option>
               <Option value="GBP">GBP – British Pound</Option>
@@ -292,7 +354,14 @@ export default function POSSettings() {
           sublabel="Language displayed in the POS interface"
           last
           control={
-            <Select value={defaultLanguage} onChange={(v) => { setDefaultLanguage(v); mark(); }} style={{ width: 180 }}>
+            <Select
+              value={defaultLanguage}
+              onChange={v => {
+                setDefaultLanguage(v);
+                mark();
+              }}
+              style={{ width: 180 }}
+            >
               <Option value="en">English</Option>
               <Option value="ar">العربية (Arabic)</Option>
               <Option value="fr">Français (French)</Option>
@@ -306,7 +375,15 @@ export default function POSSettings() {
         <SettingRow
           label="Auto-Print Receipt"
           sublabel="Automatically print a receipt after every completed sale"
-          control={<Switch checked={generalAutoPrint} onChange={(v) => { setGeneralAutoPrint(v); mark(); }} />}
+          control={
+            <Switch
+              checked={generalAutoPrint}
+              onChange={v => {
+                setGeneralAutoPrint(v);
+                mark();
+              }}
+            />
+          }
         />
         <SettingRow
           label="Number of Receipt Copies"
@@ -314,9 +391,13 @@ export default function POSSettings() {
           last
           control={
             <InputNumber
-              min={1} max={5}
+              min={1}
+              max={5}
               value={generalReceiptCopies}
-              onChange={(v) => { setGeneralReceiptCopies(v ?? 1); mark(); }}
+              onChange={v => {
+                setGeneralReceiptCopies(v ?? 1);
+                mark();
+              }}
               addonAfter="copies"
               style={{ width: 140 }}
             />
@@ -331,9 +412,13 @@ export default function POSSettings() {
           last
           control={
             <InputNumber
-              min={1} max={10}
+              min={1}
+              max={10}
               value={maxOrders}
-              onChange={(v) => { setMaxOrders(v ?? 5); mark(); }}
+              onChange={v => {
+                setMaxOrders(v ?? 5);
+                mark();
+              }}
               addonAfter="tabs"
               style={{ width: 130 }}
             />
@@ -342,7 +427,11 @@ export default function POSSettings() {
       </Section>
 
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button type="primary" icon={<SaveOutlined />} onClick={() => saveAndNotify("General")}>
+        <Button
+          type="primary"
+          icon={<SaveOutlined />}
+          onClick={() => saveAndNotify("General")}
+        >
           Save Settings
         </Button>
       </div>
@@ -361,9 +450,13 @@ export default function POSSettings() {
                 help="Max simultaneous order tabs per POS session (1–10)"
               >
                 <InputNumber
-                  min={1} max={10}
+                  min={1}
+                  max={10}
                   value={maxOrders}
-                  onChange={(v) => { setMaxOrders(v ?? 5); mark(); }}
+                  onChange={v => {
+                    setMaxOrders(v ?? 5);
+                    mark();
+                  }}
                   addonAfter="tabs"
                   style={{ width: "100%" }}
                 />
@@ -373,7 +466,11 @@ export default function POSSettings() {
         </Form>
       </Section>
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button type="primary" icon={<SaveOutlined />} onClick={() => saveAndNotify("POS session")}>
+        <Button
+          type="primary"
+          icon={<SaveOutlined />}
+          onClick={() => saveAndNotify("POS session")}
+        >
           Save Settings
         </Button>
       </div>
@@ -388,9 +485,13 @@ export default function POSSettings() {
           sublabel="Automatically lock the terminal after a period of inactivity"
           control={
             <InputNumber
-              min={1} max={60}
+              min={1}
+              max={60}
               value={posSessionSettings.inactivityLockMinutes}
-              onChange={(v) => { setPOSSessionSettings({ inactivityLockMinutes: v ?? 5 }); mark(); }}
+              onChange={v => {
+                setPOSSessionSettings({ inactivityLockMinutes: v ?? 5 });
+                mark();
+              }}
               addonAfter="min"
               style={{ width: 120 }}
             />
@@ -401,9 +502,13 @@ export default function POSSettings() {
           sublabel="Lock after this many failed PIN entries"
           control={
             <InputNumber
-              min={1} max={10}
+              min={1}
+              max={10}
               value={posSessionSettings.maxPINAttempts}
-              onChange={(v) => { setPOSSessionSettings({ maxPINAttempts: v ?? 3 }); mark(); }}
+              onChange={v => {
+                setPOSSessionSettings({ maxPINAttempts: v ?? 3 });
+                mark();
+              }}
               addonAfter="tries"
               style={{ width: 130 }}
             />
@@ -415,7 +520,10 @@ export default function POSSettings() {
           control={
             <Switch
               checked={posSessionSettings.requireManagerForRefunds}
-              onChange={(v) => { setPOSSessionSettings({ requireManagerForRefunds: v }); mark(); }}
+              onChange={v => {
+                setPOSSessionSettings({ requireManagerForRefunds: v });
+                mark();
+              }}
             />
           }
         />
@@ -425,9 +533,15 @@ export default function POSSettings() {
           last
           control={
             <InputNumber
-              min={0} max={100}
+              min={0}
+              max={100}
               value={posSessionSettings.requireManagerForDiscountsAbove}
-              onChange={(v) => { setPOSSessionSettings({ requireManagerForDiscountsAbove: v ?? 20 }); mark(); }}
+              onChange={v => {
+                setPOSSessionSettings({
+                  requireManagerForDiscountsAbove: v ?? 20,
+                });
+                mark();
+              }}
               addonAfter="%"
               style={{ width: 120 }}
             />
@@ -435,7 +549,11 @@ export default function POSSettings() {
         />
       </Section>
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button type="primary" icon={<SaveOutlined />} onClick={() => saveAndNotify("Security")}>
+        <Button
+          type="primary"
+          icon={<SaveOutlined />}
+          onClick={() => saveAndNotify("Security")}
+        >
           Save Settings
         </Button>
       </div>
@@ -448,16 +566,28 @@ export default function POSSettings() {
         <SettingRow
           label="Auto-Print Receipt"
           sublabel="Automatically print receipt after every completed sale"
-          control={<Switch checked={autoPrintReceipt} onChange={(v) => { setAutoPrintReceipt(v); mark(); }} />}
+          control={
+            <Switch
+              checked={autoPrintReceipt}
+              onChange={v => {
+                setAutoPrintReceipt(v);
+                mark();
+              }}
+            />
+          }
         />
         <SettingRow
           label="Receipt Copies"
           sublabel="Number of copies printed per transaction"
           control={
             <InputNumber
-              min={1} max={5}
+              min={1}
+              max={5}
               value={receiptCopies}
-              onChange={(v) => { setReceiptCopies(v ?? 1); mark(); }}
+              onChange={v => {
+                setReceiptCopies(v ?? 1);
+                mark();
+              }}
               addonAfter="copies"
               style={{ width: 140 }}
             />
@@ -470,7 +600,10 @@ export default function POSSettings() {
           control={
             <Select
               value={printerPaperSize}
-              onChange={(v) => { setPrinterPaperSize(v); mark(); }}
+              onChange={v => {
+                setPrinterPaperSize(v);
+                mark();
+              }}
               style={{ width: 110 }}
               options={[
                 { value: "80mm", label: "80 mm" },
@@ -485,13 +618,29 @@ export default function POSSettings() {
         <SettingRow
           label="Open Drawer on Cash Payment"
           sublabel="Automatically trigger cash drawer when a cash sale is completed"
-          control={<Switch checked={openDrawerOnCash} onChange={(v) => { setOpenDrawerOnCash(v); mark(); }} />}
+          control={
+            <Switch
+              checked={openDrawerOnCash}
+              onChange={v => {
+                setOpenDrawerOnCash(v);
+                mark();
+              }}
+            />
+          }
         />
         <SettingRow
           label="Open Drawer on Receipt Print"
           sublabel="Trigger cash drawer whenever a receipt is printed"
           last
-          control={<Switch checked={openDrawerOnReceipt} onChange={(v) => { setOpenDrawerOnReceipt(v); mark(); }} />}
+          control={
+            <Switch
+              checked={openDrawerOnReceipt}
+              onChange={v => {
+                setOpenDrawerOnReceipt(v);
+                mark();
+              }}
+            />
+          }
         />
       </Section>
 
@@ -502,11 +651,14 @@ export default function POSSettings() {
           control={
             <Select
               value={scannerMode}
-              onChange={(v) => { setScannerMode(v); mark(); }}
+              onChange={v => {
+                setScannerMode(v);
+                mark();
+              }}
               style={{ width: 150 }}
               options={[
                 { value: "keyboard", label: "Keyboard (HID)" },
-                { value: "serial",   label: "Serial / USB COM" },
+                { value: "serial", label: "Serial / USB COM" },
               ]}
             />
           }
@@ -515,7 +667,15 @@ export default function POSSettings() {
           label="Beep on Successful Scan"
           sublabel="Play a sound when a product barcode is recognised"
           last
-          control={<Switch checked={soundOnScan} onChange={(v) => { setSoundOnScan(v); mark(); }} />}
+          control={
+            <Switch
+              checked={soundOnScan}
+              onChange={v => {
+                setSoundOnScan(v);
+                mark();
+              }}
+            />
+          }
         />
       </Section>
 
@@ -525,9 +685,13 @@ export default function POSSettings() {
           sublabel="Switch to idle/screensaver display after inactivity"
           control={
             <InputNumber
-              min={1} max={60}
+              min={1}
+              max={60}
               value={idleScreenTimeout}
-              onChange={(v) => { setIdleScreenTimeout(v ?? 5); mark(); }}
+              onChange={v => {
+                setIdleScreenTimeout(v ?? 5);
+                mark();
+              }}
               addonAfter="min"
               style={{ width: 120 }}
             />
@@ -537,12 +701,24 @@ export default function POSSettings() {
           label="Sound on Payment Completion"
           sublabel="Play a confirmation sound when a payment is processed"
           last
-          control={<Switch checked={soundOnPayment} onChange={(v) => { setSoundOnPayment(v); mark(); }} />}
+          control={
+            <Switch
+              checked={soundOnPayment}
+              onChange={v => {
+                setSoundOnPayment(v);
+                mark();
+              }}
+            />
+          }
         />
       </Section>
 
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button type="primary" icon={<SaveOutlined />} onClick={() => saveAndNotify("Register")}>
+        <Button
+          type="primary"
+          icon={<SaveOutlined />}
+          onClick={() => saveAndNotify("Register")}
+        >
           Save Settings
         </Button>
       </div>
@@ -558,12 +734,15 @@ export default function POSSettings() {
           control={
             <Select
               value={receiptTemplate}
-              onChange={(v) => { setReceiptTemplate(v); mark(); }}
+              onChange={v => {
+                setReceiptTemplate(v);
+                mark();
+              }}
               style={{ width: 160 }}
               options={[
-                { value: "full",    label: "Full (all details)" },
-                { value: "compact", label: "Compact"            },
-                { value: "minimal", label: "Minimal"            },
+                { value: "full", label: "Full (all details)" },
+                { value: "compact", label: "Compact" },
+                { value: "minimal", label: "Minimal" },
               ]}
             />
           }
@@ -571,26 +750,48 @@ export default function POSSettings() {
         <SettingRow
           label="Show Barcode"
           sublabel="Print a scannable barcode (order reference) on the receipt"
-          control={<Switch checked={showBarcodeOnReceipt} onChange={(v) => { setShowBarcodeOnReceipt(v); mark(); }} />}
+          control={
+            <Switch
+              checked={showBarcodeOnReceipt}
+              onChange={v => {
+                setShowBarcodeOnReceipt(v);
+                mark();
+              }}
+            />
+          }
         />
         <SettingRow
           label="Show Customer Name"
           sublabel="Print the attached customer's name on the receipt"
           last
-          control={<Switch checked={showCustomerName} onChange={(v) => { setShowCustomerName(v); mark(); }} />}
+          control={
+            <Switch
+              checked={showCustomerName}
+              onChange={v => {
+                setShowCustomerName(v);
+                mark();
+              }}
+            />
+          }
         />
       </Section>
 
       <Section title="Footer">
         <div style={{ paddingTop: 4 }}>
-          <Text strong style={{ fontSize: 13 }}>Footer Message</Text>
+          <Text strong style={{ fontSize: 13 }}>
+            Footer Message
+          </Text>
           <br />
           <Text type="secondary" style={{ fontSize: 12 }}>
-            Text printed at the bottom of every receipt (e.g. thank-you note, return policy)
+            Text printed at the bottom of every receipt (e.g. thank-you note,
+            return policy)
           </Text>
           <TextArea
             value={receiptFooterMsg}
-            onChange={(e) => { setReceiptFooterMsg(e.target.value); mark(); }}
+            onChange={e => {
+              setReceiptFooterMsg(e.target.value);
+              mark();
+            }}
             rows={3}
             maxLength={200}
             showCount
@@ -601,7 +802,11 @@ export default function POSSettings() {
       </Section>
 
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button type="primary" icon={<SaveOutlined />} onClick={() => saveAndNotify("Receipt")}>
+        <Button
+          type="primary"
+          icon={<SaveOutlined />}
+          onClick={() => saveAndNotify("Receipt")}
+        >
           Save Settings
         </Button>
       </div>
@@ -616,9 +821,13 @@ export default function POSSettings() {
           sublabel="Applied to all products unless overridden at product level"
           control={
             <InputNumber
-              min={0} max={100}
+              min={0}
+              max={100}
               value={defaultTaxRate}
-              onChange={(v) => { setDefaultTaxRate(v ?? 15); mark(); }}
+              onChange={v => {
+                setDefaultTaxRate(v ?? 15);
+                mark();
+              }}
               addonAfter="%"
               style={{ width: 120 }}
             />
@@ -627,13 +836,29 @@ export default function POSSettings() {
         <SettingRow
           label="Tax-Inclusive Pricing"
           sublabel="Product prices already include tax — do not add tax on top"
-          control={<Switch checked={taxInclusive} onChange={(v) => { setTaxInclusive(v); mark(); }} />}
+          control={
+            <Switch
+              checked={taxInclusive}
+              onChange={v => {
+                setTaxInclusive(v);
+                mark();
+              }}
+            />
+          }
         />
         <SettingRow
           label="Show Tax Breakdown on Receipt"
           sublabel="Print a separate tax line on the customer receipt"
           last
-          control={<Switch checked={showTaxBreakdown} onChange={(v) => { setShowTaxBreakdown(v); mark(); }} />}
+          control={
+            <Switch
+              checked={showTaxBreakdown}
+              onChange={v => {
+                setShowTaxBreakdown(v);
+                mark();
+              }}
+            />
+          }
         />
       </Section>
 
@@ -641,32 +866,80 @@ export default function POSSettings() {
         <SettingRow
           label="Accept Cash"
           sublabel="Allow cash as a payment method at checkout"
-          control={<Switch checked={cashEnabled} onChange={(v) => { setCashEnabled(v); mark(); }} />}
+          control={
+            <Switch
+              checked={cashEnabled}
+              onChange={v => {
+                setCashEnabled(v);
+                mark();
+              }}
+            />
+          }
         />
         <SettingRow
           label="Accept Card"
           sublabel="Allow card (debit / credit) payments at checkout"
-          control={<Switch checked={cardEnabled} onChange={(v) => { setCardEnabled(v); mark(); }} />}
+          control={
+            <Switch
+              checked={cardEnabled}
+              onChange={v => {
+                setCardEnabled(v);
+                mark();
+              }}
+            />
+          }
         />
         <SettingRow
           label="Allow Split Payment"
           sublabel="Let customers split the total between cash and card"
-          control={<Switch checked={splitEnabled} onChange={(v) => { setSplitEnabled(v); mark(); }} />}
+          control={
+            <Switch
+              checked={splitEnabled}
+              onChange={v => {
+                setSplitEnabled(v);
+                mark();
+              }}
+            />
+          }
         />
         <SettingRow
           label="Allow Partial Payment"
           sublabel="Accept partial payment and record the remaining balance as outstanding"
-          control={<Switch checked={allowPartialPayment} onChange={(v) => { setAllowPartialPayment(v); mark(); }} />}
+          control={
+            <Switch
+              checked={allowPartialPayment}
+              onChange={v => {
+                setAllowPartialPayment(v);
+                mark();
+              }}
+            />
+          }
         />
         <SettingRow
           label="Accept Gift Cards"
           sublabel="Allow gift cards to be redeemed at checkout"
-          control={<Switch checked={giftCardEnabled} onChange={(v) => { setGiftCardEnabled(v); mark(); }} />}
+          control={
+            <Switch
+              checked={giftCardEnabled}
+              onChange={v => {
+                setGiftCardEnabled(v);
+                mark();
+              }}
+            />
+          }
         />
         <SettingRow
           label="Accept Vouchers"
           sublabel="Allow promotional voucher codes at checkout"
-          control={<Switch checked={voucherEnabled} onChange={(v) => { setVoucherEnabled(v); mark(); }} />}
+          control={
+            <Switch
+              checked={voucherEnabled}
+              onChange={v => {
+                setVoucherEnabled(v);
+                mark();
+              }}
+            />
+          }
         />
         <SettingRow
           label="Minimum Card Payment Amount"
@@ -676,7 +949,10 @@ export default function POSSettings() {
             <InputNumber
               min={0}
               value={minCardAmount}
-              onChange={(v) => { setMinCardAmount(v ?? 0); mark(); }}
+              onChange={v => {
+                setMinCardAmount(v ?? 0);
+                mark();
+              }}
               addonBefore="$"
               style={{ width: 130 }}
             />
@@ -691,13 +967,16 @@ export default function POSSettings() {
           control={
             <Select
               value={roundingRule}
-              onChange={(v) => { setRoundingRule(v); mark(); }}
+              onChange={v => {
+                setRoundingRule(v);
+                mark();
+              }}
               style={{ width: 150 }}
               options={[
-                { value: "none",  label: "No rounding"    },
-                { value: "0.05",  label: "Nearest $0.05"  },
-                { value: "0.10",  label: "Nearest $0.10"  },
-                { value: "1.00",  label: "Nearest $1.00"  },
+                { value: "none", label: "No rounding" },
+                { value: "0.05", label: "Nearest $0.05" },
+                { value: "0.10", label: "Nearest $0.10" },
+                { value: "1.00", label: "Nearest $1.00" },
               ]}
             />
           }
@@ -705,7 +984,15 @@ export default function POSSettings() {
         <SettingRow
           label="Enable Tips / Gratuity"
           sublabel="Show a tip prompt on the customer-facing display at checkout"
-          control={<Switch checked={tipsEnabled} onChange={(v) => { setTipsEnabled(v); mark(); }} />}
+          control={
+            <Switch
+              checked={tipsEnabled}
+              onChange={v => {
+                setTipsEnabled(v);
+                mark();
+              }}
+            />
+          }
         />
         {tipsEnabled && (
           <>
@@ -716,18 +1003,34 @@ export default function POSSettings() {
                 <Select
                   mode="tags"
                   value={tipPresets.map(String)}
-                  onChange={(vals) => { setTipPresets(vals.map(Number).filter((n) => n >= 0 && n <= 100)); mark(); }}
+                  onChange={vals => {
+                    setTipPresets(
+                      vals.map(Number).filter(n => n >= 0 && n <= 100)
+                    );
+                    mark();
+                  }}
                   style={{ minWidth: 200 }}
                   tokenSeparators={[","]}
                   placeholder="e.g. 10, 15, 20"
-                  options={[10, 15, 18, 20, 25].map((p) => ({ label: `${p}%`, value: String(p) }))}
+                  options={[10, 15, 18, 20, 25].map(p => ({
+                    label: `${p}%`,
+                    value: String(p),
+                  }))}
                 />
               }
             />
             <SettingRow
               label="Auto-Gratuity"
               sublabel="Automatically add gratuity for large parties (restaurant mode)"
-              control={<Switch checked={autoGratuityEnabled} onChange={(v) => { setAutoGratuityEnabled(v); mark(); }} />}
+              control={
+                <Switch
+                  checked={autoGratuityEnabled}
+                  onChange={v => {
+                    setAutoGratuityEnabled(v);
+                    mark();
+                  }}
+                />
+              }
             />
             {autoGratuityEnabled && (
               <>
@@ -736,9 +1039,13 @@ export default function POSSettings() {
                   sublabel="Gratuity rate applied automatically to qualifying orders"
                   control={
                     <InputNumber
-                      min={0} max={100}
+                      min={0}
+                      max={100}
                       value={autoGratuityPct}
-                      onChange={(v) => { setAutoGratuityPct(v ?? 18); mark(); }}
+                      onChange={v => {
+                        setAutoGratuityPct(v ?? 18);
+                        mark();
+                      }}
                       addonAfter="%"
                       style={{ width: 120 }}
                     />
@@ -749,9 +1056,13 @@ export default function POSSettings() {
                   sublabel="Auto-gratuity applies when the party has this many or more guests"
                   control={
                     <InputNumber
-                      min={2} max={50}
+                      min={2}
+                      max={50}
                       value={autoGratuityPartySize}
-                      onChange={(v) => { setAutoGratuityPartySize(v ?? 6); mark(); }}
+                      onChange={v => {
+                        setAutoGratuityPartySize(v ?? 6);
+                        mark();
+                      }}
                       addonAfter="guests"
                       style={{ width: 140 }}
                     />
@@ -764,7 +1075,11 @@ export default function POSSettings() {
       </Section>
 
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button type="primary" icon={<SaveOutlined />} onClick={() => saveAndNotify("Payment & tax")}>
+        <Button
+          type="primary"
+          icon={<SaveOutlined />}
+          onClick={() => saveAndNotify("Payment & tax")}
+        >
           Save Settings
         </Button>
       </div>
@@ -777,13 +1092,29 @@ export default function POSSettings() {
         <SettingRow
           label="Allow Item-Level Discount"
           sublabel="Cashiers can apply a discount to individual line items in the cart"
-          control={<Switch checked={allowItemDiscount} onChange={(v) => { setAllowItemDiscount(v); mark(); }} />}
+          control={
+            <Switch
+              checked={allowItemDiscount}
+              onChange={v => {
+                setAllowItemDiscount(v);
+                mark();
+              }}
+            />
+          }
         />
         <SettingRow
           label="Allow Order-Level Discount"
           sublabel="Cashiers can apply a discount to the entire order total"
           last
-          control={<Switch checked={allowOrderDiscount} onChange={(v) => { setAllowOrderDiscount(v); mark(); }} />}
+          control={
+            <Switch
+              checked={allowOrderDiscount}
+              onChange={v => {
+                setAllowOrderDiscount(v);
+                mark();
+              }}
+            />
+          }
         />
       </Section>
 
@@ -793,9 +1124,13 @@ export default function POSSettings() {
           sublabel="Cashiers cannot apply a discount percentage above this limit"
           control={
             <InputNumber
-              min={0} max={100}
+              min={0}
+              max={100}
               value={maxDiscountPercent}
-              onChange={(v) => { setMaxDiscountPercent(v ?? 50); mark(); }}
+              onChange={v => {
+                setMaxDiscountPercent(v ?? 50);
+                mark();
+              }}
               addonAfter="%"
               style={{ width: 120 }}
             />
@@ -807,9 +1142,13 @@ export default function POSSettings() {
           last
           control={
             <InputNumber
-              min={0} max={100}
+              min={0}
+              max={100}
               value={requireManagerAbove}
-              onChange={(v) => { setRequireManagerAbove(v ?? 20); mark(); }}
+              onChange={v => {
+                setRequireManagerAbove(v ?? 20);
+                mark();
+              }}
               addonAfter="%"
               style={{ width: 120 }}
             />
@@ -818,7 +1157,11 @@ export default function POSSettings() {
       </Section>
 
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button type="primary" icon={<SaveOutlined />} onClick={() => saveAndNotify("Discounts")}>
+        <Button
+          type="primary"
+          icon={<SaveOutlined />}
+          onClick={() => saveAndNotify("Discounts")}
+        >
           Save Settings
         </Button>
       </div>
@@ -831,13 +1174,29 @@ export default function POSSettings() {
         <SettingRow
           label="Allow Cashier Price Override"
           sublabel="Cashiers can manually change a product's unit price at checkout"
-          control={<Switch checked={allowPriceOverride} onChange={(v) => { setAllowPriceOverride(v); mark(); }} />}
+          control={
+            <Switch
+              checked={allowPriceOverride}
+              onChange={v => {
+                setAllowPriceOverride(v);
+                mark();
+              }}
+            />
+          }
         />
         <SettingRow
           label="Allow Selling Out-of-Stock Items"
           sublabel="Proceed with checkout even when product stock is zero"
           last
-          control={<Switch checked={allowNegativeStock} onChange={(v) => { setAllowNegativeStock(v); mark(); }} />}
+          control={
+            <Switch
+              checked={allowNegativeStock}
+              onChange={v => {
+                setAllowNegativeStock(v);
+                mark();
+              }}
+            />
+          }
         />
       </Section>
 
@@ -845,13 +1204,29 @@ export default function POSSettings() {
         <SettingRow
           label="Require Reason for Void"
           sublabel="Cashier must select a void reason before cancelling a transaction"
-          control={<Switch checked={requireVoidReason} onChange={(v) => { setRequireVoidReason(v); mark(); }} />}
+          control={
+            <Switch
+              checked={requireVoidReason}
+              onChange={v => {
+                setRequireVoidReason(v);
+                mark();
+              }}
+            />
+          }
         />
         <SettingRow
           label="Require Reason for Refund"
           sublabel="Cashier must select a refund reason before processing a return"
           last
-          control={<Switch checked={requireRefundReason} onChange={(v) => { setRequireRefundReason(v); mark(); }} />}
+          control={
+            <Switch
+              checked={requireRefundReason}
+              onChange={v => {
+                setRequireRefundReason(v);
+                mark();
+              }}
+            />
+          }
         />
       </Section>
 
@@ -863,7 +1238,10 @@ export default function POSSettings() {
             <InputNumber
               min={0}
               value={minSaleAmount}
-              onChange={(v) => { setMinSaleAmount(v ?? 0); mark(); }}
+              onChange={v => {
+                setMinSaleAmount(v ?? 0);
+                mark();
+              }}
               addonBefore="$"
               style={{ width: 140 }}
             />
@@ -876,7 +1254,10 @@ export default function POSSettings() {
             <InputNumber
               min={0}
               value={maxSaleAmount}
-              onChange={(v) => { setMaxSaleAmount(v ?? 0); mark(); }}
+              onChange={v => {
+                setMaxSaleAmount(v ?? 0);
+                mark();
+              }}
               addonBefore="$"
               style={{ width: 140 }}
             />
@@ -888,9 +1269,13 @@ export default function POSSettings() {
           last
           control={
             <InputNumber
-              min={5} max={480}
+              min={5}
+              max={480}
               value={holdTimeout}
-              onChange={(v) => { setHoldTimeout(v ?? 60); mark(); }}
+              onChange={v => {
+                setHoldTimeout(v ?? 60);
+                mark();
+              }}
               addonAfter="min"
               style={{ width: 130 }}
             />
@@ -899,7 +1284,11 @@ export default function POSSettings() {
       </Section>
 
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button type="primary" icon={<SaveOutlined />} onClick={() => saveAndNotify("Checkout")}>
+        <Button
+          type="primary"
+          icon={<SaveOutlined />}
+          onClick={() => saveAndNotify("Checkout")}
+        >
           Save Settings
         </Button>
       </div>
@@ -912,17 +1301,41 @@ export default function POSSettings() {
         <SettingRow
           label="Require Opening Float Entry"
           sublabel="Cashier must count and declare the opening cash amount before starting a shift"
-          control={<Switch checked={requireOpeningFloat} onChange={(v) => { setRequireOpeningFloat(v); mark(); }} />}
+          control={
+            <Switch
+              checked={requireOpeningFloat}
+              onChange={v => {
+                setRequireOpeningFloat(v);
+                mark();
+              }}
+            />
+          }
         />
         <SettingRow
           label="Allow Cashier to Close Session"
           sublabel="Cashiers can close their own session without manager approval"
-          control={<Switch checked={allowCashierClose} onChange={(v) => { setAllowCashierClose(v); mark(); }} />}
+          control={
+            <Switch
+              checked={allowCashierClose}
+              onChange={v => {
+                setAllowCashierClose(v);
+                mark();
+              }}
+            />
+          }
         />
         <SettingRow
           label="Auto Close at End of Day"
           sublabel="Automatically close all open sessions at the specified time"
-          control={<Switch checked={autoCloseEnabled} onChange={(v) => { setAutoCloseEnabled(v); mark(); }} />}
+          control={
+            <Switch
+              checked={autoCloseEnabled}
+              onChange={v => {
+                setAutoCloseEnabled(v);
+                mark();
+              }}
+            />
+          }
         />
         <SettingRow
           label="End of Day Time"
@@ -931,7 +1344,12 @@ export default function POSSettings() {
           control={
             <TimePicker
               value={autoCloseTime}
-              onChange={(v) => { if (v) { setAutoCloseTime(v); mark(); } }}
+              onChange={v => {
+                if (v) {
+                  setAutoCloseTime(v);
+                  mark();
+                }
+              }}
               format="HH:mm"
               disabled={!autoCloseEnabled}
               style={{ width: 110 }}
@@ -944,13 +1362,29 @@ export default function POSSettings() {
         <SettingRow
           label="Require Opening Cash Count"
           sublabel="Cashier must count and enter the opening float before starting a shift"
-          control={<Switch checked={requireOpeningCount} onChange={(v) => { setRequireOpeningCount(v); mark(); }} />}
+          control={
+            <Switch
+              checked={requireOpeningCount}
+              onChange={v => {
+                setRequireOpeningCount(v);
+                mark();
+              }}
+            />
+          }
         />
         <SettingRow
           label="Require Closing Cash Count"
           sublabel="Cashier must count and enter the closing cash before ending a shift"
           last
-          control={<Switch checked={requireClosingCount} onChange={(v) => { setRequireClosingCount(v); mark(); }} />}
+          control={
+            <Switch
+              checked={requireClosingCount}
+              onChange={v => {
+                setRequireClosingCount(v);
+                mark();
+              }}
+            />
+          }
         />
       </Section>
 
@@ -958,7 +1392,15 @@ export default function POSSettings() {
         <SettingRow
           label="Alert on Cash Discrepancy"
           sublabel="Notify the manager when closing cash differs from expected amount"
-          control={<Switch checked={alertOnDiscrepancy} onChange={(v) => { setAlertOnDiscrepancy(v); mark(); }} />}
+          control={
+            <Switch
+              checked={alertOnDiscrepancy}
+              onChange={v => {
+                setAlertOnDiscrepancy(v);
+                mark();
+              }}
+            />
+          }
         />
         <SettingRow
           label="Discrepancy Alert Threshold"
@@ -968,7 +1410,10 @@ export default function POSSettings() {
             <InputNumber
               min={0}
               value={discrepancyThreshold}
-              onChange={(v) => { setDiscrepancyThreshold(v ?? 5); mark(); }}
+              onChange={v => {
+                setDiscrepancyThreshold(v ?? 5);
+                mark();
+              }}
               addonBefore="$"
               style={{ width: 130 }}
             />
@@ -985,7 +1430,10 @@ export default function POSSettings() {
             <InputNumber
               min={0}
               value={eodFloatTarget}
-              onChange={(v) => { setEodFloatTarget(v ?? 200); mark(); }}
+              onChange={v => {
+                setEodFloatTarget(v ?? 200);
+                mark();
+              }}
               addonBefore="$"
               style={{ width: 130 }}
             />
@@ -994,7 +1442,11 @@ export default function POSSettings() {
       </Section>
 
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button type="primary" icon={<SaveOutlined />} onClick={() => saveAndNotify("Shift & cash")}>
+        <Button
+          type="primary"
+          icon={<SaveOutlined />}
+          onClick={() => saveAndNotify("Shift & cash")}
+        >
           Save Settings
         </Button>
       </div>
@@ -1010,7 +1462,10 @@ export default function POSSettings() {
           control={
             <Switch
               checked={loyaltyEnabled}
-              onChange={(v) => { setLoyaltyEnabled(v); mark(); }}
+              onChange={v => {
+                setLoyaltyEnabled(v);
+                mark();
+              }}
               checkedChildren="ON"
               unCheckedChildren="OFF"
             />
@@ -1023,7 +1478,10 @@ export default function POSSettings() {
             <InputNumber
               min={0}
               value={pointsExpiryDays}
-              onChange={(v) => { setPointsExpiryDays(v ?? 365); mark(); }}
+              onChange={v => {
+                setPointsExpiryDays(v ?? 365);
+                mark();
+              }}
               disabled={!loyaltyEnabled}
               addonAfter="days"
               style={{ width: 140 }}
@@ -1037,7 +1495,10 @@ export default function POSSettings() {
             <InputNumber
               min={0}
               value={minRedemptionPoints}
-              onChange={(v) => { setMinRedemptionPoints(v ?? 100); mark(); }}
+              onChange={v => {
+                setMinRedemptionPoints(v ?? 100);
+                mark();
+              }}
               disabled={!loyaltyEnabled}
               addonAfter="pts"
               style={{ width: 140 }}
@@ -1050,7 +1511,10 @@ export default function POSSettings() {
           control={
             <Switch
               checked={allowPartialRedemption}
-              onChange={(v) => { setAllowPartialRedemption(v); mark(); }}
+              onChange={v => {
+                setAllowPartialRedemption(v);
+                mark();
+              }}
               disabled={!loyaltyEnabled}
             />
           }
@@ -1062,7 +1526,10 @@ export default function POSSettings() {
           control={
             <Switch
               checked={showLoyaltyOnReceipt}
-              onChange={(v) => { setShowLoyaltyOnReceipt(v); mark(); }}
+              onChange={v => {
+                setShowLoyaltyOnReceipt(v);
+                mark();
+              }}
               disabled={!loyaltyEnabled}
             />
           }
@@ -1070,7 +1537,11 @@ export default function POSSettings() {
       </Section>
 
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button type="primary" icon={<SaveOutlined />} onClick={() => saveAndNotify("Loyalty")}>
+        <Button
+          type="primary"
+          icon={<SaveOutlined />}
+          onClick={() => saveAndNotify("Loyalty")}
+        >
           Save Settings
         </Button>
       </div>
@@ -1083,13 +1554,29 @@ export default function POSSettings() {
         <SettingRow
           label="Allow Voucher Redemption"
           sublabel="Customers can apply promotional voucher codes at checkout"
-          control={<Switch checked={allowVoucherRedemption} onChange={(v) => { setAllowVoucherRedemption(v); mark(); }} />}
+          control={
+            <Switch
+              checked={allowVoucherRedemption}
+              onChange={v => {
+                setAllowVoucherRedemption(v);
+                mark();
+              }}
+            />
+          }
         />
         <SettingRow
           label="Allow Gift Card Redemption"
           sublabel="Customers can pay with gift cards at checkout"
           last
-          control={<Switch checked={allowGiftCardRedemption} onChange={(v) => { setAllowGiftCardRedemption(v); mark(); }} />}
+          control={
+            <Switch
+              checked={allowGiftCardRedemption}
+              onChange={v => {
+                setAllowGiftCardRedemption(v);
+                mark();
+              }}
+            />
+          }
         />
       </Section>
 
@@ -1097,7 +1584,15 @@ export default function POSSettings() {
         <SettingRow
           label="Allow Gift Card Issuance"
           sublabel="Cashiers can issue new gift cards from the POS"
-          control={<Switch checked={allowGiftCardIssuance} onChange={(v) => { setAllowGiftCardIssuance(v); mark(); }} />}
+          control={
+            <Switch
+              checked={allowGiftCardIssuance}
+              onChange={v => {
+                setAllowGiftCardIssuance(v);
+                mark();
+              }}
+            />
+          }
         />
         <SettingRow
           label="Default Gift Card Expiry"
@@ -1106,7 +1601,10 @@ export default function POSSettings() {
             <InputNumber
               min={0}
               value={giftCardExpiryDays}
-              onChange={(v) => { setGiftCardExpiryDays(v ?? 365); mark(); }}
+              onChange={v => {
+                setGiftCardExpiryDays(v ?? 365);
+                mark();
+              }}
               disabled={!allowGiftCardIssuance}
               addonAfter="days"
               style={{ width: 140 }}
@@ -1120,7 +1618,10 @@ export default function POSSettings() {
           control={
             <Switch
               checked={allowMultipleGiftCards}
-              onChange={(v) => { setAllowMultipleGiftCards(v); mark(); }}
+              onChange={v => {
+                setAllowMultipleGiftCards(v);
+                mark();
+              }}
               disabled={!allowGiftCardRedemption}
             />
           }
@@ -1128,7 +1629,11 @@ export default function POSSettings() {
       </Section>
 
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button type="primary" icon={<SaveOutlined />} onClick={() => saveAndNotify("Vouchers & Gift Cards")}>
+        <Button
+          type="primary"
+          icon={<SaveOutlined />}
+          onClick={() => saveAndNotify("Vouchers & Gift Cards")}
+        >
           Save Settings
         </Button>
       </div>
@@ -1141,13 +1646,29 @@ export default function POSSettings() {
         <SettingRow
           label="Auto-Attach Last Customer"
           sublabel="Automatically re-attach the last used customer to the next order"
-          control={<Switch checked={autoAttachCustomer} onChange={(v) => { setAutoAttachCustomer(v); mark(); }} />}
+          control={
+            <Switch
+              checked={autoAttachCustomer}
+              onChange={v => {
+                setAutoAttachCustomer(v);
+                mark();
+              }}
+            />
+          }
         />
         <SettingRow
           label="Prompt to Add Customer on Checkout"
           sublabel="Show a reminder to attach a customer if none is selected"
           last
-          control={<Switch checked={promptAddCustomer} onChange={(v) => { setPromptAddCustomer(v); mark(); }} />}
+          control={
+            <Switch
+              checked={promptAddCustomer}
+              onChange={v => {
+                setPromptAddCustomer(v);
+                mark();
+              }}
+            />
+          }
         />
       </Section>
 
@@ -1156,7 +1677,15 @@ export default function POSSettings() {
           label="Show Loyalty Points Balance"
           sublabel="Display the customer's current points balance during checkout"
           last
-          control={<Switch checked={showLoyaltyAtCheckout} onChange={(v) => { setShowLoyaltyAtCheckout(v); mark(); }} />}
+          control={
+            <Switch
+              checked={showLoyaltyAtCheckout}
+              onChange={v => {
+                setShowLoyaltyAtCheckout(v);
+                mark();
+              }}
+            />
+          }
         />
       </Section>
 
@@ -1167,13 +1696,16 @@ export default function POSSettings() {
           control={
             <Select
               value={defaultProductSort}
-              onChange={(v) => { setDefaultProductSort(v); mark(); }}
+              onChange={v => {
+                setDefaultProductSort(v);
+                mark();
+              }}
               style={{ width: 170 }}
               options={[
-                { value: "name",       label: "Name (A–Z)"       },
-                { value: "price_asc",  label: "Price (low–high)" },
+                { value: "name", label: "Name (A–Z)" },
+                { value: "price_asc", label: "Price (low–high)" },
                 { value: "price_desc", label: "Price (high–low)" },
-                { value: "category",   label: "Category"         },
+                { value: "category", label: "Category" },
               ]}
             />
           }
@@ -1182,12 +1714,24 @@ export default function POSSettings() {
           label="Hide Out-of-Stock Products"
           sublabel="Remove products with zero stock from the product grid"
           last
-          control={<Switch checked={hideOutOfStock} onChange={(v) => { setHideOutOfStock(v); mark(); }} />}
+          control={
+            <Switch
+              checked={hideOutOfStock}
+              onChange={v => {
+                setHideOutOfStock(v);
+                mark();
+              }}
+            />
+          }
         />
       </Section>
 
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button type="primary" icon={<SaveOutlined />} onClick={() => saveAndNotify("Customer & display")}>
+        <Button
+          type="primary"
+          icon={<SaveOutlined />}
+          onClick={() => saveAndNotify("Customer & display")}
+        >
           Save Settings
         </Button>
       </div>
@@ -1203,7 +1747,10 @@ export default function POSSettings() {
           control={
             <Switch
               checked={restaurantMode}
-              onChange={(v) => { setRestaurantMode(v); mark(); }}
+              onChange={v => {
+                setRestaurantMode(v);
+                mark();
+              }}
               checkedChildren="ON"
               unCheckedChildren="OFF"
             />
@@ -1216,7 +1763,10 @@ export default function POSSettings() {
             <Switch
               checked={tableManagementEnabled}
               disabled={!restaurantMode}
-              onChange={(v) => { setTableManagementEnabled(v); mark(); }}
+              onChange={v => {
+                setTableManagementEnabled(v);
+                mark();
+              }}
             />
           }
         />
@@ -1227,7 +1777,10 @@ export default function POSSettings() {
             <Switch
               checked={courseManagementEnabled}
               disabled={!restaurantMode}
-              onChange={(v) => { setCourseManagementEnabled(v); mark(); }}
+              onChange={v => {
+                setCourseManagementEnabled(v);
+                mark();
+              }}
             />
           }
         />
@@ -1238,7 +1791,10 @@ export default function POSSettings() {
             <Switch
               checked={kitchenPrintingEnabled}
               disabled={!restaurantMode}
-              onChange={(v) => { setKitchenPrintingEnabled(v); mark(); }}
+              onChange={v => {
+                setKitchenPrintingEnabled(v);
+                mark();
+              }}
             />
           }
         />
@@ -1249,7 +1805,10 @@ export default function POSSettings() {
             <Switch
               checked={autoSendKitchen}
               disabled={!restaurantMode || !kitchenPrintingEnabled}
-              onChange={(v) => { setAutoSendKitchen(v); mark(); }}
+              onChange={v => {
+                setAutoSendKitchen(v);
+                mark();
+              }}
             />
           }
         />
@@ -1260,7 +1819,10 @@ export default function POSSettings() {
             <Switch
               checked={allowTakeAway}
               disabled={!restaurantMode}
-              onChange={(v) => { setAllowTakeAway(v); mark(); }}
+              onChange={v => {
+                setAllowTakeAway(v);
+                mark();
+              }}
             />
           }
         />
@@ -1270,9 +1832,13 @@ export default function POSSettings() {
           last
           control={
             <InputNumber
-              min={1} max={20}
+              min={1}
+              max={20}
               value={defaultGuests}
-              onChange={(v) => { setDefaultGuests(v ?? 2); mark(); }}
+              onChange={v => {
+                setDefaultGuests(v ?? 2);
+                mark();
+              }}
               disabled={!restaurantMode}
               addonAfter="guests"
               style={{ width: 140 }}
@@ -1281,7 +1847,11 @@ export default function POSSettings() {
         />
       </Section>
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button type="primary" icon={<SaveOutlined />} onClick={() => saveAndNotify("Restaurant")}>
+        <Button
+          type="primary"
+          icon={<SaveOutlined />}
+          onClick={() => saveAndNotify("Restaurant")}
+        >
           Save Settings
         </Button>
       </div>
@@ -1294,7 +1864,11 @@ export default function POSSettings() {
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       <OfflineSettingsTab onDirty={mark} />
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button type="primary" icon={<SaveOutlined />} onClick={() => saveAndNotify("Offline mode")}>
+        <Button
+          type="primary"
+          icon={<SaveOutlined />}
+          onClick={() => saveAndNotify("Offline mode")}
+        >
           Save Settings
         </Button>
       </div>
@@ -1309,9 +1883,13 @@ export default function POSSettings() {
           sublabel="Maximum number of days after purchase a return is accepted"
           control={
             <InputNumber
-              min={0} max={365}
+              min={0}
+              max={365}
               value={returnWindowDays}
-              onChange={(v) => { setReturnWindowDays(v ?? 30); mark(); }}
+              onChange={v => {
+                setReturnWindowDays(v ?? 30);
+                mark();
+              }}
               addonAfter="days"
               style={{ width: 140 }}
             />
@@ -1320,12 +1898,28 @@ export default function POSSettings() {
         <SettingRow
           label="Require Manager Approval"
           sublabel="All refunds must be approved by a manager before processing"
-          control={<Switch checked={requireManagerRefund} onChange={(v) => { setRequireManagerRefund(v); mark(); }} />}
+          control={
+            <Switch
+              checked={requireManagerRefund}
+              onChange={v => {
+                setRequireManagerRefund(v);
+                mark();
+              }}
+            />
+          }
         />
         <SettingRow
           label="Require Refund Reason"
           sublabel="Cashiers must select a reason when processing any refund"
-          control={<Switch checked={refundNoteRequired} onChange={(v) => { setRefundNoteRequired(v); mark(); }} />}
+          control={
+            <Switch
+              checked={refundNoteRequired}
+              onChange={v => {
+                setRefundNoteRequired(v);
+                mark();
+              }}
+            />
+          }
         />
         <SettingRow
           label="Restocking Fee"
@@ -1333,9 +1927,13 @@ export default function POSSettings() {
           last
           control={
             <InputNumber
-              min={0} max={50}
+              min={0}
+              max={50}
               value={restockingFeePct}
-              onChange={(v) => { setRestockingFeePct(v ?? 0); mark(); }}
+              onChange={v => {
+                setRestockingFeePct(v ?? 0);
+                mark();
+              }}
               addonAfter="%"
               style={{ width: 120 }}
             />
@@ -1347,23 +1945,51 @@ export default function POSSettings() {
         <SettingRow
           label="Refund to Original Payment Method"
           sublabel="Allow refund back to the card or method used at purchase"
-          control={<Switch checked={allowOriginalRefund} onChange={(v) => { setAllowOriginalRefund(v); mark(); }} />}
+          control={
+            <Switch
+              checked={allowOriginalRefund}
+              onChange={v => {
+                setAllowOriginalRefund(v);
+                mark();
+              }}
+            />
+          }
         />
         <SettingRow
           label="Refund to Cash"
           sublabel="Allow cashier to issue a cash refund regardless of original payment"
-          control={<Switch checked={allowCashRefund} onChange={(v) => { setAllowCashRefund(v); mark(); }} />}
+          control={
+            <Switch
+              checked={allowCashRefund}
+              onChange={v => {
+                setAllowCashRefund(v);
+                mark();
+              }}
+            />
+          }
         />
         <SettingRow
           label="Refund to Store Credit"
           sublabel="Allow issuing store credit or gift card instead of a cash/card refund"
           last
-          control={<Switch checked={allowCreditRefund} onChange={(v) => { setAllowCreditRefund(v); mark(); }} />}
+          control={
+            <Switch
+              checked={allowCreditRefund}
+              onChange={v => {
+                setAllowCreditRefund(v);
+                mark();
+              }}
+            />
+          }
         />
       </Section>
 
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button type="primary" icon={<SaveOutlined />} onClick={() => saveAndNotify("Returns & Refunds")}>
+        <Button
+          type="primary"
+          icon={<SaveOutlined />}
+          onClick={() => saveAndNotify("Returns & Refunds")}
+        >
           Save Settings
         </Button>
       </div>
@@ -1372,18 +1998,23 @@ export default function POSSettings() {
 
   // ── Dirty indicator badge ─────────────────────────────────────────────────
 
-  function navLabel(item: typeof NAV_ITEMS[number]) {
+  function navLabel(item: (typeof NAV_ITEMS)[number]) {
     const isActive = activeTab === item.key;
-    const showDot  = isDirty && isActive;
+    const showDot = isDirty && isActive;
     return (
       <span style={{ display: "flex", alignItems: "center", gap: 6, flex: 1 }}>
         {item.label}
         {showDot && (
-          <span style={{
-            display: "inline-block", width: 6, height: 6,
-            borderRadius: "50%", background: "#F59E0B",
-            flexShrink: 0,
-          }} />
+          <span
+            style={{
+              display: "inline-block",
+              width: 6,
+              height: 6,
+              borderRadius: "50%",
+              background: "#F59E0B",
+              flexShrink: 0,
+            }}
+          />
         )}
       </span>
     );
@@ -1393,10 +2024,14 @@ export default function POSSettings() {
 
   const navCard = (
     <Card
-      style={{ border: `1px solid ${token.colorBorderSecondary}`, borderRadius: token.borderRadiusLG, flexShrink: 0 }}
+      style={{
+        border: `1px solid ${token.colorBorderSecondary}`,
+        borderRadius: token.borderRadiusLG,
+        flexShrink: 0,
+      }}
       styles={{ body: { padding: 8 } }}
     >
-      {NAV_ITEMS.map((item) => {
+      {NAV_ITEMS.map(item => {
         const isActive = activeTab === item.key;
         return (
           <button
@@ -1429,24 +2064,29 @@ export default function POSSettings() {
 
   const contentCard = (
     <Card
-      style={{ border: `1px solid ${token.colorBorderSecondary}`, borderRadius: token.borderRadiusLG, flex: 1, minWidth: 0 }}
+      style={{
+        border: `1px solid ${token.colorBorderSecondary}`,
+        borderRadius: token.borderRadiusLG,
+        flex: 1,
+        minWidth: 0,
+      }}
       styles={{ body: { padding: 24 } }}
     >
-      {activeTab === "general"     && GeneralTab}
+      {activeTab === "general" && GeneralTab}
       {activeTab === "pos-session" && POSSessionTab}
-      {activeTab === "security"    && SecurityTab}
-      {activeTab === "register"    && RegisterTab}
-      {activeTab === "receipt"     && ReceiptTab}
-      {activeTab === "payment"     && PaymentTaxTab}
-      {activeTab === "discounts"   && DiscountsTab}
-      {activeTab === "checkout"    && CheckoutTab}
-      {activeTab === "shift"       && ShiftTab}
-      {activeTab === "loyalty"     && LoyaltyTab}
-      {activeTab === "vouchers"    && VouchersTab}
-      {activeTab === "customer"    && CustomerDisplayTab}
-      {activeTab === "offline"     && OfflineTab}
-      {activeTab === "restaurant"  && RestaurantTab}
-      {activeTab === "returns"     && ReturnsTab}
+      {activeTab === "security" && SecurityTab}
+      {activeTab === "register" && RegisterTab}
+      {activeTab === "receipt" && ReceiptTab}
+      {activeTab === "payment" && PaymentTaxTab}
+      {activeTab === "discounts" && DiscountsTab}
+      {activeTab === "checkout" && CheckoutTab}
+      {activeTab === "shift" && ShiftTab}
+      {activeTab === "loyalty" && LoyaltyTab}
+      {activeTab === "vouchers" && VouchersTab}
+      {activeTab === "customer" && CustomerDisplayTab}
+      {activeTab === "offline" && OfflineTab}
+      {activeTab === "restaurant" && RestaurantTab}
+      {activeTab === "returns" && ReturnsTab}
     </Card>
   );
 
@@ -1468,11 +2108,14 @@ export default function POSSettings() {
     <DashboardLayout>
       <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
         <Card
-          style={{ border: `1px solid ${token.colorBorderSecondary}`, borderRadius: token.borderRadiusLG }}
+          style={{
+            border: `1px solid ${token.colorBorderSecondary}`,
+            borderRadius: token.borderRadiusLG,
+          }}
           styles={{ body: { padding: "4px 8px" } }}
         >
           <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-            {NAV_ITEMS.map((item) => {
+            {NAV_ITEMS.map(item => {
               const isActive = activeTab === item.key;
               return (
                 <button
@@ -1484,7 +2127,9 @@ export default function POSSettings() {
                     gap: 8,
                     padding: "8px 16px",
                     border: "none",
-                    borderBottom: isActive ? `2px solid ${token.colorPrimary}` : "2px solid transparent",
+                    borderBottom: isActive
+                      ? `2px solid ${token.colorPrimary}`
+                      : "2px solid transparent",
                     borderRadius: token.borderRadius,
                     background: isActive ? token.colorPrimaryBg : "transparent",
                     color: isActive ? token.colorPrimary : token.colorText,
@@ -1498,10 +2143,15 @@ export default function POSSettings() {
                   {item.icon}
                   {item.label}
                   {isDirty && isActive && (
-                    <span style={{
-                      display: "inline-block", width: 6, height: 6,
-                      borderRadius: "50%", background: "#F59E0B",
-                    }} />
+                    <span
+                      style={{
+                        display: "inline-block",
+                        width: 6,
+                        height: 6,
+                        borderRadius: "50%",
+                        background: "#F59E0B",
+                      }}
+                    />
                   )}
                 </button>
               );

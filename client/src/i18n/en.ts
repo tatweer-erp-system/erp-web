@@ -1,30 +1,30 @@
 export const en: Record<string, string> = {
   // Navigation sections
-  "Dashboard": "Dashboard",
-  "SALES": "Sales",
-  "PURCHASES": "Purchases",
-  "INVENTORY": "Inventory",
-  "ACCOUNTING": "Accounting",
-  "TREASURY": "Treasury",
-  "REPORTS": "Reports",
-  "SETTINGS": "Settings",
+  Dashboard: "Dashboard",
+  SALES: "Sales",
+  PURCHASES: "Purchases",
+  INVENTORY: "Inventory",
+  ACCOUNTING: "Accounting",
+  TREASURY: "Treasury",
+  REPORTS: "Reports",
+  SETTINGS: "Settings",
 
   // Sales
-  "Customers": "Customers",
+  Customers: "Customers",
   "All Customers": "All Customers",
   "Customer Groups": "Customer Groups",
-  "Quotations": "Quotations",
+  Quotations: "Quotations",
   "Sales Orders": "Sales Orders",
   "All Orders": "All Orders",
-  "Pending": "Pending",
-  "Completed": "Completed",
+  Pending: "Pending",
+  Completed: "Completed",
   "Sales Invoices": "Sales Invoices",
   "Sales Returns": "Sales Returns",
   "Customer Receipts": "Customer Receipts",
   "Customer Statements": "Customer Statements",
 
   // Purchases
-  "Vendors": "Vendors",
+  Vendors: "Vendors",
   "All Vendors": "All Vendors",
   "Vendor Groups": "Vendor Groups",
   "Purchase Orders": "Purchase Orders",
@@ -34,13 +34,13 @@ export const en: Record<string, string> = {
   "Vendor Statements": "Vendor Statements",
 
   // Inventory
-  "Products": "Products",
+  Products: "Products",
   "All Products": "All Products",
   "In Stock": "In Stock",
   "Low Stock": "Low Stock",
   "Product Categories": "Product Categories",
   "Units of Measure": "Units of Measure",
-  "Warehouses": "Warehouses",
+  Warehouses: "Warehouses",
   "Opening Stock": "Opening Stock",
   "Stock Adjustments": "Stock Adjustments",
   "Stock Transfers": "Stock Transfers",
@@ -65,8 +65,8 @@ export const en: Record<string, string> = {
   // Treasury
   "Cash Accounts": "Cash Accounts",
   "Bank Accounts": "Bank Accounts",
-  "Receipts": "Receipts",
-  "Payments": "Payments",
+  Receipts: "Receipts",
+  Payments: "Payments",
   "Bank Transfers": "Bank Transfers",
   "Bank Reconciliation": "Bank Reconciliation",
 
@@ -80,26 +80,26 @@ export const en: Record<string, string> = {
 
   // Settings
   "Company Profile": "Company Profile",
-  "Branches": "Branches",
-  "Currencies": "Currencies",
+  Branches: "Branches",
+  Currencies: "Currencies",
   "Exchange Rates": "Exchange Rates",
-  "Taxes": "Taxes",
+  Taxes: "Taxes",
   "Numbering Series": "Numbering Series",
   "Payment Methods": "Payment Methods",
   "Price Lists": "Price Lists",
   "Cost Centers": "Cost Centers",
-  "Users": "Users",
+  Users: "Users",
   "Roles & Permissions": "Roles & Permissions",
   "Audit Logs": "Audit Logs",
 
   // Definitions
-  "Definitions": "Definitions",
+  Definitions: "Definitions",
 
   // UI
-  "Logout": "Logout",
-  "Search": "Search",
-  "Settings": "Settings",
-  "Profile": "Profile",
+  Logout: "Logout",
+  Search: "Search",
+  Settings: "Settings",
+  Profile: "Profile",
 
   // Login
   "login.welcome": "Welcome",
@@ -113,8 +113,10 @@ export const en: Record<string, string> = {
   "login.signIn": "Sign In",
   "login.signingIn": "Signing in...",
   "login.invalidCredentials": "Invalid email or password. Please try again.",
-  "login.accountLocked": "Your account has been locked. Please contact an administrator.",
-  "login.networkError": "Unable to connect to the server. Please try again later.",
+  "login.accountLocked":
+    "Your account has been locked. Please contact an administrator.",
+  "login.networkError":
+    "Unable to connect to the server. Please try again later.",
   "login.success": "Signed in successfully!",
   "login.redirecting": "Redirecting to dashboard...",
   "login.selectBranch": "Select Branch",
@@ -122,42 +124,43 @@ export const en: Record<string, string> = {
   "login.back": "Back",
   "login.footerNote": "Tatweer ERP Enterprise Suite",
   "login.vision2030": "Kingdom of Saudi Arabia  -  Vision 2030",
-  "login.cashierNotAllowed": "Cashier accounts must use the POS terminal to log in.",
+  "login.cashierNotAllowed":
+    "Cashier accounts must use the POS terminal to log in.",
 
   // Branch & Order fields
-  "branch": "Branch",
-  "selectBranch": "Select Branch",
-  "orderNumber": "Order Number",
-  "employeeNumber": "Employee Number",
+  branch: "Branch",
+  selectBranch: "Select Branch",
+  orderNumber: "Order Number",
+  employeeNumber: "Employee Number",
 
   // Project members
-  "projectMembers": "Project Members",
-  "addMember": "Add Member",
-  "memberRole": "Member Role",
-  "owner": "Owner",
-  "member": "Member",
-  "viewer": "Viewer",
-  "removeMember": "Remove Member",
-  "removeMemberConfirm": "Are you sure you want to remove this member?",
-  "selectUser": "Select User",
+  projectMembers: "Project Members",
+  addMember: "Add Member",
+  memberRole: "Member Role",
+  owner: "Owner",
+  member: "Member",
+  viewer: "Viewer",
+  removeMember: "Remove Member",
+  removeMemberConfirm: "Are you sure you want to remove this member?",
+  selectUser: "Select User",
 
   // Roles
-  "roles": "Roles",
-  "assignRoles": "Assign Roles",
+  roles: "Roles",
+  assignRoles: "Assign Roles",
 
   // Misc
-  "lowStock": "Low Stock",
-  "sequences": "Sequences",
-  "save": "Save",
-  "cancel": "Cancel",
-  "confirm": "Confirm",
-  "actions": "Actions",
-  "name": "Name",
-  "email": "Email",
-  "status": "Status",
-  "date": "Date",
-  "total": "Total",
-  "noData": "No data available",
+  lowStock: "Low Stock",
+  sequences: "Sequences",
+  save: "Save",
+  cancel: "Cancel",
+  confirm: "Confirm",
+  actions: "Actions",
+  name: "Name",
+  email: "Email",
+  status: "Status",
+  date: "Date",
+  total: "Total",
+  noData: "No data available",
 
   // Sequence Settings
   "seq.title": "Sequence Configuration",
@@ -189,8 +192,10 @@ export const en: Record<string, string> = {
   "seq.editSuccess": "Sequence updated successfully",
   "seq.resetTitle": "Reset Counter",
   "seq.confirmReset": "Reset Counter",
-  "seq.resetWarning": "This will reset the counter to 0. This action is logged.",
-  "seq.resetWarningDesc": "The counter for this sequence will be set back to zero. All future numbers will start from 1 again. This action cannot be undone.",
+  "seq.resetWarning":
+    "This will reset the counter to 0. This action is logged.",
+  "seq.resetWarningDesc":
+    "The counter for this sequence will be set back to zero. All future numbers will start from 1 again. This action cannot be undone.",
   "seq.resetReason": "Reason for reset",
   "seq.reasonRequired": "A reason is required",
   "seq.reasonMinLength": "Reason must be at least 3 characters",
@@ -223,7 +228,8 @@ export const en: Record<string, string> = {
   "inventory.currentQty": "Current Qty",
   "inventory.reorderPoint": "Reorder Point",
   "inventory.lowStockNotif": "Low stock alert",
-  "inventory.lowStockNotifDesc": "has only {qty} units remaining (reorder point: {reorderPoint})",
+  "inventory.lowStockNotifDesc":
+    "has only {qty} units remaining (reorder point: {reorderPoint})",
 
   // Cross-Module Navigation
   "nav.relatedLeads": "Related Leads",

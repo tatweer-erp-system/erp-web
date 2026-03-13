@@ -1,5 +1,10 @@
 export type StockStatus = "In Stock" | "Low Stock" | "Out of Stock";
-export type StockCategory = "Electronics" | "Clothing" | "Food" | "Furniture" | "Other";
+export type StockCategory =
+  | "Electronics"
+  | "Clothing"
+  | "Food"
+  | "Furniture"
+  | "Other";
 
 export interface InventoryItem {
   id: string;

@@ -41,7 +41,9 @@ export default function Users() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
-  const [appliedFilters, setAppliedFilters] = useState<Record<string, string>>({});
+  const [appliedFilters, setAppliedFilters] = useState<Record<string, string>>(
+    {}
+  );
   const [searchQuery, setSearchQuery] = useState("");
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -83,13 +85,13 @@ export default function Users() {
   const handleExport = () => {
     const csv = [
       ["Name", "Email", "Roles"],
-      ...users.map((u) => [
+      ...users.map(u => [
         `${u.firstName} ${u.lastName}`,
         u.email,
-        (u.roles ?? []).map((r) => r.name).join("; "),
+        (u.roles ?? []).map(r => r.name).join("; "),
       ]),
     ]
-      .map((row) => row.join(","))
+      .map(row => row.join(","))
       .join("\n");
 
     const blob = new Blob([csv], { type: "text/csv" });
@@ -106,21 +108,26 @@ export default function Users() {
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
-      selectedRoleIds: (user.roles ?? []).map((r) => r.id),
+      selectedRoleIds: (user.roles ?? []).map(r => r.id),
     });
     setIsEditModalOpen(true);
   };
 
   const openCreateModal = () => {
-    setFormData({ firstName: "", lastName: "", email: "", selectedRoleIds: [] });
+    setFormData({
+      firstName: "",
+      lastName: "",
+      email: "",
+      selectedRoleIds: [],
+    });
     setIsCreateModalOpen(true);
   };
 
   const toggleRole = (roleId: string) => {
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       selectedRoleIds: prev.selectedRoleIds.includes(roleId)
-        ? prev.selectedRoleIds.filter((id) => id !== roleId)
+        ? prev.selectedRoleIds.filter(id => id !== roleId)
         : [...prev.selectedRoleIds, roleId],
     }));
   };
@@ -135,7 +142,9 @@ export default function Users() {
     <DashboardLayout currentPage="Users" breadcrumbs={breadcrumbs}>
       <div className="space-y-6">
         {/* Header Section */}
-        <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 ${isRTL ? "text-right" : ""}`}>
+        <div
+          className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 ${isRTL ? "text-right" : ""}`}
+        >
           <Button
             className="bg-primary hover:bg-blue-700 text-white flex items-center gap-2 w-full sm:w-auto"
             onClick={openCreateModal}
@@ -148,15 +157,25 @@ export default function Users() {
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card className="p-4 dark:bg-card bg-card shadow-sm border-0">
-            <p className="text-sm font-medium text-muted-foreground">{t("Users", language)}</p>
-            <h3 className="text-2xl font-bold text-foreground mt-2">{totalUsers}</h3>
+            <p className="text-sm font-medium text-muted-foreground">
+              {t("Users", language)}
+            </p>
+            <h3 className="text-2xl font-bold text-foreground mt-2">
+              {totalUsers}
+            </h3>
           </Card>
           <Card className="p-4 dark:bg-card bg-card shadow-sm border-0">
-            <p className="text-sm font-medium text-muted-foreground">{t("roles", language)}</p>
-            <h3 className="text-2xl font-bold text-primary mt-2">{availableRoles.length}</h3>
+            <p className="text-sm font-medium text-muted-foreground">
+              {t("roles", language)}
+            </p>
+            <h3 className="text-2xl font-bold text-primary mt-2">
+              {availableRoles.length}
+            </h3>
           </Card>
           <Card className="p-4 dark:bg-card bg-card shadow-sm border-0">
-            <p className="text-sm font-medium text-muted-foreground">{t("Roles & Permissions", language)}</p>
+            <p className="text-sm font-medium text-muted-foreground">
+              {t("Roles & Permissions", language)}
+            </p>
             <h3 className="text-2xl font-bold text-green-600 mt-2">
               <Shield size={24} />
             </h3>
@@ -168,8 +187,8 @@ export default function Users() {
           <BulkActions
             selectedCount={selectedItems.length}
             isAllSelected={selectedItems.length === users.length}
-            onSelectAll={(checked) => {
-              setSelectedItems(checked ? users.map((u) => u.id) : []);
+            onSelectAll={checked => {
+              setSelectedItems(checked ? users.map(u => u.id) : []);
             }}
             onDelete={() => setSelectedItems([])}
             onExport={() => {
@@ -188,7 +207,7 @@ export default function Users() {
                 type="text"
                 placeholder={`${t("Search", language)}...`}
                 value={searchQuery}
-                onChange={(e) => {
+                onChange={e => {
                   setSearchQuery(e.target.value);
                   setCurrentPage(1);
                 }}
@@ -196,21 +215,39 @@ export default function Users() {
               />
             </div>
 
-            <Button variant="outline" className="border-border" onClick={() => queryClient.invalidateQueries({ queryKey: ["users"] })}>
+            <Button
+              variant="outline"
+              className="border-border"
+              onClick={() =>
+                queryClient.invalidateQueries({ queryKey: ["users"] })
+              }
+            >
               <RotateCcw size={16} />
             </Button>
-            <Button variant="outline" className="border-border" onClick={handlePrint}>
+            <Button
+              variant="outline"
+              className="border-border"
+              onClick={handlePrint}
+            >
               <Printer size={16} />
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="border-border flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  className="border-border flex items-center gap-2"
+                >
                   <Download size={16} />
                   <span className="hidden sm:inline">Export</span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align={isRTL ? "start" : "end"} className="w-48">
-                <DropdownMenuItem onClick={handleExport}>Export as CSV</DropdownMenuItem>
+              <DropdownMenuContent
+                align={isRTL ? "start" : "end"}
+                className="w-48"
+              >
+                <DropdownMenuItem onClick={handleExport}>
+                  Export as CSV
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
@@ -241,29 +278,53 @@ export default function Users() {
                     <th className="px-6 py-4 text-sm font-semibold text-foreground text-center">
                       <input
                         type="checkbox"
-                        checked={selectedItems.length === users.length && users.length > 0}
-                        onChange={(e) => setSelectedItems(e.target.checked ? users.map((u) => u.id) : [])}
+                        checked={
+                          selectedItems.length === users.length &&
+                          users.length > 0
+                        }
+                        onChange={e =>
+                          setSelectedItems(
+                            e.target.checked ? users.map(u => u.id) : []
+                          )
+                        }
                         className="w-4 h-4 rounded border-border"
                       />
                     </th>
-                    <th className={`px-6 py-4 text-sm font-semibold text-foreground ${isRTL ? "text-right" : "text-left"}`}>{t("name", language)}</th>
-                    <th className={`px-6 py-4 text-sm font-semibold text-foreground ${isRTL ? "text-right" : "text-left"}`}>{t("email", language)}</th>
-                    <th className={`px-6 py-4 text-sm font-semibold text-foreground ${isRTL ? "text-right" : "text-left"}`}>{t("roles", language)}</th>
-                    <th className="px-6 py-4 text-sm font-semibold text-foreground text-center">{t("actions", language)}</th>
+                    <th
+                      className={`px-6 py-4 text-sm font-semibold text-foreground ${isRTL ? "text-right" : "text-left"}`}
+                    >
+                      {t("name", language)}
+                    </th>
+                    <th
+                      className={`px-6 py-4 text-sm font-semibold text-foreground ${isRTL ? "text-right" : "text-left"}`}
+                    >
+                      {t("email", language)}
+                    </th>
+                    <th
+                      className={`px-6 py-4 text-sm font-semibold text-foreground ${isRTL ? "text-right" : "text-left"}`}
+                    >
+                      {t("roles", language)}
+                    </th>
+                    <th className="px-6 py-4 text-sm font-semibold text-foreground text-center">
+                      {t("actions", language)}
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {users.map((user) => (
-                    <tr key={user.id} className="border-b border-border hover:bg-secondary/50 transition-colors">
+                  {users.map(user => (
+                    <tr
+                      key={user.id}
+                      className="border-b border-border hover:bg-secondary/50 transition-colors"
+                    >
                       <td className="px-6 py-4 text-center">
                         <input
                           type="checkbox"
                           checked={selectedItems.includes(user.id)}
-                          onChange={(e) => {
+                          onChange={e => {
                             setSelectedItems(
                               e.target.checked
                                 ? [...selectedItems, user.id]
-                                : selectedItems.filter((id) => id !== user.id)
+                                : selectedItems.filter(id => id !== user.id)
                             );
                           }}
                           className="w-4 h-4 rounded border-border"
@@ -272,10 +333,12 @@ export default function Users() {
                       <td className="px-6 py-4 text-sm text-foreground font-medium">
                         {user.firstName} {user.lastName}
                       </td>
-                      <td className="px-6 py-4 text-sm text-muted-foreground">{user.email}</td>
+                      <td className="px-6 py-4 text-sm text-muted-foreground">
+                        {user.email}
+                      </td>
                       <td className="px-6 py-4 text-sm">
                         <div className="flex flex-wrap gap-1">
-                          {(user.roles ?? []).map((role) => (
+                          {(user.roles ?? []).map(role => (
                             <span
                               key={role.id}
                               className="px-2 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary"
@@ -284,7 +347,9 @@ export default function Users() {
                             </span>
                           ))}
                           {(!user.roles || user.roles.length === 0) && (
-                            <span className="text-xs text-muted-foreground">--</span>
+                            <span className="text-xs text-muted-foreground">
+                              --
+                            </span>
                           )}
                         </div>
                       </td>
@@ -296,7 +361,9 @@ export default function Users() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align={isRTL ? "start" : "end"}>
-                            <DropdownMenuItem onClick={() => openEditModal(user)}>
+                            <DropdownMenuItem
+                              onClick={() => openEditModal(user)}
+                            >
                               <Edit size={14} className="mr-2" /> Edit
                             </DropdownMenuItem>
                             <DropdownMenuItem className="text-destructive">
@@ -309,7 +376,10 @@ export default function Users() {
                   ))}
                   {users.length === 0 && !isLoading && (
                     <tr>
-                      <td colSpan={5} className="px-6 py-8 text-center text-muted-foreground">
+                      <td
+                        colSpan={5}
+                        className="px-6 py-8 text-center text-muted-foreground"
+                      >
                         {t("noData", language)}
                       </td>
                     </tr>
@@ -324,23 +394,46 @@ export default function Users() {
                 {t("Users", language)}: {totalUsers}
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={() => setCurrentPage(Math.max(1, currentPage - 1))} disabled={currentPage === 1}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                  disabled={currentPage === 1}
+                >
                   Previous
                 </Button>
                 <div className="flex items-center gap-1">
-                  {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => i + 1).map((page) => (
-                    <Button key={page} variant={currentPage === page ? "default" : "outline"} size="sm" onClick={() => setCurrentPage(page)}>
+                  {Array.from(
+                    { length: Math.min(totalPages, 5) },
+                    (_, i) => i + 1
+                  ).map(page => (
+                    <Button
+                      key={page}
+                      variant={currentPage === page ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setCurrentPage(page)}
+                    >
                       {page}
                     </Button>
                   ))}
                 </div>
-                <Button variant="outline" size="sm" onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))} disabled={currentPage === totalPages}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    setCurrentPage(Math.min(totalPages, currentPage + 1))
+                  }
+                  disabled={currentPage === totalPages}
+                >
                   Next
                 </Button>
               </div>
               <select
                 value={pageSize}
-                onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); }}
+                onChange={e => {
+                  setPageSize(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
                 className="px-3 py-2 border border-border rounded-lg text-sm dark:bg-card bg-card text-foreground"
               >
                 <option value={5}>5 per page</option>
@@ -355,23 +448,35 @@ export default function Users() {
         {/* Grid View */}
         {viewMode === "grid" && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {users.map((user) => (
-              <Card key={user.id} className="p-4 dark:bg-card bg-card shadow-sm border-0">
+            {users.map(user => (
+              <Card
+                key={user.id}
+                className="p-4 dark:bg-card bg-card shadow-sm border-0"
+              >
                 <div className="flex items-start justify-between">
                   <div className={isRTL ? "text-right" : ""}>
                     <h3 className="font-semibold text-foreground">
                       {user.firstName} {user.lastName}
                     </h3>
-                    <p className="text-xs text-muted-foreground mt-1">{user.email}</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {user.email}
+                    </p>
                     <div className="flex flex-wrap gap-1 mt-2">
-                      {(user.roles ?? []).map((role) => (
-                        <span key={role.id} className="px-2 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
+                      {(user.roles ?? []).map(role => (
+                        <span
+                          key={role.id}
+                          className="px-2 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary"
+                        >
                           {role.name}
                         </span>
                       ))}
                     </div>
                   </div>
-                  <Button variant="ghost" size="sm" onClick={() => openEditModal(user)}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => openEditModal(user)}
+                  >
                     <Edit size={16} />
                   </Button>
                 </div>
@@ -398,7 +503,9 @@ export default function Users() {
               <Input
                 type="text"
                 value={formData.firstName}
-                onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                onChange={e =>
+                  setFormData({ ...formData, firstName: e.target.value })
+                }
                 placeholder="First name"
               />
             </div>
@@ -409,7 +516,9 @@ export default function Users() {
               <Input
                 type="text"
                 value={formData.lastName}
-                onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                onChange={e =>
+                  setFormData({ ...formData, lastName: e.target.value })
+                }
                 placeholder="Last name"
               />
             </div>
@@ -420,7 +529,9 @@ export default function Users() {
               <Input
                 type="email"
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                onChange={e =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
                 placeholder="user@company.com"
               />
             </div>
@@ -432,8 +543,8 @@ export default function Users() {
               </label>
               {/* Selected roles as tags */}
               <div className="flex flex-wrap gap-2 mb-2">
-                {formData.selectedRoleIds.map((roleId) => {
-                  const role = availableRoles.find((r) => r.id === roleId);
+                {formData.selectedRoleIds.map(roleId => {
+                  const role = availableRoles.find(r => r.id === roleId);
                   if (!role) return null;
                   return (
                     <span
@@ -455,7 +566,7 @@ export default function Users() {
               </div>
               {/* Available roles to pick */}
               <div className="flex flex-wrap gap-2 p-3 border border-border rounded-lg bg-secondary/30">
-                {availableRoles.map((role) => {
+                {availableRoles.map(role => {
                   const isSelected = formData.selectedRoleIds.includes(role.id);
                   return (
                     <button
@@ -473,7 +584,9 @@ export default function Users() {
                   );
                 })}
                 {availableRoles.length === 0 && (
-                  <p className="text-xs text-muted-foreground">{t("noData", language)}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {t("noData", language)}
+                  </p>
                 )}
               </div>
             </div>

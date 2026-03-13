@@ -1,30 +1,30 @@
 export const ar: Record<string, string> = {
   // Navigation sections
-  "Dashboard": "لوحة التحكم",
-  "SALES": "المبيعات",
-  "PURCHASES": "المشتريات",
-  "INVENTORY": "المخزون",
-  "ACCOUNTING": "المحاسبة",
-  "TREASURY": "الخزانة",
-  "REPORTS": "التقارير",
-  "SETTINGS": "الإعدادات",
+  Dashboard: "لوحة التحكم",
+  SALES: "المبيعات",
+  PURCHASES: "المشتريات",
+  INVENTORY: "المخزون",
+  ACCOUNTING: "المحاسبة",
+  TREASURY: "الخزانة",
+  REPORTS: "التقارير",
+  SETTINGS: "الإعدادات",
 
   // Sales
-  "Customers": "العملاء",
+  Customers: "العملاء",
   "All Customers": "جميع العملاء",
   "Customer Groups": "مجموعات العملاء",
-  "Quotations": "العروض",
+  Quotations: "العروض",
   "Sales Orders": "أوامر البيع",
   "All Orders": "جميع الأوامر",
-  "Pending": "قيد الانتظار",
-  "Completed": "مكتمل",
+  Pending: "قيد الانتظار",
+  Completed: "مكتمل",
   "Sales Invoices": "فواتير البيع",
   "Sales Returns": "مرتجعات البيع",
   "Customer Receipts": "إيصالات العملاء",
   "Customer Statements": "كشوفات العملاء",
 
   // Purchases
-  "Vendors": "الموردون",
+  Vendors: "الموردون",
   "All Vendors": "جميع الموردين",
   "Vendor Groups": "مجموعات الموردين",
   "Purchase Orders": "أوامر الشراء",
@@ -34,13 +34,13 @@ export const ar: Record<string, string> = {
   "Vendor Statements": "كشوفات الموردين",
 
   // Inventory
-  "Products": "المنتجات",
+  Products: "المنتجات",
   "All Products": "جميع المنتجات",
   "In Stock": "في المخزون",
   "Low Stock": "مخزون منخفض",
   "Product Categories": "فئات المنتجات",
   "Units of Measure": "وحدات القياس",
-  "Warehouses": "المستودعات",
+  Warehouses: "المستودعات",
   "Opening Stock": "المخزون الافتتاحي",
   "Stock Adjustments": "تعديلات المخزون",
   "Stock Transfers": "تحويلات المخزون",
@@ -65,8 +65,8 @@ export const ar: Record<string, string> = {
   // Treasury
   "Cash Accounts": "حسابات النقد",
   "Bank Accounts": "الحسابات البنكية",
-  "Receipts": "الإيصالات",
-  "Payments": "المدفوعات",
+  Receipts: "الإيصالات",
+  Payments: "المدفوعات",
   "Bank Transfers": "التحويلات البنكية",
   "Bank Reconciliation": "التسوية البنكية",
 
@@ -79,44 +79,44 @@ export const ar: Record<string, string> = {
   "Tax Reports": "التقارير الضريبية",
 
   // HR
-  "HR": "الموارد البشرية",
-  "Employees": "الموظفون",
+  HR: "الموارد البشرية",
+  Employees: "الموظفون",
   "All Employees": "جميع الموظفين",
   "Employee Details": "تفاصيل الموظف",
-  "Departments": "الأقسام",
+  Departments: "الأقسام",
   "Job Positions": "المسميات الوظيفية",
-  "Attendance": "الحضور والانصراف",
+  Attendance: "الحضور والانصراف",
   "Leave Management": "إدارة الإجازات",
-  "Payroll": "الرواتب",
-  "Training": "التدريب",
+  Payroll: "الرواتب",
+  Training: "التدريب",
 
   // Settings
   "Company Profile": "ملف الشركة",
-  "Branches": "الفروع",
-  "Currencies": "العملات",
+  Branches: "الفروع",
+  Currencies: "العملات",
   "Exchange Rates": "أسعار الصرف",
-  "Taxes": "الضرائب",
+  Taxes: "الضرائب",
   "Numbering Series": "سلاسل الترقيم",
   "Payment Methods": "طرق الدفع",
   "Price Lists": "قوائم الأسعار",
   "Cost Centers": "مراكز التكلفة",
-  "Users": "المستخدمون",
+  Users: "المستخدمون",
   "Roles & Permissions": "الأدوار والصلاحيات",
   "Audit Logs": "سجلات التدقيق",
 
   // App branding
-  "Tatweer": "تطوير",
+  Tatweer: "تطوير",
   "Enterprise Suite": "منظومة متكاملة",
   "Select Branch": "اختر الفرع",
 
   // Definitions
-  "Definitions": "التعريفات",
+  Definitions: "التعريفات",
 
   // UI
-  "Logout": "تسجيل الخروج",
-  "Search": "بحث",
-  "Settings": "الإعدادات",
-  "Profile": "الملف الشخصي",
+  Logout: "تسجيل الخروج",
+  Search: "بحث",
+  Settings: "الإعدادات",
+  Profile: "الملف الشخصي",
 
   // Login
   "login.welcome": "مرحباً بك",
@@ -129,7 +129,8 @@ export const ar: Record<string, string> = {
   "login.hidePassword": "إخفاء",
   "login.signIn": "تسجيل الدخول",
   "login.signingIn": "جاري تسجيل الدخول...",
-  "login.invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة. حاول مرة أخرى.",
+  "login.invalidCredentials":
+    "البريد الإلكتروني أو كلمة المرور غير صحيحة. حاول مرة أخرى.",
   "login.accountLocked": "تم قفل حسابك. يرجى التواصل مع المسؤول.",
   "login.networkError": "تعذر الاتصال بالخادم. حاول مرة أخرى لاحقًا.",
   "login.success": "تم تسجيل الدخول بنجاح!",
@@ -139,42 +140,43 @@ export const ar: Record<string, string> = {
   "login.back": "رجوع",
   "login.footerNote": "تطوير ERP — نظام آمن للمؤسسات",
   "login.vision2030": "المملكة العربية السعودية  ·  رؤية ٢٠٣٠",
-  "login.cashierNotAllowed": "حسابات الكاشير يجب أن تستخدم نقطة البيع لتسجيل الدخول.",
+  "login.cashierNotAllowed":
+    "حسابات الكاشير يجب أن تستخدم نقطة البيع لتسجيل الدخول.",
 
   // Branch & Order fields
-  "branch": "الفرع",
-  "selectBranch": "اختر الفرع",
-  "orderNumber": "رقم الطلب",
-  "employeeNumber": "رقم الموظف",
+  branch: "الفرع",
+  selectBranch: "اختر الفرع",
+  orderNumber: "رقم الطلب",
+  employeeNumber: "رقم الموظف",
 
   // Project members
-  "projectMembers": "أعضاء المشروع",
-  "addMember": "إضافة عضو",
-  "memberRole": "دور العضو",
-  "owner": "مالك",
-  "member": "عضو",
-  "viewer": "مشاهد",
-  "removeMember": "إزالة عضو",
-  "removeMemberConfirm": "هل أنت متأكد من إزالة هذا العضو؟",
-  "selectUser": "اختر مستخدم",
+  projectMembers: "أعضاء المشروع",
+  addMember: "إضافة عضو",
+  memberRole: "دور العضو",
+  owner: "مالك",
+  member: "عضو",
+  viewer: "مشاهد",
+  removeMember: "إزالة عضو",
+  removeMemberConfirm: "هل أنت متأكد من إزالة هذا العضو؟",
+  selectUser: "اختر مستخدم",
 
   // Roles
-  "roles": "الأدوار",
-  "assignRoles": "تعيين الأدوار",
+  roles: "الأدوار",
+  assignRoles: "تعيين الأدوار",
 
   // Misc
-  "lowStock": "مخزون منخفض",
-  "sequences": "التسلسلات",
-  "save": "حفظ",
-  "cancel": "إلغاء",
-  "confirm": "تأكيد",
-  "actions": "إجراءات",
-  "name": "الاسم",
-  "email": "البريد الإلكتروني",
-  "status": "الحالة",
-  "date": "التاريخ",
-  "total": "المجموع",
-  "noData": "لا توجد بيانات",
+  lowStock: "مخزون منخفض",
+  sequences: "التسلسلات",
+  save: "حفظ",
+  cancel: "إلغاء",
+  confirm: "تأكيد",
+  actions: "إجراءات",
+  name: "الاسم",
+  email: "البريد الإلكتروني",
+  status: "الحالة",
+  date: "التاريخ",
+  total: "المجموع",
+  noData: "لا توجد بيانات",
 
   // Sequence Settings
   "seq.title": "إعدادات التسلسلات",
@@ -207,7 +209,8 @@ export const ar: Record<string, string> = {
   "seq.resetTitle": "إعادة تعيين العداد",
   "seq.confirmReset": "إعادة تعيين العداد",
   "seq.resetWarning": "سيتم إعادة تعيين العداد إلى 0. هذا الإجراء مسجل.",
-  "seq.resetWarningDesc": "سيتم إرجاع عداد هذا التسلسل إلى الصفر. جميع الأرقام المستقبلية ستبدأ من 1 مرة أخرى. لا يمكن التراجع عن هذا الإجراء.",
+  "seq.resetWarningDesc":
+    "سيتم إرجاع عداد هذا التسلسل إلى الصفر. جميع الأرقام المستقبلية ستبدأ من 1 مرة أخرى. لا يمكن التراجع عن هذا الإجراء.",
   "seq.resetReason": "سبب إعادة التعيين",
   "seq.reasonRequired": "السبب مطلوب",
   "seq.reasonMinLength": "يجب أن يكون السبب 3 أحرف على الأقل",
@@ -240,7 +243,8 @@ export const ar: Record<string, string> = {
   "inventory.currentQty": "الكمية الحالية",
   "inventory.reorderPoint": "نقطة إعادة الطلب",
   "inventory.lowStockNotif": "تنبيه مخزون منخفض",
-  "inventory.lowStockNotifDesc": "يتبقى فقط {qty} وحدات (نقطة إعادة الطلب: {reorderPoint})",
+  "inventory.lowStockNotifDesc":
+    "يتبقى فقط {qty} وحدات (نقطة إعادة الطلب: {reorderPoint})",
 
   // Cross-Module Navigation
   "nav.relatedLeads": "العملاء المحتملون ذوو الصلة",

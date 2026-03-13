@@ -1,4 +1,11 @@
-import { ReactNode, useState, useEffect, useRef, createContext, useContext } from "react";
+import {
+  ReactNode,
+  useState,
+  useEffect,
+  useRef,
+  createContext,
+  useContext,
+} from "react";
 import { Link, useLocation } from "wouter";
 import { Sidebar } from "./Sidebar";
 import { Navbar } from "./Navbar";
@@ -41,13 +48,19 @@ export default function DashboardLayout({
   );
 }
 
-function BreadcrumbBar({ currentPage, breadcrumbs }: Pick<DashboardLayoutProps, "currentPage" | "breadcrumbs">) {
+function BreadcrumbBar({
+  currentPage,
+  breadcrumbs,
+}: Pick<DashboardLayoutProps, "currentPage" | "breadcrumbs">) {
   const { token } = antTheme.useToken();
 
   const items = [
     {
       title: (
-        <Link href="/" style={{ color: token.colorTextSecondary, fontSize: 13 }}>
+        <Link
+          href="/"
+          style={{ color: token.colorTextSecondary, fontSize: 13 }}
+        >
           <HomeOutlined />
         </Link>
       ),
@@ -56,17 +69,34 @@ function BreadcrumbBar({ currentPage, breadcrumbs }: Pick<DashboardLayoutProps, 
       ? breadcrumbs.map((b, i) => ({
           title:
             i < breadcrumbs.length - 1 && b.href ? (
-              <Link href={b.href} style={{ color: token.colorTextSecondary, fontSize: 13 }}>
+              <Link
+                href={b.href}
+                style={{ color: token.colorTextSecondary, fontSize: 13 }}
+              >
                 {b.label}
               </Link>
             ) : (
-              <span style={{ color: token.colorText, fontSize: 13, fontWeight: 500 }}>{b.label}</span>
+              <span
+                style={{
+                  color: token.colorText,
+                  fontSize: 13,
+                  fontWeight: 500,
+                }}
+              >
+                {b.label}
+              </span>
             ),
         }))
       : [
           {
             title: (
-              <span style={{ color: token.colorText, fontSize: 13, fontWeight: 500 }}>
+              <span
+                style={{
+                  color: token.colorText,
+                  fontSize: 13,
+                  fontWeight: 500,
+                }}
+              >
                 {currentPage}
               </span>
             ),
@@ -90,7 +120,11 @@ function BreadcrumbBar({ currentPage, breadcrumbs }: Pick<DashboardLayoutProps, 
 
 const { useBreakpoint } = Grid;
 
-function LayoutShell({ children, currentPage = "Dashboard", breadcrumbs }: DashboardLayoutProps) {
+function LayoutShell({
+  children,
+  currentPage = "Dashboard",
+  breadcrumbs,
+}: DashboardLayoutProps) {
   const { language } = useAppSettings();
   const screens = useBreakpoint();
   const isMobile = !screens.md;
@@ -132,7 +166,8 @@ function LayoutShell({ children, currentPage = "Dashboard", breadcrumbs }: Dashb
         <div
           onClick={() => setSidebarOpen(false)}
           style={{
-            position: "fixed", inset: 0,
+            position: "fixed",
+            inset: 0,
             background: "rgba(0,0,0,0.45)",
             zIndex: 999,
             backdropFilter: "blur(2px)",
@@ -141,27 +176,35 @@ function LayoutShell({ children, currentPage = "Dashboard", breadcrumbs }: Dashb
       )}
 
       {/* Sidebar — fixed overlay on mobile, inline on desktop */}
-      <div style={{
-        display: "flex",
-        flexShrink: 0,
-        ...(isMobile ? {
-          position: "fixed",
-          top: 0,
-          bottom: 0,
-          [isRTL ? "right" : "left"]: 0,
-          zIndex: 1000,
-          height: "100vh",
-          transform: sidebarOpen
-            ? "translateX(0)"
-            : `translateX(${isRTL ? "100%" : "-100%"})`,
-          transition: "transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
-        } : {}),
-      }}>
+      <div
+        style={{
+          display: "flex",
+          flexShrink: 0,
+          ...(isMobile
+            ? {
+                position: "fixed",
+                top: 0,
+                bottom: 0,
+                [isRTL ? "right" : "left"]: 0,
+                zIndex: 1000,
+                height: "100vh",
+                transform: sidebarOpen
+                  ? "translateX(0)"
+                  : `translateX(${isRTL ? "100%" : "-100%"})`,
+                transition: "transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+              }
+            : {}),
+        }}
+      >
         <Sidebar isOpen={sidebarOpen} isRTL={isRTL} language={language} />
       </div>
 
       <div className="flex-1 flex flex-col overflow-hidden min-w-0">
-        <Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} isRTL={isRTL} />
+        <Navbar
+          sidebarOpen={sidebarOpen}
+          setSidebarOpen={setSidebarOpen}
+          isRTL={isRTL}
+        />
         <BreadcrumbBar currentPage={currentPage} breadcrumbs={breadcrumbs} />
         <main className="flex-1 overflow-auto bg-background">
           <div className="p-4 md:p-6">{children}</div>

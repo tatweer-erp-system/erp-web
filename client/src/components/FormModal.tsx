@@ -37,9 +37,7 @@ export default function FormModal({
           <DialogTitle>{title}</DialogTitle>
           {description && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>
-        <div className="space-y-4 py-4">
-          {children}
-        </div>
+        <div className="space-y-4 py-4">{children}</div>
         <div className="flex gap-3 justify-end">
           <Button variant="outline" onClick={onClose}>
             Cancel

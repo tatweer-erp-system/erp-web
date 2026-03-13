@@ -3,7 +3,10 @@ import { Search, Download, Columns } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuCheckboxItem, DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuCheckboxItem,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useDebounce } from "@/hooks/useDebounce";
 import type { Table } from "@tanstack/react-table";
@@ -37,16 +40,19 @@ export function DataTableToolbar<T>({
     onSearchChange?.(value);
   };
 
-  const allColumns = table.getAllColumns().filter((c) => c.getCanHide());
+  const allColumns = table.getAllColumns().filter(c => c.getCanHide());
 
   return (
     <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-border">
       {/* Search */}
       <div className="relative flex-1 max-w-xs">
-        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+        <Search
+          size={14}
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+        />
         <Input
           value={search}
-          onChange={(e) => handleSearch(e.target.value)}
+          onChange={e => handleSearch(e.target.value)}
           placeholder="Search..."
           className="pl-8 h-8 text-xs"
         />
@@ -64,11 +70,11 @@ export function DataTableToolbar<T>({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-44">
-            {allColumns.map((col) => (
+            {allColumns.map(col => (
               <DropdownMenuCheckboxItem
                 key={col.id}
                 checked={col.getIsVisible()}
-                onCheckedChange={(v) => col.toggleVisibility(v)}
+                onCheckedChange={v => col.toggleVisibility(v)}
                 className="capitalize text-xs"
               >
                 {col.id}
@@ -79,7 +85,12 @@ export function DataTableToolbar<T>({
 
         {/* Export CSV */}
         {onExportCSV && (
-          <Button variant="outline" size="sm" className="h-8 text-xs gap-1" onClick={onExportCSV}>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 text-xs gap-1"
+            onClick={onExportCSV}
+          >
             <Download size={13} />
             Export
           </Button>

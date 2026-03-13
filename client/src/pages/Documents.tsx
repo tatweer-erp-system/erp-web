@@ -72,11 +72,11 @@ interface Document {
   id: string;
   name: string;
   type: string;
-  size: number;        // bytes
+  size: number; // bytes
   module: DocModule;
-  relatedTo?: string;  // e.g. "Invoice #INV-0042"
+  relatedTo?: string; // e.g. "Invoice #INV-0042"
   uploadedBy: string;
-  uploadedAt: string;  // ISO date string
+  uploadedAt: string; // ISO date string
   tags: string[];
   status: "active" | "archived";
 }
@@ -84,28 +84,193 @@ interface Document {
 // ─── Mock Data ────────────────────────────────────────────────────────────────
 
 const DOCUMENTS: Document[] = [
-  { id: "1",  name: "Q1-2025-Sales-Report.pdf",       type: "pdf",   size: 2_450_000, module: "sales",      relatedTo: "Sales Report Q1",    uploadedBy: "Ahmed Ali",     uploadedAt: "2025-03-15", tags: ["report", "q1"],       status: "active" },
-  { id: "2",  name: "Invoice-INV-0042.pdf",            type: "pdf",   size: 340_000,   module: "sales",      relatedTo: "Invoice #INV-0042",  uploadedBy: "Sara Hassan",   uploadedAt: "2025-03-10", tags: ["invoice"],             status: "active" },
-  { id: "3",  name: "Vendor-Contract-ABC.docx",        type: "docx",  size: 890_000,   module: "purchases",  relatedTo: "Vendor: ABC Corp",   uploadedBy: "Omar Khalid",   uploadedAt: "2025-02-28", tags: ["contract", "vendor"],  status: "active" },
-  { id: "4",  name: "Purchase-Order-PO-0101.pdf",      type: "pdf",   size: 210_000,   module: "purchases",  relatedTo: "PO #PO-0101",        uploadedBy: "Mona Saad",     uploadedAt: "2025-02-25", tags: ["po"],                  status: "active" },
-  { id: "5",  name: "Warehouse-Layout-2025.png",       type: "png",   size: 5_200_000, module: "inventory",  relatedTo: "Warehouse: Main",    uploadedBy: "Ahmed Ali",     uploadedAt: "2025-02-20", tags: ["layout", "warehouse"], status: "active" },
-  { id: "6",  name: "Stock-Count-Feb-2025.xlsx",       type: "xlsx",  size: 1_100_000, module: "inventory",  relatedTo: "Stock Count Feb",    uploadedBy: "Youssef Nasr",  uploadedAt: "2025-02-18", tags: ["stock", "count"],      status: "active" },
-  { id: "7",  name: "Bank-Statement-Feb-2025.pdf",     type: "pdf",   size: 780_000,   module: "accounting", relatedTo: "Bank Reconciliation",uploadedBy: "Sara Hassan",   uploadedAt: "2025-02-15", tags: ["bank", "statement"],   status: "active" },
-  { id: "8",  name: "Tax-Certificate-2024.pdf",        type: "pdf",   size: 450_000,   module: "accounting", relatedTo: "Tax Year 2024",      uploadedBy: "Omar Khalid",   uploadedAt: "2025-01-30", tags: ["tax", "certificate"],  status: "active" },
-  { id: "9",  name: "Treasury-Report-Q4-2024.xlsx",    type: "xlsx",  size: 1_800_000, module: "treasury",   relatedTo: "Treasury Q4 2024",   uploadedBy: "Mona Saad",     uploadedAt: "2025-01-20", tags: ["treasury", "q4"],      status: "active" },
-  { id: "10", name: "Employee-Contract-EMP-005.pdf",   type: "pdf",   size: 520_000,   module: "hr",         relatedTo: "Employee #EMP-005",  uploadedBy: "Ahmed Ali",     uploadedAt: "2025-01-15", tags: ["contract", "hr"],      status: "active" },
-  { id: "11", name: "Payroll-January-2025.xlsx",       type: "xlsx",  size: 990_000,   module: "hr",         relatedTo: "Payroll Jan 2025",   uploadedBy: "Youssef Nasr",  uploadedAt: "2025-02-01", tags: ["payroll"],             status: "active" },
-  { id: "12", name: "Company-Policy-2025.docx",        type: "docx",  size: 1_300_000, module: "general",    relatedTo: undefined,            uploadedBy: "Sara Hassan",   uploadedAt: "2025-01-10", tags: ["policy", "general"],   status: "active" },
-  { id: "13", name: "Office-Photo-HQ.jpg",             type: "jpg",   size: 3_600_000, module: "general",    relatedTo: undefined,            uploadedBy: "Omar Khalid",   uploadedAt: "2025-01-05", tags: ["photo"],               status: "archived" },
-  { id: "14", name: "Audit-Report-2024.pdf",           type: "pdf",   size: 4_100_000, module: "accounting", relatedTo: "Audit 2024",         uploadedBy: "Mona Saad",     uploadedAt: "2024-12-20", tags: ["audit", "2024"],       status: "archived" },
-  { id: "15", name: "Customer-Agreement-CUST-101.pdf", type: "pdf",   size: 630_000,   module: "sales",      relatedTo: "Customer #CUST-101", uploadedBy: "Ahmed Ali",     uploadedAt: "2024-12-15", tags: ["agreement", "customer"],status: "active" },
+  {
+    id: "1",
+    name: "Q1-2025-Sales-Report.pdf",
+    type: "pdf",
+    size: 2_450_000,
+    module: "sales",
+    relatedTo: "Sales Report Q1",
+    uploadedBy: "Ahmed Ali",
+    uploadedAt: "2025-03-15",
+    tags: ["report", "q1"],
+    status: "active",
+  },
+  {
+    id: "2",
+    name: "Invoice-INV-0042.pdf",
+    type: "pdf",
+    size: 340_000,
+    module: "sales",
+    relatedTo: "Invoice #INV-0042",
+    uploadedBy: "Sara Hassan",
+    uploadedAt: "2025-03-10",
+    tags: ["invoice"],
+    status: "active",
+  },
+  {
+    id: "3",
+    name: "Vendor-Contract-ABC.docx",
+    type: "docx",
+    size: 890_000,
+    module: "purchases",
+    relatedTo: "Vendor: ABC Corp",
+    uploadedBy: "Omar Khalid",
+    uploadedAt: "2025-02-28",
+    tags: ["contract", "vendor"],
+    status: "active",
+  },
+  {
+    id: "4",
+    name: "Purchase-Order-PO-0101.pdf",
+    type: "pdf",
+    size: 210_000,
+    module: "purchases",
+    relatedTo: "PO #PO-0101",
+    uploadedBy: "Mona Saad",
+    uploadedAt: "2025-02-25",
+    tags: ["po"],
+    status: "active",
+  },
+  {
+    id: "5",
+    name: "Warehouse-Layout-2025.png",
+    type: "png",
+    size: 5_200_000,
+    module: "inventory",
+    relatedTo: "Warehouse: Main",
+    uploadedBy: "Ahmed Ali",
+    uploadedAt: "2025-02-20",
+    tags: ["layout", "warehouse"],
+    status: "active",
+  },
+  {
+    id: "6",
+    name: "Stock-Count-Feb-2025.xlsx",
+    type: "xlsx",
+    size: 1_100_000,
+    module: "inventory",
+    relatedTo: "Stock Count Feb",
+    uploadedBy: "Youssef Nasr",
+    uploadedAt: "2025-02-18",
+    tags: ["stock", "count"],
+    status: "active",
+  },
+  {
+    id: "7",
+    name: "Bank-Statement-Feb-2025.pdf",
+    type: "pdf",
+    size: 780_000,
+    module: "accounting",
+    relatedTo: "Bank Reconciliation",
+    uploadedBy: "Sara Hassan",
+    uploadedAt: "2025-02-15",
+    tags: ["bank", "statement"],
+    status: "active",
+  },
+  {
+    id: "8",
+    name: "Tax-Certificate-2024.pdf",
+    type: "pdf",
+    size: 450_000,
+    module: "accounting",
+    relatedTo: "Tax Year 2024",
+    uploadedBy: "Omar Khalid",
+    uploadedAt: "2025-01-30",
+    tags: ["tax", "certificate"],
+    status: "active",
+  },
+  {
+    id: "9",
+    name: "Treasury-Report-Q4-2024.xlsx",
+    type: "xlsx",
+    size: 1_800_000,
+    module: "treasury",
+    relatedTo: "Treasury Q4 2024",
+    uploadedBy: "Mona Saad",
+    uploadedAt: "2025-01-20",
+    tags: ["treasury", "q4"],
+    status: "active",
+  },
+  {
+    id: "10",
+    name: "Employee-Contract-EMP-005.pdf",
+    type: "pdf",
+    size: 520_000,
+    module: "hr",
+    relatedTo: "Employee #EMP-005",
+    uploadedBy: "Ahmed Ali",
+    uploadedAt: "2025-01-15",
+    tags: ["contract", "hr"],
+    status: "active",
+  },
+  {
+    id: "11",
+    name: "Payroll-January-2025.xlsx",
+    type: "xlsx",
+    size: 990_000,
+    module: "hr",
+    relatedTo: "Payroll Jan 2025",
+    uploadedBy: "Youssef Nasr",
+    uploadedAt: "2025-02-01",
+    tags: ["payroll"],
+    status: "active",
+  },
+  {
+    id: "12",
+    name: "Company-Policy-2025.docx",
+    type: "docx",
+    size: 1_300_000,
+    module: "general",
+    relatedTo: undefined,
+    uploadedBy: "Sara Hassan",
+    uploadedAt: "2025-01-10",
+    tags: ["policy", "general"],
+    status: "active",
+  },
+  {
+    id: "13",
+    name: "Office-Photo-HQ.jpg",
+    type: "jpg",
+    size: 3_600_000,
+    module: "general",
+    relatedTo: undefined,
+    uploadedBy: "Omar Khalid",
+    uploadedAt: "2025-01-05",
+    tags: ["photo"],
+    status: "archived",
+  },
+  {
+    id: "14",
+    name: "Audit-Report-2024.pdf",
+    type: "pdf",
+    size: 4_100_000,
+    module: "accounting",
+    relatedTo: "Audit 2024",
+    uploadedBy: "Mona Saad",
+    uploadedAt: "2024-12-20",
+    tags: ["audit", "2024"],
+    status: "archived",
+  },
+  {
+    id: "15",
+    name: "Customer-Agreement-CUST-101.pdf",
+    type: "pdf",
+    size: 630_000,
+    module: "sales",
+    relatedTo: "Customer #CUST-101",
+    uploadedBy: "Ahmed Ali",
+    uploadedAt: "2024-12-15",
+    tags: ["agreement", "customer"],
+    status: "active",
+  },
 ];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function formatBytes(bytes: number): string {
-  if (bytes < 1024)        return `${bytes} B`;
-  if (bytes < 1_048_576)   return `${(bytes / 1024).toFixed(1)} KB`;
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1_048_576) return `${(bytes / 1024).toFixed(1)} KB`;
   return `${(bytes / 1_048_576).toFixed(1)} MB`;
 }
 
@@ -114,31 +279,42 @@ function totalBytes(docs: Document[]): number {
 }
 
 const FILE_ICONS: Record<string, React.ReactNode> = {
-  pdf:  <FilePdfOutlined  style={{ color: "#f5222d", fontSize: 18 }} />,
+  pdf: <FilePdfOutlined style={{ color: "#f5222d", fontSize: 18 }} />,
   docx: <FileWordOutlined style={{ color: "#1677ff", fontSize: 18 }} />,
-  doc:  <FileWordOutlined style={{ color: "#1677ff", fontSize: 18 }} />,
+  doc: <FileWordOutlined style={{ color: "#1677ff", fontSize: 18 }} />,
   xlsx: <FileExcelOutlined style={{ color: "#52c41a", fontSize: 18 }} />,
-  xls:  <FileExcelOutlined style={{ color: "#52c41a", fontSize: 18 }} />,
-  png:  <FileImageOutlined style={{ color: "#722ed1", fontSize: 18 }} />,
-  jpg:  <FileImageOutlined style={{ color: "#722ed1", fontSize: 18 }} />,
+  xls: <FileExcelOutlined style={{ color: "#52c41a", fontSize: 18 }} />,
+  png: <FileImageOutlined style={{ color: "#722ed1", fontSize: 18 }} />,
+  jpg: <FileImageOutlined style={{ color: "#722ed1", fontSize: 18 }} />,
   jpeg: <FileImageOutlined style={{ color: "#722ed1", fontSize: 18 }} />,
-  zip:  <FileZipOutlined   style={{ color: "#fa8c16", fontSize: 18 }} />,
-  txt:  <FileTextOutlined  style={{ color: "#8c8c8c", fontSize: 18 }} />,
+  zip: <FileZipOutlined style={{ color: "#fa8c16", fontSize: 18 }} />,
+  txt: <FileTextOutlined style={{ color: "#8c8c8c", fontSize: 18 }} />,
 };
 
 function fileIcon(type: string) {
-  return FILE_ICONS[type.toLowerCase()] ?? <FileUnknownOutlined style={{ color: "#8c8c8c", fontSize: 18 }} />;
+  return (
+    FILE_ICONS[type.toLowerCase()] ?? (
+      <FileUnknownOutlined style={{ color: "#8c8c8c", fontSize: 18 }} />
+    )
+  );
 }
 
-const MODULE_META: Record<DocModule, { label: string; color: string; icon: React.ReactNode }> = {
-  all:        { label: "All Modules",  color: "default", icon: <FolderOpenOutlined /> },
-  sales:      { label: "Sales",        color: "blue",    icon: <ShoppingCartOutlined /> },
-  purchases:  { label: "Purchases",    color: "orange",  icon: <ShoppingOutlined /> },
-  inventory:  { label: "Inventory",    color: "green",   icon: <AppstoreOutlined /> },
-  accounting: { label: "Accounting",   color: "purple",  icon: <BankOutlined /> },
-  treasury:   { label: "Treasury",     color: "cyan",    icon: <BankOutlined /> },
-  hr:         { label: "HR",           color: "geekblue",icon: <UsergroupAddOutlined /> },
-  general:    { label: "General",      color: "default", icon: <FolderOutlined /> },
+const MODULE_META: Record<
+  DocModule,
+  { label: string; color: string; icon: React.ReactNode }
+> = {
+  all: { label: "All Modules", color: "default", icon: <FolderOpenOutlined /> },
+  sales: { label: "Sales", color: "blue", icon: <ShoppingCartOutlined /> },
+  purchases: {
+    label: "Purchases",
+    color: "orange",
+    icon: <ShoppingOutlined />,
+  },
+  inventory: { label: "Inventory", color: "green", icon: <AppstoreOutlined /> },
+  accounting: { label: "Accounting", color: "purple", icon: <BankOutlined /> },
+  treasury: { label: "Treasury", color: "cyan", icon: <BankOutlined /> },
+  hr: { label: "HR", color: "geekblue", icon: <UsergroupAddOutlined /> },
+  general: { label: "General", color: "default", icon: <FolderOutlined /> },
 };
 
 // ─── Upload Modal (Enhanced) ──────────────────────────────────────────────────
@@ -156,18 +332,22 @@ interface PendingUpload {
 }
 
 const UPLOAD_FILE_ICONS: Record<string, React.ReactNode> = {
-  pdf:  <FilePdfOutlined   style={{ color: "#f5222d", fontSize: 20 }} />,
-  docx: <FileWordOutlined  style={{ color: "#1677ff", fontSize: 20 }} />,
-  doc:  <FileWordOutlined  style={{ color: "#1677ff", fontSize: 20 }} />,
+  pdf: <FilePdfOutlined style={{ color: "#f5222d", fontSize: 20 }} />,
+  docx: <FileWordOutlined style={{ color: "#1677ff", fontSize: 20 }} />,
+  doc: <FileWordOutlined style={{ color: "#1677ff", fontSize: 20 }} />,
   xlsx: <FileExcelOutlined style={{ color: "#52c41a", fontSize: 20 }} />,
-  xls:  <FileExcelOutlined style={{ color: "#52c41a", fontSize: 20 }} />,
-  png:  <FileImageOutlined style={{ color: "#722ed1", fontSize: 20 }} />,
-  jpg:  <FileImageOutlined style={{ color: "#722ed1", fontSize: 20 }} />,
+  xls: <FileExcelOutlined style={{ color: "#52c41a", fontSize: 20 }} />,
+  png: <FileImageOutlined style={{ color: "#722ed1", fontSize: 20 }} />,
+  jpg: <FileImageOutlined style={{ color: "#722ed1", fontSize: 20 }} />,
   jpeg: <FileImageOutlined style={{ color: "#722ed1", fontSize: 20 }} />,
-  zip:  <FileZipOutlined   style={{ color: "#fa8c16", fontSize: 20 }} />,
+  zip: <FileZipOutlined style={{ color: "#fa8c16", fontSize: 20 }} />,
 };
 function uploadFileIcon(ext: string) {
-  return UPLOAD_FILE_ICONS[ext.toLowerCase()] ?? <FileUnknownOutlined style={{ color: "#8c8c8c", fontSize: 20 }} />;
+  return (
+    UPLOAD_FILE_ICONS[ext.toLowerCase()] ?? (
+      <FileUnknownOutlined style={{ color: "#8c8c8c", fontSize: 20 }} />
+    )
+  );
 }
 
 function UploadModal({
@@ -183,19 +363,21 @@ function UploadModal({
   const [globalModule, setGlobalModule] = useState<DocModule>("general");
 
   function updateFile(uid: string, patch: Partial<PendingUpload>) {
-    setPendingFiles((prev) => prev.map((f) => (f.uid === uid ? { ...f, ...patch } : f)));
+    setPendingFiles(prev =>
+      prev.map(f => (f.uid === uid ? { ...f, ...patch } : f))
+    );
   }
 
   function removeFile(uid: string) {
-    setPendingFiles((prev) => prev.filter((f) => f.uid !== uid));
+    setPendingFiles(prev => prev.filter(f => f.uid !== uid));
   }
 
   const draggerProps: UploadProps = {
     multiple: true,
     showUploadList: false,
-    beforeUpload: (file) => {
+    beforeUpload: file => {
       const ext = file.name.split(".").pop() ?? "file";
-      setPendingFiles((prev) => [
+      setPendingFiles(prev => [
         ...prev,
         {
           uid: file.uid,
@@ -218,7 +400,7 @@ function UploadModal({
     for (const file of pendingFiles) {
       updateFile(file.uid, { status: "uploading" });
       for (let p = 15; p <= 100; p += 17) {
-        await new Promise<void>((r) => setTimeout(r, 90));
+        await new Promise<void>(r => setTimeout(r, 90));
         updateFile(file.uid, { progress: Math.min(p, 100) });
       }
       updateFile(file.uid, { status: "done", progress: 100 });
@@ -238,7 +420,8 @@ function UploadModal({
     }
   }
 
-  const allDone = pendingFiles.length > 0 && pendingFiles.every((f) => f.status === "done");
+  const allDone =
+    pendingFiles.length > 0 && pendingFiles.every(f => f.status === "done");
 
   return (
     <Modal
@@ -248,7 +431,9 @@ function UploadModal({
       maskClosable={!uploading}
       title={
         <Space>
-          <CloudUploadOutlined style={{ color: token.colorPrimary, fontSize: 18 }} />
+          <CloudUploadOutlined
+            style={{ color: token.colorPrimary, fontSize: 18 }}
+          />
           <span style={{ fontSize: 15 }}>Upload Documents</span>
         </Space>
       }
@@ -259,7 +444,15 @@ function UploadModal({
         <Button
           key="upload"
           type="primary"
-          icon={uploading ? <LoadingOutlined /> : allDone ? <CheckCircleOutlined /> : <UploadOutlined />}
+          icon={
+            uploading ? (
+              <LoadingOutlined />
+            ) : allDone ? (
+              <CheckCircleOutlined />
+            ) : (
+              <UploadOutlined />
+            )
+          }
           disabled={pendingFiles.length === 0 || allDone}
           loading={uploading}
           onClick={handleUpload}
@@ -267,8 +460,8 @@ function UploadModal({
           {uploading
             ? "Uploading…"
             : allDone
-            ? "Done"
-            : `Upload${pendingFiles.length > 0 ? ` (${pendingFiles.length} file${pendingFiles.length > 1 ? "s" : ""})` : ""}`}
+              ? "Done"
+              : `Upload${pendingFiles.length > 0 ? ` (${pendingFiles.length} file${pendingFiles.length > 1 ? "s" : ""})` : ""}`}
         </Button>,
       ]}
       width={680}
@@ -277,16 +470,21 @@ function UploadModal({
         {/* Global module selector */}
         <Row gutter={12} align="middle">
           <Col flex="auto">
-            <Text type="secondary" style={{ fontSize: 12, display: "block", marginBottom: 4 }}>
+            <Text
+              type="secondary"
+              style={{ fontSize: 12, display: "block", marginBottom: 4 }}
+            >
               Default Module (applied to all files, overridable per file)
             </Text>
             <Select
               value={globalModule}
-              onChange={(v) => {
+              onChange={v => {
                 setGlobalModule(v);
                 // Only update pending files that haven't been individually changed
-                setPendingFiles((prev) =>
-                  prev.map((f) => (f.status === "pending" ? { ...f, module: v } : f))
+                setPendingFiles(prev =>
+                  prev.map(f =>
+                    f.status === "pending" ? { ...f, module: v } : f
+                  )
                 );
               }}
               style={{ width: "100%" }}
@@ -307,7 +505,9 @@ function UploadModal({
           }}
         >
           <div style={{ padding: "12px 0" }}>
-            <InboxOutlined style={{ fontSize: 44, color: token.colorPrimary }} />
+            <InboxOutlined
+              style={{ fontSize: 44, color: token.colorPrimary }}
+            />
             <p style={{ margin: "10px 0 4px", fontWeight: 600, fontSize: 14 }}>
               Click or drag files here to upload
             </p>
@@ -328,7 +528,7 @@ function UploadModal({
               gap: 10,
             }}
           >
-            {pendingFiles.map((file) => (
+            {pendingFiles.map(file => (
               <div
                 key={file.uid}
                 style={{
@@ -336,8 +536,8 @@ function UploadModal({
                     file.status === "done"
                       ? token.colorSuccess
                       : file.status === "error"
-                      ? token.colorError
-                      : token.colorBorderSecondary
+                        ? token.colorError
+                        : token.colorBorderSecondary
                   }`,
                   borderRadius: 10,
                   padding: "12px 14px",
@@ -346,12 +546,18 @@ function UploadModal({
                 }}
               >
                 {/* Top row: icon + name + size + status/remove */}
-                <Row justify="space-between" align="middle" style={{ marginBottom: 8 }}>
+                <Row
+                  justify="space-between"
+                  align="middle"
+                  style={{ marginBottom: 8 }}
+                >
                   <Col>
                     <Space>
                       {uploadFileIcon(file.ext)}
                       <div>
-                        <Text strong style={{ fontSize: 13 }}>{file.name}</Text>
+                        <Text strong style={{ fontSize: 13 }}>
+                          {file.name}
+                        </Text>
                         <Text
                           type="secondary"
                           style={{ fontSize: 11, marginLeft: 8 }}
@@ -363,11 +569,17 @@ function UploadModal({
                   </Col>
                   <Col>
                     {file.status === "done" ? (
-                      <CheckCircleOutlined style={{ color: token.colorSuccess, fontSize: 18 }} />
+                      <CheckCircleOutlined
+                        style={{ color: token.colorSuccess, fontSize: 18 }}
+                      />
                     ) : file.status === "error" ? (
-                      <CloseCircleOutlined style={{ color: token.colorError, fontSize: 18 }} />
+                      <CloseCircleOutlined
+                        style={{ color: token.colorError, fontSize: 18 }}
+                      />
                     ) : file.status === "uploading" ? (
-                      <LoadingOutlined style={{ color: token.colorPrimary, fontSize: 18 }} />
+                      <LoadingOutlined
+                        style={{ color: token.colorPrimary, fontSize: 18 }}
+                      />
                     ) : (
                       !uploading && (
                         <Button
@@ -407,7 +619,7 @@ function UploadModal({
                       <Select
                         size="small"
                         value={file.module}
-                        onChange={(v) => updateFile(file.uid, { module: v })}
+                        onChange={v => updateFile(file.uid, { module: v })}
                         style={{ width: "100%" }}
                         options={Object.entries(MODULE_META)
                           .filter(([k]) => k !== "all")
@@ -419,7 +631,9 @@ function UploadModal({
                         size="small"
                         placeholder="Description (optional)"
                         value={file.description}
-                        onChange={(e) => updateFile(file.uid, { description: e.target.value })}
+                        onChange={e =>
+                          updateFile(file.uid, { description: e.target.value })
+                        }
                       />
                     </Col>
                     <Col xs={24}>
@@ -429,7 +643,7 @@ function UploadModal({
                         placeholder="Add tags (press Enter)"
                         style={{ width: "100%" }}
                         value={file.tags}
-                        onChange={(v) => updateFile(file.uid, { tags: v })}
+                        onChange={v => updateFile(file.uid, { tags: v })}
                         options={[
                           { value: "contract" },
                           { value: "invoice" },
@@ -459,11 +673,13 @@ export default function Documents() {
   const { token } = antTheme.useToken();
   const [search, setSearch] = useState("");
   const [moduleFilter, setModuleFilter] = useState<DocModule>("all");
-  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "archived">("all");
+  const [statusFilter, setStatusFilter] = useState<
+    "all" | "active" | "archived"
+  >("all");
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [uploadOpen, setUploadOpen] = useState(false);
 
-  const filtered = DOCUMENTS.filter((d) => {
+  const filtered = DOCUMENTS.filter(d => {
     if (moduleFilter !== "all" && d.module !== moduleFilter) return false;
     if (statusFilter !== "all" && d.status !== statusFilter) return false;
     if (typeFilter !== "all" && d.type !== typeFilter) return false;
@@ -471,7 +687,7 @@ export default function Documents() {
       const q = search.toLowerCase();
       return (
         d.name.toLowerCase().includes(q) ||
-        d.tags.some((t) => t.includes(q)) ||
+        d.tags.some(t => t.includes(q)) ||
         (d.relatedTo?.toLowerCase().includes(q) ?? false)
       );
     }
@@ -479,13 +695,13 @@ export default function Documents() {
   });
 
   // Stats
-  const active   = DOCUMENTS.filter((d) => d.status === "active").length;
-  const archived = DOCUMENTS.filter((d) => d.status === "archived").length;
+  const active = DOCUMENTS.filter(d => d.status === "active").length;
+  const archived = DOCUMENTS.filter(d => d.status === "archived").length;
   const totalSize = totalBytes(DOCUMENTS);
   const usedPercent = Math.round((totalSize / (200 * 1_048_576)) * 100); // assume 200 MB quota
 
   // Available file types from current dataset
-  const fileTypes = Array.from(new Set(DOCUMENTS.map((d) => d.type))).sort();
+  const fileTypes = Array.from(new Set(DOCUMENTS.map(d => d.type))).sort();
 
   const columns: ColumnsType<Document> = [
     {
@@ -495,9 +711,13 @@ export default function Documents() {
         <Space>
           {fileIcon(doc.type)}
           <div>
-            <Text strong style={{ display: "block", fontSize: 13 }}>{doc.name}</Text>
+            <Text strong style={{ display: "block", fontSize: 13 }}>
+              {doc.name}
+            </Text>
             {doc.relatedTo && (
-              <Text type="secondary" style={{ fontSize: 12 }}>{doc.relatedTo}</Text>
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                {doc.relatedTo}
+              </Text>
             )}
           </div>
         </Space>
@@ -509,9 +729,7 @@ export default function Documents() {
       key: "module",
       width: 140,
       render: (mod: DocModule) => (
-        <Tag color={MODULE_META[mod].color}>
-          {MODULE_META[mod].label}
-        </Tag>
+        <Tag color={MODULE_META[mod].color}>{MODULE_META[mod].label}</Tag>
       ),
     },
     {
@@ -529,8 +747,15 @@ export default function Documents() {
       width: 140,
       render: (name: string) => (
         <Space>
-          <Avatar size={24} style={{ background: token.colorPrimary, fontSize: 11 }}>
-            {name.split(" ").map((n) => n[0]).join("").slice(0, 2)}
+          <Avatar
+            size={24}
+            style={{ background: token.colorPrimary, fontSize: 11 }}
+          >
+            {name
+              .split(" ")
+              .map(n => n[0])
+              .join("")
+              .slice(0, 2)}
           </Avatar>
           <Text style={{ fontSize: 13 }}>{name}</Text>
         </Space>
@@ -551,8 +776,10 @@ export default function Documents() {
       width: 180,
       render: (tags: string[]) => (
         <>
-          {tags.map((t) => (
-            <Tag key={t} style={{ marginBottom: 2, fontSize: 11 }}>{t}</Tag>
+          {tags.map(t => (
+            <Tag key={t} style={{ marginBottom: 2, fontSize: 11 }}>
+              {t}
+            </Tag>
           ))}
         </>
       ),
@@ -564,9 +791,13 @@ export default function Documents() {
       width: 100,
       render: (s: string) =>
         s === "active" ? (
-          <Tag icon={<CheckCircleOutlined />} color="success">Active</Tag>
+          <Tag icon={<CheckCircleOutlined />} color="success">
+            Active
+          </Tag>
         ) : (
-          <Tag icon={<WarningOutlined />} color="warning">Archived</Tag>
+          <Tag icon={<WarningOutlined />} color="warning">
+            Archived
+          </Tag>
         ),
     },
     {
@@ -577,13 +808,30 @@ export default function Documents() {
         <Dropdown
           menu={{
             items: [
-              { key: "view",     icon: <EyeOutlined />,       label: "Preview" },
-              { key: "download", icon: <DownloadOutlined />,  label: "Download" },
-              { key: "share",    icon: <ShareAltOutlined />,  label: "Share Link" },
+              { key: "view", icon: <EyeOutlined />, label: "Preview" },
+              {
+                key: "download",
+                icon: <DownloadOutlined />,
+                label: "Download",
+              },
+              { key: "share", icon: <ShareAltOutlined />, label: "Share Link" },
               { type: "divider" },
-              { key: "archive",  icon: doc.status === "active" ? <WarningOutlined /> : <CheckCircleOutlined />,
-                label: doc.status === "active" ? "Archive" : "Restore" },
-              { key: "delete",   icon: <DeleteOutlined />,    label: "Delete", danger: true },
+              {
+                key: "archive",
+                icon:
+                  doc.status === "active" ? (
+                    <WarningOutlined />
+                  ) : (
+                    <CheckCircleOutlined />
+                  ),
+                label: doc.status === "active" ? "Archive" : "Restore",
+              },
+              {
+                key: "delete",
+                icon: <DeleteOutlined />,
+                label: "Delete",
+                danger: true,
+              },
             ],
           }}
           trigger={["click"]}
@@ -598,13 +846,23 @@ export default function Documents() {
     <DashboardLayout>
       <div style={{ padding: "24px 24px 40px" }}>
         {/* Header */}
-        <Row justify="space-between" align="middle" style={{ marginBottom: 24 }}>
+        <Row
+          justify="space-between"
+          align="middle"
+          style={{ marginBottom: 24 }}
+        >
           <Col>
             <Space align="center">
-              <FolderOpenOutlined style={{ fontSize: 28, color: token.colorPrimary }} />
+              <FolderOpenOutlined
+                style={{ fontSize: 28, color: token.colorPrimary }}
+              />
               <div>
-                <Title level={3} style={{ margin: 0 }}>Document Manager</Title>
-                <Text type="secondary">Centralized file storage across all modules</Text>
+                <Title level={3} style={{ margin: 0 }}>
+                  Document Manager
+                </Title>
+                <Text type="secondary">
+                  Centralized file storage across all modules
+                </Text>
               </div>
             </Space>
           </Col>
@@ -626,7 +884,11 @@ export default function Documents() {
             {
               title: "Total Files",
               value: DOCUMENTS.length,
-              icon: <FolderOpenOutlined style={{ color: token.colorPrimary, fontSize: 20 }} />,
+              icon: (
+                <FolderOpenOutlined
+                  style={{ color: token.colorPrimary, fontSize: 20 }}
+                />
+              ),
               iconBg: token.colorPrimaryBg,
               borderAccent: token.colorPrimaryBorder,
               valueColor: token.colorPrimary,
@@ -635,7 +897,11 @@ export default function Documents() {
             {
               title: "Active",
               value: active,
-              icon: <CheckCircleOutlined style={{ color: token.colorSuccess, fontSize: 20 }} />,
+              icon: (
+                <CheckCircleOutlined
+                  style={{ color: token.colorSuccess, fontSize: 20 }}
+                />
+              ),
               iconBg: token.colorSuccessBg,
               borderAccent: token.colorSuccessBorder,
               valueColor: token.colorSuccess,
@@ -644,13 +910,17 @@ export default function Documents() {
             {
               title: "Archived",
               value: archived,
-              icon: <WarningOutlined style={{ color: token.colorWarning, fontSize: 20 }} />,
+              icon: (
+                <WarningOutlined
+                  style={{ color: token.colorWarning, fontSize: 20 }}
+                />
+              ),
               iconBg: token.colorWarningBg,
               borderAccent: token.colorWarningBorder,
               valueColor: token.colorWarning,
               sub: `${Math.round((archived / DOCUMENTS.length) * 100)}% of all files`,
             },
-          ].map((card) => (
+          ].map(card => (
             <Col xs={24} sm={6} key={card.title}>
               <div
                 style={{
@@ -665,11 +935,21 @@ export default function Documents() {
                 }}
               >
                 <div>
-                  <Text type="secondary" style={{ fontSize: 12 }}>{card.title}</Text>
+                  <Text type="secondary" style={{ fontSize: 12 }}>
+                    {card.title}
+                  </Text>
                   <div style={{ marginTop: 6 }}>
-                    <Text strong style={{ fontSize: 24, color: card.valueColor }}>{card.value}</Text>
+                    <Text
+                      strong
+                      style={{ fontSize: 24, color: card.valueColor }}
+                    >
+                      {card.value}
+                    </Text>
                   </div>
-                  <Text type="secondary" style={{ fontSize: 11, marginTop: 4, display: "block" }}>
+                  <Text
+                    type="secondary"
+                    style={{ fontSize: 11, marginTop: 4, display: "block" }}
+                  >
                     {card.sub}
                   </Text>
                 </div>
@@ -705,17 +985,26 @@ export default function Documents() {
               }}
             >
               <div style={{ flex: 1 }}>
-                <Text type="secondary" style={{ fontSize: 12 }}>Storage Used</Text>
+                <Text type="secondary" style={{ fontSize: 12 }}>
+                  Storage Used
+                </Text>
                 <div style={{ marginTop: 6 }}>
                   <Text strong style={{ fontSize: 24 }}>
                     {formatBytes(totalSize)}
                   </Text>
-                  <Text type="secondary" style={{ fontSize: 12, marginLeft: 6 }}>/ 200 MB</Text>
+                  <Text
+                    type="secondary"
+                    style={{ fontSize: 12, marginLeft: 6 }}
+                  >
+                    / 200 MB
+                  </Text>
                 </div>
                 <Progress
                   percent={usedPercent}
                   size="small"
-                  strokeColor={usedPercent > 80 ? token.colorError : token.colorPrimary}
+                  strokeColor={
+                    usedPercent > 80 ? token.colorError : token.colorPrimary
+                  }
                   style={{ marginTop: 8 }}
                 />
               </div>
@@ -724,7 +1013,10 @@ export default function Documents() {
                   width: 44,
                   height: 44,
                   borderRadius: 10,
-                  background: usedPercent > 80 ? token.colorErrorBg : token.colorPrimaryBg,
+                  background:
+                    usedPercent > 80
+                      ? token.colorErrorBg
+                      : token.colorPrimaryBg,
                   border: `1px solid ${usedPercent > 80 ? token.colorErrorBorder : token.colorPrimaryBorder}`,
                   display: "flex",
                   alignItems: "center",
@@ -734,7 +1026,8 @@ export default function Documents() {
               >
                 <CloudUploadOutlined
                   style={{
-                    color: usedPercent > 80 ? token.colorError : token.colorPrimary,
+                    color:
+                      usedPercent > 80 ? token.colorError : token.colorPrimary,
                     fontSize: 20,
                   }}
                 />
@@ -753,28 +1046,41 @@ export default function Documents() {
             <Text type="secondary" style={{ fontSize: 13, marginRight: 4 }}>
               <FilterOutlined /> Filter by module:
             </Text>
-            {(Object.entries(MODULE_META) as [DocModule, typeof MODULE_META[DocModule]][]).map(
-              ([key, meta]) => {
-                const count = key === "all"
+            {(
+              Object.entries(MODULE_META) as [
+                DocModule,
+                (typeof MODULE_META)[DocModule],
+              ][]
+            ).map(([key, meta]) => {
+              const count =
+                key === "all"
                   ? DOCUMENTS.length
-                  : DOCUMENTS.filter((d) => d.module === key).length;
-                const active = moduleFilter === key;
-                return (
-                  <Badge key={key} count={count} size="small" offset={[-4, 0]}
-                    style={{ background: active ? token.colorPrimary : token.colorTextTertiary }}>
-                    <Button
-                      size="small"
-                      type={active ? "primary" : "default"}
-                      icon={meta.icon}
-                      onClick={() => setModuleFilter(key)}
-                      style={{ fontSize: 12 }}
-                    >
-                      {meta.label}
-                    </Button>
-                  </Badge>
-                );
-              }
-            )}
+                  : DOCUMENTS.filter(d => d.module === key).length;
+              const active = moduleFilter === key;
+              return (
+                <Badge
+                  key={key}
+                  count={count}
+                  size="small"
+                  offset={[-4, 0]}
+                  style={{
+                    background: active
+                      ? token.colorPrimary
+                      : token.colorTextTertiary,
+                  }}
+                >
+                  <Button
+                    size="small"
+                    type={active ? "primary" : "default"}
+                    icon={meta.icon}
+                    onClick={() => setModuleFilter(key)}
+                    style={{ fontSize: 12 }}
+                  >
+                    {meta.label}
+                  </Button>
+                </Badge>
+              );
+            })}
           </Space>
         </Card>
 
@@ -785,7 +1091,7 @@ export default function Documents() {
               placeholder="Search by name, tags, or related record…"
               prefix={<SearchOutlined />}
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={e => setSearch(e.target.value)}
               allowClear
             />
           </Col>
@@ -795,8 +1101,8 @@ export default function Documents() {
               onChange={setStatusFilter}
               style={{ width: "100%" }}
               options={[
-                { value: "all",      label: "All Statuses" },
-                { value: "active",   label: "Active" },
+                { value: "all", label: "All Statuses" },
+                { value: "active", label: "Active" },
                 { value: "archived", label: "Archived" },
               ]}
             />
@@ -808,7 +1114,7 @@ export default function Documents() {
               style={{ width: "100%" }}
               options={[
                 { value: "all", label: "All Types" },
-                ...fileTypes.map((t) => ({ value: t, label: t.toUpperCase() })),
+                ...fileTypes.map(t => ({ value: t, label: t.toUpperCase() })),
               ]}
             />
           </Col>

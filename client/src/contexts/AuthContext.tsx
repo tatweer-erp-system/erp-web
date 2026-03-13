@@ -1,20 +1,35 @@
-import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  type ReactNode,
+} from "react";
 import { type User, type Tenant, type Branch, Role } from "@/types/auth";
 import * as authService from "@/services/auth.service";
-import { getAccessToken, getRefreshToken, setTokens, clearTokens } from "@/lib/token";
+import {
+  getAccessToken,
+  getRefreshToken,
+  setTokens,
+  clearTokens,
+} from "@/lib/token";
 
 const USER_STORAGE_KEY = "web_user";
 const TENANT_STORAGE_KEY = "web_tenant";
 const BRANCHES_STORAGE_KEY = "web_branches";
 const SELECTED_BRANCH_KEY = "web_selected_branch";
 
-export const ROLE_DISPLAY: Record<Role, { label: string; color: string; bg: string }> = {
+export const ROLE_DISPLAY: Record<
+  Role,
+  { label: string; color: string; bg: string }
+> = {
   [Role.SuperAdmin]: { label: "Super Admin", color: "#7C3AED", bg: "#F5F3FF" },
-  [Role.Admin]:      { label: "Admin",       color: "#1D4ED8", bg: "#EFF6FF" },
-  [Role.Manager]:    { label: "Manager",     color: "#047857", bg: "#ECFDF5" },
-  [Role.Accountant]: { label: "Accountant",  color: "#B45309", bg: "#FFFBEB" },
-  [Role.Viewer]:     { label: "Viewer",      color: "#6B7280", bg: "#F9FAFB" },
-  [Role.Cashier]:    { label: "Cashier",     color: "#C2410C", bg: "#FFF7ED" },
+  [Role.Admin]: { label: "Admin", color: "#1D4ED8", bg: "#EFF6FF" },
+  [Role.Manager]: { label: "Manager", color: "#047857", bg: "#ECFDF5" },
+  [Role.Accountant]: { label: "Accountant", color: "#B45309", bg: "#FFFBEB" },
+  [Role.Viewer]: { label: "Viewer", color: "#6B7280", bg: "#F9FAFB" },
+  [Role.Cashier]: { label: "Cashier", color: "#C2410C", bg: "#FFF7ED" },
 };
 
 interface AuthContextValue {
@@ -42,10 +57,18 @@ function loadFromStorage<T>(key: string): T | null {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(() => loadFromStorage<User>(USER_STORAGE_KEY));
-  const [tenant, setTenant] = useState<Tenant | null>(() => loadFromStorage<Tenant>(TENANT_STORAGE_KEY));
-  const [branches, setBranches] = useState<Branch[]>(() => loadFromStorage<Branch[]>(BRANCHES_STORAGE_KEY) ?? []);
-  const [selectedBranch, setSelectedBranch] = useState<Branch | null>(() => loadFromStorage<Branch>(SELECTED_BRANCH_KEY));
+  const [user, setUser] = useState<User | null>(() =>
+    loadFromStorage<User>(USER_STORAGE_KEY)
+  );
+  const [tenant, setTenant] = useState<Tenant | null>(() =>
+    loadFromStorage<Tenant>(TENANT_STORAGE_KEY)
+  );
+  const [branches, setBranches] = useState<Branch[]>(
+    () => loadFromStorage<Branch[]>(BRANCHES_STORAGE_KEY) ?? []
+  );
+  const [selectedBranch, setSelectedBranch] = useState<Branch | null>(() =>
+    loadFromStorage<Branch>(SELECTED_BRANCH_KEY)
+  );
   const [isLoading, setIsLoading] = useState(() => !!getAccessToken());
 
   const clearAuth = useCallback(() => {
@@ -72,8 +95,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     // Try to refresh the token to validate the session
-    authService.refresh(refresh)
-      .then((res) => {
+    authService
+      .refresh(refresh)
+      .then(res => {
         setTokens(res.accessToken, res.refreshToken);
       })
       .catch(() => {
@@ -117,18 +141,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{
-      user,
-      tenant,
-      branches,
-      selectedBranch,
-      isAuthenticated: !!user && !!getAccessToken(),
-      isLoading,
-      isCashier: user?.role === Role.Cashier || (user?.roles ?? []).some(r => r.name.toLowerCase() === "cashier"),
-      login,
-      logout,
-      selectBranch,
-    }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        tenant,
+        branches,
+        selectedBranch,
+        isAuthenticated: !!user && !!getAccessToken(),
+        isLoading,
+        isCashier:
+          user?.role === Role.Cashier ||
+          (user?.roles ?? []).some(r => r.name.toLowerCase() === "cashier"),
+        login,
+        logout,
+        selectBranch,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

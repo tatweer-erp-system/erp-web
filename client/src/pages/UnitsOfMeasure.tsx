@@ -12,8 +12,12 @@ export default function UnitsOfMeasure() {
       ]}
     >
       <Card className="p-8 text-center">
-        <h2 className="text-2xl font-bold text-foreground mb-2">UnitsOfMeasure</h2>
-        <p className="text-muted-foreground">This page is coming soon. Content will be added here.</p>
+        <h2 className="text-2xl font-bold text-foreground mb-2">
+          UnitsOfMeasure
+        </h2>
+        <p className="text-muted-foreground">
+          This page is coming soon. Content will be added here.
+        </p>
       </Card>
     </DashboardLayout>
   );

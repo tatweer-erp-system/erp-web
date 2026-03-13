@@ -1,40 +1,82 @@
 import { useParams } from "wouter";
 import { useLocation } from "wouter";
 import {
-  Alert, Button, Card, Col, Form, Input, InputNumber,
-  Row, Select, Space, Switch, Typography, message, theme as antTheme,
+  Alert,
+  Button,
+  Card,
+  Col,
+  Form,
+  Input,
+  InputNumber,
+  Row,
+  Select,
+  Space,
+  Switch,
+  Typography,
+  message,
+  theme as antTheme,
 } from "antd";
 import {
-  CarOutlined, DollarOutlined, FileTextOutlined,
-  SaveOutlined, SettingOutlined, ShoppingOutlined, UndoOutlined, PercentageOutlined,
+  CarOutlined,
+  DollarOutlined,
+  FileTextOutlined,
+  SaveOutlined,
+  SettingOutlined,
+  ShoppingOutlined,
+  UndoOutlined,
+  PercentageOutlined,
 } from "@ant-design/icons";
 
 const { Title, Text } = Typography;
 
 const TABS = [
-  { key: "general",   label: "General",          icon: <SettingOutlined /> },
-  { key: "orders",    label: "Purchase Orders",   icon: <ShoppingOutlined /> },
-  { key: "vendors",   label: "Vendors",           icon: <CarOutlined /> },
-  { key: "receiving", label: "Receiving",         icon: <FileTextOutlined /> },
-  { key: "numbering", label: "Numbering Series",  icon: <FileTextOutlined /> },
-  { key: "returns",   label: "Returns",           icon: <UndoOutlined /> },
-  { key: "tax",       label: "Tax Settings",      icon: <PercentageOutlined /> },
+  { key: "general", label: "General", icon: <SettingOutlined /> },
+  { key: "orders", label: "Purchase Orders", icon: <ShoppingOutlined /> },
+  { key: "vendors", label: "Vendors", icon: <CarOutlined /> },
+  { key: "receiving", label: "Receiving", icon: <FileTextOutlined /> },
+  { key: "numbering", label: "Numbering Series", icon: <FileTextOutlined /> },
+  { key: "returns", label: "Returns", icon: <UndoOutlined /> },
+  { key: "tax", label: "Tax Settings", icon: <PercentageOutlined /> },
 ];
 
-function Section({ title, description, children }: { title?: string; description?: string; children: React.ReactNode }) {
+function Section({
+  title,
+  description,
+  children,
+}: {
+  title?: string;
+  description?: string;
+  children: React.ReactNode;
+}) {
   const { token } = antTheme.useToken();
   return (
-    <div style={{
-      background: token.colorBgContainer,
-      border: `1px solid ${token.colorBorderSecondary}`,
-      borderRadius: token.borderRadiusLG,
-      overflow: "hidden",
-      marginBottom: 16,
-    }}>
+    <div
+      style={{
+        background: token.colorBgContainer,
+        border: `1px solid ${token.colorBorderSecondary}`,
+        borderRadius: token.borderRadiusLG,
+        overflow: "hidden",
+        marginBottom: 16,
+      }}
+    >
       {title && (
-        <div style={{ padding: "14px 20px", borderBottom: `1px solid ${token.colorBorderSecondary}` }}>
-          <Text strong style={{ fontSize: 13 }}>{title}</Text>
-          {description && <><br /><Text type="secondary" style={{ fontSize: 12 }}>{description}</Text></>}
+        <div
+          style={{
+            padding: "14px 20px",
+            borderBottom: `1px solid ${token.colorBorderSecondary}`,
+          }}
+        >
+          <Text strong style={{ fontSize: 13 }}>
+            {title}
+          </Text>
+          {description && (
+            <>
+              <br />
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                {description}
+              </Text>
+            </>
+          )}
         </div>
       )}
       <div style={{ padding: 20 }}>{children}</div>
@@ -45,7 +87,9 @@ function Section({ title, description, children }: { title?: string; description
 function SaveRow({ onSave }: { onSave: () => void }) {
   return (
     <div style={{ display: "flex", justifyContent: "flex-end" }}>
-      <Button type="primary" icon={<SaveOutlined />} onClick={onSave}>Save Changes</Button>
+      <Button type="primary" icon={<SaveOutlined />} onClick={onSave}>
+        Save Changes
+      </Button>
     </div>
   );
 }
@@ -57,34 +101,54 @@ function GeneralTab() {
         <Form layout="vertical">
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
-              <Form.Item label="Default Payment Terms" style={{ marginBottom: 16 }}>
-                <Select defaultValue="net30" options={[
-                  { value: "immediate", label: "Immediate" },
-                  { value: "net15",     label: "Net 15 days" },
-                  { value: "net30",     label: "Net 30 days" },
-                  { value: "net60",     label: "Net 60 days" },
-                  { value: "net90",     label: "Net 90 days" },
-                ]} />
+              <Form.Item
+                label="Default Payment Terms"
+                style={{ marginBottom: 16 }}
+              >
+                <Select
+                  defaultValue="net30"
+                  options={[
+                    { value: "immediate", label: "Immediate" },
+                    { value: "net15", label: "Net 15 days" },
+                    { value: "net30", label: "Net 30 days" },
+                    { value: "net60", label: "Net 60 days" },
+                    { value: "net90", label: "Net 90 days" },
+                  ]}
+                />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item label="Default Currency" style={{ marginBottom: 16 }}>
-                <Select defaultValue="USD" options={[
-                  { value: "USD", label: "US Dollar (USD)" },
-                  { value: "EUR", label: "Euro (EUR)" },
-                  { value: "GBP", label: "British Pound (GBP)" },
-                  { value: "AED", label: "UAE Dirham (AED)" },
-                  { value: "SAR", label: "Saudi Riyal (SAR)" },
-                ]} />
+                <Select
+                  defaultValue="USD"
+                  options={[
+                    { value: "USD", label: "US Dollar (USD)" },
+                    { value: "EUR", label: "Euro (EUR)" },
+                    { value: "GBP", label: "British Pound (GBP)" },
+                    { value: "AED", label: "UAE Dirham (AED)" },
+                    { value: "SAR", label: "Saudi Riyal (SAR)" },
+                  ]}
+                />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Default Delivery Lead Time (days)" style={{ marginBottom: 16 }}>
-                <InputNumber defaultValue={7} min={0} style={{ width: "100%" }} addonAfter="days" />
+              <Form.Item
+                label="Default Delivery Lead Time (days)"
+                style={{ marginBottom: 16 }}
+              >
+                <InputNumber
+                  defaultValue={7}
+                  min={0}
+                  style={{ width: "100%" }}
+                  addonAfter="days"
+                />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Auto-send PO to vendor" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label="Auto-send PO to vendor"
+                style={{ marginBottom: 16 }}
+              >
                 <Switch />
               </Form.Item>
             </Col>
@@ -103,37 +167,69 @@ function OrdersTab() {
         <Form layout="vertical">
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
-              <Form.Item label="Purchase Order Approval" style={{ marginBottom: 16 }}>
-                <Select defaultValue="auto" options={[
-                  { value: "auto",   label: "Auto-confirm" },
-                  { value: "manual", label: "Require approval" },
-                  { value: "above",  label: "Require approval above amount" },
-                ]} />
+              <Form.Item
+                label="Purchase Order Approval"
+                style={{ marginBottom: 16 }}
+              >
+                <Select
+                  defaultValue="auto"
+                  options={[
+                    { value: "auto", label: "Auto-confirm" },
+                    { value: "manual", label: "Require approval" },
+                    { value: "above", label: "Require approval above amount" },
+                  ]}
+                />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Approval threshold amount" style={{ marginBottom: 16 }}>
-                <InputNumber defaultValue={10000} min={0} style={{ width: "100%" }} addonBefore="$" />
+              <Form.Item
+                label="Approval threshold amount"
+                style={{ marginBottom: 16 }}
+              >
+                <InputNumber
+                  defaultValue={10000}
+                  min={0}
+                  style={{ width: "100%" }}
+                  addonBefore="$"
+                />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Allow partial receiving" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label="Allow partial receiving"
+                style={{ marginBottom: 16 }}
+              >
                 <Switch defaultChecked />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Lock confirmed POs" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label="Lock confirmed POs"
+                style={{ marginBottom: 16 }}
+              >
                 <Switch defaultChecked />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Allow over-receipt (above ordered qty)" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label="Allow over-receipt (above ordered qty)"
+                style={{ marginBottom: 16 }}
+              >
                 <Switch />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Over-receipt tolerance (%)" style={{ marginBottom: 16 }}>
-                <InputNumber defaultValue={5} min={0} max={100} style={{ width: "100%" }} addonAfter="%" />
+              <Form.Item
+                label="Over-receipt tolerance (%)"
+                style={{ marginBottom: 16 }}
+              >
+                <InputNumber
+                  defaultValue={5}
+                  min={0}
+                  max={100}
+                  style={{ width: "100%" }}
+                  addonAfter="%"
+                />
               </Form.Item>
             </Col>
           </Row>
@@ -151,31 +247,49 @@ function VendorsTab() {
         <Form layout="vertical">
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
-              <Form.Item label="Default Vendor Payment Method" style={{ marginBottom: 16 }}>
-                <Select defaultValue="bank" options={[
-                  { value: "bank",   label: "Bank Transfer" },
-                  { value: "check",  label: "Check" },
-                  { value: "cash",   label: "Cash" },
-                  { value: "card",   label: "Credit Card" },
-                ]} />
+              <Form.Item
+                label="Default Vendor Payment Method"
+                style={{ marginBottom: 16 }}
+              >
+                <Select
+                  defaultValue="bank"
+                  options={[
+                    { value: "bank", label: "Bank Transfer" },
+                    { value: "check", label: "Check" },
+                    { value: "cash", label: "Cash" },
+                    { value: "card", label: "Credit Card" },
+                  ]}
+                />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Default Tax for Purchases" style={{ marginBottom: 16 }}>
-                <Select defaultValue="vat15" options={[
-                  { value: "none",  label: "No Tax" },
-                  { value: "vat5",  label: "VAT 5%" },
-                  { value: "vat15", label: "VAT 15%" },
-                ]} />
+              <Form.Item
+                label="Default Tax for Purchases"
+                style={{ marginBottom: 16 }}
+              >
+                <Select
+                  defaultValue="vat15"
+                  options={[
+                    { value: "none", label: "No Tax" },
+                    { value: "vat5", label: "VAT 5%" },
+                    { value: "vat15", label: "VAT 15%" },
+                  ]}
+                />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Require vendor approval before ordering" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label="Require vendor approval before ordering"
+                style={{ marginBottom: 16 }}
+              >
                 <Switch />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Allow purchase from unapproved vendors" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label="Allow purchase from unapproved vendors"
+                style={{ marginBottom: 16 }}
+              >
                 <Switch defaultChecked />
               </Form.Item>
             </Col>
@@ -194,30 +308,48 @@ function ReceivingTab() {
         <Form layout="vertical">
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
-              <Form.Item label="Require quality inspection on receipt" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label="Require quality inspection on receipt"
+                style={{ marginBottom: 16 }}
+              >
                 <Switch />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Auto-validate receipt" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label="Auto-validate receipt"
+                style={{ marginBottom: 16 }}
+              >
                 <Switch />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Default destination warehouse" style={{ marginBottom: 16 }}>
-                <Select defaultValue="main" options={[
-                  { value: "main",   label: "Main Warehouse" },
-                  { value: "store1", label: "Store 1" },
-                ]} />
+              <Form.Item
+                label="Default destination warehouse"
+                style={{ marginBottom: 16 }}
+              >
+                <Select
+                  defaultValue="main"
+                  options={[
+                    { value: "main", label: "Main Warehouse" },
+                    { value: "store1", label: "Store 1" },
+                  ]}
+                />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Create bill on receipt" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label="Create bill on receipt"
+                style={{ marginBottom: 16 }}
+              >
                 <Switch />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="3-way matching (PO → Receipt → Invoice)" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label="3-way matching (PO → Receipt → Invoice)"
+                style={{ marginBottom: 16 }}
+              >
                 <Switch defaultChecked />
               </Form.Item>
             </Col>
@@ -231,15 +363,20 @@ function ReceivingTab() {
 
 function NumberingTab() {
   const series = [
-    { label: "Purchase Orders",    prefix: "PO-",  next: 4001 },
-    { label: "Purchase Invoices",  prefix: "BILL-",next: 2001 },
-    { label: "Goods Receipts",     prefix: "GRN-", next: 1001 },
-    { label: "Debit Notes",        prefix: "DN-",  next: 101  },
+    { label: "Purchase Orders", prefix: "PO-", next: 4001 },
+    { label: "Purchase Invoices", prefix: "BILL-", next: 2001 },
+    { label: "Goods Receipts", prefix: "GRN-", next: 1001 },
+    { label: "Debit Notes", prefix: "DN-", next: 101 },
   ];
   return (
     <>
-      <Alert type="info" showIcon message="Changes to numbering series only affect new documents." style={{ marginBottom: 16, fontSize: 12 }} />
-      {series.map((s) => (
+      <Alert
+        type="info"
+        showIcon
+        message="Changes to numbering series only affect new documents."
+        style={{ marginBottom: 16, fontSize: 12 }}
+      />
+      {series.map(s => (
         <Section key={s.label} title={s.label}>
           <Form layout="vertical">
             <Row gutter={[16, 0]}>
@@ -250,12 +387,22 @@ function NumberingTab() {
               </Col>
               <Col xs={24} sm={8}>
                 <Form.Item label="Next Number" style={{ marginBottom: 0 }}>
-                  <InputNumber defaultValue={s.next} min={1} style={{ width: "100%" }} />
+                  <InputNumber
+                    defaultValue={s.next}
+                    min={1}
+                    style={{ width: "100%" }}
+                  />
                 </Form.Item>
               </Col>
               <Col xs={24} sm={8}>
                 <Form.Item label="Padding" style={{ marginBottom: 0 }}>
-                  <Select defaultValue={4} options={[3,4,5,6].map(v => ({ value: v, label: `${v} digits` }))} />
+                  <Select
+                    defaultValue={4}
+                    options={[3, 4, 5, 6].map(v => ({
+                      value: v,
+                      label: `${v} digits`,
+                    }))}
+                  />
                 </Form.Item>
               </Col>
             </Row>
@@ -274,22 +421,34 @@ function ReturnsTab() {
         <Form layout="vertical">
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
-              <Form.Item label="Allow purchase returns" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label="Allow purchase returns"
+                style={{ marginBottom: 16 }}
+              >
                 <Switch defaultChecked />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Require reason for return" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label="Require reason for return"
+                style={{ marginBottom: 16 }}
+              >
                 <Switch defaultChecked />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Require approval for returns" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label="Require approval for returns"
+                style={{ marginBottom: 16 }}
+              >
                 <Switch />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Auto-deduct from vendor balance" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label="Auto-deduct from vendor balance"
+                style={{ marginBottom: 16 }}
+              >
                 <Switch defaultChecked />
               </Form.Item>
             </Col>
@@ -308,17 +467,26 @@ function TaxTab() {
         <Form layout="vertical">
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
-              <Form.Item label="Default Input Tax (VAT)" style={{ marginBottom: 16 }}>
-                <Select defaultValue="vat15" options={[
-                  { value: "none",  label: "No Tax" },
-                  { value: "vat5",  label: "VAT 5%" },
-                  { value: "vat15", label: "VAT 15%" },
-                  { value: "vat20", label: "VAT 20%" },
-                ]} />
+              <Form.Item
+                label="Default Input Tax (VAT)"
+                style={{ marginBottom: 16 }}
+              >
+                <Select
+                  defaultValue="vat15"
+                  options={[
+                    { value: "none", label: "No Tax" },
+                    { value: "vat5", label: "VAT 5%" },
+                    { value: "vat15", label: "VAT 15%" },
+                    { value: "vat20", label: "VAT 20%" },
+                  ]}
+                />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Show tax on purchase documents" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label="Show tax on purchase documents"
+                style={{ marginBottom: 16 }}
+              >
                 <Switch defaultChecked />
               </Form.Item>
             </Col>
@@ -328,8 +496,17 @@ function TaxTab() {
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Withholding Tax Rate (%)" style={{ marginBottom: 16 }}>
-                <InputNumber defaultValue={5} min={0} max={100} style={{ width: "100%" }} addonAfter="%" />
+              <Form.Item
+                label="Withholding Tax Rate (%)"
+                style={{ marginBottom: 16 }}
+              >
+                <InputNumber
+                  defaultValue={5}
+                  min={0}
+                  max={100}
+                  style={{ width: "100%" }}
+                  addonAfter="%"
+                />
               </Form.Item>
             </Col>
           </Row>
@@ -347,63 +524,115 @@ export default function PurchasesSettings() {
   const activeTab = params.tab ?? "general";
 
   const tabContent: Record<string, React.ReactNode> = {
-    general:   <GeneralTab />,
-    orders:    <OrdersTab />,
-    vendors:   <VendorsTab />,
+    general: <GeneralTab />,
+    orders: <OrdersTab />,
+    vendors: <VendorsTab />,
     receiving: <ReceivingTab />,
     numbering: <NumberingTab />,
-    returns:   <ReturnsTab />,
-    tax:       <TaxTab />,
+    returns: <ReturnsTab />,
+    tax: <TaxTab />,
   };
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-        <div style={{
-          width: 44, height: 44, borderRadius: 12, flexShrink: 0,
-          background: `linear-gradient(135deg, ${token.colorPrimary}dd, ${token.colorPrimary}88)`,
-          display: "flex", alignItems: "center", justifyContent: "center",
-        }}>
+        <div
+          style={{
+            width: 44,
+            height: 44,
+            borderRadius: 12,
+            flexShrink: 0,
+            background: `linear-gradient(135deg, ${token.colorPrimary}dd, ${token.colorPrimary}88)`,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           <ShoppingOutlined style={{ fontSize: 20, color: "#fff" }} />
         </div>
         <div>
-          <Title level={5} style={{ margin: 0 }}>Purchases Settings</Title>
-          <Text type="secondary" style={{ fontSize: 12 }}>Configure purchase orders, vendor policies, and receiving</Text>
+          <Title level={5} style={{ margin: 0 }}>
+            Purchases Settings
+          </Title>
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            Configure purchase orders, vendor policies, and receiving
+          </Text>
         </div>
       </div>
 
       <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
         <Card
-          style={{ border: `1px solid ${token.colorBorderSecondary}`, borderRadius: token.borderRadiusLG, width: 210, flexShrink: 0 }}
+          style={{
+            border: `1px solid ${token.colorBorderSecondary}`,
+            borderRadius: token.borderRadiusLG,
+            width: 210,
+            flexShrink: 0,
+          }}
           styles={{ body: { padding: "8px 0" } }}
         >
-          {TABS.map((tab) => (
+          {TABS.map(tab => (
             <button
               key={tab.key}
               onClick={() => setLocation(`/settings/purchases/${tab.key}`)}
               style={{
-                width: "100%", display: "flex", alignItems: "center", gap: 10,
-                padding: "9px 16px", background: activeTab === tab.key ? token.colorPrimaryBg : "transparent",
-                color: activeTab === tab.key ? token.colorPrimary : token.colorText,
-                border: "none", cursor: "pointer", fontSize: 13,
+                width: "100%",
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                padding: "9px 16px",
+                background:
+                  activeTab === tab.key ? token.colorPrimaryBg : "transparent",
+                color:
+                  activeTab === tab.key ? token.colorPrimary : token.colorText,
+                border: "none",
+                cursor: "pointer",
+                fontSize: 13,
                 fontWeight: activeTab === tab.key ? 600 : 400,
-                transition: "background 0.15s, color 0.15s", textAlign: "left",
+                transition: "background 0.15s, color 0.15s",
+                textAlign: "left",
               }}
-              onMouseEnter={(e) => { if (activeTab !== tab.key) (e.currentTarget as HTMLButtonElement).style.background = token.colorFillAlter; }}
-              onMouseLeave={(e) => { if (activeTab !== tab.key) (e.currentTarget as HTMLButtonElement).style.background = "transparent"; }}
+              onMouseEnter={e => {
+                if (activeTab !== tab.key)
+                  (e.currentTarget as HTMLButtonElement).style.background =
+                    token.colorFillAlter;
+              }}
+              onMouseLeave={e => {
+                if (activeTab !== tab.key)
+                  (e.currentTarget as HTMLButtonElement).style.background =
+                    "transparent";
+              }}
             >
-              <span style={{ fontSize: 14, opacity: activeTab === tab.key ? 1 : 0.55 }}>{tab.icon}</span>
+              <span
+                style={{
+                  fontSize: 14,
+                  opacity: activeTab === tab.key ? 1 : 0.55,
+                }}
+              >
+                {tab.icon}
+              </span>
               <span style={{ flex: 1 }}>{tab.label}</span>
             </button>
           ))}
         </Card>
 
         <Card
-          style={{ border: `1px solid ${token.colorBorderSecondary}`, borderRadius: token.borderRadiusLG, flex: 1, minWidth: 0 }}
+          style={{
+            border: `1px solid ${token.colorBorderSecondary}`,
+            borderRadius: token.borderRadiusLG,
+            flex: 1,
+            minWidth: 0,
+          }}
           styles={{ body: { padding: 24 } }}
-          title={<Space>{TABS.find(t => t.key === activeTab)?.icon}<Text strong>{TABS.find(t => t.key === activeTab)?.label}</Text></Space>}
+          title={
+            <Space>
+              {TABS.find(t => t.key === activeTab)?.icon}
+              <Text strong>{TABS.find(t => t.key === activeTab)?.label}</Text>
+            </Space>
+          }
         >
-          {tabContent[activeTab] ?? <Alert type="info" message="Content coming soon" />}
+          {tabContent[activeTab] ?? (
+            <Alert type="info" message="Content coming soon" />
+          )}
         </Card>
       </div>
     </div>

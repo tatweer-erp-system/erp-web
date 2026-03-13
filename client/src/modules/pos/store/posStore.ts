@@ -2,7 +2,11 @@ import { create } from "zustand";
 import type { Product } from "../data/mockProducts";
 import type { OrderResult } from "../services/posService";
 import type { Customer } from "../data/mockCustomers";
-import { getTier, DEFAULT_EARN_RATIO, DEFAULT_REDEEM_RATIO } from "../data/mockCustomers";
+import {
+  getTier,
+  DEFAULT_EARN_RATIO,
+  DEFAULT_REDEEM_RATIO,
+} from "../data/mockCustomers";
 import type { CashierRole } from "../services/cashierAuthService";
 import type { RestaurantTable } from "../data/mockRestaurant";
 
@@ -152,7 +156,11 @@ function flatFromOrder(order: OrderTab): Partial<POSState> {
 }
 
 /** Write the current flat-state back into orders[idx] */
-function syncOrder(state: POSState, idx: number, patch: Partial<OrderTab>): OrderTab[] {
+function syncOrder(
+  state: POSState,
+  idx: number,
+  patch: Partial<OrderTab>
+): OrderTab[] {
   const newOrders = [...state.orders];
   newOrders[idx] = { ...newOrders[idx], ...patch };
   return newOrders;
@@ -165,7 +173,10 @@ function mergeCartItems(arrays: CartItem[][]): CartItem[] {
     for (const item of items) {
       const existing = map.get(item.product.id);
       if (existing) {
-        map.set(item.product.id, { ...existing, quantity: existing.quantity + item.quantity });
+        map.set(item.product.id, {
+          ...existing,
+          quantity: existing.quantity + item.quantity,
+        });
       } else {
         map.set(item.product.id, { ...item });
       }
@@ -343,7 +354,7 @@ export const usePOSStore = create<POSState>()((set, get) => ({
   maxOrders: 5,
 
   addOrder() {
-    set((state) => {
+    set(state => {
       if (state.orders.length >= state.maxOrders) return state;
       const newOrder = createEmptyOrder();
       const newOrders = [...state.orders, newOrder];
@@ -356,12 +367,13 @@ export const usePOSStore = create<POSState>()((set, get) => ({
   },
 
   removeOrder(index) {
-    set((state) => {
+    set(state => {
       if (state.orders.length <= 1) return state;
       const newOrders = state.orders.filter((_, i) => i !== index);
       let newActive = state.activeOrderIndex;
       if (index < state.activeOrderIndex) newActive--;
-      else if (index === state.activeOrderIndex) newActive = Math.max(0, index - 1);
+      else if (index === state.activeOrderIndex)
+        newActive = Math.max(0, index - 1);
       newActive = Math.min(newActive, newOrders.length - 1);
       const target = newOrders[newActive];
       return {
@@ -373,7 +385,7 @@ export const usePOSStore = create<POSState>()((set, get) => ({
   },
 
   switchOrder(index) {
-    set((state) => {
+    set(state => {
       if (index === state.activeOrderIndex) return state;
       const target = state.orders[index];
       if (!target) return state;
@@ -385,17 +397,18 @@ export const usePOSStore = create<POSState>()((set, get) => ({
   },
 
   mergeOrders(indices, keepCustomerFromIndex) {
-    set((state) => {
+    set(state => {
       if (indices.length < 2) return state;
-      const toMerge = indices.map((i) => state.orders[i]);
-      const mergedItems = mergeCartItems(toMerge.map((o) => o.cartItems));
+      const toMerge = indices.map(i => state.orders[i]);
+      const mergedItems = mergeCartItems(toMerge.map(o => o.cartItems));
 
       // Resolve customer
       let customer: Customer | null = null;
       if (keepCustomerFromIndex !== undefined) {
         customer = toMerge[keepCustomerFromIndex]?.attachedCustomer ?? null;
       } else {
-        customer = toMerge.find((o) => o.attachedCustomer)?.attachedCustomer ?? null;
+        customer =
+          toMerge.find(o => o.attachedCustomer)?.attachedCustomer ?? null;
       }
 
       const mergedOrder: OrderTab = {
@@ -437,11 +450,11 @@ export const usePOSStore = create<POSState>()((set, get) => ({
   cartItems: INITIAL_ORDER.cartItems,
 
   addToCart(product) {
-    set((state) => {
+    set(state => {
       const idx = state.activeOrderIndex;
-      const existing = state.cartItems.find((i) => i.product.id === product.id);
+      const existing = state.cartItems.find(i => i.product.id === product.id);
       const newCartItems = existing
-        ? state.cartItems.map((i) =>
+        ? state.cartItems.map(i =>
             i.product.id === product.id ? { ...i, quantity: i.quantity + 1 } : i
           )
         : [...state.cartItems, { product, quantity: 1 }];
@@ -453,9 +466,11 @@ export const usePOSStore = create<POSState>()((set, get) => ({
   },
 
   removeFromCart(productId) {
-    set((state) => {
+    set(state => {
       const idx = state.activeOrderIndex;
-      const newCartItems = state.cartItems.filter((i) => i.product.id !== productId);
+      const newCartItems = state.cartItems.filter(
+        i => i.product.id !== productId
+      );
       return {
         cartItems: newCartItems,
         orders: syncOrder(state, idx, { cartItems: newCartItems }),
@@ -468,9 +483,9 @@ export const usePOSStore = create<POSState>()((set, get) => ({
       get().removeFromCart(productId);
       return;
     }
-    set((state) => {
+    set(state => {
       const idx = state.activeOrderIndex;
-      const newCartItems = state.cartItems.map((i) =>
+      const newCartItems = state.cartItems.map(i =>
         i.product.id === productId ? { ...i, quantity } : i
       );
       return {
@@ -482,7 +497,7 @@ export const usePOSStore = create<POSState>()((set, get) => ({
 
   clearCart() {
     const empty = createEmptyOrder();
-    set((state) => {
+    set(state => {
       const idx = state.activeOrderIndex;
       const clearedOrder: OrderTab = { ...empty, id: state.orders[idx].id };
       return {
@@ -510,10 +525,13 @@ export const usePOSStore = create<POSState>()((set, get) => ({
   attachedCustomer: INITIAL_ORDER.attachedCustomer,
 
   setAttachedCustomer(customer) {
-    set((state) => ({
+    set(state => ({
       attachedCustomer: customer,
       redeemPoints: 0,
-      orders: syncOrder(state, state.activeOrderIndex, { attachedCustomer: customer, redeemPoints: 0 }),
+      orders: syncOrder(state, state.activeOrderIndex, {
+        attachedCustomer: customer,
+        redeemPoints: 0,
+      }),
     }));
   },
 
@@ -524,9 +542,11 @@ export const usePOSStore = create<POSState>()((set, get) => ({
     const { attachedCustomer } = get();
     const maxPoints = attachedCustomer?.loyaltyPoints ?? 0;
     const clamped = Math.max(0, Math.min(Math.floor(points), maxPoints));
-    set((state) => ({
+    set(state => ({
       redeemPoints: clamped,
-      orders: syncOrder(state, state.activeOrderIndex, { redeemPoints: clamped }),
+      orders: syncOrder(state, state.activeOrderIndex, {
+        redeemPoints: clamped,
+      }),
     }));
   },
 
@@ -534,7 +554,7 @@ export const usePOSStore = create<POSState>()((set, get) => ({
   appliedVoucher: null,
 
   setAppliedVoucher(v) {
-    set((state) => ({
+    set(state => ({
       appliedVoucher: v,
       orders: syncOrder(state, state.activeOrderIndex, { appliedVoucher: v }),
     }));
@@ -544,22 +564,26 @@ export const usePOSStore = create<POSState>()((set, get) => ({
   appliedGiftCards: [],
 
   addGiftCard(gc) {
-    set((state) => {
-      if (state.appliedGiftCards.some((c) => c.code === gc.code)) return state;
+    set(state => {
+      if (state.appliedGiftCards.some(c => c.code === gc.code)) return state;
       const newCards = [...state.appliedGiftCards, gc];
       return {
         appliedGiftCards: newCards,
-        orders: syncOrder(state, state.activeOrderIndex, { appliedGiftCards: newCards }),
+        orders: syncOrder(state, state.activeOrderIndex, {
+          appliedGiftCards: newCards,
+        }),
       };
     });
   },
 
   removeGiftCard(code) {
-    set((state) => {
-      const newCards = state.appliedGiftCards.filter((c) => c.code !== code);
+    set(state => {
+      const newCards = state.appliedGiftCards.filter(c => c.code !== code);
       return {
         appliedGiftCards: newCards,
-        orders: syncOrder(state, state.activeOrderIndex, { appliedGiftCards: newCards }),
+        orders: syncOrder(state, state.activeOrderIndex, {
+          appliedGiftCards: newCards,
+        }),
       };
     });
   },
@@ -567,15 +591,17 @@ export const usePOSStore = create<POSState>()((set, get) => ({
   // ── Payment ───────────────────────────────────────────────────────────────
   paymentMethod: "cash",
   setPaymentMethod(method) {
-    set((state) => ({
+    set(state => ({
       paymentMethod: method,
-      orders: syncOrder(state, state.activeOrderIndex, { paymentMethod: method }),
+      orders: syncOrder(state, state.activeOrderIndex, {
+        paymentMethod: method,
+      }),
     }));
   },
 
   cashGiven: 0,
   setCashGiven(amount) {
-    set((state) => ({
+    set(state => ({
       cashGiven: amount,
       orders: syncOrder(state, state.activeOrderIndex, { cashGiven: amount }),
     }));
@@ -583,7 +609,7 @@ export const usePOSStore = create<POSState>()((set, get) => ({
 
   cardRef: "",
   setCardRef(ref) {
-    set((state) => ({
+    set(state => ({
       cardRef: ref,
       orders: syncOrder(state, state.activeOrderIndex, { cardRef: ref }),
     }));
@@ -591,7 +617,7 @@ export const usePOSStore = create<POSState>()((set, get) => ({
 
   splitCash: 0,
   setSplitCash(amount) {
-    set((state) => ({
+    set(state => ({
       splitCash: amount,
       orders: syncOrder(state, state.activeOrderIndex, { splitCash: amount }),
     }));
@@ -599,7 +625,7 @@ export const usePOSStore = create<POSState>()((set, get) => ({
 
   splitCard: 0,
   setSplitCard(amount) {
-    set((state) => ({
+    set(state => ({
       splitCard: amount,
       orders: syncOrder(state, state.activeOrderIndex, { splitCard: amount }),
     }));
@@ -607,7 +633,7 @@ export const usePOSStore = create<POSState>()((set, get) => ({
 
   splitCardRef: "",
   setSplitCardRef(ref) {
-    set((state) => ({
+    set(state => ({
       splitCardRef: ref,
       orders: syncOrder(state, state.activeOrderIndex, { splitCardRef: ref }),
     }));
@@ -617,7 +643,7 @@ export const usePOSStore = create<POSState>()((set, get) => ({
   discount: { type: "percent", value: 0 },
 
   setDiscount(discount) {
-    set((state) => ({
+    set(state => ({
       discount,
       orders: syncOrder(state, state.activeOrderIndex, { discount }),
     }));
@@ -635,21 +661,21 @@ export const usePOSStore = create<POSState>()((set, get) => ({
       customer: attachedCustomer,
       savedAt: new Date().toLocaleTimeString(),
     };
-    set((state) => ({ heldOrders: [...state.heldOrders, heldOrder] }));
+    set(state => ({ heldOrders: [...state.heldOrders, heldOrder] }));
     get().clearCart();
   },
 
   resumeOrder(id) {
     const { heldOrders } = get();
-    const order = heldOrders.find((o) => o.id === id);
+    const order = heldOrders.find(o => o.id === id);
     if (!order) return;
-    set((state) => ({
+    set(state => ({
       cartItems: order.items,
       attachedCustomer: order.customer,
       redeemPoints: 0,
       appliedVoucher: null,
       appliedGiftCards: [],
-      heldOrders: heldOrders.filter((o) => o.id !== id),
+      heldOrders: heldOrders.filter(o => o.id !== id),
       orders: syncOrder(state, state.activeOrderIndex, {
         cartItems: order.items,
         attachedCustomer: order.customer,
@@ -667,42 +693,48 @@ export const usePOSStore = create<POSState>()((set, get) => ({
       if (!stored) return null;
       const s = JSON.parse(stored) as CashierSession;
       return { ...s, loginTime: new Date(s.loginTime) };
-    } catch { return null; }
+    } catch {
+      return null;
+    }
   })(),
 
   setCashierSession(session) {
-    if (session) localStorage.setItem("pos-cashier-session", JSON.stringify(session));
+    if (session)
+      localStorage.setItem("pos-cashier-session", JSON.stringify(session));
     else localStorage.removeItem("pos-cashier-session");
     set({ cashierSession: session });
   },
 
   lockSession() {
-    set((state) => {
-      const updated = state.cashierSession ? { ...state.cashierSession, isLocked: true } : null;
-      if (updated) localStorage.setItem("pos-cashier-session", JSON.stringify(updated));
+    set(state => {
+      const updated = state.cashierSession
+        ? { ...state.cashierSession, isLocked: true }
+        : null;
+      if (updated)
+        localStorage.setItem("pos-cashier-session", JSON.stringify(updated));
       return { cashierSession: updated };
     });
   },
 
   unlockSession() {
-    set((state) => {
-      const updated = state.cashierSession ? { ...state.cashierSession, isLocked: false } : null;
-      if (updated) localStorage.setItem("pos-cashier-session", JSON.stringify(updated));
+    set(state => {
+      const updated = state.cashierSession
+        ? { ...state.cashierSession, isLocked: false }
+        : null;
+      if (updated)
+        localStorage.setItem("pos-cashier-session", JSON.stringify(updated));
       return { cashierSession: updated };
     });
   },
 
   // ── Cash drawer ───────────────────────────────────────────────────────────
   openingFloat: 0,
-  setOpeningFloat: (n) => set({ openingFloat: n }),
+  setOpeningFloat: n => set({ openingFloat: n }),
   cashMovements: [],
 
   addCashMovement(m) {
-    set((state) => ({
-      cashMovements: [
-        ...state.cashMovements,
-        { ...m, id: `cm-${Date.now()}` },
-      ],
+    set(state => ({
+      cashMovements: [...state.cashMovements, { ...m, id: `cm-${Date.now()}` }],
     }));
   },
 
@@ -718,38 +750,40 @@ export const usePOSStore = create<POSState>()((set, get) => ({
   overrideLog: [],
 
   addOverrideLog(r) {
-    set((state) => ({
+    set(state => ({
       overrideLog: [...state.overrideLog, { ...r, id: `ovr-${Date.now()}` }],
     }));
   },
 
   discountOverrideGranted: false,
-  setDiscountOverrideGranted: (v) => set({ discountOverrideGranted: v }),
+  setDiscountOverrideGranted: v => set({ discountOverrideGranted: v }),
 
   // ── Restaurant — attached table ───────────────────────────────────────────
   attachedTable: INITIAL_ORDER.attachedTable,
 
   setAttachedTable(table) {
-    set((state) => ({
+    set(state => ({
       attachedTable: table,
       guestCount: table ? state.guestCount : 1,
-      orders: syncOrder(state, state.activeOrderIndex, { attachedTable: table }),
+      orders: syncOrder(state, state.activeOrderIndex, {
+        attachedTable: table,
+      }),
     }));
   },
 
   guestCount: INITIAL_ORDER.guestCount,
 
   setGuestCount(n) {
-    set((state) => ({
+    set(state => ({
       guestCount: n,
       orders: syncOrder(state, state.activeOrderIndex, { guestCount: n }),
     }));
   },
 
   setItemCourse(productId, courseId) {
-    set((state) => {
+    set(state => {
       const idx = state.activeOrderIndex;
-      const newCartItems = state.cartItems.map((i) =>
+      const newCartItems = state.cartItems.map(i =>
         i.product.id === productId ? { ...i, course: courseId } : i
       );
       return {
@@ -760,9 +794,9 @@ export const usePOSStore = create<POSState>()((set, get) => ({
   },
 
   setItemNote(productId, note) {
-    set((state) => {
+    set(state => {
       const idx = state.activeOrderIndex;
-      const newCartItems = state.cartItems.map((i) =>
+      const newCartItems = state.cartItems.map(i =>
         i.product.id === productId ? { ...i, note } : i
       );
       return {
@@ -774,10 +808,18 @@ export const usePOSStore = create<POSState>()((set, get) => ({
 
   // ── Restaurant — settings ─────────────────────────────────────────────────
   restaurantMode: (() => {
-    try { return localStorage.getItem("pos-restaurant-mode") === "true"; } catch { return false; }
+    try {
+      return localStorage.getItem("pos-restaurant-mode") === "true";
+    } catch {
+      return false;
+    }
   })(),
-  setRestaurantMode: (v) => {
-    try { localStorage.setItem("pos-restaurant-mode", String(v)); } catch { /* noop */ }
+  setRestaurantMode: v => {
+    try {
+      localStorage.setItem("pos-restaurant-mode", String(v));
+    } catch {
+      /* noop */
+    }
     set({ restaurantMode: v });
   },
 
@@ -785,34 +827,68 @@ export const usePOSStore = create<POSState>()((set, get) => ({
     try {
       const v = localStorage.getItem("pos-restaurant-table-management");
       return v === null ? true : v === "true";
-    } catch { return true; }
+    } catch {
+      return true;
+    }
   })(),
-  setTableManagementEnabled: (v) => {
-    try { localStorage.setItem("pos-restaurant-table-management", String(v)); } catch { /* noop */ }
+  setTableManagementEnabled: v => {
+    try {
+      localStorage.setItem("pos-restaurant-table-management", String(v));
+    } catch {
+      /* noop */
+    }
     set({ tableManagementEnabled: v });
   },
 
   courseManagementEnabled: (() => {
-    try { return localStorage.getItem("pos-restaurant-course-management") === "true"; } catch { return false; }
+    try {
+      return (
+        localStorage.getItem("pos-restaurant-course-management") === "true"
+      );
+    } catch {
+      return false;
+    }
   })(),
-  setCourseManagementEnabled: (v) => {
-    try { localStorage.setItem("pos-restaurant-course-management", String(v)); } catch { /* noop */ }
+  setCourseManagementEnabled: v => {
+    try {
+      localStorage.setItem("pos-restaurant-course-management", String(v));
+    } catch {
+      /* noop */
+    }
     set({ courseManagementEnabled: v });
   },
 
   kitchenPrintingEnabled: (() => {
-    try { return localStorage.getItem("pos-restaurant-kitchen-printing") === "true"; } catch { return false; }
+    try {
+      return localStorage.getItem("pos-restaurant-kitchen-printing") === "true";
+    } catch {
+      return false;
+    }
   })(),
-  setKitchenPrintingEnabled: (v) => {
-    try { localStorage.setItem("pos-restaurant-kitchen-printing", String(v)); } catch { /* noop */ }
+  setKitchenPrintingEnabled: v => {
+    try {
+      localStorage.setItem("pos-restaurant-kitchen-printing", String(v));
+    } catch {
+      /* noop */
+    }
     set({ kitchenPrintingEnabled: v });
   },
 
   autoSendKitchen: (() => {
-    try { return localStorage.getItem("pos-restaurant-auto-send-kitchen") === "true"; } catch { return false; }
+    try {
+      return (
+        localStorage.getItem("pos-restaurant-auto-send-kitchen") === "true"
+      );
+    } catch {
+      return false;
+    }
   })(),
-  setAutoSendKitchen: (v) => {
-    try { localStorage.setItem("pos-restaurant-auto-send-kitchen", String(v)); } catch { /* noop */ }
+  setAutoSendKitchen: v => {
+    try {
+      localStorage.setItem("pos-restaurant-auto-send-kitchen", String(v));
+    } catch {
+      /* noop */
+    }
     set({ autoSendKitchen: v });
   },
 
@@ -820,18 +896,35 @@ export const usePOSStore = create<POSState>()((set, get) => ({
     try {
       const v = localStorage.getItem("pos-restaurant-allow-takeaway");
       return v === null ? true : v === "true";
-    } catch { return true; }
+    } catch {
+      return true;
+    }
   })(),
-  setAllowTakeAway: (v) => {
-    try { localStorage.setItem("pos-restaurant-allow-takeaway", String(v)); } catch { /* noop */ }
+  setAllowTakeAway: v => {
+    try {
+      localStorage.setItem("pos-restaurant-allow-takeaway", String(v));
+    } catch {
+      /* noop */
+    }
     set({ allowTakeAway: v });
   },
 
   defaultGuests: (() => {
-    try { return parseInt(localStorage.getItem("pos-restaurant-default-guests") ?? "2", 10); } catch { return 2; }
+    try {
+      return parseInt(
+        localStorage.getItem("pos-restaurant-default-guests") ?? "2",
+        10
+      );
+    } catch {
+      return 2;
+    }
   })(),
-  setDefaultGuests: (n) => {
-    try { localStorage.setItem("pos-restaurant-default-guests", String(n)); } catch { /* noop */ }
+  setDefaultGuests: n => {
+    try {
+      localStorage.setItem("pos-restaurant-default-guests", String(n));
+    } catch {
+      /* noop */
+    }
     set({ defaultGuests: n });
   },
 
@@ -844,57 +937,87 @@ export const usePOSStore = create<POSState>()((set, get) => ({
   },
 
   setPOSSessionSettings(s) {
-    set((state) => ({ posSessionSettings: { ...state.posSessionSettings, ...s } }));
+    set(state => ({
+      posSessionSettings: { ...state.posSessionSettings, ...s },
+    }));
   },
 
   // ── Offline mode ──────────────────────────────────────────────────────────
   isOnline: typeof navigator !== "undefined" ? navigator.onLine : true,
-  setIsOnline: (v) => set({ isOnline: v }),
+  setIsOnline: v => set({ isOnline: v }),
 
   offlineModeEnabled: (() => {
-    try { return localStorage.getItem("pos-offline-enabled") === "true"; } catch { return false; }
+    try {
+      return localStorage.getItem("pos-offline-enabled") === "true";
+    } catch {
+      return false;
+    }
   })(),
-  setOfflineModeEnabled: (v) => {
-    try { localStorage.setItem("pos-offline-enabled", String(v)); } catch { /* noop */ }
+  setOfflineModeEnabled: v => {
+    try {
+      localStorage.setItem("pos-offline-enabled", String(v));
+    } catch {
+      /* noop */
+    }
     set({ offlineModeEnabled: v });
   },
 
   cacheRefreshInterval: (() => {
     try {
-      const v = parseInt(localStorage.getItem("pos-cache-interval") ?? "60", 10);
-      return ([15, 30, 60, 0] as const).includes(v as 15 | 30 | 60 | 0) ? (v as 15 | 30 | 60 | 0) : 60;
-    } catch { return 60; }
+      const v = parseInt(
+        localStorage.getItem("pos-cache-interval") ?? "60",
+        10
+      );
+      return ([15, 30, 60, 0] as const).includes(v as 15 | 30 | 60 | 0)
+        ? (v as 15 | 30 | 60 | 0)
+        : 60;
+    } catch {
+      return 60;
+    }
   })(),
-  setCacheRefreshInterval: (v) => {
-    try { localStorage.setItem("pos-cache-interval", String(v)); } catch { /* noop */ }
+  setCacheRefreshInterval: v => {
+    try {
+      localStorage.setItem("pos-cache-interval", String(v));
+    } catch {
+      /* noop */
+    }
     set({ cacheRefreshInterval: v });
   },
 
   lastCacheSync: (() => {
-    try { return localStorage.getItem("pos-last-cache-sync"); } catch { return null; }
+    try {
+      return localStorage.getItem("pos-last-cache-sync");
+    } catch {
+      return null;
+    }
   })(),
-  setLastCacheSync: (t) => {
+  setLastCacheSync: t => {
     try {
       if (t) localStorage.setItem("pos-last-cache-sync", t);
       else localStorage.removeItem("pos-last-cache-sync");
-    } catch { /* noop */ }
+    } catch {
+      /* noop */
+    }
     set({ lastCacheSync: t });
   },
 
   pendingCount: 0,
-  setPendingCount: (n) => set({ pendingCount: n }),
+  setPendingCount: n => set({ pendingCount: n }),
   failedCount: 0,
-  setFailedCount: (n) => set({ failedCount: n }),
+  setFailedCount: n => set({ failedCount: n }),
   isSyncing: false,
-  setIsSyncing: (v) => set({ isSyncing: v }),
+  setIsSyncing: v => set({ isSyncing: v }),
 
   // ── Completed order ───────────────────────────────────────────────────────
   completedOrder: null,
-  setCompletedOrder: (order) => set({ completedOrder: order }),
+  setCompletedOrder: order => set({ completedOrder: order }),
 
   // ── Computed ──────────────────────────────────────────────────────────────
   subtotal() {
-    return get().cartItems.reduce((sum, i) => sum + i.product.price * i.quantity, 0);
+    return get().cartItems.reduce(
+      (sum, i) => sum + i.product.price * i.quantity,
+      0
+    );
   },
 
   discountAmount() {
@@ -964,7 +1087,8 @@ export const usePOSStore = create<POSState>()((set, get) => ({
     const { paymentMethod, cashGiven, splitCash } = get();
     const due = get().amountDue();
     if (paymentMethod === "cash") return Math.max(0, cashGiven - due);
-    if (paymentMethod === "split") return Math.max(0, splitCash - (due - get().splitCard));
+    if (paymentMethod === "split")
+      return Math.max(0, splitCash - (due - get().splitCard));
     return 0;
   },
 }));

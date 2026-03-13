@@ -12,7 +12,10 @@ interface DateRangePickerProps {
   isRTL?: boolean;
 }
 
-export default function DateRangePicker({ onDateRangeChange, isRTL = false }: DateRangePickerProps) {
+export default function DateRangePicker({
+  onDateRangeChange,
+  isRTL = false,
+}: DateRangePickerProps) {
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -27,7 +30,11 @@ export default function DateRangePicker({ onDateRangeChange, isRTL = false }: Da
   };
 
   const handleDateClick = (day: number) => {
-    const selectedDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
+    const selectedDate = new Date(
+      currentMonth.getFullYear(),
+      currentMonth.getMonth(),
+      day
+    );
 
     if (selectingStart) {
       setStartDate(selectedDate);
@@ -62,38 +69,60 @@ export default function DateRangePicker({ onDateRangeChange, isRTL = false }: Da
     setCurrentMonth(new Date());
   };
 
-  const monthName = currentMonth.toLocaleString("en-US", { month: "long", year: "numeric" });
+  const monthName = currentMonth.toLocaleString("en-US", {
+    month: "long",
+    year: "numeric",
+  });
   const daysInMonth = getDaysInMonth(currentMonth);
   const firstDay = getFirstDayOfMonth(currentMonth);
   const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
 
   const formatDate = (date: Date | null) => {
     if (!date) return "Select date";
-    return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
   };
 
   const isDateInRange = (day: number) => {
     if (!startDate || !endDate) return false;
-    const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
+    const date = new Date(
+      currentMonth.getFullYear(),
+      currentMonth.getMonth(),
+      day
+    );
     return date >= startDate && date <= endDate;
   };
 
   const isDateStart = (day: number) => {
     if (!startDate) return false;
-    const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
+    const date = new Date(
+      currentMonth.getFullYear(),
+      currentMonth.getMonth(),
+      day
+    );
     return date.toDateString() === startDate.toDateString();
   };
 
   const isDateEnd = (day: number) => {
     if (!endDate) return false;
-    const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
+    const date = new Date(
+      currentMonth.getFullYear(),
+      currentMonth.getMonth(),
+      day
+    );
     return date.toDateString() === endDate.toDateString();
   };
 
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" className="border-border gap-2 flex-1 sm:flex-none">
+        <Button
+          variant="outline"
+          className="border-border gap-2 flex-1 sm:flex-none"
+        >
           <Calendar size={16} />
           <span className="hidden sm:inline text-xs">
             {startDate && endDate
@@ -113,7 +142,7 @@ export default function DateRangePicker({ onDateRangeChange, isRTL = false }: Da
               { label: "90 Days", days: 90 },
               { label: "6 Months", days: 180 },
               { label: "1 Year", days: 365 },
-            ].map((range) => (
+            ].map(range => (
               <Button
                 key={range.label}
                 variant="outline"
@@ -133,7 +162,14 @@ export default function DateRangePicker({ onDateRangeChange, isRTL = false }: Da
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))}
+                onClick={() =>
+                  setCurrentMonth(
+                    new Date(
+                      currentMonth.getFullYear(),
+                      currentMonth.getMonth() - 1
+                    )
+                  )
+                }
               >
                 <ChevronLeft size={16} />
               </Button>
@@ -141,7 +177,14 @@ export default function DateRangePicker({ onDateRangeChange, isRTL = false }: Da
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}
+                onClick={() =>
+                  setCurrentMonth(
+                    new Date(
+                      currentMonth.getFullYear(),
+                      currentMonth.getMonth() + 1
+                    )
+                  )
+                }
               >
                 <ChevronRight size={16} />
               </Button>
@@ -149,8 +192,11 @@ export default function DateRangePicker({ onDateRangeChange, isRTL = false }: Da
 
             {/* Weekdays */}
             <div className="grid grid-cols-7 gap-1 text-center">
-              {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-                <div key={day} className="text-xs font-semibold text-muted-foreground h-8 flex items-center justify-center">
+              {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(day => (
+                <div
+                  key={day}
+                  className="text-xs font-semibold text-muted-foreground h-8 flex items-center justify-center"
+                >
                   {day}
                 </div>
               ))}
@@ -161,7 +207,7 @@ export default function DateRangePicker({ onDateRangeChange, isRTL = false }: Da
               {Array.from({ length: firstDay }).map((_, i) => (
                 <div key={`empty-${i}`} className="h-8" />
               ))}
-              {days.map((day) => {
+              {days.map(day => {
                 const isStart = isDateStart(day);
                 const isEnd = isDateEnd(day);
                 const inRange = isDateInRange(day);
@@ -174,8 +220,8 @@ export default function DateRangePicker({ onDateRangeChange, isRTL = false }: Da
                       isStart || isEnd
                         ? "bg-primary text-white"
                         : inRange
-                        ? "bg-primary/20 text-primary"
-                        : "hover:bg-secondary text-foreground"
+                          ? "bg-primary/20 text-primary"
+                          : "hover:bg-secondary text-foreground"
                     }`}
                   >
                     {day}

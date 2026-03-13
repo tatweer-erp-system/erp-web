@@ -1,7 +1,13 @@
 import { memo } from "react";
 import { Link } from "wouter";
 import {
-  Avatar, Button, Divider, Dropdown, Grid, Input, Tooltip,
+  Avatar,
+  Button,
+  Divider,
+  Dropdown,
+  Grid,
+  Input,
+  Tooltip,
   theme as antTheme,
 } from "antd";
 import type { MenuProps } from "antd";
@@ -31,8 +37,14 @@ interface NavbarProps {
 
 function NavbarInner({ sidebarOpen, setSidebarOpen, isRTL }: NavbarProps) {
   const { token } = antTheme.useToken();
-  const { theme, language, financialYear, toggleTheme, setLanguage, setFinancialYear } =
-    useAppSettings();
+  const {
+    theme,
+    language,
+    financialYear,
+    toggleTheme,
+    setLanguage,
+    setFinancialYear,
+  } = useAppSettings();
   const { lock } = usePinLock();
   const { user, logout } = useAuthContext();
   const screens = Grid.useBreakpoint();
@@ -41,16 +53,22 @@ function NavbarInner({ sidebarOpen, setSidebarOpen, isRTL }: NavbarProps) {
   const isDark = theme === "dark";
 
   function toggleFullscreen() {
-    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+    if (!document.fullscreenElement)
+      document.documentElement.requestFullscreen();
     else document.exitFullscreen();
   }
 
-
   // Financial year menu
-  const fyItems: MenuProps["items"] = ["2025-2026","2024-2025","2023-2024","2022-2023"].map((y) => ({
+  const fyItems: MenuProps["items"] = [
+    "2025-2026",
+    "2024-2025",
+    "2023-2024",
+    "2022-2023",
+  ].map(y => ({
     key: y,
     label: y,
-    style: y === financialYear ? { color: token.colorPrimary, fontWeight: 600 } : {},
+    style:
+      y === financialYear ? { color: token.colorPrimary, fontWeight: 600 } : {},
   }));
 
   // Profile menu
@@ -59,15 +77,28 @@ function NavbarInner({ sidebarOpen, setSidebarOpen, isRTL }: NavbarProps) {
       key: "profile-header",
       label: (
         <div style={{ padding: "4px 0 8px" }}>
-          <div style={{ fontWeight: 600, fontSize: 13 }}>{user ? `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim() || "User" : "User"}</div>
-          <div style={{ fontSize: 12, color: token.colorTextSecondary }}>{user?.email ?? ""}</div>
+          <div style={{ fontWeight: 600, fontSize: 13 }}>
+            {user
+              ? `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim() ||
+                "User"
+              : "User"}
+          </div>
+          <div style={{ fontSize: 12, color: token.colorTextSecondary }}>
+            {user?.email ?? ""}
+          </div>
           {user && ROLE_DISPLAY[user.role] && (
-            <div style={{
-              display: "inline-block", marginTop: 4, fontSize: 10, fontWeight: 600,
-              padding: "1px 6px", borderRadius: 20,
-              color: ROLE_DISPLAY[user.role].color,
-              background: ROLE_DISPLAY[user.role].bg,
-            }}>
+            <div
+              style={{
+                display: "inline-block",
+                marginTop: 4,
+                fontSize: 10,
+                fontWeight: 600,
+                padding: "1px 6px",
+                borderRadius: 20,
+                color: ROLE_DISPLAY[user.role].color,
+                background: ROLE_DISPLAY[user.role].bg,
+              }}
+            >
               {ROLE_DISPLAY[user.role].label}
             </div>
           )}
@@ -76,10 +107,18 @@ function NavbarInner({ sidebarOpen, setSidebarOpen, isRTL }: NavbarProps) {
       disabled: true,
     },
     { type: "divider" },
-    { key: "profile",  label: <Link href="/settings">My Profile</Link>,  icon: <UserOutlined /> },
-    { key: "settings", label: <Link href="/settings">Settings</Link>,     icon: <SettingOutlined /> },
+    {
+      key: "profile",
+      label: <Link href="/settings">My Profile</Link>,
+      icon: <UserOutlined />,
+    },
+    {
+      key: "settings",
+      label: <Link href="/settings">Settings</Link>,
+      icon: <SettingOutlined />,
+    },
     { type: "divider" },
-    { key: "logout",   label: "Logout", icon: <LogoutOutlined />, danger: true },
+    { key: "logout", label: "Logout", icon: <LogoutOutlined />, danger: true },
   ];
 
   const iconBtnStyle = {
@@ -91,26 +130,38 @@ function NavbarInner({ sidebarOpen, setSidebarOpen, isRTL }: NavbarProps) {
   };
 
   return (
-    <header style={{
-      background: token.colorBgContainer,
-      borderBottom: `1px solid ${token.colorBorderSecondary}`,
-      padding: "0 20px",
-      height: 56,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-      flexShrink: 0,
-    }}>
+    <header
+      style={{
+        background: token.colorBgContainer,
+        borderBottom: `1px solid ${token.colorBorderSecondary}`,
+        padding: "0 20px",
+        height: 56,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        flexShrink: 0,
+      }}
+    >
       {/* Left */}
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-        <Tooltip title={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"} placement={isRTL ? "right" : "left"}>
+        <Tooltip
+          title={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+          placement={isRTL ? "right" : "left"}
+        >
           <Button
             type="text"
             icon={
-              <span style={{ display: "inline-flex", transition: "transform 0.25s cubic-bezier(0.4,0,0.2,1)" }}>
-                {sidebarOpen
-                  ? <MenuFoldOutlined style={{ fontSize: 17 }} />
-                  : <MenuUnfoldOutlined style={{ fontSize: 17 }} />}
+              <span
+                style={{
+                  display: "inline-flex",
+                  transition: "transform 0.25s cubic-bezier(0.4,0,0.2,1)",
+                }}
+              >
+                {sidebarOpen ? (
+                  <MenuFoldOutlined style={{ fontSize: 17 }} />
+                ) : (
+                  <MenuUnfoldOutlined style={{ fontSize: 17 }} />
+                )}
               </span>
             }
             onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -120,7 +171,9 @@ function NavbarInner({ sidebarOpen, setSidebarOpen, isRTL }: NavbarProps) {
 
         {!isMobile && (
           <Input
-            prefix={<SearchOutlined style={{ color: token.colorTextQuaternary }} />}
+            prefix={
+              <SearchOutlined style={{ color: token.colorTextQuaternary }} />
+            }
             placeholder="Search anything..."
             variant="filled"
             style={{ width: 240 }}
@@ -141,7 +194,17 @@ function NavbarInner({ sidebarOpen, setSidebarOpen, isRTL }: NavbarProps) {
           trigger={["click"]}
         >
           <Tooltip title="Financial Year">
-            <Button type="text" style={{ ...iconBtnStyle, width: "auto", padding: "0 10px", gap: 6, fontSize: 12, fontWeight: 600 }}>
+            <Button
+              type="text"
+              style={{
+                ...iconBtnStyle,
+                width: "auto",
+                padding: "0 10px",
+                gap: 6,
+                fontSize: 12,
+                fontWeight: 600,
+              }}
+            >
               <CalendarOutlined />
               <span className="hidden sm:inline">{financialYear}</span>
             </Button>
@@ -211,7 +274,12 @@ function NavbarInner({ sidebarOpen, setSidebarOpen, isRTL }: NavbarProps) {
             <Button
               icon={<GlobalOutlined />}
               onClick={() => setLanguage(isRTL ? "en" : "ar")}
-              style={{ borderRadius: 10, height: 36, fontSize: 12, fontWeight: 700 }}
+              style={{
+                borderRadius: 10,
+                height: 36,
+                fontSize: 12,
+                fontWeight: 700,
+              }}
             >
               {isRTL ? "EN" : "AR"}
             </Button>
@@ -220,15 +288,32 @@ function NavbarInner({ sidebarOpen, setSidebarOpen, isRTL }: NavbarProps) {
 
         {/* Profile */}
         <Dropdown
-          menu={{ items: profileItems, onClick: ({ key }) => { if (key === "logout") { logout(); window.location.href = "/login"; } } }}
+          menu={{
+            items: profileItems,
+            onClick: ({ key }) => {
+              if (key === "logout") {
+                logout();
+                window.location.href = "/login";
+              }
+            },
+          }}
           placement="bottomRight"
           trigger={["click"]}
         >
           <Avatar
-            style={{ background: user ? ROLE_DISPLAY[user.role]?.color ?? token.colorPrimary : token.colorPrimary, cursor: "pointer", fontWeight: 700, fontSize: 13 }}
+            style={{
+              background: user
+                ? (ROLE_DISPLAY[user.role]?.color ?? token.colorPrimary)
+                : token.colorPrimary,
+              cursor: "pointer",
+              fontWeight: 700,
+              fontSize: 13,
+            }}
             size={32}
           >
-            {user ? `${(user.firstName ?? "U")[0]}${(user.lastName ?? "")[0]}`.toUpperCase() : "?"}
+            {user
+              ? `${(user.firstName ?? "U")[0]}${(user.lastName ?? "")[0]}`.toUpperCase()
+              : "?"}
           </Avatar>
         </Dropdown>
       </div>

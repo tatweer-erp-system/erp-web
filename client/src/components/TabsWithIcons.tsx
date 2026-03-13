@@ -21,8 +21,10 @@ export default function TabsWithIcons({
   isRTL = false,
 }: TabsWithIconsProps) {
   return (
-    <div className={`flex border-b border-border overflow-x-auto ${isRTL ? "flex-row-reverse" : ""}`}>
-      {tabs.map((tab) => {
+    <div
+      className={`flex border-b border-border overflow-x-auto ${isRTL ? "flex-row-reverse" : ""}`}
+    >
+      {tabs.map(tab => {
         const Icon = tab.icon;
         return (
           <button

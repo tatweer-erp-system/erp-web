@@ -20,7 +20,13 @@ export default function Breadcrumb({ items }: BreadcrumbProps) {
   if (!items.length) return null;
 
   const antItems = [
-    { title: <Link href="/"><HomeOutlined /></Link> },
+    {
+      title: (
+        <Link href="/">
+          <HomeOutlined />
+        </Link>
+      ),
+    },
     ...items.map((item, i) => ({
       title:
         item.href && i < items.length - 1 ? (

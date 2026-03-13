@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useEffect,
+} from "react";
 import { pinService } from "@/services/pin.service";
 
 interface PinLockContextType {
@@ -18,7 +24,7 @@ export function PinLockProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     pinService
       .status()
-      .then((r) => setHasPin(r.data?.hasPin ?? false))
+      .then(r => setHasPin(r.data?.hasPin ?? false))
       .catch(() => setHasPin(false));
   }, []);
 
@@ -35,7 +41,9 @@ export function PinLockProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <PinLockContext.Provider value={{ isLocked, hasPin, lock, unlock, setupPin }}>
+    <PinLockContext.Provider
+      value={{ isLocked, hasPin, lock, unlock, setupPin }}
+    >
       {children}
     </PinLockContext.Provider>
   );

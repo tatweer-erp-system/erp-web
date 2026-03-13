@@ -28,8 +28,14 @@ export default function Taxes() {
   const [editValues, setEditValues] = useState<Record<string, any>>({});
 
   const menuItems = [
-    { id: "tax-rates", label: language === "ar" ? "معدلات الضريبة" : "Tax Rates" },
-    { id: "payment-gateway", label: language === "ar" ? "بوابة الدفع" : "Payment Gateway" },
+    {
+      id: "tax-rates",
+      label: language === "ar" ? "معدلات الضريبة" : "Tax Rates",
+    },
+    {
+      id: "payment-gateway",
+      label: language === "ar" ? "بوابة الدفع" : "Payment Gateway",
+    },
   ];
 
   const handleEdit = (tax: Tax) => {
@@ -38,7 +44,7 @@ export default function Taxes() {
   };
 
   const handleDelete = (id: string) => {
-    setTaxes(taxes.filter((t) => t.id !== id));
+    setTaxes(taxes.filter(t => t.id !== id));
   };
 
   const handleAddTax = () => {
@@ -55,9 +61,7 @@ export default function Taxes() {
   const handleSave = () => {
     if (editingId) {
       setTaxes(
-        taxes.map((t) =>
-          t.id === editingId ? { ...t, ...editValues } : t
-        )
+        taxes.map(t => (t.id === editingId ? { ...t, ...editValues } : t))
       );
       setEditingId(null);
     }
@@ -73,7 +77,10 @@ export default function Taxes() {
       currentPage="Taxes"
       breadcrumbs={[
         { label: language === "ar" ? "لوحة التحكم" : "Dashboard", href: "/" },
-        { label: language === "ar" ? "الإعدادات" : "Settings", href: "/settings" },
+        {
+          label: language === "ar" ? "الإعدادات" : "Settings",
+          href: "/settings",
+        },
         { label: language === "ar" ? "الضرائب" : "Taxes" },
       ]}
     >
@@ -82,7 +89,7 @@ export default function Taxes() {
         <div className="w-64 flex-shrink-0">
           <Card className="p-4 dark:bg-card bg-card shadow-sm border-0">
             <div className="space-y-2">
-              {menuItems.map((item) => (
+              {menuItems.map(item => (
                 <button
                   key={item.id}
                   onClick={() => setSelectedTab(item.id)}
@@ -105,11 +112,17 @@ export default function Taxes() {
             {/* Header with Title and Actions */}
             <div className={`flex justify-between items-start mb-6`}>
               <div>
-                <h2 className={`text-2xl font-bold text-foreground mb-1 ${isRTL ? "text-right" : ""}`}>
+                <h2
+                  className={`text-2xl font-bold text-foreground mb-1 ${isRTL ? "text-right" : ""}`}
+                >
                   {language === "ar" ? "معدلات الضريبة" : "Tax Rates"}
                 </h2>
-                <p className={`text-sm text-muted-foreground ${isRTL ? "text-right" : ""}`}>
-                  {language === "ar" ? "تكوين معدلات الضريبة" : "Tax Rates Configuration"}
+                <p
+                  className={`text-sm text-muted-foreground ${isRTL ? "text-right" : ""}`}
+                >
+                  {language === "ar"
+                    ? "تكوين معدلات الضريبة"
+                    : "Tax Rates Configuration"}
                 </p>
               </div>
               <div className={`flex gap-2`}>
@@ -133,7 +146,7 @@ export default function Taxes() {
 
             {/* Tax Cards Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-              {taxes.map((tax) => (
+              {taxes.map(tax => (
                 <div
                   key={tax.id}
                   className="border border-border rounded-lg p-4 dark:bg-secondary bg-secondary dark:bg-gray-900"
@@ -146,8 +159,11 @@ export default function Taxes() {
                         </label>
                         <Input
                           value={editValues.name || ""}
-                          onChange={(e) =>
-                            setEditValues({ ...editValues, name: e.target.value })
+                          onChange={e =>
+                            setEditValues({
+                              ...editValues,
+                              name: e.target.value,
+                            })
                           }
                           className="mt-1 border-0 dark:bg-card bg-card h-9"
                           placeholder="Tax Name"
@@ -159,8 +175,11 @@ export default function Taxes() {
                         </label>
                         <Input
                           value={editValues.code || ""}
-                          onChange={(e) =>
-                            setEditValues({ ...editValues, code: e.target.value })
+                          onChange={e =>
+                            setEditValues({
+                              ...editValues,
+                              code: e.target.value,
+                            })
                           }
                           className="mt-1 border-0 dark:bg-card bg-card h-9"
                           placeholder="Tax Code"
@@ -173,7 +192,7 @@ export default function Taxes() {
                         <Input
                           type="number"
                           value={editValues.rate || 0}
-                          onChange={(e) =>
+                          onChange={e =>
                             setEditValues({
                               ...editValues,
                               rate: parseFloat(e.target.value),
@@ -203,14 +222,18 @@ export default function Taxes() {
                     </div>
                   ) : (
                     <>
-                      <h3 className="font-semibold text-foreground mb-3">{tax.name}</h3>
+                      <h3 className="font-semibold text-foreground mb-3">
+                        {tax.name}
+                      </h3>
                       <div className="space-y-2 mb-4">
                         {tax.code && (
                           <div className="text-sm">
                             <span className="text-muted-foreground">
                               {language === "ar" ? "الكود: " : "Code: "}
                             </span>
-                            <span className="font-medium text-foreground">{tax.code}</span>
+                            <span className="font-medium text-foreground">
+                              {tax.code}
+                            </span>
                           </div>
                         )}
                         {tax.rate > 0 && (
@@ -218,7 +241,9 @@ export default function Taxes() {
                             <span className="text-muted-foreground">
                               {language === "ar" ? "المعدل: " : "Rate: "}
                             </span>
-                            <span className="font-medium text-foreground">{tax.rate}%</span>
+                            <span className="font-medium text-foreground">
+                              {tax.rate}%
+                            </span>
                           </div>
                         )}
                       </div>
@@ -246,7 +271,10 @@ export default function Taxes() {
 
             {/* Action Buttons */}
             <div className={`flex gap-3 justify-end`}>
-              <Button variant="outline" className="border-0 hover:dark:bg-secondary bg-secondary">
+              <Button
+                variant="outline"
+                className="border-0 hover:dark:bg-secondary bg-secondary"
+              >
                 {language === "ar" ? "إلغاء" : "Cancel"}
               </Button>
               <Button className="bg-primary hover:bg-primary/90 text-white">

@@ -49,12 +49,12 @@ export default function BranchSelector({
       </label>
       <select
         value={value ?? defaultValue ?? ""}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={e => onChange(e.target.value)}
         disabled={disabled}
         className="w-full px-3 py-2 border border-border rounded-lg text-sm dark:bg-card bg-card text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <option value="">{t("selectBranch", language)}</option>
-        {branches.map((branch) => (
+        {branches.map(branch => (
           <option key={branch.id} value={branch.id}>
             {branch.name} ({branch.code})
           </option>

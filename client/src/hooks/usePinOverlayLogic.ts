@@ -59,14 +59,29 @@ export function usePinOverlayLogic() {
   }
 
   const title =
-    mode === "setup" ? "Set your PIN" :
-    mode === "confirm" ? "Confirm your PIN" :
-    "Session Locked";
+    mode === "setup"
+      ? "Set your PIN"
+      : mode === "confirm"
+        ? "Confirm your PIN"
+        : "Session Locked";
 
   const subtitle =
-    mode === "setup" ? "Create a 4-digit PIN to secure your session" :
-    mode === "confirm" ? "Re-enter your PIN to confirm" :
-    "Enter your PIN to continue";
+    mode === "setup"
+      ? "Create a 4-digit PIN to secure your session"
+      : mode === "confirm"
+        ? "Re-enter your PIN to confirm"
+        : "Enter your PIN to continue";
 
-  return { isLocked, mode, pin, setPin, error, setError, loading, handleComplete, title, subtitle };
+  return {
+    isLocked,
+    mode,
+    pin,
+    setPin,
+    error,
+    setError,
+    loading,
+    handleComplete,
+    title,
+    subtitle,
+  };
 }

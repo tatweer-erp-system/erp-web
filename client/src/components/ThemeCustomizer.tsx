@@ -1,12 +1,25 @@
 import { useState } from "react";
 import {
-  Button, Divider, Drawer, Tooltip, Typography,
+  Button,
+  Divider,
+  Drawer,
+  Tooltip,
+  Typography,
   theme as antTheme,
 } from "antd";
 import {
-  BgColorsOutlined, CheckOutlined, ReloadOutlined, LockOutlined,
-  AppstoreOutlined, MobileOutlined, ProfileOutlined, FormOutlined,
-  LayoutOutlined, SettingOutlined, SunOutlined, MoonOutlined,
+  BgColorsOutlined,
+  CheckOutlined,
+  ReloadOutlined,
+  LockOutlined,
+  AppstoreOutlined,
+  MobileOutlined,
+  ProfileOutlined,
+  FormOutlined,
+  LayoutOutlined,
+  SettingOutlined,
+  SunOutlined,
+  MoonOutlined,
 } from "@ant-design/icons";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
 
@@ -36,27 +49,35 @@ const PALETTE: { hex: string; label: string }[] = [
 ];
 
 const RADIUS_PRESETS = [
-  { label: "Sharp",   value: 2,  preview: 2 },
-  { label: "Default", value: 6,  preview: 6 },
+  { label: "Sharp", value: 2, preview: 2 },
+  { label: "Default", value: 6, preview: 6 },
   { label: "Rounded", value: 10, preview: 10 },
-  { label: "Pill",    value: 16, preview: 16 },
+  { label: "Pill", value: 16, preview: 16 },
 ];
 
 function SectionLabel({ children }: { children: string }) {
   const { token } = antTheme.useToken();
   return (
-    <div style={{
-      fontSize: 11, fontWeight: 700, letterSpacing: "0.08em",
-      textTransform: "uppercase", color: token.colorTextTertiary,
-      marginBottom: 10,
-    }}>
+    <div
+      style={{
+        fontSize: 11,
+        fontWeight: 700,
+        letterSpacing: "0.08em",
+        textTransform: "uppercase",
+        color: token.colorTextTertiary,
+        marginBottom: 10,
+      }}
+    >
       {children}
     </div>
   );
 }
 
 function OptionButton({
-  isActive, onClick, children, style,
+  isActive,
+  onClick,
+  children,
+  style,
 }: {
   isActive: boolean;
   onClick: () => void;
@@ -91,14 +112,23 @@ function OptionButton({
 export function ThemeCustomizer() {
   const { token } = antTheme.useToken();
   const {
-    theme, setMode,
-    accentColor, setAccentColor,
-    themeRadius, setThemeRadius,
-    preset, setPreset, presets,
-    pinStyle, setPinStyle,
-    definitionsLayout, setDefinitionsLayout,
-    settingsLayout, setSettingsLayout,
-    definitionsCrudStyle, setDefinitionsCrudStyle,
+    theme,
+    setMode,
+    accentColor,
+    setAccentColor,
+    themeRadius,
+    setThemeRadius,
+    preset,
+    setPreset,
+    presets,
+    pinStyle,
+    setPinStyle,
+    definitionsLayout,
+    setDefinitionsLayout,
+    settingsLayout,
+    setSettingsLayout,
+    definitionsCrudStyle,
+    setDefinitionsCrudStyle,
   } = useAppSettings();
 
   const [open, setOpen] = useState(false);
@@ -114,23 +144,29 @@ export function ThemeCustomizer() {
   return (
     <>
       {/* ── Floating trigger ─────────────────────────────────────────────── */}
-      <div style={{
-        position: "fixed",
-        right: 0,
-        top: "50%",
-        transform: "translateY(-50%)",
-        zIndex: 999,
-      }}>
+      <div
+        style={{
+          position: "fixed",
+          right: 0,
+          top: "50%",
+          transform: "translateY(-50%)",
+          zIndex: 999,
+        }}
+      >
         <Tooltip title="Customize Theme" placement="left">
           <button
             onClick={() => setOpen(true)}
             style={{
-              width: 40, height: 48,
+              width: 40,
+              height: 48,
               background: activeColor,
               border: "none",
               borderRadius: "8px 0 0 8px",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              cursor: "pointer", color: "#fff",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              color: "#fff",
               boxShadow: `-3px 0 16px ${activeColor}55`,
               transition: "background 0.2s, box-shadow 0.2s",
             }}
@@ -144,13 +180,19 @@ export function ThemeCustomizer() {
       <Drawer
         title={
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <BgColorsOutlined style={{ color: token.colorPrimary, fontSize: 16 }} />
-            <span style={{ fontWeight: 700, fontSize: 15 }}>Theme Customizer</span>
+            <BgColorsOutlined
+              style={{ color: token.colorPrimary, fontSize: 16 }}
+            />
+            <span style={{ fontWeight: 700, fontSize: 15 }}>
+              Theme Customizer
+            </span>
           </div>
         }
         extra={
           <Tooltip title="Reset to default theme">
-            <Button size="small" icon={<ReloadOutlined />} onClick={reset}>Reset</Button>
+            <Button size="small" icon={<ReloadOutlined />} onClick={reset}>
+              Reset
+            </Button>
           </Tooltip>
         }
         placement="right"
@@ -197,59 +239,118 @@ export function ThemeCustomizer() {
         {/* ── Theme Presets ──────────────────────────────────────────────── */}
         <div>
           <SectionLabel>Theme Presets</SectionLabel>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+          <div
+            style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}
+          >
             <div
-              onClick={() => { setPreset(null); setAccentColor(""); }}
+              onClick={() => {
+                setPreset(null);
+                setAccentColor("");
+              }}
               style={{
-                padding: "10px 12px", borderRadius: 10, cursor: "pointer",
+                padding: "10px 12px",
+                borderRadius: 10,
+                cursor: "pointer",
                 border: `2px solid ${!preset ? token.colorPrimary : token.colorBorderSecondary}`,
-                background: !preset ? `${token.colorPrimary}12` : token.colorFillAlter,
+                background: !preset
+                  ? `${token.colorPrimary}12`
+                  : token.colorFillAlter,
                 transition: "all 0.15s",
-                display: "flex", alignItems: "center", justifyContent: "space-between",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
               }}
             >
               <div>
                 <div style={{ display: "flex", gap: 3, marginBottom: 5 }}>
                   {["#3B82F6", "#10B981", "#F59E0B", "#EF4444"].map((c, i) => (
-                    <div key={i} style={{ width: 12, height: 12, borderRadius: "50%", background: c }} />
+                    <div
+                      key={i}
+                      style={{
+                        width: 12,
+                        height: 12,
+                        borderRadius: "50%",
+                        background: c,
+                      }}
+                    />
                   ))}
                 </div>
-                <div style={{ fontSize: 12, fontWeight: 600, color: !preset ? token.colorPrimary : token.colorText }}>
+                <div
+                  style={{
+                    fontSize: 12,
+                    fontWeight: 600,
+                    color: !preset ? token.colorPrimary : token.colorText,
+                  }}
+                >
                   Default
                 </div>
               </div>
-              {!preset && <CheckOutlined style={{ color: token.colorPrimary, fontSize: 12 }} />}
+              {!preset && (
+                <CheckOutlined
+                  style={{ color: token.colorPrimary, fontSize: 12 }}
+                />
+              )}
             </div>
 
-            {presets.map((p) => {
+            {presets.map(p => {
               const colors = p[theme];
               const isActive = preset === p.id;
               return (
                 <div
                   key={p.id}
-                  onClick={() => { setPreset(isActive ? null : p.id); setAccentColor(""); }}
+                  onClick={() => {
+                    setPreset(isActive ? null : p.id);
+                    setAccentColor("");
+                  }}
                   style={{
-                    padding: "10px 12px", borderRadius: 10, cursor: "pointer",
+                    padding: "10px 12px",
+                    borderRadius: 10,
+                    cursor: "pointer",
                     border: `2px solid ${isActive ? colors.primary : token.colorBorderSecondary}`,
-                    background: isActive ? `${colors.primary}12` : token.colorFillAlter,
+                    background: isActive
+                      ? `${colors.primary}12`
+                      : token.colorFillAlter,
                     transition: "all 0.15s",
-                    display: "flex", alignItems: "center", justifyContent: "space-between",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
                   }}
                 >
                   <div>
                     <div style={{ display: "flex", gap: 3, marginBottom: 5 }}>
-                      {[colors.primary, colors.secondary, colors.accent, colors.background].map((c, i) => (
-                        <div key={i} style={{
-                          width: 12, height: 12, borderRadius: "50%", background: c,
-                          border: `1px solid ${token.colorBorder}`,
-                        }} />
+                      {[
+                        colors.primary,
+                        colors.secondary,
+                        colors.accent,
+                        colors.background,
+                      ].map((c, i) => (
+                        <div
+                          key={i}
+                          style={{
+                            width: 12,
+                            height: 12,
+                            borderRadius: "50%",
+                            background: c,
+                            border: `1px solid ${token.colorBorder}`,
+                          }}
+                        />
                       ))}
                     </div>
-                    <div style={{ fontSize: 12, fontWeight: 600, color: isActive ? colors.primary : token.colorText }}>
+                    <div
+                      style={{
+                        fontSize: 12,
+                        fontWeight: 600,
+                        color: isActive ? colors.primary : token.colorText,
+                      }}
+                    >
                       {p.name}
                     </div>
                   </div>
-                  {isActive && <CheckOutlined style={{ color: colors.primary, fontSize: 12 }} />}
+                  {isActive && (
+                    <CheckOutlined
+                      style={{ color: colors.primary, fontSize: 12 }}
+                    />
+                  )}
                 </div>
               );
             })}
@@ -261,45 +362,98 @@ export function ThemeCustomizer() {
         {/* ── Primary Color ──────────────────────────────────────────────── */}
         <div>
           <SectionLabel>Primary Color</SectionLabel>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 7, marginBottom: 12 }}>
-            {PALETTE.map((c) => {
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(5, 1fr)",
+              gap: 7,
+              marginBottom: 12,
+            }}
+          >
+            {PALETTE.map(c => {
               const isActive = accentColor === c.hex;
               return (
                 <Tooltip key={c.hex} title={c.label} placement="top">
                   <button
-                    onClick={() => { setAccentColor(c.hex); setPreset(null); }}
+                    onClick={() => {
+                      setAccentColor(c.hex);
+                      setPreset(null);
+                    }}
                     style={{
-                      width: "100%", aspectRatio: "1",
-                      borderRadius: 7, background: c.hex,
-                      border: isActive ? `2px solid ${token.colorBgContainer}` : "2px solid transparent",
-                      outline: isActive ? `2px solid ${c.hex}` : "2px solid transparent",
+                      width: "100%",
+                      aspectRatio: "1",
+                      borderRadius: 7,
+                      background: c.hex,
+                      border: isActive
+                        ? `2px solid ${token.colorBgContainer}`
+                        : "2px solid transparent",
+                      outline: isActive
+                        ? `2px solid ${c.hex}`
+                        : "2px solid transparent",
                       cursor: "pointer",
-                      display: "flex", alignItems: "center", justifyContent: "center",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
                       transform: isActive ? "scale(1.12)" : "scale(1)",
                       transition: "transform 0.15s, outline 0.15s",
                     }}
                   >
-                    {isActive && <CheckOutlined style={{ fontSize: 10, color: "#fff" }} />}
+                    {isActive && (
+                      <CheckOutlined style={{ fontSize: 10, color: "#fff" }} />
+                    )}
                   </button>
                 </Tooltip>
               );
             })}
           </div>
-          <div style={{
-            display: "flex", alignItems: "center", gap: 10,
-            padding: "9px 12px",
-            background: token.colorFillAlter,
-            borderRadius: token.borderRadiusLG,
-            border: `1px solid ${token.colorBorderSecondary}`,
-          }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              padding: "9px 12px",
+              background: token.colorFillAlter,
+              borderRadius: token.borderRadiusLG,
+              border: `1px solid ${token.colorBorderSecondary}`,
+            }}
+          >
             <div style={{ position: "relative", flexShrink: 0 }}>
-              <div style={{ width: 26, height: 26, borderRadius: 6, background: activeColor, border: `1px solid ${token.colorBorderSecondary}` }} />
-              <input type="color" value={activeColor} onChange={(e) => { setAccentColor(e.target.value); setPreset(null); }}
-                style={{ position: "absolute", inset: 0, opacity: 0, cursor: "pointer", width: "100%", height: "100%" }} />
+              <div
+                style={{
+                  width: 26,
+                  height: 26,
+                  borderRadius: 6,
+                  background: activeColor,
+                  border: `1px solid ${token.colorBorderSecondary}`,
+                }}
+              />
+              <input
+                type="color"
+                value={activeColor}
+                onChange={e => {
+                  setAccentColor(e.target.value);
+                  setPreset(null);
+                }}
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  opacity: 0,
+                  cursor: "pointer",
+                  width: "100%",
+                  height: "100%",
+                }}
+              />
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <Text style={{ fontSize: 11, display: "block", fontWeight: 500 }}>Custom color</Text>
-              <Text type="secondary" style={{ fontSize: 11, fontFamily: "monospace" }}>{activeColor.toUpperCase()}</Text>
+              <Text style={{ fontSize: 11, display: "block", fontWeight: 500 }}>
+                Custom color
+              </Text>
+              <Text
+                type="secondary"
+                style={{ fontSize: 11, fontFamily: "monospace" }}
+              >
+                {activeColor.toUpperCase()}
+              </Text>
             </div>
           </div>
         </div>
@@ -309,8 +463,10 @@ export function ThemeCustomizer() {
         {/* ── Border Radius ──────────────────────────────────────────────── */}
         <div>
           <SectionLabel>Border Radius</SectionLabel>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-            {RADIUS_PRESETS.map((p) => {
+          <div
+            style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}
+          >
+            {RADIUS_PRESETS.map(p => {
               const isActive = themeRadius === p.value;
               return (
                 <OptionButton
@@ -319,7 +475,16 @@ export function ThemeCustomizer() {
                   onClick={() => setThemeRadius(p.value)}
                   style={{ padding: "10px 8px", borderRadius: p.preview }}
                 >
-                  <div style={{ width: 32, height: 12, background: isActive ? token.colorPrimary : token.colorFillSecondary, borderRadius: p.preview }} />
+                  <div
+                    style={{
+                      width: 32,
+                      height: 12,
+                      background: isActive
+                        ? token.colorPrimary
+                        : token.colorFillSecondary,
+                      borderRadius: p.preview,
+                    }}
+                  />
                   {p.label}
                 </OptionButton>
               );
@@ -331,21 +496,57 @@ export function ThemeCustomizer() {
 
         {/* ── UI & Layout ────────────────────────────────────────────────── */}
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: -10 }}>
-            <LayoutOutlined style={{ color: token.colorPrimary, fontSize: 13 }} />
-            <span style={{ fontSize: 12, fontWeight: 700, color: token.colorText }}>UI & Layout</span>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              marginBottom: -10,
+            }}
+          >
+            <LayoutOutlined
+              style={{ color: token.colorPrimary, fontSize: 13 }}
+            />
+            <span
+              style={{ fontSize: 12, fontWeight: 700, color: token.colorText }}
+            >
+              UI & Layout
+            </span>
           </div>
 
           {/* PIN Lock Style */}
           <div>
             <SectionLabel>PIN Lock Style</SectionLabel>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr 1fr",
+                gap: 8,
+              }}
+            >
               {[
-                { value: 1 as const, label: "Minimal", icon: <LockOutlined style={{ fontSize: 16 }} /> },
-                { value: 2 as const, label: "Split",   icon: <AppstoreOutlined style={{ fontSize: 16 }} /> },
-                { value: 3 as const, label: "Phone",   icon: <MobileOutlined style={{ fontSize: 16 }} /> },
-              ].map((opt) => (
-                <OptionButton key={opt.value} isActive={pinStyle === opt.value} onClick={() => setPinStyle(opt.value)} style={{ padding: "12px 6px 10px" }}>
+                {
+                  value: 1 as const,
+                  label: "Minimal",
+                  icon: <LockOutlined style={{ fontSize: 16 }} />,
+                },
+                {
+                  value: 2 as const,
+                  label: "Split",
+                  icon: <AppstoreOutlined style={{ fontSize: 16 }} />,
+                },
+                {
+                  value: 3 as const,
+                  label: "Phone",
+                  icon: <MobileOutlined style={{ fontSize: 16 }} />,
+                },
+              ].map(opt => (
+                <OptionButton
+                  key={opt.value}
+                  isActive={pinStyle === opt.value}
+                  onClick={() => setPinStyle(opt.value)}
+                  style={{ padding: "12px 6px 10px" }}
+                >
                   {opt.icon}
                   {opt.label}
                 </OptionButton>
@@ -356,24 +557,82 @@ export function ThemeCustomizer() {
           {/* Definitions Layout */}
           <div>
             <SectionLabel>Definitions Layout</SectionLabel>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-              {([
-                { value: "vertical"   as const, label: "Vertical" },
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 8,
+              }}
+            >
+              {[
+                { value: "vertical" as const, label: "Vertical" },
                 { value: "horizontal" as const, label: "Horizontal" },
-              ]).map((opt) => {
+              ].map(opt => {
                 const isActive = definitionsLayout === opt.value;
                 const isVert = opt.value === "vertical";
                 return (
-                  <OptionButton key={opt.value} isActive={isActive} onClick={() => setDefinitionsLayout(opt.value)} style={{ padding: "12px 6px 10px" }}>
+                  <OptionButton
+                    key={opt.value}
+                    isActive={isActive}
+                    onClick={() => setDefinitionsLayout(opt.value)}
+                    style={{ padding: "12px 6px 10px" }}
+                  >
                     {isVert ? (
-                      <div style={{ display: "flex", gap: 3, width: 32, height: 20 }}>
-                        <div style={{ width: 9, background: isActive ? token.colorPrimary : token.colorBorderSecondary, borderRadius: 2 }} />
-                        <div style={{ flex: 1, background: isActive ? `${token.colorPrimary}30` : token.colorFillAlter, borderRadius: 2 }} />
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: 3,
+                          width: 32,
+                          height: 20,
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: 9,
+                            background: isActive
+                              ? token.colorPrimary
+                              : token.colorBorderSecondary,
+                            borderRadius: 2,
+                          }}
+                        />
+                        <div
+                          style={{
+                            flex: 1,
+                            background: isActive
+                              ? `${token.colorPrimary}30`
+                              : token.colorFillAlter,
+                            borderRadius: 2,
+                          }}
+                        />
                       </div>
                     ) : (
-                      <div style={{ display: "flex", flexDirection: "column", gap: 3, width: 32, height: 20 }}>
-                        <div style={{ height: 6, background: isActive ? token.colorPrimary : token.colorBorderSecondary, borderRadius: 2 }} />
-                        <div style={{ flex: 1, background: isActive ? `${token.colorPrimary}30` : token.colorFillAlter, borderRadius: 2 }} />
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: 3,
+                          width: 32,
+                          height: 20,
+                        }}
+                      >
+                        <div
+                          style={{
+                            height: 6,
+                            background: isActive
+                              ? token.colorPrimary
+                              : token.colorBorderSecondary,
+                            borderRadius: 2,
+                          }}
+                        />
+                        <div
+                          style={{
+                            flex: 1,
+                            background: isActive
+                              ? `${token.colorPrimary}30`
+                              : token.colorFillAlter,
+                            borderRadius: 2,
+                          }}
+                        />
                       </div>
                     )}
                     {opt.label}
@@ -386,24 +645,82 @@ export function ThemeCustomizer() {
           {/* Settings Layout */}
           <div>
             <SectionLabel>Settings Layout</SectionLabel>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-              {([
-                { value: "vertical"   as const, label: "Vertical" },
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 8,
+              }}
+            >
+              {[
+                { value: "vertical" as const, label: "Vertical" },
                 { value: "horizontal" as const, label: "Horizontal" },
-              ]).map((opt) => {
+              ].map(opt => {
                 const isActive = settingsLayout === opt.value;
                 const isVert = opt.value === "vertical";
                 return (
-                  <OptionButton key={opt.value} isActive={isActive} onClick={() => setSettingsLayout(opt.value)} style={{ padding: "12px 6px 10px" }}>
+                  <OptionButton
+                    key={opt.value}
+                    isActive={isActive}
+                    onClick={() => setSettingsLayout(opt.value)}
+                    style={{ padding: "12px 6px 10px" }}
+                  >
                     {isVert ? (
-                      <div style={{ display: "flex", gap: 3, width: 32, height: 20 }}>
-                        <div style={{ width: 9, background: isActive ? token.colorPrimary : token.colorBorderSecondary, borderRadius: 2 }} />
-                        <div style={{ flex: 1, background: isActive ? `${token.colorPrimary}30` : token.colorFillAlter, borderRadius: 2 }} />
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: 3,
+                          width: 32,
+                          height: 20,
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: 9,
+                            background: isActive
+                              ? token.colorPrimary
+                              : token.colorBorderSecondary,
+                            borderRadius: 2,
+                          }}
+                        />
+                        <div
+                          style={{
+                            flex: 1,
+                            background: isActive
+                              ? `${token.colorPrimary}30`
+                              : token.colorFillAlter,
+                            borderRadius: 2,
+                          }}
+                        />
                       </div>
                     ) : (
-                      <div style={{ display: "flex", flexDirection: "column", gap: 3, width: 32, height: 20 }}>
-                        <div style={{ height: 6, background: isActive ? token.colorPrimary : token.colorBorderSecondary, borderRadius: 2 }} />
-                        <div style={{ flex: 1, background: isActive ? `${token.colorPrimary}30` : token.colorFillAlter, borderRadius: 2 }} />
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: 3,
+                          width: 32,
+                          height: 20,
+                        }}
+                      >
+                        <div
+                          style={{
+                            height: 6,
+                            background: isActive
+                              ? token.colorPrimary
+                              : token.colorBorderSecondary,
+                            borderRadius: 2,
+                          }}
+                        />
+                        <div
+                          style={{
+                            flex: 1,
+                            background: isActive
+                              ? `${token.colorPrimary}30`
+                              : token.colorFillAlter,
+                            borderRadius: 2,
+                          }}
+                        />
                       </div>
                     )}
                     {opt.label}
@@ -416,12 +733,31 @@ export function ThemeCustomizer() {
           {/* Definitions CRUD Style */}
           <div>
             <SectionLabel>Definitions CRUD Style</SectionLabel>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 8,
+              }}
+            >
               {[
-                { value: "drawer" as const, label: "Drawer", icon: <ProfileOutlined style={{ fontSize: 16 }} /> },
-                { value: "modal"  as const, label: "Modal",  icon: <FormOutlined style={{ fontSize: 16 }} /> },
-              ].map((opt) => (
-                <OptionButton key={opt.value} isActive={definitionsCrudStyle === opt.value} onClick={() => setDefinitionsCrudStyle(opt.value)} style={{ padding: "12px 6px 10px" }}>
+                {
+                  value: "drawer" as const,
+                  label: "Drawer",
+                  icon: <ProfileOutlined style={{ fontSize: 16 }} />,
+                },
+                {
+                  value: "modal" as const,
+                  label: "Modal",
+                  icon: <FormOutlined style={{ fontSize: 16 }} />,
+                },
+              ].map(opt => (
+                <OptionButton
+                  key={opt.value}
+                  isActive={definitionsCrudStyle === opt.value}
+                  onClick={() => setDefinitionsCrudStyle(opt.value)}
+                  style={{ padding: "12px 6px 10px" }}
+                >
                   {opt.icon}
                   {opt.label}
                 </OptionButton>

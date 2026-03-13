@@ -68,26 +68,30 @@ interface Attachment {
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function formatBytes(bytes: number): string {
-  if (bytes < 1024)       return `${bytes} B`;
-  if (bytes < 1_048_576)  return `${(bytes / 1024).toFixed(1)} KB`;
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1_048_576) return `${(bytes / 1024).toFixed(1)} KB`;
   return `${(bytes / 1_048_576).toFixed(1)} MB`;
 }
 
 const FILE_ICONS: Record<string, React.ReactNode> = {
-  pdf:  <FilePdfOutlined   style={{ color: "#f5222d", fontSize: 18 }} />,
-  docx: <FileWordOutlined  style={{ color: "#1677ff", fontSize: 18 }} />,
-  doc:  <FileWordOutlined  style={{ color: "#1677ff", fontSize: 18 }} />,
+  pdf: <FilePdfOutlined style={{ color: "#f5222d", fontSize: 18 }} />,
+  docx: <FileWordOutlined style={{ color: "#1677ff", fontSize: 18 }} />,
+  doc: <FileWordOutlined style={{ color: "#1677ff", fontSize: 18 }} />,
   xlsx: <FileExcelOutlined style={{ color: "#52c41a", fontSize: 18 }} />,
-  xls:  <FileExcelOutlined style={{ color: "#52c41a", fontSize: 18 }} />,
-  png:  <FileImageOutlined style={{ color: "#722ed1", fontSize: 18 }} />,
-  jpg:  <FileImageOutlined style={{ color: "#722ed1", fontSize: 18 }} />,
+  xls: <FileExcelOutlined style={{ color: "#52c41a", fontSize: 18 }} />,
+  png: <FileImageOutlined style={{ color: "#722ed1", fontSize: 18 }} />,
+  jpg: <FileImageOutlined style={{ color: "#722ed1", fontSize: 18 }} />,
   jpeg: <FileImageOutlined style={{ color: "#722ed1", fontSize: 18 }} />,
-  zip:  <FileZipOutlined   style={{ color: "#fa8c16", fontSize: 18 }} />,
-  txt:  <FileTextOutlined  style={{ color: "#8c8c8c", fontSize: 18 }} />,
+  zip: <FileZipOutlined style={{ color: "#fa8c16", fontSize: 18 }} />,
+  txt: <FileTextOutlined style={{ color: "#8c8c8c", fontSize: 18 }} />,
 };
 
 function fileIcon(type: string) {
-  return FILE_ICONS[type.toLowerCase()] ?? <FileUnknownOutlined style={{ color: "#8c8c8c", fontSize: 18 }} />;
+  return (
+    FILE_ICONS[type.toLowerCase()] ?? (
+      <FileUnknownOutlined style={{ color: "#8c8c8c", fontSize: 18 }} />
+    )
+  );
 }
 
 // ─── Pending file row (during upload) ────────────────────────────────────────
@@ -113,7 +117,12 @@ function AttachUploadModal({
 }: {
   open: boolean;
   onClose: () => void;
-  onUploaded: (files: Omit<Attachment, "id" | "uploadedAt" | "uploadedBy" | "uploadStatus">[]) => void;
+  onUploaded: (
+    files: Omit<
+      Attachment,
+      "id" | "uploadedAt" | "uploadedBy" | "uploadStatus"
+    >[]
+  ) => void;
   entityName: string;
 }) {
   const [pendingFiles, setPendingFiles] = useState<PendingFile[]>([]);
@@ -122,9 +131,9 @@ function AttachUploadModal({
   const draggerProps: UploadProps = {
     multiple: true,
     showUploadList: false,
-    beforeUpload: (file) => {
+    beforeUpload: file => {
       const ext = file.name.split(".").pop() ?? "file";
-      setPendingFiles((prev) => [
+      setPendingFiles(prev => [
         ...prev,
         {
           uid: file.uid,
@@ -142,11 +151,13 @@ function AttachUploadModal({
   };
 
   function updateFile(uid: string, patch: Partial<PendingFile>) {
-    setPendingFiles((prev) => prev.map((f) => (f.uid === uid ? { ...f, ...patch } : f)));
+    setPendingFiles(prev =>
+      prev.map(f => (f.uid === uid ? { ...f, ...patch } : f))
+    );
   }
 
   function removeFile(uid: string) {
-    setPendingFiles((prev) => prev.filter((f) => f.uid !== uid));
+    setPendingFiles(prev => prev.filter(f => f.uid !== uid));
   }
 
   async function handleUpload() {
@@ -155,14 +166,14 @@ function AttachUploadModal({
     for (const file of pendingFiles) {
       updateFile(file.uid, { status: "uploading" });
       for (let p = 10; p <= 100; p += 20) {
-        await new Promise<void>((r) => setTimeout(r, 80));
+        await new Promise<void>(r => setTimeout(r, 80));
         updateFile(file.uid, { progress: p });
       }
       updateFile(file.uid, { status: "done", progress: 100 });
     }
     setUploading(false);
     onUploaded(
-      pendingFiles.map((f) => ({
+      pendingFiles.map(f => ({
         name: f.name,
         type: f.type,
         size: f.size,
@@ -177,7 +188,12 @@ function AttachUploadModal({
   return (
     <Modal
       open={open}
-      onCancel={() => { if (!uploading) { setPendingFiles([]); onClose(); } }}
+      onCancel={() => {
+        if (!uploading) {
+          setPendingFiles([]);
+          onClose();
+        }
+      }}
       title={
         <Space>
           <PaperClipOutlined />
@@ -186,7 +202,14 @@ function AttachUploadModal({
       }
       width={680}
       footer={[
-        <Button key="cancel" onClick={() => { setPendingFiles([]); onClose(); }} disabled={uploading}>
+        <Button
+          key="cancel"
+          onClick={() => {
+            setPendingFiles([]);
+            onClose();
+          }}
+          disabled={uploading}
+        >
           Cancel
         </Button>,
         <Button
@@ -197,7 +220,9 @@ function AttachUploadModal({
           loading={uploading}
           onClick={handleUpload}
         >
-          {uploading ? "Uploading…" : `Upload${pendingFiles.length > 0 ? ` (${pendingFiles.length})` : ""}`}
+          {uploading
+            ? "Uploading…"
+            : `Upload${pendingFiles.length > 0 ? ` (${pendingFiles.length})` : ""}`}
         </Button>,
       ]}
     >
@@ -218,7 +243,7 @@ function AttachUploadModal({
         {/* Per-file metadata */}
         {pendingFiles.length > 0 && (
           <div style={{ maxHeight: 360, overflowY: "auto" }}>
-            {pendingFiles.map((file) => (
+            {pendingFiles.map(file => (
               <div
                 key={file.uid}
                 style={{
@@ -230,13 +255,22 @@ function AttachUploadModal({
                 }}
               >
                 {/* File header */}
-                <Row justify="space-between" align="middle" style={{ marginBottom: 8 }}>
+                <Row
+                  justify="space-between"
+                  align="middle"
+                  style={{ marginBottom: 8 }}
+                >
                   <Col>
                     <Space>
                       {fileIcon(file.type)}
                       <div>
-                        <Text strong style={{ fontSize: 13 }}>{file.name}</Text>
-                        <Text type="secondary" style={{ fontSize: 12, marginLeft: 8 }}>
+                        <Text strong style={{ fontSize: 13 }}>
+                          {file.name}
+                        </Text>
+                        <Text
+                          type="secondary"
+                          style={{ fontSize: 12, marginLeft: 8 }}
+                        >
                           {formatBytes(file.size)}
                         </Text>
                       </div>
@@ -263,7 +297,11 @@ function AttachUploadModal({
 
                 {/* Progress bar when uploading */}
                 {file.status === "uploading" && (
-                  <Progress percent={file.progress} size="small" style={{ marginBottom: 8 }} />
+                  <Progress
+                    percent={file.progress}
+                    size="small"
+                    style={{ marginBottom: 8 }}
+                  />
                 )}
 
                 {/* Metadata fields (only before upload starts) */}
@@ -274,7 +312,9 @@ function AttachUploadModal({
                         placeholder="Description (optional)"
                         size="small"
                         value={file.description}
-                        onChange={(e) => updateFile(file.uid, { description: e.target.value })}
+                        onChange={e =>
+                          updateFile(file.uid, { description: e.target.value })
+                        }
                       />
                     </Col>
                     <Col xs={24} sm={10}>
@@ -284,7 +324,7 @@ function AttachUploadModal({
                         placeholder="Tags"
                         style={{ width: "100%" }}
                         value={file.tags}
-                        onChange={(val) => updateFile(file.uid, { tags: val })}
+                        onChange={val => updateFile(file.uid, { tags: val })}
                         options={[
                           { value: "contract" },
                           { value: "invoice" },
@@ -344,12 +384,18 @@ export default function AttachmentsTab({
   entityName,
   initialAttachments = SEED,
 }: AttachmentsTabProps) {
-  const [attachments, setAttachments] = useState<Attachment[]>(initialAttachments);
+  const [attachments, setAttachments] =
+    useState<Attachment[]>(initialAttachments);
   const [modalOpen, setModalOpen] = useState(false);
 
-  function handleUploaded(files: Omit<Attachment, "id" | "uploadedAt" | "uploadedBy" | "uploadStatus">[]) {
+  function handleUploaded(
+    files: Omit<
+      Attachment,
+      "id" | "uploadedAt" | "uploadedBy" | "uploadStatus"
+    >[]
+  ) {
     const now = new Date().toISOString().slice(0, 10);
-    setAttachments((prev) => [
+    setAttachments(prev => [
       ...prev,
       ...files.map((f, i) => ({
         ...f,
@@ -362,7 +408,7 @@ export default function AttachmentsTab({
   }
 
   function deleteAttachment(id: string) {
-    setAttachments((prev) => prev.filter((a) => a.id !== id));
+    setAttachments(prev => prev.filter(a => a.id !== id));
   }
 
   const columns: ColumnsType<Attachment> = [
@@ -373,7 +419,9 @@ export default function AttachmentsTab({
         <Space>
           {fileIcon(a.type)}
           <div>
-            <Text strong style={{ fontSize: 13 }}>{a.name}</Text>
+            <Text strong style={{ fontSize: 13 }}>
+              {a.name}
+            </Text>
             {a.description && (
               <Text type="secondary" style={{ display: "block", fontSize: 12 }}>
                 {a.description}
@@ -388,7 +436,11 @@ export default function AttachmentsTab({
       dataIndex: "size",
       key: "size",
       width: 90,
-      render: (s: number) => <Text type="secondary" style={{ fontSize: 12 }}>{formatBytes(s)}</Text>,
+      render: (s: number) => (
+        <Text type="secondary" style={{ fontSize: 12 }}>
+          {formatBytes(s)}
+        </Text>
+      ),
     },
     {
       title: "Tags",
@@ -396,7 +448,13 @@ export default function AttachmentsTab({
       key: "tags",
       width: 160,
       render: (tags: string[]) => (
-        <>{tags.map((t) => <Tag key={t} style={{ fontSize: 11 }}>{t}</Tag>)}</>
+        <>
+          {tags.map(t => (
+            <Tag key={t} style={{ fontSize: 11 }}>
+              {t}
+            </Tag>
+          ))}
+        </>
       ),
     },
     {
@@ -406,7 +464,11 @@ export default function AttachmentsTab({
       render: (_, a) => (
         <Space>
           <Avatar size={22} style={{ background: "#1677ff", fontSize: 10 }}>
-            {a.uploadedBy.split(" ").map((n) => n[0]).join("").slice(0, 2)}
+            {a.uploadedBy
+              .split(" ")
+              .map(n => n[0])
+              .join("")
+              .slice(0, 2)}
           </Avatar>
           <Text style={{ fontSize: 12 }}>{a.uploadedBy}</Text>
         </Space>
@@ -417,7 +479,11 @@ export default function AttachmentsTab({
       dataIndex: "uploadedAt",
       key: "date",
       width: 110,
-      render: (d: string) => <Text type="secondary" style={{ fontSize: 12 }}>{d}</Text>,
+      render: (d: string) => (
+        <Text type="secondary" style={{ fontSize: 12 }}>
+          {d}
+        </Text>
+      ),
     },
     {
       title: "",
@@ -427,8 +493,12 @@ export default function AttachmentsTab({
         <Dropdown
           menu={{
             items: [
-              { key: "preview",  icon: <EyeOutlined />,       label: "Preview" },
-              { key: "download", icon: <DownloadOutlined />,  label: "Download" },
+              { key: "preview", icon: <EyeOutlined />, label: "Preview" },
+              {
+                key: "download",
+                icon: <DownloadOutlined />,
+                label: "Download",
+              },
               { type: "divider" },
               {
                 key: "delete",
@@ -454,7 +524,10 @@ export default function AttachmentsTab({
         <Col>
           <Space>
             <PaperClipOutlined style={{ fontSize: 16 }} />
-            <Text strong>{attachments.length} attachment{attachments.length !== 1 ? "s" : ""}</Text>
+            <Text strong>
+              {attachments.length} attachment
+              {attachments.length !== 1 ? "s" : ""}
+            </Text>
           </Space>
         </Col>
         <Col>

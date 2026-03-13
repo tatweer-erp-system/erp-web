@@ -1,56 +1,145 @@
 import { useParams, useLocation } from "wouter";
 import DashboardLayout from "@/components/DashboardLayout";
 import {
-  Alert, Avatar, Badge, Button, Card, Checkbox, Col, DatePicker,
-  Divider, Form, Input, Row, Select, Space, Switch, Table, Tag,
-  TimePicker, Tooltip, Typography, Upload, message, theme as antTheme,
+  Alert,
+  Avatar,
+  Badge,
+  Button,
+  Card,
+  Checkbox,
+  Col,
+  DatePicker,
+  Divider,
+  Form,
+  Input,
+  Row,
+  Select,
+  Space,
+  Switch,
+  Table,
+  Tag,
+  TimePicker,
+  Tooltip,
+  Typography,
+  Upload,
+  message,
+  theme as antTheme,
 } from "antd";
 import {
-  ApartmentOutlined, BranchesOutlined, CheckCircleOutlined,
-  ClockCircleOutlined, CloudUploadOutlined, DeleteOutlined,
-  EditOutlined, EnvironmentOutlined, GlobalOutlined, PlusOutlined,
-  PercentageOutlined, PhoneOutlined, SaveOutlined, ShopOutlined,
-  FileProtectOutlined, AppstoreOutlined, LinkOutlined,
+  ApartmentOutlined,
+  BranchesOutlined,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  CloudUploadOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  EnvironmentOutlined,
+  GlobalOutlined,
+  PlusOutlined,
+  PercentageOutlined,
+  PhoneOutlined,
+  SaveOutlined,
+  ShopOutlined,
+  FileProtectOutlined,
+  AppstoreOutlined,
+  LinkOutlined,
 } from "@ant-design/icons";
 
 const { Title, Text, Paragraph } = Typography;
 
 // ─── Tab definitions ─────────────────────────────────────────────────────────
 const TABS = [
-  { key: "profile",      label: "Name & Logo",          icon: <ShopOutlined /> },
-  { key: "registration", label: "Registration Number",   icon: <FileProtectOutlined /> },
-  { key: "tax",          label: "Tax / VAT Number",      icon: <PercentageOutlined /> },
-  { key: "industry",     label: "Industry & Type",       icon: <AppstoreOutlined /> },
-  { key: "address",      label: "Company Address",       icon: <EnvironmentOutlined /> },
-  { key: "contact",      label: "Contact Info",          icon: <PhoneOutlined /> },
-  { key: "social",       label: "Social Media",          icon: <GlobalOutlined /> },
-  { key: "hours",        label: "Working Hours",         icon: <ClockCircleOutlined /> },
-  { key: "branches",     label: "Branches",              icon: <BranchesOutlined /> },
+  { key: "profile", label: "Name & Logo", icon: <ShopOutlined /> },
+  {
+    key: "registration",
+    label: "Registration Number",
+    icon: <FileProtectOutlined />,
+  },
+  { key: "tax", label: "Tax / VAT Number", icon: <PercentageOutlined /> },
+  { key: "industry", label: "Industry & Type", icon: <AppstoreOutlined /> },
+  { key: "address", label: "Company Address", icon: <EnvironmentOutlined /> },
+  { key: "contact", label: "Contact Info", icon: <PhoneOutlined /> },
+  { key: "social", label: "Social Media", icon: <GlobalOutlined /> },
+  { key: "hours", label: "Working Hours", icon: <ClockCircleOutlined /> },
+  { key: "branches", label: "Branches", icon: <BranchesOutlined /> },
 ];
 
-const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+const DAYS = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+];
 
 const BRANCHES_DATA = [
-  { key: "1", name: "Main Branch",   city: "New York",  country: "USA",   manager: "John Doe",   status: "active" },
-  { key: "2", name: "Cairo Branch",  city: "Cairo",     country: "Egypt", manager: "Ahmed Ali",  status: "active" },
-  { key: "3", name: "Dubai Branch",  city: "Dubai",     country: "UAE",   manager: "Sara Hassan", status: "inactive" },
+  {
+    key: "1",
+    name: "Main Branch",
+    city: "New York",
+    country: "USA",
+    manager: "John Doe",
+    status: "active",
+  },
+  {
+    key: "2",
+    name: "Cairo Branch",
+    city: "Cairo",
+    country: "Egypt",
+    manager: "Ahmed Ali",
+    status: "active",
+  },
+  {
+    key: "3",
+    name: "Dubai Branch",
+    city: "Dubai",
+    country: "UAE",
+    manager: "Sara Hassan",
+    status: "inactive",
+  },
 ];
 
 // ─── Section wrapper ─────────────────────────────────────────────────────────
-function Section({ title, description, children }: { title?: string; description?: string; children: React.ReactNode }) {
+function Section({
+  title,
+  description,
+  children,
+}: {
+  title?: string;
+  description?: string;
+  children: React.ReactNode;
+}) {
   const { token } = antTheme.useToken();
   return (
-    <div style={{
-      background: token.colorBgContainer,
-      border: `1px solid ${token.colorBorderSecondary}`,
-      borderRadius: token.borderRadiusLG,
-      overflow: "hidden",
-      marginBottom: 16,
-    }}>
+    <div
+      style={{
+        background: token.colorBgContainer,
+        border: `1px solid ${token.colorBorderSecondary}`,
+        borderRadius: token.borderRadiusLG,
+        overflow: "hidden",
+        marginBottom: 16,
+      }}
+    >
       {title && (
-        <div style={{ padding: "14px 20px", borderBottom: `1px solid ${token.colorBorderSecondary}` }}>
-          <Text strong style={{ fontSize: 13 }}>{title}</Text>
-          {description && <><br /><Text type="secondary" style={{ fontSize: 12 }}>{description}</Text></>}
+        <div
+          style={{
+            padding: "14px 20px",
+            borderBottom: `1px solid ${token.colorBorderSecondary}`,
+          }}
+        >
+          <Text strong style={{ fontSize: 13 }}>
+            {title}
+          </Text>
+          {description && (
+            <>
+              <br />
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                {description}
+              </Text>
+            </>
+          )}
         </div>
       )}
       <div style={{ padding: 20 }}>{children}</div>
@@ -65,22 +154,50 @@ function ProfileTab() {
     <>
       <Section title="Company Logo">
         <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
-          <Upload showUploadList={false} beforeUpload={() => false} accept="image/*">
-            <div style={{
-              width: 96, height: 96, borderRadius: 16, border: `2px dashed ${token.colorBorderSecondary}`,
-              display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-              cursor: "pointer", background: token.colorFillAlter, gap: 6,
-            }}>
-              <CloudUploadOutlined style={{ fontSize: 24, color: token.colorTextQuaternary }} />
-              <Text type="secondary" style={{ fontSize: 11 }}>Upload</Text>
+          <Upload
+            showUploadList={false}
+            beforeUpload={() => false}
+            accept="image/*"
+          >
+            <div
+              style={{
+                width: 96,
+                height: 96,
+                borderRadius: 16,
+                border: `2px dashed ${token.colorBorderSecondary}`,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                background: token.colorFillAlter,
+                gap: 6,
+              }}
+            >
+              <CloudUploadOutlined
+                style={{ fontSize: 24, color: token.colorTextQuaternary }}
+              />
+              <Text type="secondary" style={{ fontSize: 11 }}>
+                Upload
+              </Text>
             </div>
           </Upload>
           <div>
-            <Text strong style={{ fontSize: 13 }}>Company Logo</Text><br />
-            <Text type="secondary" style={{ fontSize: 12 }}>PNG or SVG, 512×512px recommended, max 2MB</Text><br />
+            <Text strong style={{ fontSize: 13 }}>
+              Company Logo
+            </Text>
+            <br />
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              PNG or SVG, 512×512px recommended, max 2MB
+            </Text>
+            <br />
             <Space style={{ marginTop: 8 }}>
-              <Button size="small" icon={<CloudUploadOutlined />}>Upload new</Button>
-              <Button size="small" danger>Remove</Button>
+              <Button size="small" icon={<CloudUploadOutlined />}>
+                Upload new
+              </Button>
+              <Button size="small" danger>
+                Remove
+              </Button>
             </Space>
           </div>
         </div>
@@ -89,13 +206,26 @@ function ProfileTab() {
         <Form layout="vertical">
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
-              <Form.Item label="Legal Company Name" required style={{ marginBottom: 16 }}>
-                <Input defaultValue="Tech Solutions Inc." placeholder="As per registration" />
+              <Form.Item
+                label="Legal Company Name"
+                required
+                style={{ marginBottom: 16 }}
+              >
+                <Input
+                  defaultValue="Tech Solutions Inc."
+                  placeholder="As per registration"
+                />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Display Name / Trade Name" style={{ marginBottom: 16 }}>
-                <Input defaultValue="TechSol" placeholder="Brand / short name" />
+              <Form.Item
+                label="Display Name / Trade Name"
+                style={{ marginBottom: 16 }}
+              >
+                <Input
+                  defaultValue="TechSol"
+                  placeholder="Brand / short name"
+                />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
@@ -104,20 +234,37 @@ function ProfileTab() {
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Company Code / Abbreviation" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label="Company Code / Abbreviation"
+                style={{ marginBottom: 16 }}
+              >
                 <Input defaultValue="TSI" maxLength={6} />
               </Form.Item>
             </Col>
             <Col xs={24}>
-              <Form.Item label="Company Description" style={{ marginBottom: 0 }}>
-                <Input.TextArea rows={3} defaultValue="A leading provider of enterprise ERP solutions." showCount maxLength={500} />
+              <Form.Item
+                label="Company Description"
+                style={{ marginBottom: 0 }}
+              >
+                <Input.TextArea
+                  rows={3}
+                  defaultValue="A leading provider of enterprise ERP solutions."
+                  showCount
+                  maxLength={500}
+                />
               </Form.Item>
             </Col>
           </Row>
         </Form>
       </Section>
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button type="primary" icon={<SaveOutlined />} onClick={() => message.success("Company identity saved")}>Save Changes</Button>
+        <Button
+          type="primary"
+          icon={<SaveOutlined />}
+          onClick={() => message.success("Company identity saved")}
+        >
+          Save Changes
+        </Button>
       </div>
     </>
   );
@@ -126,12 +273,22 @@ function ProfileTab() {
 function RegistrationTab() {
   return (
     <>
-      <Section title="Commercial Registration" description="Official government-issued business registration details">
+      <Section
+        title="Commercial Registration"
+        description="Official government-issued business registration details"
+      >
         <Form layout="vertical">
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
-              <Form.Item label="Registration Number" required style={{ marginBottom: 16 }}>
-                <Input defaultValue="CR-2019-00847312" prefix={<FileProtectOutlined />} />
+              <Form.Item
+                label="Registration Number"
+                required
+                style={{ marginBottom: 16 }}
+              >
+                <Input
+                  defaultValue="CR-2019-00847312"
+                  prefix={<FileProtectOutlined />}
+                />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
@@ -150,33 +307,59 @@ function RegistrationTab() {
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Country of Registration" style={{ marginBottom: 16 }}>
-                <Select defaultValue="US" options={[
-                  { value: "US", label: "United States" },
-                  { value: "EG", label: "Egypt" },
-                  { value: "AE", label: "UAE" },
-                  { value: "GB", label: "United Kingdom" },
-                  { value: "SA", label: "Saudi Arabia" },
-                ]} />
+              <Form.Item
+                label="Country of Registration"
+                style={{ marginBottom: 16 }}
+              >
+                <Select
+                  defaultValue="US"
+                  options={[
+                    { value: "US", label: "United States" },
+                    { value: "EG", label: "Egypt" },
+                    { value: "AE", label: "UAE" },
+                    { value: "GB", label: "United Kingdom" },
+                    { value: "SA", label: "Saudi Arabia" },
+                  ]}
+                />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Business License Number" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label="Business License Number"
+                style={{ marginBottom: 16 }}
+              >
                 <Input defaultValue="BL-2019-54321" />
               </Form.Item>
             </Col>
           </Row>
         </Form>
       </Section>
-      <Section title="Document Upload" description="Upload scanned copies of your registration documents">
-        <Upload.Dragger beforeUpload={() => false} multiple style={{ padding: "12px 0" }}>
+      <Section
+        title="Document Upload"
+        description="Upload scanned copies of your registration documents"
+      >
+        <Upload.Dragger
+          beforeUpload={() => false}
+          multiple
+          style={{ padding: "12px 0" }}
+        >
           <CloudUploadOutlined style={{ fontSize: 32, color: "#8c8c8c" }} />
-          <p style={{ margin: "8px 0 4px", fontSize: 13 }}>Drag & drop files here, or click to browse</p>
-          <Text type="secondary" style={{ fontSize: 12 }}>PDF, PNG, JPG up to 10MB each</Text>
+          <p style={{ margin: "8px 0 4px", fontSize: 13 }}>
+            Drag & drop files here, or click to browse
+          </p>
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            PDF, PNG, JPG up to 10MB each
+          </Text>
         </Upload.Dragger>
       </Section>
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button type="primary" icon={<SaveOutlined />} onClick={() => message.success("Registration details saved")}>Save Changes</Button>
+        <Button
+          type="primary"
+          icon={<SaveOutlined />}
+          onClick={() => message.success("Registration details saved")}
+        >
+          Save Changes
+        </Button>
       </div>
     </>
   );
@@ -185,31 +368,50 @@ function RegistrationTab() {
 function TaxTab() {
   return (
     <>
-      <Section title="Tax / VAT Registration" description="Tax identification and VAT registration details">
+      <Section
+        title="Tax / VAT Registration"
+        description="Tax identification and VAT registration details"
+      >
         <Form layout="vertical">
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
-              <Form.Item label="VAT Registration Number" required style={{ marginBottom: 16 }}>
-                <Input defaultValue="VAT-US-123456789" prefix={<PercentageOutlined />} />
+              <Form.Item
+                label="VAT Registration Number"
+                required
+                style={{ marginBottom: 16 }}
+              >
+                <Input
+                  defaultValue="VAT-US-123456789"
+                  prefix={<PercentageOutlined />}
+                />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item label="Tax Type" style={{ marginBottom: 16 }}>
-                <Select defaultValue="vat" options={[
-                  { value: "vat", label: "VAT (Value Added Tax)" },
-                  { value: "gst", label: "GST (Goods & Services Tax)" },
-                  { value: "sales", label: "Sales Tax" },
-                  { value: "corporate", label: "Corporate Tax" },
-                ]} />
+                <Select
+                  defaultValue="vat"
+                  options={[
+                    { value: "vat", label: "VAT (Value Added Tax)" },
+                    { value: "gst", label: "GST (Goods & Services Tax)" },
+                    { value: "sales", label: "Sales Tax" },
+                    { value: "corporate", label: "Corporate Tax" },
+                  ]}
+                />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Tax Registration Date" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label="Tax Registration Date"
+                style={{ marginBottom: 16 }}
+              >
                 <DatePicker style={{ width: "100%" }} />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Default VAT Rate (%)" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label="Default VAT Rate (%)"
+                style={{ marginBottom: 16 }}
+              >
                 <Input defaultValue="15" suffix="%" type="number" />
               </Form.Item>
             </Col>
@@ -219,19 +421,31 @@ function TaxTab() {
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Tax Filing Frequency" style={{ marginBottom: 16 }}>
-                <Select defaultValue="quarterly" options={[
-                  { value: "monthly", label: "Monthly" },
-                  { value: "quarterly", label: "Quarterly" },
-                  { value: "annually", label: "Annually" },
-                ]} />
+              <Form.Item
+                label="Tax Filing Frequency"
+                style={{ marginBottom: 16 }}
+              >
+                <Select
+                  defaultValue="quarterly"
+                  options={[
+                    { value: "monthly", label: "Monthly" },
+                    { value: "quarterly", label: "Quarterly" },
+                    { value: "annually", label: "Annually" },
+                  ]}
+                />
               </Form.Item>
             </Col>
           </Row>
         </Form>
       </Section>
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button type="primary" icon={<SaveOutlined />} onClick={() => message.success("Tax details saved")}>Save Changes</Button>
+        <Button
+          type="primary"
+          icon={<SaveOutlined />}
+          onClick={() => message.success("Tax details saved")}
+        >
+          Save Changes
+        </Button>
       </div>
     </>
   );
@@ -245,69 +459,104 @@ function IndustryTab() {
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
               <Form.Item label="Industry" style={{ marginBottom: 16 }}>
-                <Select defaultValue="tech" options={[
-                  { value: "tech", label: "Information Technology" },
-                  { value: "retail", label: "Retail & E-commerce" },
-                  { value: "manufacturing", label: "Manufacturing" },
-                  { value: "healthcare", label: "Healthcare" },
-                  { value: "finance", label: "Finance & Banking" },
-                  { value: "education", label: "Education" },
-                  { value: "logistics", label: "Logistics & Supply Chain" },
-                  { value: "construction", label: "Construction & Real Estate" },
-                  { value: "hospitality", label: "Hospitality & Tourism" },
-                  { value: "other", label: "Other" },
-                ]} />
+                <Select
+                  defaultValue="tech"
+                  options={[
+                    { value: "tech", label: "Information Technology" },
+                    { value: "retail", label: "Retail & E-commerce" },
+                    { value: "manufacturing", label: "Manufacturing" },
+                    { value: "healthcare", label: "Healthcare" },
+                    { value: "finance", label: "Finance & Banking" },
+                    { value: "education", label: "Education" },
+                    { value: "logistics", label: "Logistics & Supply Chain" },
+                    {
+                      value: "construction",
+                      label: "Construction & Real Estate",
+                    },
+                    { value: "hospitality", label: "Hospitality & Tourism" },
+                    { value: "other", label: "Other" },
+                  ]}
+                />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item label="Business Type" style={{ marginBottom: 16 }}>
-                <Select defaultValue="llc" options={[
-                  { value: "llc", label: "Limited Liability Company (LLC)" },
-                  { value: "corp", label: "Corporation (Corp)" },
-                  { value: "sole", label: "Sole Proprietorship" },
-                  { value: "partnership", label: "Partnership" },
-                  { value: "nonprofit", label: "Non-profit Organization" },
-                  { value: "gov", label: "Government Entity" },
-                ]} />
+                <Select
+                  defaultValue="llc"
+                  options={[
+                    { value: "llc", label: "Limited Liability Company (LLC)" },
+                    { value: "corp", label: "Corporation (Corp)" },
+                    { value: "sole", label: "Sole Proprietorship" },
+                    { value: "partnership", label: "Partnership" },
+                    { value: "nonprofit", label: "Non-profit Organization" },
+                    { value: "gov", label: "Government Entity" },
+                  ]}
+                />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item label="Company Size" style={{ marginBottom: 16 }}>
-                <Select defaultValue="medium" options={[
-                  { value: "micro", label: "Micro (1–9 employees)" },
-                  { value: "small", label: "Small (10–49 employees)" },
-                  { value: "medium", label: "Medium (50–249 employees)" },
-                  { value: "large", label: "Large (250+ employees)" },
-                  { value: "enterprise", label: "Enterprise (1000+ employees)" },
-                ]} />
+                <Select
+                  defaultValue="medium"
+                  options={[
+                    { value: "micro", label: "Micro (1–9 employees)" },
+                    { value: "small", label: "Small (10–49 employees)" },
+                    { value: "medium", label: "Medium (50–249 employees)" },
+                    { value: "large", label: "Large (250+ employees)" },
+                    {
+                      value: "enterprise",
+                      label: "Enterprise (1000+ employees)",
+                    },
+                  ]}
+                />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item label="Year Founded" style={{ marginBottom: 16 }}>
-                <Input defaultValue="2015" type="number" min={1800} max={2030} />
+                <Input
+                  defaultValue="2015"
+                  type="number"
+                  min={1800}
+                  max={2030}
+                />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Number of Employees" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label="Number of Employees"
+                style={{ marginBottom: 16 }}
+              >
                 <Input defaultValue="120" type="number" />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Annual Revenue Range" style={{ marginBottom: 16 }}>
-                <Select defaultValue="5-25m" options={[
-                  { value: "under1m", label: "Under $1M" },
-                  { value: "1-5m", label: "$1M – $5M" },
-                  { value: "5-25m", label: "$5M – $25M" },
-                  { value: "25-100m", label: "$25M – $100M" },
-                  { value: "over100m", label: "Over $100M" },
-                ]} />
+              <Form.Item
+                label="Annual Revenue Range"
+                style={{ marginBottom: 16 }}
+              >
+                <Select
+                  defaultValue="5-25m"
+                  options={[
+                    { value: "under1m", label: "Under $1M" },
+                    { value: "1-5m", label: "$1M – $5M" },
+                    { value: "5-25m", label: "$5M – $25M" },
+                    { value: "25-100m", label: "$25M – $100M" },
+                    { value: "over100m", label: "Over $100M" },
+                  ]}
+                />
               </Form.Item>
             </Col>
           </Row>
         </Form>
       </Section>
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button type="primary" icon={<SaveOutlined />} onClick={() => message.success("Industry details saved")}>Save Changes</Button>
+        <Button
+          type="primary"
+          icon={<SaveOutlined />}
+          onClick={() => message.success("Industry details saved")}
+        >
+          Save Changes
+        </Button>
       </div>
     </>
   );
@@ -316,19 +565,26 @@ function IndustryTab() {
 function AddressTab() {
   return (
     <>
-      <Section title="Registered Address" description="Primary legal address of the company">
+      <Section
+        title="Registered Address"
+        description="Primary legal address of the company"
+      >
         <Form layout="vertical">
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
               <Form.Item label="Country" style={{ marginBottom: 16 }}>
-                <Select defaultValue="US" showSearch options={[
-                  { value: "US", label: "🇺🇸 United States" },
-                  { value: "EG", label: "🇪🇬 Egypt" },
-                  { value: "AE", label: "🇦🇪 UAE" },
-                  { value: "GB", label: "🇬🇧 United Kingdom" },
-                  { value: "SA", label: "🇸🇦 Saudi Arabia" },
-                  { value: "DE", label: "🇩🇪 Germany" },
-                ]} />
+                <Select
+                  defaultValue="US"
+                  showSearch
+                  options={[
+                    { value: "US", label: "🇺🇸 United States" },
+                    { value: "EG", label: "🇪🇬 Egypt" },
+                    { value: "AE", label: "🇦🇪 UAE" },
+                    { value: "GB", label: "🇬🇧 United Kingdom" },
+                    { value: "SA", label: "🇸🇦 Saudi Arabia" },
+                    { value: "DE", label: "🇩🇪 Germany" },
+                  ]}
+                />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
@@ -365,7 +621,13 @@ function AddressTab() {
         </Form>
       </Section>
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button type="primary" icon={<SaveOutlined />} onClick={() => message.success("Address saved")}>Save Changes</Button>
+        <Button
+          type="primary"
+          icon={<SaveOutlined />}
+          onClick={() => message.success("Address saved")}
+        >
+          Save Changes
+        </Button>
       </div>
     </>
   );
@@ -378,7 +640,11 @@ function ContactTab() {
         <Form layout="vertical">
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
-              <Form.Item label="Primary Email" required style={{ marginBottom: 16 }}>
+              <Form.Item
+                label="Primary Email"
+                required
+                style={{ marginBottom: 16 }}
+              >
                 <Input defaultValue="info@techsol.com" type="email" />
               </Form.Item>
             </Col>
@@ -388,7 +654,11 @@ function ContactTab() {
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Primary Phone" required style={{ marginBottom: 16 }}>
+              <Form.Item
+                label="Primary Phone"
+                required
+                style={{ marginBottom: 16 }}
+              >
                 <Input defaultValue="+1 (555) 123-4567" />
               </Form.Item>
             </Col>
@@ -404,14 +674,23 @@ function ContactTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item label="Company Website" style={{ marginBottom: 16 }}>
-                <Input defaultValue="https://www.techsol.com" prefix={<LinkOutlined />} />
+                <Input
+                  defaultValue="https://www.techsol.com"
+                  prefix={<LinkOutlined />}
+                />
               </Form.Item>
             </Col>
           </Row>
         </Form>
       </Section>
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button type="primary" icon={<SaveOutlined />} onClick={() => message.success("Contact info saved")}>Save Changes</Button>
+        <Button
+          type="primary"
+          icon={<SaveOutlined />}
+          onClick={() => message.success("Contact info saved")}
+        >
+          Save Changes
+        </Button>
       </div>
     </>
   );
@@ -419,22 +698,59 @@ function ContactTab() {
 
 function SocialTab() {
   const socials = [
-    { key: "linkedin",  label: "LinkedIn",    placeholder: "https://linkedin.com/company/...", defaultValue: "https://linkedin.com/company/techsol" },
-    { key: "twitter",   label: "X (Twitter)", placeholder: "https://x.com/...",               defaultValue: "https://x.com/techsol" },
-    { key: "facebook",  label: "Facebook",    placeholder: "https://facebook.com/...",         defaultValue: "" },
-    { key: "instagram", label: "Instagram",   placeholder: "https://instagram.com/...",        defaultValue: "" },
-    { key: "youtube",   label: "YouTube",     placeholder: "https://youtube.com/@...",         defaultValue: "" },
-    { key: "whatsapp",  label: "WhatsApp Business", placeholder: "+1 555 000 0000",           defaultValue: "" },
+    {
+      key: "linkedin",
+      label: "LinkedIn",
+      placeholder: "https://linkedin.com/company/...",
+      defaultValue: "https://linkedin.com/company/techsol",
+    },
+    {
+      key: "twitter",
+      label: "X (Twitter)",
+      placeholder: "https://x.com/...",
+      defaultValue: "https://x.com/techsol",
+    },
+    {
+      key: "facebook",
+      label: "Facebook",
+      placeholder: "https://facebook.com/...",
+      defaultValue: "",
+    },
+    {
+      key: "instagram",
+      label: "Instagram",
+      placeholder: "https://instagram.com/...",
+      defaultValue: "",
+    },
+    {
+      key: "youtube",
+      label: "YouTube",
+      placeholder: "https://youtube.com/@...",
+      defaultValue: "",
+    },
+    {
+      key: "whatsapp",
+      label: "WhatsApp Business",
+      placeholder: "+1 555 000 0000",
+      defaultValue: "",
+    },
   ];
   return (
     <>
-      <Section title="Social Media Profiles" description="Add your official company social media links">
+      <Section
+        title="Social Media Profiles"
+        description="Add your official company social media links"
+      >
         <Form layout="vertical">
           <Row gutter={[16, 0]}>
-            {socials.map((s) => (
+            {socials.map(s => (
               <Col xs={24} sm={12} key={s.key}>
                 <Form.Item label={s.label} style={{ marginBottom: 16 }}>
-                  <Input prefix={<GlobalOutlined />} placeholder={s.placeholder} defaultValue={s.defaultValue} />
+                  <Input
+                    prefix={<GlobalOutlined />}
+                    placeholder={s.placeholder}
+                    defaultValue={s.defaultValue}
+                  />
                 </Form.Item>
               </Col>
             ))}
@@ -442,7 +758,13 @@ function SocialTab() {
         </Form>
       </Section>
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button type="primary" icon={<SaveOutlined />} onClick={() => message.success("Social media links saved")}>Save Changes</Button>
+        <Button
+          type="primary"
+          icon={<SaveOutlined />}
+          onClick={() => message.success("Social media links saved")}
+        >
+          Save Changes
+        </Button>
       </div>
     </>
   );
@@ -454,19 +776,50 @@ function HoursTab() {
     <>
       <Section title="Working Days & Hours">
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          {DAYS.map((day) => {
+          {DAYS.map(day => {
             const isWeekend = day === "Saturday" || day === "Sunday";
             return (
-              <div key={day} style={{
-                display: "flex", alignItems: "center", gap: 16,
-                padding: "10px 16px", borderRadius: 8,
-                background: token.colorFillAlter,
-              }}>
-                <Checkbox defaultChecked={!isWeekend} style={{ width: 110, fontWeight: 500 }}>{day}</Checkbox>
-                <TimePicker defaultValue={undefined} placeholder="Start" format="HH:mm" size="small" style={{ width: 100 }} disabled={isWeekend} />
-                <Text type="secondary" style={{ fontSize: 12 }}>to</Text>
-                <TimePicker defaultValue={undefined} placeholder="End" format="HH:mm" size="small" style={{ width: 100 }} disabled={isWeekend} />
-                <Select size="small" defaultValue="1hr" style={{ width: 130 }} disabled={isWeekend}
+              <div
+                key={day}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 16,
+                  padding: "10px 16px",
+                  borderRadius: 8,
+                  background: token.colorFillAlter,
+                }}
+              >
+                <Checkbox
+                  defaultChecked={!isWeekend}
+                  style={{ width: 110, fontWeight: 500 }}
+                >
+                  {day}
+                </Checkbox>
+                <TimePicker
+                  defaultValue={undefined}
+                  placeholder="Start"
+                  format="HH:mm"
+                  size="small"
+                  style={{ width: 100 }}
+                  disabled={isWeekend}
+                />
+                <Text type="secondary" style={{ fontSize: 12 }}>
+                  to
+                </Text>
+                <TimePicker
+                  defaultValue={undefined}
+                  placeholder="End"
+                  format="HH:mm"
+                  size="small"
+                  style={{ width: 100 }}
+                  disabled={isWeekend}
+                />
+                <Select
+                  size="small"
+                  defaultValue="1hr"
+                  style={{ width: 130 }}
+                  disabled={isWeekend}
                   options={[
                     { value: "none", label: "No break" },
                     { value: "30min", label: "30 min break" },
@@ -485,20 +838,29 @@ function HoursTab() {
           <Row gutter={16}>
             <Col xs={24} sm={12}>
               <Form.Item label="Company Timezone" style={{ marginBottom: 0 }}>
-                <Select defaultValue="UTC-5" options={[
-                  { value: "UTC-8", label: "UTC-8 · Pacific Time" },
-                  { value: "UTC-5", label: "UTC-5 · Eastern Time" },
-                  { value: "UTC+0", label: "UTC+0 · GMT / London" },
-                  { value: "UTC+3", label: "UTC+3 · Riyadh / Cairo" },
-                  { value: "UTC+4", label: "UTC+4 · Dubai" },
-                ]} />
+                <Select
+                  defaultValue="UTC-5"
+                  options={[
+                    { value: "UTC-8", label: "UTC-8 · Pacific Time" },
+                    { value: "UTC-5", label: "UTC-5 · Eastern Time" },
+                    { value: "UTC+0", label: "UTC+0 · GMT / London" },
+                    { value: "UTC+3", label: "UTC+3 · Riyadh / Cairo" },
+                    { value: "UTC+4", label: "UTC+4 · Dubai" },
+                  ]}
+                />
               </Form.Item>
             </Col>
           </Row>
         </Form>
       </Section>
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button type="primary" icon={<SaveOutlined />} onClick={() => message.success("Working hours saved")}>Save Changes</Button>
+        <Button
+          type="primary"
+          icon={<SaveOutlined />}
+          onClick={() => message.success("Working hours saved")}
+        >
+          Save Changes
+        </Button>
       </div>
     </>
   );
@@ -506,30 +868,93 @@ function HoursTab() {
 
 function BranchesTab() {
   const columns = [
-    { title: "Branch Name", dataIndex: "name", key: "name", render: (v: string) => <Text strong style={{ fontSize: 13 }}>{v}</Text> },
-    { title: "City", dataIndex: "city", key: "city", render: (v: string) => <Space size={4}><EnvironmentOutlined /><Text style={{ fontSize: 13 }}>{v}</Text></Space> },
+    {
+      title: "Branch Name",
+      dataIndex: "name",
+      key: "name",
+      render: (v: string) => (
+        <Text strong style={{ fontSize: 13 }}>
+          {v}
+        </Text>
+      ),
+    },
+    {
+      title: "City",
+      dataIndex: "city",
+      key: "city",
+      render: (v: string) => (
+        <Space size={4}>
+          <EnvironmentOutlined />
+          <Text style={{ fontSize: 13 }}>{v}</Text>
+        </Space>
+      ),
+    },
     { title: "Country", dataIndex: "country", key: "country" },
-    { title: "Manager", dataIndex: "manager", key: "manager", render: (v: string) => (
-      <Space><Avatar size={24} style={{ background: "#6366f1", fontSize: 10 }}>{v[0]}</Avatar><Text style={{ fontSize: 13 }}>{v}</Text></Space>
-    )},
-    { title: "Status", dataIndex: "status", key: "status", render: (v: string) => (
-      <Badge status={v === "active" ? "success" : "default"} text={v === "active" ? "Active" : "Inactive"} />
-    )},
-    { title: "Actions", key: "actions", render: () => (
-      <Space>
-        <Button size="small" icon={<EditOutlined />}>Edit</Button>
-        <Button size="small" danger icon={<DeleteOutlined />} />
-      </Space>
-    )},
+    {
+      title: "Manager",
+      dataIndex: "manager",
+      key: "manager",
+      render: (v: string) => (
+        <Space>
+          <Avatar size={24} style={{ background: "#6366f1", fontSize: 10 }}>
+            {v[0]}
+          </Avatar>
+          <Text style={{ fontSize: 13 }}>{v}</Text>
+        </Space>
+      ),
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      render: (v: string) => (
+        <Badge
+          status={v === "active" ? "success" : "default"}
+          text={v === "active" ? "Active" : "Inactive"}
+        />
+      ),
+    },
+    {
+      title: "Actions",
+      key: "actions",
+      render: () => (
+        <Space>
+          <Button size="small" icon={<EditOutlined />}>
+            Edit
+          </Button>
+          <Button size="small" danger icon={<DeleteOutlined />} />
+        </Space>
+      ),
+    },
   ];
   return (
     <>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-        <Text strong style={{ fontSize: 14 }}>Branch Locations</Text>
-        <Button type="primary" icon={<PlusOutlined />} onClick={() => message.info("Add branch modal")}>Add Branch</Button>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 16,
+        }}
+      >
+        <Text strong style={{ fontSize: 14 }}>
+          Branch Locations
+        </Text>
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={() => message.info("Add branch modal")}
+        >
+          Add Branch
+        </Button>
       </div>
       <Card style={{ border: "none" }} styles={{ body: { padding: 0 } }}>
-        <Table size="small" dataSource={BRANCHES_DATA} columns={columns} pagination={false} />
+        <Table
+          size="small"
+          dataSource={BRANCHES_DATA}
+          columns={columns}
+          pagination={false}
+        />
       </Card>
     </>
   );
@@ -542,38 +967,54 @@ export default function CompanyProfile() {
   const { token } = antTheme.useToken();
   const activeTab = params.tab ?? "profile";
 
-  const activeLabel = TABS.find((t) => t.key === activeTab)?.label ?? "Company Profile";
+  const activeLabel =
+    TABS.find(t => t.key === activeTab)?.label ?? "Company Profile";
 
   const tabContent: Record<string, React.ReactNode> = {
-    profile:      <ProfileTab />,
+    profile: <ProfileTab />,
     registration: <RegistrationTab />,
-    tax:          <TaxTab />,
-    industry:     <IndustryTab />,
-    address:      <AddressTab />,
-    contact:      <ContactTab />,
-    social:       <SocialTab />,
-    hours:        <HoursTab />,
-    branches:     <BranchesTab />,
+    tax: <TaxTab />,
+    industry: <IndustryTab />,
+    address: <AddressTab />,
+    contact: <ContactTab />,
+    social: <SocialTab />,
+    hours: <HoursTab />,
+    branches: <BranchesTab />,
   };
 
   return (
     <DashboardLayout
       currentPage="Company Profile"
-      breadcrumbs={[{ label: "Dashboard", href: "/" }, { label: "Settings" }, { label: "Company Profile" }]}
+      breadcrumbs={[
+        { label: "Dashboard", href: "/" },
+        { label: "Settings" },
+        { label: "Company Profile" },
+      ]}
     >
       <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-          <div style={{
-            width: 44, height: 44, borderRadius: 12, flexShrink: 0,
-            background: `linear-gradient(135deg, ${token.colorPrimary}dd, ${token.colorPrimary}88)`,
-            display: "flex", alignItems: "center", justifyContent: "center",
-          }}>
+          <div
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: 12,
+              flexShrink: 0,
+              background: `linear-gradient(135deg, ${token.colorPrimary}dd, ${token.colorPrimary}88)`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
             <ApartmentOutlined style={{ fontSize: 20, color: "#fff" }} />
           </div>
           <div>
-            <Title level={5} style={{ margin: 0 }}>Company Profile</Title>
-            <Text type="secondary" style={{ fontSize: 12 }}>Manage your company's official information and legal details</Text>
+            <Title level={5} style={{ margin: 0 }}>
+              Company Profile
+            </Title>
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              Manage your company's official information and legal details
+            </Text>
           </div>
         </div>
 
@@ -581,25 +1022,58 @@ export default function CompanyProfile() {
         <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
           {/* Nav card */}
           <Card
-            style={{ border: `1px solid ${token.colorBorderSecondary}`, borderRadius: token.borderRadiusLG, width: 210, flexShrink: 0 }}
+            style={{
+              border: `1px solid ${token.colorBorderSecondary}`,
+              borderRadius: token.borderRadiusLG,
+              width: 210,
+              flexShrink: 0,
+            }}
             styles={{ body: { padding: "8px 0" } }}
           >
-            {TABS.map((tab) => (
+            {TABS.map(tab => (
               <button
                 key={tab.key}
                 onClick={() => setLocation(`/settings/company/${tab.key}`)}
                 style={{
-                  width: "100%", display: "flex", alignItems: "center", gap: 10,
-                  padding: "9px 16px", background: activeTab === tab.key ? token.colorPrimaryBg : "transparent",
-                  color: activeTab === tab.key ? token.colorPrimary : token.colorText,
-                  border: "none", cursor: "pointer", fontSize: 13,
+                  width: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  padding: "9px 16px",
+                  background:
+                    activeTab === tab.key
+                      ? token.colorPrimaryBg
+                      : "transparent",
+                  color:
+                    activeTab === tab.key
+                      ? token.colorPrimary
+                      : token.colorText,
+                  border: "none",
+                  cursor: "pointer",
+                  fontSize: 13,
                   fontWeight: activeTab === tab.key ? 600 : 400,
-                  transition: "background 0.15s, color 0.15s", textAlign: "left",
+                  transition: "background 0.15s, color 0.15s",
+                  textAlign: "left",
                 }}
-                onMouseEnter={(e) => { if (activeTab !== tab.key) (e.currentTarget as HTMLButtonElement).style.background = token.colorFillAlter; }}
-                onMouseLeave={(e) => { if (activeTab !== tab.key) (e.currentTarget as HTMLButtonElement).style.background = "transparent"; }}
+                onMouseEnter={e => {
+                  if (activeTab !== tab.key)
+                    (e.currentTarget as HTMLButtonElement).style.background =
+                      token.colorFillAlter;
+                }}
+                onMouseLeave={e => {
+                  if (activeTab !== tab.key)
+                    (e.currentTarget as HTMLButtonElement).style.background =
+                      "transparent";
+                }}
               >
-                <span style={{ fontSize: 14, opacity: activeTab === tab.key ? 1 : 0.55 }}>{tab.icon}</span>
+                <span
+                  style={{
+                    fontSize: 14,
+                    opacity: activeTab === tab.key ? 1 : 0.55,
+                  }}
+                >
+                  {tab.icon}
+                </span>
                 <span style={{ flex: 1 }}>{tab.label}</span>
               </button>
             ))}
@@ -607,11 +1081,23 @@ export default function CompanyProfile() {
 
           {/* Content card */}
           <Card
-            style={{ border: `1px solid ${token.colorBorderSecondary}`, borderRadius: token.borderRadiusLG, flex: 1, minWidth: 0 }}
+            style={{
+              border: `1px solid ${token.colorBorderSecondary}`,
+              borderRadius: token.borderRadiusLG,
+              flex: 1,
+              minWidth: 0,
+            }}
             styles={{ body: { padding: 24 } }}
-            title={<Space>{TABS.find(t => t.key === activeTab)?.icon}<Text strong>{activeLabel}</Text></Space>}
+            title={
+              <Space>
+                {TABS.find(t => t.key === activeTab)?.icon}
+                <Text strong>{activeLabel}</Text>
+              </Space>
+            }
           >
-            {tabContent[activeTab] ?? <Alert type="info" message="Content coming soon" />}
+            {tabContent[activeTab] ?? (
+              <Alert type="info" message="Content coming soon" />
+            )}
           </Card>
         </div>
       </div>

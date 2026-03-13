@@ -38,7 +38,9 @@ export function ConfirmDialog({
         <AlertDialogHeader>
           <div
             className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 ${
-              isDanger ? "bg-red-100 dark:bg-red-900/30" : "bg-orange-100 dark:bg-orange-900/30"
+              isDanger
+                ? "bg-red-100 dark:bg-red-900/30"
+                : "bg-orange-100 dark:bg-orange-900/30"
             }`}
           >
             <Icon

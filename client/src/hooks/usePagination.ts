@@ -7,9 +7,12 @@ export interface PaginationState {
 }
 
 export function usePagination(initialLimit = DEFAULT_PAGE_SIZE) {
-  const [pagination, setPagination] = useState<PaginationState>({ page: 1, limit: initialLimit });
+  const [pagination, setPagination] = useState<PaginationState>({
+    page: 1,
+    limit: initialLimit,
+  });
 
-  const goToPage = (page: number) => setPagination((p) => ({ ...p, page }));
+  const goToPage = (page: number) => setPagination(p => ({ ...p, page }));
   const setLimit = (limit: number) => setPagination({ page: 1, limit });
   const reset = () => setPagination({ page: 1, limit: initialLimit });
 

@@ -1,5 +1,14 @@
 import { useState } from "react";
-import { Pencil, Trash2, Plus, X, Save, CreditCard, Percent, AlertTriangle } from "lucide-react";
+import {
+  Pencil,
+  Trash2,
+  Plus,
+  X,
+  Save,
+  CreditCard,
+  Percent,
+  AlertTriangle,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -24,7 +33,7 @@ function Modal({
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
-      onClick={(e) => e.target === e.currentTarget && onClose()}
+      onClick={e => e.target === e.currentTarget && onClose()}
     >
       <div
         className={[
@@ -56,7 +65,10 @@ export default function FinancialSettings() {
   const [deleteTarget, setDeleteTarget] = useState<TaxRate | null>(null);
 
   // ── Edit / Add modal ──
-  const [modal, setModal] = useState<{ open: boolean; editing: TaxRate | null }>({
+  const [modal, setModal] = useState<{
+    open: boolean;
+    editing: TaxRate | null;
+  }>({
     open: false,
     editing: null,
   });
@@ -93,26 +105,26 @@ export default function FinancialSettings() {
       return;
     }
     if (modal.editing) {
-      setTaxRates((prev) =>
-        prev.map((r) =>
+      setTaxRates(prev =>
+        prev.map(r =>
           r.id === modal.editing!.id
             ? { ...r, name: formName.trim(), rate: rateNum }
             : r
         )
       );
     } else {
-      setTaxRates((prev) => [
+      setTaxRates(prev => [
         ...prev,
         { id: nextId, name: formName.trim(), rate: rateNum },
       ]);
-      setNextId((n) => n + 1);
+      setNextId(n => n + 1);
     }
     closeModal();
   }
 
   function confirmDelete() {
     if (!deleteTarget) return;
-    setTaxRates((prev) => prev.filter((r) => r.id !== deleteTarget.id));
+    setTaxRates(prev => prev.filter(r => r.id !== deleteTarget.id));
     setDeleteTarget(null);
   }
 
@@ -124,19 +136,22 @@ export default function FinancialSettings() {
 
   const navItems: { id: Section; label: string; icon: typeof CreditCard }[] = [
     { id: "payment-gateway", label: "Payment Gateway", icon: CreditCard },
-    { id: "tax-rates",       label: "Tax Rates",       icon: Percent },
+    { id: "tax-rates", label: "Tax Rates", icon: Percent },
   ];
 
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="font-display font-bold text-2xl text-foreground">Financial Settings</h2>
-        <p className="text-sm text-muted-foreground mt-1">Manage tax rates, payment gateways, and financial configurations</p>
+        <h2 className="font-display font-bold text-2xl text-foreground">
+          Financial Settings
+        </h2>
+        <p className="text-sm text-muted-foreground mt-1">
+          Manage tax rates, payment gateways, and financial configurations
+        </p>
       </div>
 
       {/* ── Settings shell ── */}
       <div className="flex flex-col lg:flex-row bg-card rounded-xl border border-border shadow-sm overflow-hidden min-h-[360px]">
-
         {/* Left sub-nav */}
         <div className="w-full lg:w-52 flex-shrink-0 border-b lg:border-b-0 lg:border-r border-border">
           <nav className="flex flex-row lg:flex-col">
@@ -161,15 +176,18 @@ export default function FinancialSettings() {
 
         {/* ── Main content ── */}
         <div className="flex-1 p-6">
-
           {/* ── Tax Rates ── */}
           {activeSection === "tax-rates" && (
             <>
               {/* Section header */}
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <h3 className="font-semibold text-base text-foreground">Tax Rates</h3>
-                  <p className="text-xs text-muted-foreground mt-0.5">Tax Rates Configuration</p>
+                  <h3 className="font-semibold text-base text-foreground">
+                    Tax Rates
+                  </h3>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Tax Rates Configuration
+                  </p>
                 </div>
                 <button
                   onClick={openAdd}
@@ -185,7 +203,12 @@ export default function FinancialSettings() {
                 <div className="flex flex-col items-center justify-center py-16 text-muted-foreground gap-3">
                   <Percent size={32} className="opacity-30" />
                   <p className="text-sm">No tax rates configured.</p>
-                  <Button size="sm" variant="outline" onClick={openAdd} className="gap-1.5 text-xs">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={openAdd}
+                    className="gap-1.5 text-xs"
+                  >
                     <Plus size={13} /> Add Tax Rate
                   </Button>
                 </div>
@@ -198,9 +221,11 @@ export default function FinancialSettings() {
                         "grid divide-x divide-border",
                         rowIdx > 0 ? "border-t border-border" : "",
                       ].join(" ")}
-                      style={{ gridTemplateColumns: `repeat(${row.length}, 1fr)` }}
+                      style={{
+                        gridTemplateColumns: `repeat(${row.length}, 1fr)`,
+                      }}
                     >
-                      {row.map((tax) => (
+                      {row.map(tax => (
                         <div
                           key={tax.id}
                           className="flex items-center justify-between px-4 py-2.5 bg-background hover:bg-muted/30 transition-colors"
@@ -210,7 +235,9 @@ export default function FinancialSettings() {
                             <span className="text-sm font-medium text-foreground min-w-[2.5rem]">
                               {tax.name}
                             </span>
-                            <span className="text-sm text-muted-foreground">{tax.rate}%</span>
+                            <span className="text-sm text-muted-foreground">
+                              {tax.rate}%
+                            </span>
                           </div>
 
                           {/* Actions — always visible */}
@@ -243,7 +270,9 @@ export default function FinancialSettings() {
           {activeSection === "payment-gateway" && (
             <div className="flex flex-col items-center justify-center py-16 gap-3 text-muted-foreground">
               <CreditCard size={36} className="opacity-25" />
-              <p className="text-sm">Payment Gateway configuration coming soon.</p>
+              <p className="text-sm">
+                Payment Gateway configuration coming soon.
+              </p>
             </div>
           )}
         </div>
@@ -254,15 +283,20 @@ export default function FinancialSettings() {
       {deleteTarget && (
         <Modal onClose={() => setDeleteTarget(null)} size="sm">
           <div className="p-6 flex flex-col items-center text-center gap-4">
-
             {/* Icon */}
             <div className="w-14 h-14 rounded-full border-2 border-border flex items-center justify-center">
-              <Trash2 size={22} className="text-foreground/60" strokeWidth={1.5} />
+              <Trash2
+                size={22}
+                className="text-foreground/60"
+                strokeWidth={1.5}
+              />
             </div>
 
             {/* Copy */}
             <div className="space-y-1.5">
-              <h4 className="font-semibold text-foreground text-base">Delete Tax Rate</h4>
+              <h4 className="font-semibold text-foreground text-base">
+                Delete Tax Rate
+              </h4>
               <p className="text-sm text-muted-foreground leading-relaxed max-w-[260px]">
                 Are you sure you want to delete{" "}
                 <span className="font-semibold text-foreground">
@@ -312,7 +346,6 @@ export default function FinancialSettings() {
 
           {/* Body */}
           <div className="px-6 py-5 space-y-4">
-
             {/* Fields — side by side */}
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -321,11 +354,14 @@ export default function FinancialSettings() {
                 </label>
                 <Input
                   value={formName}
-                  onChange={(e) => { setFormName(e.target.value); setFormError(""); }}
+                  onChange={e => {
+                    setFormName(e.target.value);
+                    setFormError("");
+                  }}
                   placeholder="e.g. VAT, GST"
                   className="h-9 text-sm"
                   autoFocus
-                  onKeyDown={(e) => e.key === "Enter" && handleSaveModal()}
+                  onKeyDown={e => e.key === "Enter" && handleSaveModal()}
                 />
               </div>
 
@@ -336,14 +372,17 @@ export default function FinancialSettings() {
                 <div className="relative">
                   <Input
                     value={formRate}
-                    onChange={(e) => { setFormRate(e.target.value); setFormError(""); }}
+                    onChange={e => {
+                      setFormRate(e.target.value);
+                      setFormError("");
+                    }}
                     placeholder="0.00"
                     type="number"
                     min="0"
                     max="100"
                     step="0.01"
                     className="h-9 text-sm pr-9"
-                    onKeyDown={(e) => e.key === "Enter" && handleSaveModal()}
+                    onKeyDown={e => e.key === "Enter" && handleSaveModal()}
                   />
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs font-medium pointer-events-none select-none">
                     %
@@ -362,7 +401,11 @@ export default function FinancialSettings() {
 
             {/* Actions */}
             <div className="flex gap-2.5 justify-end pt-1 border-t border-border">
-              <Button variant="outline" onClick={closeModal} className="h-9 px-5 text-sm mt-4">
+              <Button
+                variant="outline"
+                onClick={closeModal}
+                className="h-9 px-5 text-sm mt-4"
+              >
                 Cancel
               </Button>
               <Button

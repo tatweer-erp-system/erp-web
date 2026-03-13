@@ -5,7 +5,10 @@ import { type Branch, Role } from "@/types/auth";
 import { t } from "@/i18n";
 import { AxiosError } from "axios";
 
-interface EyePos { x: number; y: number }
+interface EyePos {
+  x: number;
+  y: number;
+}
 
 // ─── Saudi Accounting Illustration (left panel) ───────────────────────────────
 function SaudiIllustration() {
@@ -19,25 +22,25 @@ function SaudiIllustration() {
     >
       <defs>
         <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stopColor="#000d06" />
-          <stop offset="35%"  stopColor="#001f0c" />
-          <stop offset="70%"  stopColor="#003d18" />
+          <stop offset="0%" stopColor="#000d06" />
+          <stop offset="35%" stopColor="#001f0c" />
+          <stop offset="70%" stopColor="#003d18" />
           <stop offset="100%" stopColor="#006C35" />
         </linearGradient>
         <linearGradient id="sandGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stopColor="#c9a55a" />
+          <stop offset="0%" stopColor="#c9a55a" />
           <stop offset="100%" stopColor="#7a5510" />
         </linearGradient>
         <linearGradient id="barUp" x1="0" y1="1" x2="0" y2="0">
-          <stop offset="0%"   stopColor="#15803d" />
+          <stop offset="0%" stopColor="#15803d" />
           <stop offset="100%" stopColor="#86efac" />
         </linearGradient>
         <linearGradient id="barUp2" x1="0" y1="1" x2="0" y2="0">
-          <stop offset="0%"   stopColor="#ca8a04" />
+          <stop offset="0%" stopColor="#ca8a04" />
           <stop offset="100%" stopColor="#fde68a" />
         </linearGradient>
         <radialGradient id="moonGlow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%"   stopColor="#fef9c3" stopOpacity="0.4" />
+          <stop offset="0%" stopColor="#fef9c3" stopOpacity="0.4" />
           <stop offset="100%" stopColor="#fef9c3" stopOpacity="0" />
         </radialGradient>
         <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%">
@@ -53,42 +56,44 @@ function SaudiIllustration() {
       <rect width="560" height="760" fill="url(#skyGrad)" />
 
       {/* ── Subtle dot-grid ── */}
-      {[0,1,2,3,4,5,6,7,8,9,10,11,12,13].map((col) =>
-        [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17].map((row) => (
-          <circle
-            key={`dot-${col}-${row}`}
-            cx={col * 40 + 20}
-            cy={row * 40 + 20}
-            r="0.6"
-            fill="white"
-            opacity="0.06"
-          />
-        ))
+      {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].map(col =>
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17].map(
+          row => (
+            <circle
+              key={`dot-${col}-${row}`}
+              cx={col * 40 + 20}
+              cy={row * 40 + 20}
+              r="0.6"
+              fill="white"
+              opacity="0.06"
+            />
+          )
+        )
       )}
 
       {/* ── Stars ── */}
-      <circle cx="28"  cy="35"  r="1.4" fill="white" opacity="0.9" />
-      <circle cx="68"  cy="18"  r="0.8" fill="white" opacity="0.7" />
-      <circle cx="110" cy="44"  r="1.2" fill="white" opacity="0.8" />
-      <circle cx="165" cy="12"  r="1.0" fill="white" opacity="0.9" />
-      <circle cx="230" cy="28"  r="0.9" fill="white" opacity="0.65"/>
-      <circle cx="290" cy="10"  r="1.3" fill="white" opacity="0.85"/>
-      <circle cx="350" cy="38"  r="0.7" fill="white" opacity="0.7" />
-      <circle cx="510" cy="22"  r="1.1" fill="white" opacity="0.9" />
-      <circle cx="540" cy="55"  r="0.8" fill="white" opacity="0.6" />
-      <circle cx="55"  cy="80"  r="0.9" fill="white" opacity="0.5" />
-      <circle cx="135" cy="65"  r="1.1" fill="white" opacity="0.75"/>
-      <circle cx="200" cy="88"  r="0.7" fill="white" opacity="0.6" />
-      <circle cx="270" cy="72"  r="1.4" fill="white" opacity="0.9" />
-      <circle cx="315" cy="88"  r="0.8" fill="white" opacity="0.7" />
-      <circle cx="390" cy="58"  r="1.0" fill="white" opacity="0.8" />
-      <circle cx="480" cy="90"  r="1.2" fill="white" opacity="0.5" />
-      <circle cx="525" cy="78"  r="0.9" fill="white" opacity="0.7" />
-      <circle cx="42"  cy="122" r="0.6" fill="white" opacity="0.6" />
+      <circle cx="28" cy="35" r="1.4" fill="white" opacity="0.9" />
+      <circle cx="68" cy="18" r="0.8" fill="white" opacity="0.7" />
+      <circle cx="110" cy="44" r="1.2" fill="white" opacity="0.8" />
+      <circle cx="165" cy="12" r="1.0" fill="white" opacity="0.9" />
+      <circle cx="230" cy="28" r="0.9" fill="white" opacity="0.65" />
+      <circle cx="290" cy="10" r="1.3" fill="white" opacity="0.85" />
+      <circle cx="350" cy="38" r="0.7" fill="white" opacity="0.7" />
+      <circle cx="510" cy="22" r="1.1" fill="white" opacity="0.9" />
+      <circle cx="540" cy="55" r="0.8" fill="white" opacity="0.6" />
+      <circle cx="55" cy="80" r="0.9" fill="white" opacity="0.5" />
+      <circle cx="135" cy="65" r="1.1" fill="white" opacity="0.75" />
+      <circle cx="200" cy="88" r="0.7" fill="white" opacity="0.6" />
+      <circle cx="270" cy="72" r="1.4" fill="white" opacity="0.9" />
+      <circle cx="315" cy="88" r="0.8" fill="white" opacity="0.7" />
+      <circle cx="390" cy="58" r="1.0" fill="white" opacity="0.8" />
+      <circle cx="480" cy="90" r="1.2" fill="white" opacity="0.5" />
+      <circle cx="525" cy="78" r="0.9" fill="white" opacity="0.7" />
+      <circle cx="42" cy="122" r="0.6" fill="white" opacity="0.6" />
       <circle cx="178" cy="108" r="1.0" fill="white" opacity="0.4" />
       <circle cx="370" cy="118" r="0.8" fill="white" opacity="0.5" />
       <circle cx="490" cy="112" r="1.1" fill="white" opacity="0.7" />
-      <circle cx="75"  cy="148" r="0.7" fill="white" opacity="0.45"/>
+      <circle cx="75" cy="148" r="0.7" fill="white" opacity="0.45" />
       <circle cx="248" cy="140" r="0.9" fill="white" opacity="0.5" />
       <circle cx="435" cy="135" r="1.0" fill="white" opacity="0.4" />
 
@@ -98,14 +103,14 @@ function SaudiIllustration() {
       <circle cx="476" cy="62" r="24" fill="#001208" />
 
       {/* ── Islamic 8-pointed star pattern (top left corner, very subtle) ── */}
-      {[0,1,2].map((col) =>
-        [0,1,2].map((row) => {
+      {[0, 1, 2].map(col =>
+        [0, 1, 2].map(row => {
           const x = col * 52 + 10;
           const y = row * 52 + 10;
           return (
             <g key={`star-${col}-${row}`} opacity="0.07">
               <polygon
-                points={`${x+16},${y} ${x+20},${y+10} ${x+32},${y+10} ${x+22},${y+17} ${x+26},${y+28} ${x+16},${y+21} ${x+6},${y+28} ${x+10},${y+17} ${x},${y+10} ${x+12},${y+10}`}
+                points={`${x + 16},${y} ${x + 20},${y + 10} ${x + 32},${y + 10} ${x + 22},${y + 17} ${x + 26},${y + 28} ${x + 16},${y + 21} ${x + 6},${y + 28} ${x + 10},${y + 17} ${x},${y + 10} ${x + 12},${y + 10}`}
                 fill="white"
               />
             </g>
@@ -115,186 +120,1301 @@ function SaudiIllustration() {
 
       {/* ── RIYADH SKYLINE SILHOUETTES ── */}
       {/* Far background buildings (faint) */}
-      <rect x="0"   y="430" width="28"  height="200" rx="2" fill="white" opacity="0.06" />
-      <rect x="32"  y="400" width="20"  height="230" rx="2" fill="white" opacity="0.06" />
-      <rect x="56"  y="420" width="24"  height="210" rx="2" fill="white" opacity="0.06" />
-      <rect x="84"  y="390" width="16"  height="240" rx="2" fill="white" opacity="0.06" />
-      <rect x="104" y="410" width="22"  height="220" rx="2" fill="white" opacity="0.06" />
-      <rect x="460" y="400" width="24"  height="230" rx="2" fill="white" opacity="0.06" />
-      <rect x="488" y="420" width="18"  height="210" rx="2" fill="white" opacity="0.06" />
-      <rect x="510" y="390" width="28"  height="240" rx="2" fill="white" opacity="0.06" />
-      <rect x="542" y="410" width="18"  height="220" rx="2" fill="white" opacity="0.06" />
+      <rect
+        x="0"
+        y="430"
+        width="28"
+        height="200"
+        rx="2"
+        fill="white"
+        opacity="0.06"
+      />
+      <rect
+        x="32"
+        y="400"
+        width="20"
+        height="230"
+        rx="2"
+        fill="white"
+        opacity="0.06"
+      />
+      <rect
+        x="56"
+        y="420"
+        width="24"
+        height="210"
+        rx="2"
+        fill="white"
+        opacity="0.06"
+      />
+      <rect
+        x="84"
+        y="390"
+        width="16"
+        height="240"
+        rx="2"
+        fill="white"
+        opacity="0.06"
+      />
+      <rect
+        x="104"
+        y="410"
+        width="22"
+        height="220"
+        rx="2"
+        fill="white"
+        opacity="0.06"
+      />
+      <rect
+        x="460"
+        y="400"
+        width="24"
+        height="230"
+        rx="2"
+        fill="white"
+        opacity="0.06"
+      />
+      <rect
+        x="488"
+        y="420"
+        width="18"
+        height="210"
+        rx="2"
+        fill="white"
+        opacity="0.06"
+      />
+      <rect
+        x="510"
+        y="390"
+        width="28"
+        height="240"
+        rx="2"
+        fill="white"
+        opacity="0.06"
+      />
+      <rect
+        x="542"
+        y="410"
+        width="18"
+        height="220"
+        rx="2"
+        fill="white"
+        opacity="0.06"
+      />
 
       {/* Mid-level buildings */}
-      <rect x="20"  y="340" width="34"  height="290" rx="2" fill="white" opacity="0.1" />
-      <rect x="58"  y="310" width="28"  height="320" rx="2" fill="white" opacity="0.1" />
-      <rect x="140" y="360" width="36"  height="270" rx="2" fill="white" opacity="0.1" />
-      <rect x="180" y="345" width="28"  height="285" rx="2" fill="white" opacity="0.1" />
-      <rect x="340" y="350" width="34"  height="280" rx="2" fill="white" opacity="0.1" />
-      <rect x="378" y="330" width="26"  height="300" rx="2" fill="white" opacity="0.1" />
-      <rect x="430" y="340" width="30"  height="290" rx="2" fill="white" opacity="0.1" />
-      <rect x="464" y="360" width="22"  height="270" rx="2" fill="white" opacity="0.1" />
-      <rect x="490" y="310" width="38"  height="320" rx="2" fill="white" opacity="0.1" />
-      <rect x="532" y="345" width="28"  height="285" rx="2" fill="white" opacity="0.1" />
+      <rect
+        x="20"
+        y="340"
+        width="34"
+        height="290"
+        rx="2"
+        fill="white"
+        opacity="0.1"
+      />
+      <rect
+        x="58"
+        y="310"
+        width="28"
+        height="320"
+        rx="2"
+        fill="white"
+        opacity="0.1"
+      />
+      <rect
+        x="140"
+        y="360"
+        width="36"
+        height="270"
+        rx="2"
+        fill="white"
+        opacity="0.1"
+      />
+      <rect
+        x="180"
+        y="345"
+        width="28"
+        height="285"
+        rx="2"
+        fill="white"
+        opacity="0.1"
+      />
+      <rect
+        x="340"
+        y="350"
+        width="34"
+        height="280"
+        rx="2"
+        fill="white"
+        opacity="0.1"
+      />
+      <rect
+        x="378"
+        y="330"
+        width="26"
+        height="300"
+        rx="2"
+        fill="white"
+        opacity="0.1"
+      />
+      <rect
+        x="430"
+        y="340"
+        width="30"
+        height="290"
+        rx="2"
+        fill="white"
+        opacity="0.1"
+      />
+      <rect
+        x="464"
+        y="360"
+        width="22"
+        height="270"
+        rx="2"
+        fill="white"
+        opacity="0.1"
+      />
+      <rect
+        x="490"
+        y="310"
+        width="38"
+        height="320"
+        rx="2"
+        fill="white"
+        opacity="0.1"
+      />
+      <rect
+        x="532"
+        y="345"
+        width="28"
+        height="285"
+        rx="2"
+        fill="white"
+        opacity="0.1"
+      />
 
       {/* ── Al Faisaliah Tower ── */}
-      <rect x="88" y="490" width="52" height="10" rx="1" fill="white" opacity="0.14" />
-      <polygon points="96,490 102,290 114,280 126,280 138,290 132,490" fill="white" opacity="0.15" />
+      <rect
+        x="88"
+        y="490"
+        width="52"
+        height="10"
+        rx="1"
+        fill="white"
+        opacity="0.14"
+      />
+      <polygon
+        points="96,490 102,290 114,280 126,280 138,290 132,490"
+        fill="white"
+        opacity="0.15"
+      />
       <circle cx="114" cy="268" r="22" fill="white" opacity="0.18" />
       <circle cx="114" cy="268" r="14" fill="white" opacity="0.08" />
-      <line x1="114" y1="246" x2="114" y2="210" stroke="white" strokeWidth="2.5" opacity="0.2" />
+      <line
+        x1="114"
+        y1="246"
+        x2="114"
+        y2="210"
+        stroke="white"
+        strokeWidth="2.5"
+        opacity="0.2"
+      />
       <circle cx="114" cy="208" r="3" fill="white" opacity="0.3" />
-      <rect x="108" y="310" width="12" height="8" rx="1" fill="#4ade80" opacity="0.2" />
-      <rect x="108" y="330" width="12" height="8" rx="1" fill="#4ade80" opacity="0.2" />
-      <rect x="108" y="350" width="12" height="8" rx="1" fill="#4ade80" opacity="0.2" />
-      <rect x="108" y="370" width="12" height="8" rx="1" fill="#4ade80" opacity="0.15" />
-      <rect x="108" y="390" width="12" height="8" rx="1" fill="#4ade80" opacity="0.2" />
-      <rect x="108" y="410" width="12" height="8" rx="1" fill="#4ade80" opacity="0.15" />
-      <rect x="108" y="430" width="12" height="8" rx="1" fill="#4ade80" opacity="0.2" />
-      <rect x="108" y="450" width="12" height="8" rx="1" fill="#4ade80" opacity="0.15" />
-      <rect x="108" y="470" width="12" height="8" rx="1" fill="#4ade80" opacity="0.2" />
+      <rect
+        x="108"
+        y="310"
+        width="12"
+        height="8"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.2"
+      />
+      <rect
+        x="108"
+        y="330"
+        width="12"
+        height="8"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.2"
+      />
+      <rect
+        x="108"
+        y="350"
+        width="12"
+        height="8"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.2"
+      />
+      <rect
+        x="108"
+        y="370"
+        width="12"
+        height="8"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.15"
+      />
+      <rect
+        x="108"
+        y="390"
+        width="12"
+        height="8"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.2"
+      />
+      <rect
+        x="108"
+        y="410"
+        width="12"
+        height="8"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.15"
+      />
+      <rect
+        x="108"
+        y="430"
+        width="12"
+        height="8"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.2"
+      />
+      <rect
+        x="108"
+        y="450"
+        width="12"
+        height="8"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.15"
+      />
+      <rect
+        x="108"
+        y="470"
+        width="12"
+        height="8"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.2"
+      />
 
       {/* ── Kingdom Centre Tower ── */}
-      <rect x="218" y="520" width="124" height="14" rx="2" fill="white" opacity="0.16" />
-      <rect x="228" y="170" width="26" height="350" rx="2" fill="white" opacity="0.2" />
-      <rect x="306" y="170" width="26" height="350" rx="2" fill="white" opacity="0.2" />
-      <path d="M228 220 Q280 145 332 220" fill="none" stroke="white" strokeWidth="20" opacity="0.18" strokeLinecap="round" />
-      <rect x="222" y="330" width="116" height="12" rx="2" fill="white" opacity="0.18" />
-      <line x1="241" y1="168" x2="241" y2="130" stroke="white" strokeWidth="2" opacity="0.22" />
-      <line x1="319" y1="168" x2="319" y2="130" stroke="white" strokeWidth="2" opacity="0.22" />
+      <rect
+        x="218"
+        y="520"
+        width="124"
+        height="14"
+        rx="2"
+        fill="white"
+        opacity="0.16"
+      />
+      <rect
+        x="228"
+        y="170"
+        width="26"
+        height="350"
+        rx="2"
+        fill="white"
+        opacity="0.2"
+      />
+      <rect
+        x="306"
+        y="170"
+        width="26"
+        height="350"
+        rx="2"
+        fill="white"
+        opacity="0.2"
+      />
+      <path
+        d="M228 220 Q280 145 332 220"
+        fill="none"
+        stroke="white"
+        strokeWidth="20"
+        opacity="0.18"
+        strokeLinecap="round"
+      />
+      <rect
+        x="222"
+        y="330"
+        width="116"
+        height="12"
+        rx="2"
+        fill="white"
+        opacity="0.18"
+      />
+      <line
+        x1="241"
+        y1="168"
+        x2="241"
+        y2="130"
+        stroke="white"
+        strokeWidth="2"
+        opacity="0.22"
+      />
+      <line
+        x1="319"
+        y1="168"
+        x2="319"
+        y2="130"
+        stroke="white"
+        strokeWidth="2"
+        opacity="0.22"
+      />
       <circle cx="241" cy="128" r="3" fill="white" opacity="0.3" />
       <circle cx="319" cy="128" r="3" fill="white" opacity="0.3" />
       {/* Left column windows */}
-      <rect x="232" y="190" width="8" height="12" rx="1" fill="#4ade80" opacity="0.22" />
-      <rect x="244" y="190" width="8" height="12" rx="1" fill="#4ade80" opacity="0.18" />
-      <rect x="232" y="214" width="8" height="12" rx="1" fill="#4ade80" opacity="0.22" />
-      <rect x="244" y="214" width="8" height="12" rx="1" fill="#4ade80" opacity="0.18" />
-      <rect x="232" y="250" width="8" height="12" rx="1" fill="#4ade80" opacity="0.22" />
-      <rect x="244" y="250" width="8" height="12" rx="1" fill="#4ade80" opacity="0.18" />
-      <rect x="232" y="274" width="8" height="12" rx="1" fill="#4ade80" opacity="0.22" />
-      <rect x="244" y="274" width="8" height="12" rx="1" fill="#4ade80" opacity="0.18" />
-      <rect x="232" y="350" width="8" height="12" rx="1" fill="#4ade80" opacity="0.22" />
-      <rect x="244" y="350" width="8" height="12" rx="1" fill="#4ade80" opacity="0.18" />
-      <rect x="232" y="374" width="8" height="12" rx="1" fill="#4ade80" opacity="0.22" />
-      <rect x="244" y="374" width="8" height="12" rx="1" fill="#4ade80" opacity="0.18" />
-      <rect x="232" y="398" width="8" height="12" rx="1" fill="#4ade80" opacity="0.22" />
-      <rect x="244" y="398" width="8" height="12" rx="1" fill="#4ade80" opacity="0.18" />
-      <rect x="232" y="422" width="8" height="12" rx="1" fill="#4ade80" opacity="0.22" />
-      <rect x="244" y="422" width="8" height="12" rx="1" fill="#4ade80" opacity="0.18" />
-      <rect x="232" y="446" width="8" height="12" rx="1" fill="#4ade80" opacity="0.22" />
-      <rect x="244" y="446" width="8" height="12" rx="1" fill="#4ade80" opacity="0.18" />
-      <rect x="232" y="470" width="8" height="12" rx="1" fill="#4ade80" opacity="0.22" />
-      <rect x="244" y="470" width="8" height="12" rx="1" fill="#4ade80" opacity="0.18" />
+      <rect
+        x="232"
+        y="190"
+        width="8"
+        height="12"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.22"
+      />
+      <rect
+        x="244"
+        y="190"
+        width="8"
+        height="12"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.18"
+      />
+      <rect
+        x="232"
+        y="214"
+        width="8"
+        height="12"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.22"
+      />
+      <rect
+        x="244"
+        y="214"
+        width="8"
+        height="12"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.18"
+      />
+      <rect
+        x="232"
+        y="250"
+        width="8"
+        height="12"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.22"
+      />
+      <rect
+        x="244"
+        y="250"
+        width="8"
+        height="12"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.18"
+      />
+      <rect
+        x="232"
+        y="274"
+        width="8"
+        height="12"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.22"
+      />
+      <rect
+        x="244"
+        y="274"
+        width="8"
+        height="12"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.18"
+      />
+      <rect
+        x="232"
+        y="350"
+        width="8"
+        height="12"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.22"
+      />
+      <rect
+        x="244"
+        y="350"
+        width="8"
+        height="12"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.18"
+      />
+      <rect
+        x="232"
+        y="374"
+        width="8"
+        height="12"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.22"
+      />
+      <rect
+        x="244"
+        y="374"
+        width="8"
+        height="12"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.18"
+      />
+      <rect
+        x="232"
+        y="398"
+        width="8"
+        height="12"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.22"
+      />
+      <rect
+        x="244"
+        y="398"
+        width="8"
+        height="12"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.18"
+      />
+      <rect
+        x="232"
+        y="422"
+        width="8"
+        height="12"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.22"
+      />
+      <rect
+        x="244"
+        y="422"
+        width="8"
+        height="12"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.18"
+      />
+      <rect
+        x="232"
+        y="446"
+        width="8"
+        height="12"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.22"
+      />
+      <rect
+        x="244"
+        y="446"
+        width="8"
+        height="12"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.18"
+      />
+      <rect
+        x="232"
+        y="470"
+        width="8"
+        height="12"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.22"
+      />
+      <rect
+        x="244"
+        y="470"
+        width="8"
+        height="12"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.18"
+      />
       {/* Right column windows */}
-      <rect x="310" y="190" width="8" height="12" rx="1" fill="#4ade80" opacity="0.22" />
-      <rect x="322" y="190" width="8" height="12" rx="1" fill="#4ade80" opacity="0.18" />
-      <rect x="310" y="214" width="8" height="12" rx="1" fill="#4ade80" opacity="0.22" />
-      <rect x="322" y="214" width="8" height="12" rx="1" fill="#4ade80" opacity="0.18" />
-      <rect x="310" y="250" width="8" height="12" rx="1" fill="#4ade80" opacity="0.22" />
-      <rect x="322" y="250" width="8" height="12" rx="1" fill="#4ade80" opacity="0.18" />
-      <rect x="310" y="274" width="8" height="12" rx="1" fill="#4ade80" opacity="0.22" />
-      <rect x="322" y="274" width="8" height="12" rx="1" fill="#4ade80" opacity="0.18" />
-      <rect x="310" y="350" width="8" height="12" rx="1" fill="#4ade80" opacity="0.22" />
-      <rect x="322" y="350" width="8" height="12" rx="1" fill="#4ade80" opacity="0.18" />
-      <rect x="310" y="374" width="8" height="12" rx="1" fill="#4ade80" opacity="0.22" />
-      <rect x="322" y="374" width="8" height="12" rx="1" fill="#4ade80" opacity="0.18" />
-      <rect x="310" y="398" width="8" height="12" rx="1" fill="#4ade80" opacity="0.22" />
-      <rect x="322" y="398" width="8" height="12" rx="1" fill="#4ade80" opacity="0.18" />
-      <rect x="310" y="422" width="8" height="12" rx="1" fill="#4ade80" opacity="0.22" />
-      <rect x="322" y="422" width="8" height="12" rx="1" fill="#4ade80" opacity="0.18" />
-      <rect x="310" y="446" width="8" height="12" rx="1" fill="#4ade80" opacity="0.22" />
-      <rect x="322" y="446" width="8" height="12" rx="1" fill="#4ade80" opacity="0.18" />
-      <rect x="310" y="470" width="8" height="12" rx="1" fill="#4ade80" opacity="0.22" />
-      <rect x="322" y="470" width="8" height="12" rx="1" fill="#4ade80" opacity="0.18" />
+      <rect
+        x="310"
+        y="190"
+        width="8"
+        height="12"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.22"
+      />
+      <rect
+        x="322"
+        y="190"
+        width="8"
+        height="12"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.18"
+      />
+      <rect
+        x="310"
+        y="214"
+        width="8"
+        height="12"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.22"
+      />
+      <rect
+        x="322"
+        y="214"
+        width="8"
+        height="12"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.18"
+      />
+      <rect
+        x="310"
+        y="250"
+        width="8"
+        height="12"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.22"
+      />
+      <rect
+        x="322"
+        y="250"
+        width="8"
+        height="12"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.18"
+      />
+      <rect
+        x="310"
+        y="274"
+        width="8"
+        height="12"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.22"
+      />
+      <rect
+        x="322"
+        y="274"
+        width="8"
+        height="12"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.18"
+      />
+      <rect
+        x="310"
+        y="350"
+        width="8"
+        height="12"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.22"
+      />
+      <rect
+        x="322"
+        y="350"
+        width="8"
+        height="12"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.18"
+      />
+      <rect
+        x="310"
+        y="374"
+        width="8"
+        height="12"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.22"
+      />
+      <rect
+        x="322"
+        y="374"
+        width="8"
+        height="12"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.18"
+      />
+      <rect
+        x="310"
+        y="398"
+        width="8"
+        height="12"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.22"
+      />
+      <rect
+        x="322"
+        y="398"
+        width="8"
+        height="12"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.18"
+      />
+      <rect
+        x="310"
+        y="422"
+        width="8"
+        height="12"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.22"
+      />
+      <rect
+        x="322"
+        y="422"
+        width="8"
+        height="12"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.18"
+      />
+      <rect
+        x="310"
+        y="446"
+        width="8"
+        height="12"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.22"
+      />
+      <rect
+        x="322"
+        y="446"
+        width="8"
+        height="12"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.18"
+      />
+      <rect
+        x="310"
+        y="470"
+        width="8"
+        height="12"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.22"
+      />
+      <rect
+        x="322"
+        y="470"
+        width="8"
+        height="12"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.18"
+      />
 
       {/* ── Al Mamlaka / other tall tower (right side) ── */}
-      <rect x="408" y="290" width="40" height="240" rx="2" fill="white" opacity="0.16" />
-      <rect x="412" y="275" width="32" height="16" rx="2" fill="white" opacity="0.18" />
-      <rect x="418" y="260" width="20" height="16" rx="2" fill="white" opacity="0.2"  />
-      <line x1="428" y1="258" x2="428" y2="235" stroke="white" strokeWidth="2.5" opacity="0.22" />
-      <rect x="415" y="300" width="10" height="8" rx="1" fill="#facc15" opacity="0.2" />
-      <rect x="430" y="300" width="10" height="8" rx="1" fill="#facc15" opacity="0.2" />
-      <rect x="415" y="320" width="10" height="8" rx="1" fill="#facc15" opacity="0.2" />
-      <rect x="430" y="320" width="10" height="8" rx="1" fill="#facc15" opacity="0.2" />
-      <rect x="415" y="340" width="10" height="8" rx="1" fill="#4ade80" opacity="0.2" />
-      <rect x="430" y="340" width="10" height="8" rx="1" fill="#4ade80" opacity="0.2" />
-      <rect x="415" y="360" width="10" height="8" rx="1" fill="#4ade80" opacity="0.2" />
-      <rect x="430" y="360" width="10" height="8" rx="1" fill="#4ade80" opacity="0.2" />
-      <rect x="415" y="380" width="10" height="8" rx="1" fill="#4ade80" opacity="0.2" />
-      <rect x="430" y="380" width="10" height="8" rx="1" fill="#4ade80" opacity="0.2" />
-      <rect x="415" y="400" width="10" height="8" rx="1" fill="#4ade80" opacity="0.2" />
-      <rect x="430" y="400" width="10" height="8" rx="1" fill="#4ade80" opacity="0.2" />
+      <rect
+        x="408"
+        y="290"
+        width="40"
+        height="240"
+        rx="2"
+        fill="white"
+        opacity="0.16"
+      />
+      <rect
+        x="412"
+        y="275"
+        width="32"
+        height="16"
+        rx="2"
+        fill="white"
+        opacity="0.18"
+      />
+      <rect
+        x="418"
+        y="260"
+        width="20"
+        height="16"
+        rx="2"
+        fill="white"
+        opacity="0.2"
+      />
+      <line
+        x1="428"
+        y1="258"
+        x2="428"
+        y2="235"
+        stroke="white"
+        strokeWidth="2.5"
+        opacity="0.22"
+      />
+      <rect
+        x="415"
+        y="300"
+        width="10"
+        height="8"
+        rx="1"
+        fill="#facc15"
+        opacity="0.2"
+      />
+      <rect
+        x="430"
+        y="300"
+        width="10"
+        height="8"
+        rx="1"
+        fill="#facc15"
+        opacity="0.2"
+      />
+      <rect
+        x="415"
+        y="320"
+        width="10"
+        height="8"
+        rx="1"
+        fill="#facc15"
+        opacity="0.2"
+      />
+      <rect
+        x="430"
+        y="320"
+        width="10"
+        height="8"
+        rx="1"
+        fill="#facc15"
+        opacity="0.2"
+      />
+      <rect
+        x="415"
+        y="340"
+        width="10"
+        height="8"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.2"
+      />
+      <rect
+        x="430"
+        y="340"
+        width="10"
+        height="8"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.2"
+      />
+      <rect
+        x="415"
+        y="360"
+        width="10"
+        height="8"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.2"
+      />
+      <rect
+        x="430"
+        y="360"
+        width="10"
+        height="8"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.2"
+      />
+      <rect
+        x="415"
+        y="380"
+        width="10"
+        height="8"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.2"
+      />
+      <rect
+        x="430"
+        y="380"
+        width="10"
+        height="8"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.2"
+      />
+      <rect
+        x="415"
+        y="400"
+        width="10"
+        height="8"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.2"
+      />
+      <rect
+        x="430"
+        y="400"
+        width="10"
+        height="8"
+        rx="1"
+        fill="#4ade80"
+        opacity="0.2"
+      />
 
       {/* ── Desert dunes ── */}
-      <path d="M0 558 Q50 532 120 552 Q200 572 290 545 Q370 522 450 548 Q500 560 560 540 L560 760 L0 760 Z" fill="url(#sandGrad)" opacity="0.55" />
-      <path d="M0 580 Q90 558 180 578 Q270 598 360 572 Q440 550 560 572 L560 760 L0 760 Z" fill="url(#sandGrad)" opacity="0.35" />
-      <path d="M0 580 Q90 558 180 578 Q270 598 360 572 Q440 550 560 572" fill="none" stroke="#e8c870" strokeWidth="1.5" opacity="0.4" />
+      <path
+        d="M0 558 Q50 532 120 552 Q200 572 290 545 Q370 522 450 548 Q500 560 560 540 L560 760 L0 760 Z"
+        fill="url(#sandGrad)"
+        opacity="0.55"
+      />
+      <path
+        d="M0 580 Q90 558 180 578 Q270 598 360 572 Q440 550 560 572 L560 760 L0 760 Z"
+        fill="url(#sandGrad)"
+        opacity="0.35"
+      />
+      <path
+        d="M0 580 Q90 558 180 578 Q270 598 360 572 Q440 550 560 572"
+        fill="none"
+        stroke="#e8c870"
+        strokeWidth="1.5"
+        opacity="0.4"
+      />
 
       {/* ── FINANCIAL CHART ELEMENTS ── */}
       <g filter="url(#softGlow)">
-        <rect x="30" y="185" width="148" height="110" rx="10" fill="#003d18" opacity="0.85" stroke="#22c55e" strokeWidth="0.8" />
-        <rect x="42" y="198" width="55" height="5" rx="2" fill="#86efac" opacity="0.7" />
-        <rect x="42"  y="255" width="14" height="32" rx="2" fill="url(#barUp)" />
-        <rect x="62"  y="241" width="14" height="46" rx="2" fill="url(#barUp)" />
-        <rect x="82"  y="228" width="14" height="59" rx="2" fill="url(#barUp)" />
-        <rect x="102" y="213" width="14" height="74" rx="2" fill="url(#barUp)" />
-        <rect x="122" y="204" width="14" height="83" rx="2" fill="url(#barUp)" />
-        <rect x="142" y="196" width="14" height="91" rx="2" fill="url(#barUp)" />
-        <polyline points="49,253 69,239 89,226 109,211 129,202 149,193" stroke="#facc15" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+        <rect
+          x="30"
+          y="185"
+          width="148"
+          height="110"
+          rx="10"
+          fill="#003d18"
+          opacity="0.85"
+          stroke="#22c55e"
+          strokeWidth="0.8"
+        />
+        <rect
+          x="42"
+          y="198"
+          width="55"
+          height="5"
+          rx="2"
+          fill="#86efac"
+          opacity="0.7"
+        />
+        <rect x="42" y="255" width="14" height="32" rx="2" fill="url(#barUp)" />
+        <rect x="62" y="241" width="14" height="46" rx="2" fill="url(#barUp)" />
+        <rect x="82" y="228" width="14" height="59" rx="2" fill="url(#barUp)" />
+        <rect
+          x="102"
+          y="213"
+          width="14"
+          height="74"
+          rx="2"
+          fill="url(#barUp)"
+        />
+        <rect
+          x="122"
+          y="204"
+          width="14"
+          height="83"
+          rx="2"
+          fill="url(#barUp)"
+        />
+        <rect
+          x="142"
+          y="196"
+          width="14"
+          height="91"
+          rx="2"
+          fill="url(#barUp)"
+        />
+        <polyline
+          points="49,253 69,239 89,226 109,211 129,202 149,193"
+          stroke="#facc15"
+          strokeWidth="2"
+          fill="none"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
         <polygon points="149,188 157,196 141,196" fill="#facc15" />
-        <line x1="38" y1="290" x2="162" y2="290" stroke="#22c55e" strokeWidth="0.6" opacity="0.5" />
+        <line
+          x1="38"
+          y1="290"
+          x2="162"
+          y2="290"
+          stroke="#22c55e"
+          strokeWidth="0.6"
+          opacity="0.5"
+        />
       </g>
 
       {/* KPI card */}
       <g>
-        <rect x="30" y="310" width="148" height="62" rx="10" fill="#003d18" opacity="0.85" stroke="#22c55e" strokeWidth="0.8" />
-        <text x="44" y="330" fill="#86efac" fontSize="10" fontFamily="Arial, sans-serif" opacity="0.85">{"\u0625\u062C\u0645\u0627\u0644\u064A \u0627\u0644\u0625\u064A\u0631\u0627\u062F\u0627\u062A"}</text>
-        <text x="44" y="356" fill="#4ade80" fontSize="19" fontWeight="bold" fontFamily="Arial, sans-serif" filter="url(#softGlow)">{"\u0662.\u0664M \u0631\u064A\u0627\u0644"}</text>
-        <rect x="128" y="320" width="38" height="18" rx="9" fill="#15803d" opacity="0.9" />
-        <text x="147" y="332" fill="#bbf7d0" fontSize="9" textAnchor="middle" fontFamily="Arial, sans-serif">{"\u25B2 8.2%"}</text>
+        <rect
+          x="30"
+          y="310"
+          width="148"
+          height="62"
+          rx="10"
+          fill="#003d18"
+          opacity="0.85"
+          stroke="#22c55e"
+          strokeWidth="0.8"
+        />
+        <text
+          x="44"
+          y="330"
+          fill="#86efac"
+          fontSize="10"
+          fontFamily="Arial, sans-serif"
+          opacity="0.85"
+        >
+          {
+            "\u0625\u062C\u0645\u0627\u0644\u064A \u0627\u0644\u0625\u064A\u0631\u0627\u062F\u0627\u062A"
+          }
+        </text>
+        <text
+          x="44"
+          y="356"
+          fill="#4ade80"
+          fontSize="19"
+          fontWeight="bold"
+          fontFamily="Arial, sans-serif"
+          filter="url(#softGlow)"
+        >
+          {"\u0662.\u0664M \u0631\u064A\u0627\u0644"}
+        </text>
+        <rect
+          x="128"
+          y="320"
+          width="38"
+          height="18"
+          rx="9"
+          fill="#15803d"
+          opacity="0.9"
+        />
+        <text
+          x="147"
+          y="332"
+          fill="#bbf7d0"
+          fontSize="9"
+          textAnchor="middle"
+          fontFamily="Arial, sans-serif"
+        >
+          {"\u25B2 8.2%"}
+        </text>
       </g>
 
       {/* Pie / donut chart card */}
       <g filter="url(#softGlow)">
-        <rect x="382" y="185" width="148" height="120" rx="10" fill="#003d18" opacity="0.85" stroke="#22c55e" strokeWidth="0.8" />
-        <circle cx="434" cy="240" r="38" fill="none" stroke="#005522" strokeWidth="18" />
-        <circle cx="434" cy="240" r="38" fill="none" stroke="#4ade80"  strokeWidth="18" strokeDasharray="90 148" strokeDashoffset="0" />
-        <circle cx="434" cy="240" r="38" fill="none" stroke="#86efac"  strokeWidth="18" strokeDasharray="66 172" strokeDashoffset="-90" />
-        <circle cx="434" cy="240" r="38" fill="none" stroke="#fde68a"  strokeWidth="18" strokeDasharray="52 186" strokeDashoffset="-156" />
-        <circle cx="434" cy="240" r="38" fill="none" stroke="#ffffff"  strokeWidth="18" strokeDasharray="30 208" strokeDashoffset="-208" opacity="0.5"/>
+        <rect
+          x="382"
+          y="185"
+          width="148"
+          height="120"
+          rx="10"
+          fill="#003d18"
+          opacity="0.85"
+          stroke="#22c55e"
+          strokeWidth="0.8"
+        />
+        <circle
+          cx="434"
+          cy="240"
+          r="38"
+          fill="none"
+          stroke="#005522"
+          strokeWidth="18"
+        />
+        <circle
+          cx="434"
+          cy="240"
+          r="38"
+          fill="none"
+          stroke="#4ade80"
+          strokeWidth="18"
+          strokeDasharray="90 148"
+          strokeDashoffset="0"
+        />
+        <circle
+          cx="434"
+          cy="240"
+          r="38"
+          fill="none"
+          stroke="#86efac"
+          strokeWidth="18"
+          strokeDasharray="66 172"
+          strokeDashoffset="-90"
+        />
+        <circle
+          cx="434"
+          cy="240"
+          r="38"
+          fill="none"
+          stroke="#fde68a"
+          strokeWidth="18"
+          strokeDasharray="52 186"
+          strokeDashoffset="-156"
+        />
+        <circle
+          cx="434"
+          cy="240"
+          r="38"
+          fill="none"
+          stroke="#ffffff"
+          strokeWidth="18"
+          strokeDasharray="30 208"
+          strokeDashoffset="-208"
+          opacity="0.5"
+        />
         <circle cx="434" cy="240" r="22" fill="#003d18" />
-        <text x="434" y="237" textAnchor="middle" fill="#4ade80" fontSize="10" fontWeight="bold" fontFamily="Arial, sans-serif">2026</text>
-        <text x="434" y="249" textAnchor="middle" fill="#86efac" fontSize="8"  fontFamily="Arial, sans-serif">SAR</text>
+        <text
+          x="434"
+          y="237"
+          textAnchor="middle"
+          fill="#4ade80"
+          fontSize="10"
+          fontWeight="bold"
+          fontFamily="Arial, sans-serif"
+        >
+          2026
+        </text>
+        <text
+          x="434"
+          y="249"
+          textAnchor="middle"
+          fill="#86efac"
+          fontSize="8"
+          fontFamily="Arial, sans-serif"
+        >
+          SAR
+        </text>
         <rect x="480" y="210" width="8" height="8" rx="2" fill="#4ade80" />
-        <text x="492" y="218" fill="#86efac" fontSize="8" fontFamily="Arial, sans-serif">{"\u0645\u0628\u064A\u0639\u0627\u062A"}</text>
+        <text
+          x="492"
+          y="218"
+          fill="#86efac"
+          fontSize="8"
+          fontFamily="Arial, sans-serif"
+        >
+          {"\u0645\u0628\u064A\u0639\u0627\u062A"}
+        </text>
         <rect x="480" y="224" width="8" height="8" rx="2" fill="#86efac" />
-        <text x="492" y="232" fill="#86efac" fontSize="8" fontFamily="Arial, sans-serif">{"\u0645\u0634\u062A\u0631\u064A\u0627\u062A"}</text>
+        <text
+          x="492"
+          y="232"
+          fill="#86efac"
+          fontSize="8"
+          fontFamily="Arial, sans-serif"
+        >
+          {"\u0645\u0634\u062A\u0631\u064A\u0627\u062A"}
+        </text>
         <rect x="480" y="238" width="8" height="8" rx="2" fill="#fde68a" />
-        <text x="492" y="246" fill="#86efac" fontSize="8" fontFamily="Arial, sans-serif">{"\u0646\u0641\u0642\u0627\u062A"}</text>
-        <rect x="480" y="252" width="8" height="8" rx="2" fill="white" opacity="0.5" />
-        <text x="492" y="260" fill="#86efac" fontSize="8" fontFamily="Arial, sans-serif">{"\u0623\u062E\u0631\u0649"}</text>
+        <text
+          x="492"
+          y="246"
+          fill="#86efac"
+          fontSize="8"
+          fontFamily="Arial, sans-serif"
+        >
+          {"\u0646\u0641\u0642\u0627\u062A"}
+        </text>
+        <rect
+          x="480"
+          y="252"
+          width="8"
+          height="8"
+          rx="2"
+          fill="white"
+          opacity="0.5"
+        />
+        <text
+          x="492"
+          y="260"
+          fill="#86efac"
+          fontSize="8"
+          fontFamily="Arial, sans-serif"
+        >
+          {"\u0623\u062E\u0631\u0649"}
+        </text>
       </g>
 
       {/* Ledger / document card */}
       <g>
-        <rect x="382" y="320" width="148" height="80" rx="10" fill="#003d18" opacity="0.85" stroke="#22c55e" strokeWidth="0.8" />
-        <rect x="394" y="334" width="100" height="4" rx="2" fill="#4ade80"  opacity="0.6" />
-        <rect x="394" y="344" width="76"  height="3" rx="1.5" fill="#86efac" opacity="0.45" />
-        <rect x="394" y="352" width="90"  height="3" rx="1.5" fill="#86efac" opacity="0.45" />
-        <rect x="394" y="360" width="64"  height="3" rx="1.5" fill="#86efac" opacity="0.45" />
-        <rect x="394" y="368" width="84"  height="3" rx="1.5" fill="#4ade80"  opacity="0.5" />
-        <rect x="394" y="376" width="70"  height="3" rx="1.5" fill="#86efac" opacity="0.45" />
-        <rect x="394" y="384" width="96"  height="3" rx="1.5" fill="#fde68a" opacity="0.5" />
-        <text x="508" y="358" fill="#4ade80" fontSize="22" fontWeight="bold" fontFamily="Arial, sans-serif" opacity="0.25">{"\uFDFC"}</text>
+        <rect
+          x="382"
+          y="320"
+          width="148"
+          height="80"
+          rx="10"
+          fill="#003d18"
+          opacity="0.85"
+          stroke="#22c55e"
+          strokeWidth="0.8"
+        />
+        <rect
+          x="394"
+          y="334"
+          width="100"
+          height="4"
+          rx="2"
+          fill="#4ade80"
+          opacity="0.6"
+        />
+        <rect
+          x="394"
+          y="344"
+          width="76"
+          height="3"
+          rx="1.5"
+          fill="#86efac"
+          opacity="0.45"
+        />
+        <rect
+          x="394"
+          y="352"
+          width="90"
+          height="3"
+          rx="1.5"
+          fill="#86efac"
+          opacity="0.45"
+        />
+        <rect
+          x="394"
+          y="360"
+          width="64"
+          height="3"
+          rx="1.5"
+          fill="#86efac"
+          opacity="0.45"
+        />
+        <rect
+          x="394"
+          y="368"
+          width="84"
+          height="3"
+          rx="1.5"
+          fill="#4ade80"
+          opacity="0.5"
+        />
+        <rect
+          x="394"
+          y="376"
+          width="70"
+          height="3"
+          rx="1.5"
+          fill="#86efac"
+          opacity="0.45"
+        />
+        <rect
+          x="394"
+          y="384"
+          width="96"
+          height="3"
+          rx="1.5"
+          fill="#fde68a"
+          opacity="0.5"
+        />
+        <text
+          x="508"
+          y="358"
+          fill="#4ade80"
+          fontSize="22"
+          fontWeight="bold"
+          fontFamily="Arial, sans-serif"
+          opacity="0.25"
+        >
+          {"\uFDFC"}
+        </text>
       </g>
 
       {/* ── BRANDING OVERLAY ── */}
-      <line x1="80" y1="150" x2="480" y2="150" stroke="#22c55e" strokeWidth="0.6" opacity="0.25" />
-      <text x="280" y="118" textAnchor="middle" fill="white" fontSize="44" fontWeight="bold" fontFamily="Arial, sans-serif" opacity="0.95" filter="url(#softGlow)">{"\u062A\u0637\u0648\u064A\u0631"}</text>
-      <text x="280" y="142" textAnchor="middle" fill="#86efac" fontSize="12" fontFamily="Arial, sans-serif" letterSpacing="4" opacity="0.85">TATWEER  ERP</text>
-      <text x="280" y="720" textAnchor="middle" fill="white" fontSize="10" fontFamily="Arial, sans-serif" opacity="0.35" letterSpacing="2">{"\u0627\u0644\u0645\u0645\u0644\u0643\u0629 \u0627\u0644\u0639\u0631\u0628\u064A\u0629 \u0627\u0644\u0633\u0639\u0648\u062F\u064A\u0629  \u00B7  \u0631\u0624\u064A\u0629 \u0662\u0660\u0663\u0660"}</text>
-      <rect x="80" y="730" width="400" height="2" rx="1" fill="#22c55e" opacity="0.3" />
-      <text x="280" y="460" textAnchor="middle" fill="#22c55e" fontSize="220" fontFamily="Arial, sans-serif" opacity="0.03" fontWeight="bold">{"\uFDFC"}</text>
+      <line
+        x1="80"
+        y1="150"
+        x2="480"
+        y2="150"
+        stroke="#22c55e"
+        strokeWidth="0.6"
+        opacity="0.25"
+      />
+      <text
+        x="280"
+        y="118"
+        textAnchor="middle"
+        fill="white"
+        fontSize="44"
+        fontWeight="bold"
+        fontFamily="Arial, sans-serif"
+        opacity="0.95"
+        filter="url(#softGlow)"
+      >
+        {"\u062A\u0637\u0648\u064A\u0631"}
+      </text>
+      <text
+        x="280"
+        y="142"
+        textAnchor="middle"
+        fill="#86efac"
+        fontSize="12"
+        fontFamily="Arial, sans-serif"
+        letterSpacing="4"
+        opacity="0.85"
+      >
+        TATWEER ERP
+      </text>
+      <text
+        x="280"
+        y="720"
+        textAnchor="middle"
+        fill="white"
+        fontSize="10"
+        fontFamily="Arial, sans-serif"
+        opacity="0.35"
+        letterSpacing="2"
+      >
+        {
+          "\u0627\u0644\u0645\u0645\u0644\u0643\u0629 \u0627\u0644\u0639\u0631\u0628\u064A\u0629 \u0627\u0644\u0633\u0639\u0648\u062F\u064A\u0629  \u00B7  \u0631\u0624\u064A\u0629 \u0662\u0660\u0663\u0660"
+        }
+      </text>
+      <rect
+        x="80"
+        y="730"
+        width="400"
+        height="2"
+        rx="1"
+        fill="#22c55e"
+        opacity="0.3"
+      />
+      <text
+        x="280"
+        y="460"
+        textAnchor="middle"
+        fill="#22c55e"
+        fontSize="220"
+        fontFamily="Arial, sans-serif"
+        opacity="0.03"
+        fontWeight="bold"
+      >
+        {"\uFDFC"}
+      </text>
     </svg>
   );
 }
@@ -319,16 +1439,40 @@ function BusinessCharacter({
       aria-hidden="true"
     >
       <ellipse cx="80" cy="212" rx="44" ry="7" fill="#003d18" opacity="0.18" />
-      <rect x="57"  y="160" width="19" height="40" rx="8" fill="#14532d" />
-      <rect x="84"  y="160" width="19" height="40" rx="8" fill="#14532d" />
-      <rect x="53"  y="192" width="27" height="12" rx="6" fill="#0f172a" />
-      <rect x="80"  y="192" width="27" height="12" rx="6" fill="#0f172a" />
-      <rect x="43"  y="108" width="74" height="60" rx="14" fill="#f8fafc" />
-      <rect x="43"  y="108" width="74" height="8"  rx="4" fill="#006C35" />
-      <rect x="73"  y="116" width="14" height="42" rx="3" fill="#f0f0f0" />
-      <rect x="84"  y="122" width="22" height="15" rx="3" fill="#006C35" opacity="0.9" />
-      <rect x="87"  y="125" width="16" height="2"  rx="1" fill="white"   opacity="0.8" />
-      <rect x="87"  y="130" width="12" height="2"  rx="1" fill="white"   opacity="0.6" />
+      <rect x="57" y="160" width="19" height="40" rx="8" fill="#14532d" />
+      <rect x="84" y="160" width="19" height="40" rx="8" fill="#14532d" />
+      <rect x="53" y="192" width="27" height="12" rx="6" fill="#0f172a" />
+      <rect x="80" y="192" width="27" height="12" rx="6" fill="#0f172a" />
+      <rect x="43" y="108" width="74" height="60" rx="14" fill="#f8fafc" />
+      <rect x="43" y="108" width="74" height="8" rx="4" fill="#006C35" />
+      <rect x="73" y="116" width="14" height="42" rx="3" fill="#f0f0f0" />
+      <rect
+        x="84"
+        y="122"
+        width="22"
+        height="15"
+        rx="3"
+        fill="#006C35"
+        opacity="0.9"
+      />
+      <rect
+        x="87"
+        y="125"
+        width="16"
+        height="2"
+        rx="1"
+        fill="white"
+        opacity="0.8"
+      />
+      <rect
+        x="87"
+        y="130"
+        width="12"
+        height="2"
+        rx="1"
+        fill="white"
+        opacity="0.6"
+      />
       <g
         style={{
           transform: isPasswordFocused
@@ -339,47 +1483,178 @@ function BusinessCharacter({
         }}
       >
         <rect x="28" y="118" width="22" height="13" rx="6" fill="#f5d5b8" />
-        <rect x="8"  y="124" width="38" height="28" rx="5" fill="#92400e" />
-        <rect x="8"  y="124" width="38" height="28" rx="5" stroke="#78350f" strokeWidth="1.5" />
-        <path d="M20 124 Q28 114 36 124" stroke="#78350f" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-        <rect x="24" y="134" width="8"  height="8"  rx="2" fill="#fbbf24" />
-        <rect x="11" y="127" width="7"  height="12" rx="2" fill="#a16207" opacity="0.35" />
+        <rect x="8" y="124" width="38" height="28" rx="5" fill="#92400e" />
+        <rect
+          x="8"
+          y="124"
+          width="38"
+          height="28"
+          rx="5"
+          stroke="#78350f"
+          strokeWidth="1.5"
+        />
+        <path
+          d="M20 124 Q28 114 36 124"
+          stroke="#78350f"
+          strokeWidth="2.5"
+          fill="none"
+          strokeLinecap="round"
+        />
+        <rect x="24" y="134" width="8" height="8" rx="2" fill="#fbbf24" />
+        <rect
+          x="11"
+          y="127"
+          width="7"
+          height="12"
+          rx="2"
+          fill="#a16207"
+          opacity="0.35"
+        />
       </g>
       <rect x="110" y="118" width="22" height="13" rx="6" fill="#f5d5b8" />
-      <rect x="112" y="126" width="30" height="36" rx="3" fill="#f8fafc" stroke="#cbd5e1" strokeWidth="1.5" />
-      <line x1="117" y1="133" x2="138" y2="133" stroke="#94a3b8" strokeWidth="1.5" />
-      <line x1="117" y1="139" x2="138" y2="139" stroke="#94a3b8" strokeWidth="1.5" />
-      <line x1="117" y1="145" x2="132" y2="145" stroke="#94a3b8" strokeWidth="1.5" />
-      <line x1="117" y1="151" x2="135" y2="151" stroke="#bbf7d0" strokeWidth="1.5" />
-      <text x="122" y="158" fill="#006C35" fontSize="8" fontFamily="Arial" opacity="0.6">{"\uFDFC"}</text>
+      <rect
+        x="112"
+        y="126"
+        width="30"
+        height="36"
+        rx="3"
+        fill="#f8fafc"
+        stroke="#cbd5e1"
+        strokeWidth="1.5"
+      />
+      <line
+        x1="117"
+        y1="133"
+        x2="138"
+        y2="133"
+        stroke="#94a3b8"
+        strokeWidth="1.5"
+      />
+      <line
+        x1="117"
+        y1="139"
+        x2="138"
+        y2="139"
+        stroke="#94a3b8"
+        strokeWidth="1.5"
+      />
+      <line
+        x1="117"
+        y1="145"
+        x2="132"
+        y2="145"
+        stroke="#94a3b8"
+        strokeWidth="1.5"
+      />
+      <line
+        x1="117"
+        y1="151"
+        x2="135"
+        y2="151"
+        stroke="#bbf7d0"
+        strokeWidth="1.5"
+      />
+      <text
+        x="122"
+        y="158"
+        fill="#006C35"
+        fontSize="8"
+        fontFamily="Arial"
+        opacity="0.6"
+      >
+        {"\uFDFC"}
+      </text>
       <rect x="69" y="94" width="22" height="18" rx="6" fill="#f5d5b8" />
       <ellipse cx="80" cy="74" rx="31" ry="32" fill="#f5d5b8" />
       <ellipse cx="49" cy="74" rx="5" ry="7" fill="#f5d5b8" />
       <ellipse cx="111" cy="74" rx="5" ry="7" fill="#f5d5b8" />
-      <path d="M49 58 Q50 32 80 28 Q110 32 111 58 Q108 44 80 40 Q52 44 49 58Z" fill="#f8fafc" />
-      <path d="M49 56 Q52 50 80 48 Q108 50 111 56" stroke="#1c1917" strokeWidth="5" fill="none" strokeLinecap="round" />
-      <ellipse cx="67" cy="74" rx="9"  ry="8" fill="white" />
-      <ellipse cx="93" cy="74" rx="9"  ry="8" fill="white" />
+      <path
+        d="M49 58 Q50 32 80 28 Q110 32 111 58 Q108 44 80 40 Q52 44 49 58Z"
+        fill="#f8fafc"
+      />
+      <path
+        d="M49 56 Q52 50 80 48 Q108 50 111 56"
+        stroke="#1c1917"
+        strokeWidth="5"
+        fill="none"
+        strokeLinecap="round"
+      />
+      <ellipse cx="67" cy="74" rx="9" ry="8" fill="white" />
+      <ellipse cx="93" cy="74" rx="9" ry="8" fill="white" />
       {!isPasswordFocused && (
         <>
           <circle cx={67 + px} cy={74 + py} r="4.5" fill="#1e293b" />
           <circle cx={93 + px} cy={74 + py} r="4.5" fill="#1e293b" />
-          <circle cx={69 + px} cy={72 + py} r="1.5" fill="white"   opacity="0.9" />
-          <circle cx={95 + px} cy={72 + py} r="1.5" fill="white"   opacity="0.9" />
+          <circle
+            cx={69 + px}
+            cy={72 + py}
+            r="1.5"
+            fill="white"
+            opacity="0.9"
+          />
+          <circle
+            cx={95 + px}
+            cy={72 + py}
+            r="1.5"
+            fill="white"
+            opacity="0.9"
+          />
         </>
       )}
       {isPasswordFocused && (
         <>
-          <path d="M58 74 Q67 80 76 74" stroke="#1e293b" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-          <path d="M84 74 Q93 80 102 74" stroke="#1e293b" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+          <path
+            d="M58 74 Q67 80 76 74"
+            stroke="#1e293b"
+            strokeWidth="2.5"
+            fill="none"
+            strokeLinecap="round"
+          />
+          <path
+            d="M84 74 Q93 80 102 74"
+            stroke="#1e293b"
+            strokeWidth="2.5"
+            fill="none"
+            strokeLinecap="round"
+          />
         </>
       )}
-      <path d="M59 63 Q67 59 75 62" stroke="#4a3728" strokeWidth="2.5" fill="none" strokeLinecap="round"
-        style={{ transform: isPasswordFocused ? "translateY(2px)" : "translateY(0)", transition: "transform 0.3s ease" }} />
-      <path d="M85 62 Q93 59 101 63" stroke="#4a3728" strokeWidth="2.5" fill="none" strokeLinecap="round"
-        style={{ transform: isPasswordFocused ? "translateY(2px)" : "translateY(0)", transition: "transform 0.3s ease" }} />
-      <path d="M69 88 Q80 96 91 88" stroke="#c97d5a" strokeWidth="2" fill="none" strokeLinecap="round"
-        style={{ transform: isPasswordFocused ? "scaleX(0.65) translateX(14px)" : "scaleX(1)", transformOrigin: "80px 91px", transition: "transform 0.35s ease" }} />
+      <path
+        d="M59 63 Q67 59 75 62"
+        stroke="#4a3728"
+        strokeWidth="2.5"
+        fill="none"
+        strokeLinecap="round"
+        style={{
+          transform: isPasswordFocused ? "translateY(2px)" : "translateY(0)",
+          transition: "transform 0.3s ease",
+        }}
+      />
+      <path
+        d="M85 62 Q93 59 101 63"
+        stroke="#4a3728"
+        strokeWidth="2.5"
+        fill="none"
+        strokeLinecap="round"
+        style={{
+          transform: isPasswordFocused ? "translateY(2px)" : "translateY(0)",
+          transition: "transform 0.3s ease",
+        }}
+      />
+      <path
+        d="M69 88 Q80 96 91 88"
+        stroke="#c97d5a"
+        strokeWidth="2"
+        fill="none"
+        strokeLinecap="round"
+        style={{
+          transform: isPasswordFocused
+            ? "scaleX(0.65) translateX(14px)"
+            : "scaleX(1)",
+          transformOrigin: "80px 91px",
+          transition: "transform 0.35s ease",
+        }}
+      />
     </svg>
   );
 }
@@ -397,10 +1672,16 @@ function InputIcon({ children }: { children: React.ReactNode }) {
 function ErrorMsg({ children }: { children: React.ReactNode }) {
   return (
     <p className="mt-1.5 text-xs text-red-500 flex items-center gap-1">
-      <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-        <path fillRule="evenodd"
+      <svg
+        className="w-3 h-3 flex-shrink-0"
+        fill="currentColor"
+        viewBox="0 0 20 20"
+      >
+        <path
+          fillRule="evenodd"
           d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-          clipRule="evenodd" />
+          clipRule="evenodd"
+        />
       </svg>
       {children}
     </p>
@@ -413,17 +1694,17 @@ export default function Login() {
   const { login, branches, selectBranch } = useAuthContext();
   const lang = localStorage.getItem("app-language") ?? "en";
 
-  const [email, setEmail]               = useState("");
-  const [password, setPassword]         = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
-  const [eyePos, setEyePos]   = useState<EyePos>({ x: 0, y: 0 });
-  const [error, setError]     = useState<string | null>(null);
+  const [eyePos, setEyePos] = useState<EyePos>({ x: 0, y: 0 });
+  const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [success, setSuccess]     = useState(false);
+  const [success, setSuccess] = useState(false);
 
   // Branch selection step
-  const [step, setStep]                   = useState<"form" | "branch">("form");
+  const [step, setStep] = useState<"form" | "branch">("form");
   const [pendingBranches, setPendingBranches] = useState<Branch[]>([]);
 
   // Redirect to dashboard after successful login
@@ -439,10 +1720,10 @@ export default function Login() {
     (e: MouseEvent) => {
       if (isPasswordFocused || !characterRef.current) return;
       const rect = characterRef.current.getBoundingClientRect();
-      const cx = rect.left + rect.width  / 2;
-      const cy = rect.top  + rect.height / 2;
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
       setEyePos({
-        x: (e.clientX - cx) / (window.innerWidth  / 2),
+        x: (e.clientX - cx) / (window.innerWidth / 2),
         y: (e.clientY - cy) / (window.innerHeight / 2),
       });
     },
@@ -534,7 +1815,6 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row overflow-hidden">
-
       {/* LEFT PANEL — Saudi accounting illustration */}
       <div className="relative lg:w-[55%] h-52 lg:h-auto flex-shrink-0 overflow-hidden">
         <div className="absolute inset-0">
@@ -546,7 +1826,6 @@ export default function Login() {
       {/* RIGHT PANEL — Login form */}
       <div className="flex-1 flex items-center justify-center bg-gradient-to-b from-white to-slate-50 px-6 py-10 lg:py-0">
         <div className="w-full max-w-sm relative">
-
           {/* Character */}
           <div
             ref={characterRef}
@@ -561,21 +1840,50 @@ export default function Login() {
 
           {/* Card */}
           <div className="mt-16 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
-
             {/* Header */}
             <div className="bg-gradient-to-r from-[#006C35] to-[#00933f] px-8 pt-24 pb-5 text-center text-white">
               <div className="flex items-center justify-center gap-2.5 mb-1">
                 <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center">
-                  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="3" y="3" width="7" height="7" rx="1.5" fill="white" />
-                    <rect x="14" y="3" width="7" height="7" rx="1.5" fill="white" />
-                    <rect x="3" y="14" width="7" height="7" rx="1.5" fill="white" />
+                  <svg
+                    viewBox="0 0 24 24"
+                    className="w-5 h-5"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <rect
+                      x="3"
+                      y="3"
+                      width="7"
+                      height="7"
+                      rx="1.5"
+                      fill="white"
+                    />
+                    <rect
+                      x="14"
+                      y="3"
+                      width="7"
+                      height="7"
+                      rx="1.5"
+                      fill="white"
+                    />
+                    <rect
+                      x="3"
+                      y="14"
+                      width="7"
+                      height="7"
+                      rx="1.5"
+                      fill="white"
+                    />
                     <circle cx="17.5" cy="17.5" r="3.5" fill="white" />
                   </svg>
                 </div>
                 <div className="text-right">
-                  <div className="font-bold text-lg leading-tight tracking-wide">{t("Tatweer", lang)}</div>
-                  <div className="text-green-200 text-[10px] tracking-widest font-medium uppercase">Tatweer ERP</div>
+                  <div className="font-bold text-lg leading-tight tracking-wide">
+                    {t("Tatweer", lang)}
+                  </div>
+                  <div className="text-green-200 text-[10px] tracking-widest font-medium uppercase">
+                    Tatweer ERP
+                  </div>
                 </div>
               </div>
             </div>
@@ -592,22 +1900,40 @@ export default function Login() {
               {success ? (
                 <div className="flex flex-col items-center gap-3 py-6">
                   <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center">
-                    <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                    <svg
+                      className="w-8 h-8 text-green-600"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2.5}
+                        d="M5 13l4 4L19 7"
+                      />
                     </svg>
                   </div>
-                  <p className="text-green-700 font-semibold text-sm">{t("login.success", lang)}</p>
-                  <p className="text-slate-400 text-xs">{t("login.redirecting", lang)}</p>
+                  <p className="text-green-700 font-semibold text-sm">
+                    {t("login.success", lang)}
+                  </p>
+                  <p className="text-slate-400 text-xs">
+                    {t("login.redirecting", lang)}
+                  </p>
                 </div>
               ) : step === "branch" ? (
                 /* Branch selection */
                 <div className="space-y-2.5">
                   <div className="text-center mb-4">
-                    <h2 className="text-base font-bold text-slate-800">{t("login.selectBranch", lang)}</h2>
-                    <p className="text-xs text-slate-500 mt-1">{t("login.selectBranchHint", lang)}</p>
+                    <h2 className="text-base font-bold text-slate-800">
+                      {t("login.selectBranch", lang)}
+                    </h2>
+                    <p className="text-xs text-slate-500 mt-1">
+                      {t("login.selectBranchHint", lang)}
+                    </p>
                   </div>
 
-                  {pendingBranches.map((branch) => (
+                  {pendingBranches.map(branch => (
                     <button
                       key={branch.id}
                       type="button"
@@ -615,18 +1941,33 @@ export default function Login() {
                       className="w-full flex items-center gap-3 p-3.5 rounded-xl border border-slate-200
                         hover:border-[#006C35] hover:bg-green-50 transition-all duration-150 text-left group"
                     >
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#006C35] to-[#00933f]
+                      <div
+                        className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#006C35] to-[#00933f]
                         flex items-center justify-center text-white font-bold text-sm flex-shrink-0
-                        shadow-sm group-hover:shadow-md transition-shadow">
+                        shadow-sm group-hover:shadow-md transition-shadow"
+                      >
                         {branch.code}
                       </div>
                       <div className="flex-1 min-w-0 text-right">
-                        <div className="font-semibold text-sm text-slate-800">{branch.name}</div>
-                        <div className="text-xs text-slate-400">{branch.code}</div>
+                        <div className="font-semibold text-sm text-slate-800">
+                          {branch.name}
+                        </div>
+                        <div className="text-xs text-slate-400">
+                          {branch.code}
+                        </div>
                       </div>
-                      <svg className="w-4 h-4 text-slate-300 group-hover:text-[#006C35] transition-colors flex-shrink-0 rotate-180"
-                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      <svg
+                        className="w-4 h-4 text-slate-300 group-hover:text-[#006C35] transition-colors flex-shrink-0 rotate-180"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M15 19l-7-7 7-7"
+                        />
                       </svg>
                     </button>
                   ))}
@@ -636,28 +1977,49 @@ export default function Login() {
                     onClick={() => setStep("form")}
                     className="w-full text-center text-xs text-slate-400 hover:text-slate-600 transition-colors pt-2 flex items-center justify-center gap-1"
                   >
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    <svg
+                      className="w-3.5 h-3.5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 19l-7-7 7-7"
+                      />
                     </svg>
                     {t("login.back", lang)}
                   </button>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} noValidate className="space-y-4">
-
                   {/* Error message */}
                   {error && <ErrorMsg>{error}</ErrorMsg>}
 
                   {/* Email */}
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1.5" htmlFor="email">
+                    <label
+                      className="block text-sm font-medium text-slate-700 mb-1.5"
+                      htmlFor="email"
+                    >
                       {t("login.emailLabel", lang)}
                     </label>
                     <div className="relative">
                       <InputIcon>
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                          />
                         </svg>
                       </InputIcon>
                       <input
@@ -665,7 +2027,10 @@ export default function Login() {
                         type="email"
                         autoComplete="email"
                         value={email}
-                        onChange={(e) => { setEmail(e.target.value); setError(null); }}
+                        onChange={e => {
+                          setEmail(e.target.value);
+                          setError(null);
+                        }}
                         placeholder={t("login.emailPlaceholder", lang)}
                         className={inputCls(!!error)}
                         dir="ltr"
@@ -677,14 +2042,26 @@ export default function Login() {
 
                   {/* Password */}
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1.5" htmlFor="password">
+                    <label
+                      className="block text-sm font-medium text-slate-700 mb-1.5"
+                      htmlFor="password"
+                    >
                       {t("login.passwordLabel", lang)}
                     </label>
                     <div className="relative">
                       <InputIcon>
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                          />
                         </svg>
                       </InputIcon>
                       <input
@@ -692,9 +2069,12 @@ export default function Login() {
                         type={showPassword ? "text" : "password"}
                         autoComplete="current-password"
                         value={password}
-                        onChange={(e) => { setPassword(e.target.value); setError(null); }}
+                        onChange={e => {
+                          setPassword(e.target.value);
+                          setError(null);
+                        }}
                         onFocus={() => setIsPasswordFocused(true)}
-                        onBlur={()  => setIsPasswordFocused(false)}
+                        onBlur={() => setIsPasswordFocused(false)}
                         placeholder={t("login.passwordPlaceholder", lang)}
                         className={`${inputCls(!!error)} pr-11`}
                         dir="ltr"
@@ -702,21 +2082,48 @@ export default function Login() {
                       />
                       <button
                         type="button"
-                        onClick={() => setShowPassword((v) => !v)}
+                        onClick={() => setShowPassword(v => !v)}
                         className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
                         tabIndex={-1}
-                        aria-label={showPassword ? t("login.hidePassword", lang) : t("login.showPassword", lang)}
+                        aria-label={
+                          showPassword
+                            ? t("login.hidePassword", lang)
+                            : t("login.showPassword", lang)
+                        }
                       >
                         {showPassword ? (
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                              d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
+                            />
                           </svg>
                         ) : (
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                            />
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                            />
                           </svg>
                         )}
                       </button>
@@ -735,17 +2142,42 @@ export default function Login() {
                   >
                     {isLoading ? (
                       <>
-                        <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        <svg
+                          className="w-4 h-4 animate-spin"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          />
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                          />
                         </svg>
                         {t("login.signingIn", lang)}
                       </>
                     ) : (
                       <>
                         {t("login.signIn", lang)}
-                        <svg className="w-4 h-4 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        <svg
+                          className="w-4 h-4 rotate-180"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M17 8l4 4m0 0l-4 4m4-4H3"
+                          />
                         </svg>
                       </>
                     )}
