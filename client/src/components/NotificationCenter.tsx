@@ -16,9 +16,9 @@ import {
   SettingOutlined,
   RightOutlined,
   CloseOutlined,
+  AlertOutlined,
 } from "@ant-design/icons";
 import { useLocation } from "wouter";
-import { AlertOutlined } from "@ant-design/icons";
 import {
   useNotificationsStore,
   type NotifType,

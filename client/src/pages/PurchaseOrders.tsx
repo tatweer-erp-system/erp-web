@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { PaymentStatus, PurchaseOrderStatus } from "@/constants/enums";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -46,8 +47,8 @@ const purchaseOrdersData = [
     date: "Feb 20, 2024",
     items: 5,
     total: "$12,450",
-    status: "delivered",
-    paymentStatus: "paid",
+    status: PurchaseOrderStatus.DELIVERED,
+    paymentStatus: PaymentStatus.PAID,
     branch: "Riyadh HQ",
   },
   {
@@ -57,8 +58,8 @@ const purchaseOrdersData = [
     date: "Feb 18, 2024",
     items: 3,
     total: "$8,920",
-    status: "in-transit",
-    paymentStatus: "pending",
+    status: PurchaseOrderStatus.IN_TRANSIT,
+    paymentStatus: PaymentStatus.PENDING,
     branch: "Jeddah",
   },
   {
@@ -68,8 +69,8 @@ const purchaseOrdersData = [
     date: "Feb 15, 2024",
     items: 8,
     total: "$15,680",
-    status: "processing",
-    paymentStatus: "pending",
+    status: PurchaseOrderStatus.PROCESSING,
+    paymentStatus: PaymentStatus.PENDING,
     branch: "Riyadh HQ",
   },
   {
@@ -79,8 +80,8 @@ const purchaseOrdersData = [
     date: "Feb 10, 2024",
     items: 12,
     total: "$22,340",
-    status: "delivered",
-    paymentStatus: "paid",
+    status: PurchaseOrderStatus.DELIVERED,
+    paymentStatus: PaymentStatus.PAID,
     branch: "Dammam",
   },
   {
@@ -90,21 +91,21 @@ const purchaseOrdersData = [
     date: "Feb 8, 2024",
     items: 6,
     total: "$5,200",
-    status: "processing",
-    paymentStatus: "pending",
+    status: PurchaseOrderStatus.PROCESSING,
+    paymentStatus: PaymentStatus.PENDING,
     branch: "Riyadh HQ",
   },
 ];
 
 function getStatusColor(status: string) {
   switch (status) {
-    case "delivered":
+    case PurchaseOrderStatus.DELIVERED:
       return "bg-green-50 text-green-600";
-    case "in-transit":
+    case PurchaseOrderStatus.IN_TRANSIT:
       return "bg-blue-50 text-blue-600";
-    case "processing":
+    case PurchaseOrderStatus.PROCESSING:
       return "bg-orange-50 text-orange-600";
-    case "cancelled":
+    case PurchaseOrderStatus.CANCELLED:
       return "bg-red-50 text-red-600";
     default:
       return "dark:bg-secondary bg-secondary text-gray-600";
@@ -113,11 +114,11 @@ function getStatusColor(status: string) {
 
 function getPaymentStatusColor(status: string) {
   switch (status) {
-    case "paid":
+    case PaymentStatus.PAID:
       return "bg-green-50 text-green-600";
-    case "pending":
+    case PaymentStatus.PENDING:
       return "bg-orange-50 text-orange-600";
-    case "overdue":
+    case PaymentStatus.OVERDUE:
       return "bg-red-50 text-red-600";
     default:
       return "dark:bg-secondary bg-secondary text-gray-600";

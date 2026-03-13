@@ -1,14 +1,20 @@
+import {
+  DiscountType,
+  VoucherStatus,
+  VoucherTypeStatus,
+} from "@/constants/enums";
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface VoucherType {
   id: string;
   name: string;
-  discountType: "percent" | "fixed";
+  discountType: DiscountType;
   discountValue: number;
   minOrderAmount: number;
   validForDays: number;
   maxUses: number; // 0 = unlimited
-  status: "active" | "inactive";
+  status: VoucherTypeStatus;
 }
 
 export interface Voucher {
@@ -16,7 +22,7 @@ export interface Voucher {
   code: string;
   typeId: string;
   typeName: string;
-  discountType: "percent" | "fixed";
+  discountType: DiscountType;
   discountValue: number;
   minOrderAmount: number;
   usedBy?: string; // customer name
@@ -24,7 +30,7 @@ export interface Voucher {
   orderRef?: string;
   issuedDate: string;
   expiryDate?: string;
-  status: "active" | "used" | "expired";
+  status: VoucherStatus;
 }
 
 export interface VoucherValidationResult {
@@ -40,52 +46,52 @@ export const mockVoucherTypes: VoucherType[] = [
   {
     id: "VT001",
     name: "Welcome Discount",
-    discountType: "fixed",
+    discountType: DiscountType.FIXED,
     discountValue: 5,
     minOrderAmount: 0,
     validForDays: 30,
     maxUses: 0,
-    status: "active",
+    status: VoucherTypeStatus.ACTIVE,
   },
   {
     id: "VT002",
     name: "Summer Sale 10%",
-    discountType: "percent",
+    discountType: DiscountType.PERCENT,
     discountValue: 10,
     minOrderAmount: 0,
     validForDays: 60,
     maxUses: 500,
-    status: "active",
+    status: VoucherTypeStatus.ACTIVE,
   },
   {
     id: "VT003",
     name: "Flat $20 Off",
-    discountType: "fixed",
+    discountType: DiscountType.FIXED,
     discountValue: 20,
     minOrderAmount: 50,
     validForDays: 90,
     maxUses: 200,
-    status: "active",
+    status: VoucherTypeStatus.ACTIVE,
   },
   {
     id: "VT004",
     name: "Summer 15%",
-    discountType: "percent",
+    discountType: DiscountType.PERCENT,
     discountValue: 15,
     minOrderAmount: 100,
     validForDays: 45,
     maxUses: 100,
-    status: "active",
+    status: VoucherTypeStatus.ACTIVE,
   },
   {
     id: "VT005",
     name: "Clearance Fixed",
-    discountType: "fixed",
+    discountType: DiscountType.FIXED,
     discountValue: 50,
     minOrderAmount: 200,
     validForDays: 14,
     maxUses: 50,
-    status: "inactive",
+    status: VoucherTypeStatus.INACTIVE,
   },
 ];
 
@@ -95,70 +101,70 @@ let mockVouchers: Voucher[] = [
     code: "WELCOME",
     typeId: "VT001",
     typeName: "Welcome Discount",
-    discountType: "fixed",
+    discountType: DiscountType.FIXED,
     discountValue: 5,
     minOrderAmount: 0,
     issuedDate: "2026-01-01",
-    status: "active",
+    status: VoucherStatus.ACTIVE,
   },
   {
     id: "V002",
     code: "SAVE10",
     typeId: "VT002",
     typeName: "Summer Sale 10%",
-    discountType: "percent",
+    discountType: DiscountType.PERCENT,
     discountValue: 10,
     minOrderAmount: 0,
     issuedDate: "2026-02-01",
-    status: "active",
+    status: VoucherStatus.ACTIVE,
   },
   {
     id: "V003",
     code: "FLAT20",
     typeId: "VT003",
     typeName: "Flat $20 Off",
-    discountType: "fixed",
+    discountType: DiscountType.FIXED,
     discountValue: 20,
     minOrderAmount: 50,
     issuedDate: "2026-02-15",
-    status: "active",
+    status: VoucherStatus.ACTIVE,
   },
   {
     id: "V004",
     code: "SUMMER15",
     typeId: "VT004",
     typeName: "Summer 15%",
-    discountType: "percent",
+    discountType: DiscountType.PERCENT,
     discountValue: 15,
     minOrderAmount: 100,
     issuedDate: "2026-03-01",
-    status: "active",
+    status: VoucherStatus.ACTIVE,
   },
   {
     id: "V005",
     code: "USED20OFF",
     typeId: "VT003",
     typeName: "Flat $20 Off",
-    discountType: "fixed",
+    discountType: DiscountType.FIXED,
     discountValue: 20,
     minOrderAmount: 50,
     issuedDate: "2026-01-10",
     usedBy: "Sarah Johnson",
     usedDate: "2026-01-15",
     orderRef: "POS-123456",
-    status: "used",
+    status: VoucherStatus.USED,
   },
   {
     id: "V006",
     code: "EXPIRED10",
     typeId: "VT002",
     typeName: "Summer Sale 10%",
-    discountType: "percent",
+    discountType: DiscountType.PERCENT,
     discountValue: 10,
     minOrderAmount: 0,
     issuedDate: "2025-12-01",
     expiryDate: "2025-12-31",
-    status: "expired",
+    status: VoucherStatus.EXPIRED,
   },
 ];
 
@@ -177,10 +183,10 @@ export async function validateVoucher(
   if (!voucher) {
     return { valid: false, message: "Voucher code not found" };
   }
-  if (voucher.status === "used") {
+  if (voucher.status === VoucherStatus.USED) {
     return { valid: false, message: "This voucher has already been used" };
   }
-  if (voucher.status === "expired") {
+  if (voucher.status === VoucherStatus.EXPIRED) {
     return { valid: false, message: "This voucher has expired" };
   }
   if (cartSubtotal < voucher.minOrderAmount) {
@@ -191,7 +197,7 @@ export async function validateVoucher(
   }
 
   const discountAmount =
-    voucher.discountType === "percent"
+    voucher.discountType === DiscountType.PERCENT
       ? (cartSubtotal * voucher.discountValue) / 100
       : Math.min(voucher.discountValue, cartSubtotal);
 
@@ -208,7 +214,7 @@ export async function redeemVoucher(
     v.code.toUpperCase() === code.toUpperCase()
       ? {
           ...v,
-          status: "used" as const,
+          status: VoucherStatus.USED,
           usedBy: usedBy ?? "Walk-in Customer",
           usedDate: new Date().toISOString().split("T")[0],
           orderRef,

@@ -64,6 +64,7 @@ import {
 } from "@ant-design/icons";
 import { Sun, Moon } from "lucide-react";
 import type { ColumnsType } from "antd/es/table";
+import { LoginResult } from "@/constants/enums";
 
 const { Title, Text } = Typography;
 const { Password } = Input;
@@ -93,7 +94,7 @@ interface LoginRecord {
   location: string;
   ip: string;
   time: string;
-  status: "success" | "failed";
+  status: LoginResult;
 }
 
 const LOGIN_HISTORY: LoginRecord[] = [
@@ -103,7 +104,7 @@ const LOGIN_HISTORY: LoginRecord[] = [
     location: "New York, US",
     ip: "192.168.1.1",
     time: "5 min ago",
-    status: "success",
+    status: LoginResult.SUCCESS,
   },
   {
     key: "2",
@@ -111,7 +112,7 @@ const LOGIN_HISTORY: LoginRecord[] = [
     location: "London, UK",
     ip: "10.0.0.42",
     time: "2 hrs ago",
-    status: "success",
+    status: LoginResult.SUCCESS,
   },
   {
     key: "3",
@@ -119,7 +120,7 @@ const LOGIN_HISTORY: LoginRecord[] = [
     location: "Berlin, DE",
     ip: "172.16.0.10",
     time: "Yesterday",
-    status: "failed",
+    status: LoginResult.FAILED,
   },
   {
     key: "4",
@@ -127,7 +128,7 @@ const LOGIN_HISTORY: LoginRecord[] = [
     location: "Toronto, CA",
     ip: "192.168.0.5",
     time: "3 days ago",
-    status: "success",
+    status: LoginResult.SUCCESS,
   },
 ];
 
@@ -404,12 +405,16 @@ export default function Settings() {
       render: v => (
         <Tag
           icon={
-            v === "success" ? <CheckCircleOutlined /> : <CloseCircleOutlined />
+            v === LoginResult.SUCCESS ? (
+              <CheckCircleOutlined />
+            ) : (
+              <CloseCircleOutlined />
+            )
           }
-          color={v === "success" ? "success" : "error"}
+          color={v === LoginResult.SUCCESS ? "success" : "error"}
           style={{ fontSize: 11 }}
         >
-          {v === "success" ? "Success" : "Failed"}
+          {v === LoginResult.SUCCESS ? "Success" : "Failed"}
         </Tag>
       ),
     },

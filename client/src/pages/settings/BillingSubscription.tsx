@@ -43,6 +43,7 @@ import {
   WarningOutlined,
   DollarOutlined,
 } from "@ant-design/icons";
+import { InvoiceStatus } from "@/constants/enums";
 
 const { Title, Text } = Typography;
 
@@ -752,7 +753,7 @@ function InvoiceHistoryTab() {
       date: "Jan 15, 2025",
       amount: "$4,800.00",
       period: "Jan 2025 – Jan 2026",
-      status: "paid",
+      status: InvoiceStatus.PAID,
     },
     {
       key: "2",
@@ -760,7 +761,7 @@ function InvoiceHistoryTab() {
       date: "Jan 15, 2024",
       amount: "$4,200.00",
       period: "Jan 2024 – Jan 2025",
-      status: "paid",
+      status: InvoiceStatus.PAID,
     },
     {
       key: "3",
@@ -768,7 +769,7 @@ function InvoiceHistoryTab() {
       date: "Jan 15, 2023",
       amount: "$3,600.00",
       period: "Jan 2023 – Jan 2024",
-      status: "paid",
+      status: InvoiceStatus.PAID,
     },
     {
       key: "4",
@@ -776,7 +777,7 @@ function InvoiceHistoryTab() {
       date: "Jan 15, 2022",
       amount: "$3,600.00",
       period: "Jan 2022 – Jan 2023",
-      status: "paid",
+      status: InvoiceStatus.PAID,
     },
   ];
   const cols = [

@@ -46,19 +46,18 @@ import {
   CheckCircleOutlined,
   DollarOutlined,
 } from "@ant-design/icons";
+import { QuotationStatus } from "@/constants/enums";
 
 const { Text } = Typography;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-
-type QuoteStatus = "pending" | "accepted" | "rejected" | "expired";
 
 interface Quotation {
   id: number;
   quoteNo: string;
   customer: string;
   amount: number;
-  status: QuoteStatus;
+  status: QuotationStatus;
   date: string;
   validUntil: string;
   salesRep: string;
@@ -72,7 +71,7 @@ const quotationsData: Quotation[] = [
     quoteNo: "QT-2024-001",
     customer: "Tech Corp",
     amount: 5000,
-    status: "pending",
+    status: QuotationStatus.PENDING,
     date: "2024-02-20",
     validUntil: "2024-03-20",
     salesRep: "Ahmed Al-Rashid",
@@ -82,7 +81,7 @@ const quotationsData: Quotation[] = [
     quoteNo: "QT-2024-002",
     customer: "Global Industries",
     amount: 12500,
-    status: "accepted",
+    status: QuotationStatus.ACCEPTED,
     date: "2024-02-19",
     validUntil: "2024-03-19",
     salesRep: "Sara Johnson",
@@ -92,7 +91,7 @@ const quotationsData: Quotation[] = [
     quoteNo: "QT-2024-003",
     customer: "Local Business",
     amount: 3200,
-    status: "rejected",
+    status: QuotationStatus.REJECTED,
     date: "2024-02-18",
     validUntil: "2024-03-18",
     salesRep: "Mohamed Ali",
@@ -102,7 +101,7 @@ const quotationsData: Quotation[] = [
     quoteNo: "QT-2024-004",
     customer: "Enterprise Ltd",
     amount: 25000,
-    status: "pending",
+    status: QuotationStatus.PENDING,
     date: "2024-02-17",
     validUntil: "2024-03-17",
     salesRep: "Emily Chen",
@@ -112,7 +111,7 @@ const quotationsData: Quotation[] = [
     quoteNo: "QT-2024-005",
     customer: "Startup Inc",
     amount: 8750,
-    status: "accepted",
+    status: QuotationStatus.ACCEPTED,
     date: "2024-02-16",
     validUntil: "2024-03-16",
     salesRep: "Ahmed Al-Rashid",
@@ -122,7 +121,7 @@ const quotationsData: Quotation[] = [
     quoteNo: "QT-2024-006",
     customer: "Alpha Solutions",
     amount: 15300,
-    status: "expired",
+    status: QuotationStatus.EXPIRED,
     date: "2024-01-10",
     validUntil: "2024-02-10",
     salesRep: "Bob Smith",
@@ -132,18 +131,18 @@ const quotationsData: Quotation[] = [
     quoteNo: "QT-2024-007",
     customer: "Beta Corp",
     amount: 7400,
-    status: "pending",
+    status: QuotationStatus.PENDING,
     date: "2024-02-15",
     validUntil: "2024-03-15",
     salesRep: "Sara Johnson",
   },
 ];
 
-const STATUS_TAG: Record<QuoteStatus, { color: string; label: string }> = {
-  pending: { color: "orange", label: "Pending" },
-  accepted: { color: "success", label: "Accepted" },
-  rejected: { color: "error", label: "Rejected" },
-  expired: { color: "default", label: "Expired" },
+const STATUS_TAG: Record<QuotationStatus, { color: string; label: string }> = {
+  [QuotationStatus.PENDING]: { color: "orange", label: "Pending" },
+  [QuotationStatus.ACCEPTED]: { color: "success", label: "Accepted" },
+  [QuotationStatus.REJECTED]: { color: "error", label: "Rejected" },
+  [QuotationStatus.EXPIRED]: { color: "default", label: "Expired" },
 };
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -259,12 +258,12 @@ export default function Quotations() {
     {
       title: "Status",
       dataIndex: "status",
-      filters: (Object.keys(STATUS_TAG) as QuoteStatus[]).map(k => ({
+      filters: (Object.keys(STATUS_TAG) as QuotationStatus[]).map(k => ({
         text: STATUS_TAG[k].label,
         value: k,
       })),
       onFilter: (val, rec) => rec.status === val,
-      render: (v: QuoteStatus) => {
+      render: (v: QuotationStatus) => {
         const s = STATUS_TAG[v];
         return (
           <Tag
@@ -359,7 +358,9 @@ export default function Quotations() {
             },
             {
               title: "Pending",
-              value: quotationsData.filter(i => i.status === "pending").length,
+              value: quotationsData.filter(
+                i => i.status === QuotationStatus.PENDING
+              ).length,
               suffix: "awaiting response",
               icon: <ClockCircleOutlined />,
               iconColor: "#f59e0b",
@@ -368,7 +369,9 @@ export default function Quotations() {
             },
             {
               title: "Accepted",
-              value: quotationsData.filter(i => i.status === "accepted").length,
+              value: quotationsData.filter(
+                i => i.status === QuotationStatus.ACCEPTED
+              ).length,
               suffix: "converted to orders",
               icon: <CheckCircleOutlined />,
               iconColor: "#10b981",

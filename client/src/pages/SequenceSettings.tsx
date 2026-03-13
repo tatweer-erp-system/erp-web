@@ -21,6 +21,7 @@ import {
   message,
   Typography,
   Alert,
+  theme as antTheme,
 } from "antd";
 import type { TableColumnsType } from "antd";
 import {
@@ -33,7 +34,6 @@ import {
   SettingOutlined,
   UndoOutlined,
 } from "@ant-design/icons";
-import { theme as antTheme } from "antd";
 
 const { Text, Title } = Typography;
 const { TextArea } = Input;

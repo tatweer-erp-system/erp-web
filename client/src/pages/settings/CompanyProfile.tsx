@@ -44,6 +44,7 @@ import {
   AppstoreOutlined,
   LinkOutlined,
 } from "@ant-design/icons";
+import { UserStatus } from "@/constants/enums";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -81,7 +82,7 @@ const BRANCHES_DATA = [
     city: "New York",
     country: "USA",
     manager: "John Doe",
-    status: "active",
+    status: UserStatus.ACTIVE,
   },
   {
     key: "2",
@@ -89,7 +90,7 @@ const BRANCHES_DATA = [
     city: "Cairo",
     country: "Egypt",
     manager: "Ahmed Ali",
-    status: "active",
+    status: UserStatus.ACTIVE,
   },
   {
     key: "3",
@@ -97,7 +98,7 @@ const BRANCHES_DATA = [
     city: "Dubai",
     country: "UAE",
     manager: "Sara Hassan",
-    status: "inactive",
+    status: UserStatus.INACTIVE,
   },
 ];
 
@@ -909,8 +910,8 @@ function BranchesTab() {
       key: "status",
       render: (v: string) => (
         <Badge
-          status={v === "active" ? "success" : "default"}
-          text={v === "active" ? "Active" : "Inactive"}
+          status={v === UserStatus.ACTIVE ? "success" : "default"}
+          text={v === UserStatus.ACTIVE ? "Active" : "Inactive"}
         />
       ),
     },

@@ -46,6 +46,7 @@ import {
   StopOutlined,
   DollarOutlined,
 } from "@ant-design/icons";
+import { StockStatus } from "@/constants/enums";
 
 const { Text } = Typography;
 
@@ -58,7 +59,7 @@ interface InventoryItem {
   category: string;
   quantity: number;
   reorderLevel: number;
-  status: "in-stock" | "low-stock" | "out-of-stock";
+  status: StockStatus;
   price: number;
 }
 
@@ -72,7 +73,7 @@ const inventoryData: InventoryItem[] = [
     category: "Electronics",
     quantity: 45,
     reorderLevel: 20,
-    status: "in-stock",
+    status: StockStatus.IN_STOCK,
     price: 1299,
   },
   {
@@ -82,7 +83,7 @@ const inventoryData: InventoryItem[] = [
     category: "Peripherals",
     quantity: 8,
     reorderLevel: 15,
-    status: "low-stock",
+    status: StockStatus.LOW_STOCK,
     price: 29,
   },
   {
@@ -92,7 +93,7 @@ const inventoryData: InventoryItem[] = [
     category: "Accessories",
     quantity: 0,
     reorderLevel: 50,
-    status: "out-of-stock",
+    status: StockStatus.OUT_OF_STOCK,
     price: 12,
   },
   {
@@ -102,7 +103,7 @@ const inventoryData: InventoryItem[] = [
     category: "Electronics",
     quantity: 32,
     reorderLevel: 10,
-    status: "in-stock",
+    status: StockStatus.IN_STOCK,
     price: 599,
   },
   {
@@ -112,7 +113,7 @@ const inventoryData: InventoryItem[] = [
     category: "Peripherals",
     quantity: 5,
     reorderLevel: 10,
-    status: "low-stock",
+    status: StockStatus.LOW_STOCK,
     price: 149,
   },
   {
@@ -122,7 +123,7 @@ const inventoryData: InventoryItem[] = [
     category: "Office",
     quantity: 120,
     reorderLevel: 30,
-    status: "in-stock",
+    status: StockStatus.IN_STOCK,
     price: 45,
   },
   {
@@ -132,7 +133,7 @@ const inventoryData: InventoryItem[] = [
     category: "Electronics",
     quantity: 0,
     reorderLevel: 20,
-    status: "out-of-stock",
+    status: StockStatus.OUT_OF_STOCK,
     price: 89,
   },
   {
@@ -142,7 +143,7 @@ const inventoryData: InventoryItem[] = [
     category: "Accessories",
     quantity: 67,
     reorderLevel: 25,
-    status: "in-stock",
+    status: StockStatus.IN_STOCK,
     price: 19,
   },
   {
@@ -152,7 +153,7 @@ const inventoryData: InventoryItem[] = [
     category: "Accessories",
     quantity: 23,
     reorderLevel: 15,
-    status: "in-stock",
+    status: StockStatus.IN_STOCK,
     price: 35,
   },
   {
@@ -162,7 +163,7 @@ const inventoryData: InventoryItem[] = [
     category: "Office",
     quantity: 15,
     reorderLevel: 10,
-    status: "low-stock",
+    status: StockStatus.LOW_STOCK,
     price: 55,
   },
   {
@@ -172,7 +173,7 @@ const inventoryData: InventoryItem[] = [
     category: "Electronics",
     quantity: 42,
     reorderLevel: 20,
-    status: "in-stock",
+    status: StockStatus.IN_STOCK,
     price: 25,
   },
   {
@@ -182,7 +183,7 @@ const inventoryData: InventoryItem[] = [
     category: "Accessories",
     quantity: 3,
     reorderLevel: 30,
-    status: "low-stock",
+    status: StockStatus.LOW_STOCK,
     price: 8,
   },
 ];
@@ -468,7 +469,9 @@ export default function Inventory() {
             },
             {
               title: "Low Stock",
-              value: inventoryData.filter(i => i.status === "low-stock").length,
+              value: inventoryData.filter(
+                i => i.status === StockStatus.LOW_STOCK
+              ).length,
               suffix: "need reordering",
               icon: <AlertOutlined />,
               iconColor: "#f59e0b",
@@ -477,8 +480,9 @@ export default function Inventory() {
             },
             {
               title: "Out of Stock",
-              value: inventoryData.filter(i => i.status === "out-of-stock")
-                .length,
+              value: inventoryData.filter(
+                i => i.status === StockStatus.OUT_OF_STOCK
+              ).length,
               suffix: "urgent action",
               icon: <StopOutlined />,
               iconColor: "#ef4444",

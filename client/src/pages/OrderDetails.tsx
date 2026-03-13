@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useSettings } from "@/contexts/SettingsContext";
 import { useLocation } from "wouter";
+import { OrderStatus } from "@/constants/enums";
 
 const ordersData = [
   {
@@ -39,7 +40,7 @@ const ordersData = [
     orderNo: "ORD-2024-001",
     customer: "John Doe",
     amount: "$1,299",
-    status: "completed",
+    status: OrderStatus.COMPLETED,
     date: "2024-02-20",
   },
   {
@@ -47,7 +48,7 @@ const ordersData = [
     orderNo: "ORD-2024-002",
     customer: "Jane Smith",
     amount: "$2,450",
-    status: "in-transit",
+    status: OrderStatus.IN_TRANSIT,
     date: "2024-02-21",
   },
   {
@@ -55,7 +56,7 @@ const ordersData = [
     orderNo: "ORD-2024-003",
     customer: "Mike Johnson",
     amount: "$899",
-    status: "pending",
+    status: OrderStatus.PENDING,
     date: "2024-02-22",
   },
   {
@@ -63,7 +64,7 @@ const ordersData = [
     orderNo: "ORD-2024-004",
     customer: "Sarah Williams",
     amount: "$3,200",
-    status: "completed",
+    status: OrderStatus.COMPLETED,
     date: "2024-02-23",
   },
   {
@@ -71,7 +72,7 @@ const ordersData = [
     orderNo: "ORD-2024-005",
     customer: "Tom Brown",
     amount: "$1,550",
-    status: "pending",
+    status: OrderStatus.PENDING,
     date: "2024-02-24",
   },
   {
@@ -79,7 +80,7 @@ const ordersData = [
     orderNo: "ORD-2024-006",
     customer: "Emma Davis",
     amount: "$2,100",
-    status: "in-transit",
+    status: OrderStatus.IN_TRANSIT,
     date: "2024-02-25",
   },
   {
@@ -87,7 +88,7 @@ const ordersData = [
     orderNo: "ORD-2024-007",
     customer: "Chris Wilson",
     amount: "$890",
-    status: "completed",
+    status: OrderStatus.COMPLETED,
     date: "2024-02-26",
   },
   {
@@ -95,7 +96,7 @@ const ordersData = [
     orderNo: "ORD-2024-008",
     customer: "Lisa Anderson",
     amount: "$1,750",
-    status: "pending",
+    status: OrderStatus.PENDING,
     date: "2024-02-27",
   },
   {
@@ -103,7 +104,7 @@ const ordersData = [
     orderNo: "ORD-2024-009",
     customer: "David Taylor",
     amount: "$2,600",
-    status: "completed",
+    status: OrderStatus.COMPLETED,
     date: "2024-02-28",
   },
   {
@@ -111,20 +112,20 @@ const ordersData = [
     orderNo: "ORD-2024-010",
     customer: "Rachel Martin",
     amount: "$1,200",
-    status: "in-transit",
+    status: OrderStatus.IN_TRANSIT,
     date: "2024-02-29",
   },
 ];
 
 function getStatusColor(status: string) {
   switch (status) {
-    case "completed":
+    case OrderStatus.COMPLETED:
       return "bg-green-50 text-green-600";
-    case "in-transit":
+    case OrderStatus.IN_TRANSIT:
       return "bg-blue-50 text-blue-600";
-    case "pending":
+    case OrderStatus.PENDING:
       return "bg-orange-50 text-orange-600";
-    case "cancelled":
+    case OrderStatus.CANCELLED:
       return "bg-red-50 text-red-600";
     default:
       return "dark:bg-secondary bg-secondary text-gray-600";

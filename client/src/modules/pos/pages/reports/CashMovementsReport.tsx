@@ -20,6 +20,7 @@ import {
 import type { ColumnsType } from "antd/es/table";
 import { usePOSStore, type CashMovement } from "../../store/posStore";
 import dayjs from "dayjs";
+import { CashMovementType } from "@/constants/enums";
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -43,7 +44,7 @@ const MOCK_TERMINALS = [
 const MOCK_MOVEMENTS: CashMovement[] = [
   {
     id: "cm-1",
-    type: "in",
+    type: CashMovementType.IN,
     amount: 500,
     reason: "Opening Float",
     note: "Starting cash for the day",
@@ -52,7 +53,7 @@ const MOCK_MOVEMENTS: CashMovement[] = [
   },
   {
     id: "cm-2",
-    type: "in",
+    type: CashMovementType.IN,
     amount: 200,
     reason: "Bank Deposit",
     note: "Extra change added",
@@ -61,7 +62,7 @@ const MOCK_MOVEMENTS: CashMovement[] = [
   },
   {
     id: "cm-3",
-    type: "out",
+    type: CashMovementType.OUT,
     amount: 150,
     reason: "Petty Cash",
     note: "Office supplies purchase",
@@ -70,7 +71,7 @@ const MOCK_MOVEMENTS: CashMovement[] = [
   },
   {
     id: "cm-4",
-    type: "out",
+    type: CashMovementType.OUT,
     amount: 80,
     reason: "Safe Drop",
     note: "Routine safe drop",
@@ -79,7 +80,7 @@ const MOCK_MOVEMENTS: CashMovement[] = [
   },
   {
     id: "cm-5",
-    type: "in",
+    type: CashMovementType.IN,
     amount: 100,
     reason: "Change Fund",
     note: "Added change for busy period",
@@ -88,7 +89,7 @@ const MOCK_MOVEMENTS: CashMovement[] = [
   },
   {
     id: "cm-6",
-    type: "out",
+    type: CashMovementType.OUT,
     amount: 350,
     reason: "Bank Deposit",
     note: "End-of-shift deposit",
@@ -148,8 +149,8 @@ export default function CashMovementsReport() {
       dataIndex: "type",
       key: "type",
       width: 100,
-      render: (type: "in" | "out") =>
-        type === "in" ? (
+      render: (type: CashMovementType) =>
+        type === CashMovementType.IN ? (
           <Tag
             style={{
               background: "#10B98110",

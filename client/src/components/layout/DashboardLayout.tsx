@@ -11,10 +11,9 @@ import { Sidebar } from "./Sidebar";
 import { Navbar } from "./Navbar";
 import { ThemeCustomizer } from "@/components/ThemeCustomizer";
 import { AntProvider } from "@/lib/antd-provider";
-import { Breadcrumb, Grid } from "antd";
+import { Breadcrumb, Grid, theme as antTheme } from "antd";
 import { HomeOutlined } from "@ant-design/icons";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
-import { theme as antTheme } from "antd";
 import { PinLockProvider } from "@/contexts/PinLockContext";
 import { PinLockOverlay } from "./PinLockOverlay";
 

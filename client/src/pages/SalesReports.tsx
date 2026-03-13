@@ -48,6 +48,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { InvoiceStatus } from "@/constants/enums";
 
 const { Text, Title } = Typography;
 const { RangePicker } = DatePicker;
@@ -190,7 +191,7 @@ const transactions: Transaction[] = [
     product: "Premium Widget Pro",
     qty: 12,
     amount: 14400,
-    status: "paid",
+    status: InvoiceStatus.PAID,
     salesperson: "Alice Johnson",
   },
   {
@@ -200,7 +201,7 @@ const transactions: Transaction[] = [
     product: "Sport Gear Bundle",
     qty: 8,
     amount: 8000,
-    status: "paid",
+    status: InvoiceStatus.PAID,
     salesperson: "Bob Smith",
   },
   {
@@ -210,7 +211,7 @@ const transactions: Transaction[] = [
     product: "Home Essentials Kit",
     qty: 15,
     amount: 12750,
-    status: "pending",
+    status: InvoiceStatus.PENDING,
     salesperson: "Carol White",
   },
   {
@@ -220,7 +221,7 @@ const transactions: Transaction[] = [
     product: "Classic Apparel Set",
     qty: 20,
     amount: 9800,
-    status: "paid",
+    status: InvoiceStatus.PAID,
     salesperson: "Alice Johnson",
   },
   {
@@ -230,7 +231,7 @@ const transactions: Transaction[] = [
     product: "Tech Accessories Pack",
     qty: 6,
     amount: 4200,
-    status: "overdue",
+    status: InvoiceStatus.OVERDUE,
     salesperson: "David Brown",
   },
   {
@@ -240,7 +241,7 @@ const transactions: Transaction[] = [
     product: "Premium Widget Pro",
     qty: 9,
     amount: 10800,
-    status: "paid",
+    status: InvoiceStatus.PAID,
     salesperson: "Bob Smith",
   },
   {
@@ -250,7 +251,7 @@ const transactions: Transaction[] = [
     product: "Home Essentials Kit",
     qty: 11,
     amount: 9350,
-    status: "pending",
+    status: InvoiceStatus.PENDING,
     salesperson: "Carol White",
   },
   {
@@ -260,7 +261,7 @@ const transactions: Transaction[] = [
     product: "Sport Gear Bundle",
     qty: 5,
     amount: 5000,
-    status: "paid",
+    status: InvoiceStatus.PAID,
     salesperson: "David Brown",
   },
   {
@@ -270,7 +271,7 @@ const transactions: Transaction[] = [
     product: "Premium Widget Pro",
     qty: 18,
     amount: 21600,
-    status: "paid",
+    status: InvoiceStatus.PAID,
     salesperson: "Alice Johnson",
   },
   {
@@ -280,7 +281,7 @@ const transactions: Transaction[] = [
     product: "Classic Apparel Set",
     qty: 7,
     amount: 3430,
-    status: "cancelled",
+    status: InvoiceStatus.CANCELLED,
     salesperson: "Bob Smith",
   },
 ];

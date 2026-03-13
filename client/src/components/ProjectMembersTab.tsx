@@ -10,6 +10,7 @@ import { useSettings } from "@/contexts/SettingsContext";
 import { t } from "@/i18n";
 import { Plus, Trash2, UserPlus, Shield, Eye, User } from "lucide-react";
 import type { ProjectMember } from "@/types/modules/sales";
+import { MemberRole } from "@/constants/enums";
 
 interface ProjectMembersTabProps {
   projectId: string;
@@ -19,11 +20,11 @@ const MEMBER_ROLES = ["owner", "member", "viewer"] as const;
 
 function getRoleBadgeStyle(role: string) {
   switch (role) {
-    case "owner":
+    case MemberRole.OWNER:
       return "bg-purple-100 text-purple-700";
-    case "member":
+    case MemberRole.MEMBER:
       return "bg-blue-100 text-blue-700";
-    case "viewer":
+    case MemberRole.VIEWER:
       return "bg-gray-100 text-gray-600";
     default:
       return "bg-secondary text-muted-foreground";
@@ -32,11 +33,11 @@ function getRoleBadgeStyle(role: string) {
 
 function getRoleIcon(role: string) {
   switch (role) {
-    case "owner":
+    case MemberRole.OWNER:
       return <Shield size={14} />;
-    case "member":
+    case MemberRole.MEMBER:
       return <User size={14} />;
-    case "viewer":
+    case MemberRole.VIEWER:
       return <Eye size={14} />;
     default:
       return <User size={14} />;

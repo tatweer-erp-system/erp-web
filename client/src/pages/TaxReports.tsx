@@ -42,12 +42,11 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { FilingStatus } from "@/constants/enums";
 
 const { Text, Title } = Typography;
 
 // ─── Mock data ─────────────────────────────────────────────────────────────────
-
-type FilingStatus = "filed" | "pending" | "overdue" | "draft";
 
 interface TaxPeriod {
   key: string;
@@ -72,7 +71,7 @@ const taxPeriods: TaxPeriod[] = [
     taxableInput: 98000,
     inputVAT: 14700,
     netVAT: 6600,
-    status: "filed",
+    status: FilingStatus.FILED,
     refNo: "VAT-2024-001",
   },
   {
@@ -84,7 +83,7 @@ const taxPeriods: TaxPeriod[] = [
     taxableInput: 112000,
     inputVAT: 16800,
     netVAT: 8400,
-    status: "filed",
+    status: FilingStatus.FILED,
     refNo: "VAT-2024-002",
   },
   {
@@ -96,7 +95,7 @@ const taxPeriods: TaxPeriod[] = [
     taxableInput: 138000,
     inputVAT: 20700,
     netVAT: 8550,
-    status: "filed",
+    status: FilingStatus.FILED,
     refNo: "VAT-2024-003",
   },
   {
@@ -108,7 +107,7 @@ const taxPeriods: TaxPeriod[] = [
     taxableInput: 154000,
     inputVAT: 23100,
     netVAT: 4350,
-    status: "filed",
+    status: FilingStatus.FILED,
     refNo: "VAT-2024-004",
   },
   {
@@ -120,7 +119,7 @@ const taxPeriods: TaxPeriod[] = [
     taxableInput: 167000,
     inputVAT: 25050,
     netVAT: 8100,
-    status: "filed",
+    status: FilingStatus.FILED,
     refNo: "VAT-2024-005",
   },
   {
@@ -132,7 +131,7 @@ const taxPeriods: TaxPeriod[] = [
     taxableInput: 189000,
     inputVAT: 28350,
     netVAT: 8700,
-    status: "filed",
+    status: FilingStatus.FILED,
     refNo: "VAT-2024-006",
   },
   {
@@ -144,7 +143,7 @@ const taxPeriods: TaxPeriod[] = [
     taxableInput: 172000,
     inputVAT: 25800,
     netVAT: 9900,
-    status: "filed",
+    status: FilingStatus.FILED,
     refNo: "VAT-2024-007",
   },
   {
@@ -156,7 +155,7 @@ const taxPeriods: TaxPeriod[] = [
     taxableInput: 198000,
     inputVAT: 29700,
     netVAT: 9900,
-    status: "filed",
+    status: FilingStatus.FILED,
     refNo: "VAT-2024-008",
   },
   {
@@ -168,7 +167,7 @@ const taxPeriods: TaxPeriod[] = [
     taxableInput: 212000,
     inputVAT: 31800,
     netVAT: 11550,
-    status: "filed",
+    status: FilingStatus.FILED,
     refNo: "VAT-2024-009",
   },
   {
@@ -180,7 +179,7 @@ const taxPeriods: TaxPeriod[] = [
     taxableInput: 204000,
     inputVAT: 30600,
     netVAT: 10050,
-    status: "filed",
+    status: FilingStatus.FILED,
     refNo: "VAT-2024-010",
   },
   {
@@ -192,7 +191,7 @@ const taxPeriods: TaxPeriod[] = [
     taxableInput: 241000,
     inputVAT: 36150,
     netVAT: 11550,
-    status: "pending",
+    status: FilingStatus.PENDING,
     refNo: "—",
   },
   {
@@ -204,7 +203,7 @@ const taxPeriods: TaxPeriod[] = [
     taxableInput: 268000,
     inputVAT: 40200,
     netVAT: 13200,
-    status: "draft",
+    status: FilingStatus.DRAFT,
     refNo: "—",
   },
 ];
@@ -252,7 +251,9 @@ export default function TaxReports() {
   const totalOutputVAT = taxPeriods.reduce((s, p) => s + p.outputVAT, 0);
   const totalInputVAT = taxPeriods.reduce((s, p) => s + p.inputVAT, 0);
   const totalNetVAT = taxPeriods.reduce((s, p) => s + p.netVAT, 0);
-  const filedCount = taxPeriods.filter(p => p.status === "filed").length;
+  const filedCount = taxPeriods.filter(
+    p => p.status === FilingStatus.FILED
+  ).length;
 
   const columns: TableColumnsType<TaxPeriod> = [
     {
@@ -686,7 +687,8 @@ export default function TaxReports() {
             scroll={{ x: "max-content" }}
             pagination={false}
             rowClassName={row =>
-              row.status === "pending" || row.status === "draft"
+              row.status === FilingStatus.PENDING ||
+              row.status === FilingStatus.DRAFT
                 ? "opacity-80"
                 : ""
             }

@@ -34,6 +34,7 @@ import {
   message,
   notification,
   DatePicker,
+  theme as antTheme,
 } from "antd";
 import {
   UserOutlined,
@@ -68,11 +69,11 @@ import {
   BellOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
-import { theme as antTheme } from "antd";
 import React, { useState, useMemo } from "react";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { CustomerActivityType, CustomerStatus } from "@/constants/enums";
 
 dayjs.extend(relativeTime);
 
@@ -89,7 +90,7 @@ interface Customer {
   phone: string;
   company: string;
   group: "enterprise" | "smb" | "startup" | "individual";
-  status: "active" | "vip" | "inactive" | "suspended";
+  status: CustomerStatus;
   revenue: number;
   orders: number;
   balance: number;
@@ -111,7 +112,7 @@ interface ActivityItem {
   time: string;
   action: string;
   detail: string;
-  type: "order" | "payment" | "support" | "signup" | "note";
+  type: CustomerActivityType;
 }
 
 // ─── Mock Data ────────────────────────────────────────────────────────────────
@@ -124,7 +125,7 @@ const CUSTOMERS: Customer[] = [
     phone: "+1 (415) 234-5678",
     company: "NexaCorp",
     group: "enterprise",
-    status: "vip",
+    status: CustomerStatus.VIP,
     revenue: 248500,
     orders: 142,
     balance: 12400,
@@ -148,7 +149,7 @@ const CUSTOMERS: Customer[] = [
     phone: "+234 802 345 6789",
     company: "BlueLabs NG",
     group: "smb",
-    status: "active",
+    status: CustomerStatus.ACTIVE,
     revenue: 67200,
     orders: 58,
     balance: 3200,
@@ -172,7 +173,7 @@ const CUSTOMERS: Customer[] = [
     phone: "+86 138 0013 8000",
     company: "Quantum Ventures",
     group: "enterprise",
-    status: "active",
+    status: CustomerStatus.ACTIVE,
     revenue: 193000,
     orders: 107,
     balance: -4500,
@@ -196,7 +197,7 @@ const CUSTOMERS: Customer[] = [
     phone: "+39 02 1234 5678",
     company: "PixelForge",
     group: "startup",
-    status: "active",
+    status: CustomerStatus.ACTIVE,
     revenue: 28900,
     orders: 31,
     balance: 1100,
@@ -220,7 +221,7 @@ const CUSTOMERS: Customer[] = [
     phone: "+52 55 1234 5678",
     company: "FabricaSol",
     group: "smb",
-    status: "inactive",
+    status: CustomerStatus.INACTIVE,
     revenue: 41500,
     orders: 44,
     balance: 0,
@@ -244,7 +245,7 @@ const CUSTOMERS: Customer[] = [
     phone: "+91 98765 43210",
     company: "TechBridge India",
     group: "enterprise",
-    status: "vip",
+    status: CustomerStatus.VIP,
     revenue: 312000,
     orders: 189,
     balance: 28000,
@@ -269,7 +270,7 @@ const CUSTOMERS: Customer[] = [
     phone: "+46 8 123 456 78",
     company: "Nordic Build",
     group: "smb",
-    status: "active",
+    status: CustomerStatus.ACTIVE,
     revenue: 53400,
     orders: 62,
     balance: 2700,
@@ -293,7 +294,7 @@ const CUSTOMERS: Customer[] = [
     phone: "+965 2222 3333",
     company: "Goldline KW",
     group: "individual",
-    status: "suspended",
+    status: CustomerStatus.SUSPENDED,
     revenue: 8900,
     orders: 12,
     balance: -2100,
@@ -318,7 +319,7 @@ const CUSTOMERS: Customer[] = [
     phone: "+82 2 1234 5678",
     company: "SeoulTech",
     group: "startup",
-    status: "active",
+    status: CustomerStatus.ACTIVE,
     revenue: 19600,
     orders: 22,
     balance: 800,
@@ -342,7 +343,7 @@ const CUSTOMERS: Customer[] = [
     phone: "+61 2 8765 4321",
     company: "Luminous AU",
     group: "smb",
-    status: "active",
+    status: CustomerStatus.ACTIVE,
     revenue: 79800,
     orders: 88,
     balance: 5600,
@@ -367,31 +368,31 @@ const ACTIVITY_MAP: Record<string, ActivityItem[]> = {
       time: "2026-03-01 14:22",
       action: "Order Placed",
       detail: "Order #QT-2310 — $18,400",
-      type: "order",
+      type: CustomerActivityType.ORDER,
     },
     {
       time: "2026-02-15 09:10",
       action: "Payment Received",
       detail: "$24,500 via wire transfer",
-      type: "payment",
+      type: CustomerActivityType.PAYMENT,
     },
     {
       time: "2026-01-28 11:45",
       action: "Support Ticket Resolved",
       detail: "Ticket #4872 — Shipping delay",
-      type: "support",
+      type: CustomerActivityType.SUPPORT,
     },
     {
       time: "2026-01-10 16:00",
       action: "Note Added",
       detail: "Annual contract renewal discussion",
-      type: "note",
+      type: CustomerActivityType.NOTE,
     },
     {
       time: "2022-04-15 08:00",
       action: "Account Created",
       detail: "Enterprise onboarding started",
-      type: "signup",
+      type: CustomerActivityType.SIGNUP,
     },
   ],
   default: [
@@ -399,19 +400,19 @@ const ACTIVITY_MAP: Record<string, ActivityItem[]> = {
       time: "2026-02-20 10:00",
       action: "Order Placed",
       detail: "New order submitted",
-      type: "order",
+      type: CustomerActivityType.ORDER,
     },
     {
       time: "2026-02-10 14:30",
       action: "Payment Received",
       detail: "Invoice cleared",
-      type: "payment",
+      type: CustomerActivityType.PAYMENT,
     },
     {
       time: "2026-01-15 09:00",
       action: "Note Added",
       detail: "Follow-up scheduled",
-      type: "note",
+      type: CustomerActivityType.NOTE,
     },
   ],
 };
@@ -516,12 +517,20 @@ const GROUP_CFG = {
   individual: { color: "purple", label: "Individual" },
 };
 
-const ACTIVITY_ICONS = {
-  order: <ShoppingOutlined style={{ color: "#3B82F6" }} />,
-  payment: <DollarOutlined style={{ color: "#10B981" }} />,
-  support: <MessageOutlined style={{ color: "#F59E0B" }} />,
-  signup: <UserOutlined style={{ color: "#8B5CF6" }} />,
-  note: <FileTextOutlined style={{ color: "#94A3B8" }} />,
+const ACTIVITY_ICONS: Record<CustomerActivityType, React.ReactNode> = {
+  [CustomerActivityType.ORDER]: (
+    <ShoppingOutlined style={{ color: "#3B82F6" }} />
+  ),
+  [CustomerActivityType.PAYMENT]: (
+    <DollarOutlined style={{ color: "#10B981" }} />
+  ),
+  [CustomerActivityType.SUPPORT]: (
+    <MessageOutlined style={{ color: "#F59E0B" }} />
+  ),
+  [CustomerActivityType.SIGNUP]: <UserOutlined style={{ color: "#8B5CF6" }} />,
+  [CustomerActivityType.NOTE]: (
+    <FileTextOutlined style={{ color: "#94A3B8" }} />
+  ),
 };
 
 // ─── Customer Drawer ──────────────────────────────────────────────────────────
@@ -1377,7 +1386,7 @@ function CustomersContent() {
   const totalRevenue = CUSTOMERS.reduce((s, c) => s + c.revenue, 0);
   const totalOrders = CUSTOMERS.reduce((s, c) => s + c.orders, 0);
   const activeCount = CUSTOMERS.filter(
-    c => c.status === "active" || c.status === "vip"
+    c => c.status === CustomerStatus.ACTIVE || c.status === CustomerStatus.VIP
   ).length;
   const avgRating = (
     CUSTOMERS.reduce((s, c) => s + c.rating, 0) / CUSTOMERS.length
@@ -1450,9 +1459,10 @@ function CustomersContent() {
           <Badge
             dot
             status={
-              c.status === "active" || c.status === "vip"
+              c.status === CustomerStatus.ACTIVE ||
+              c.status === CustomerStatus.VIP
                 ? "success"
-                : c.status === "suspended"
+                : c.status === CustomerStatus.SUSPENDED
                   ? "error"
                   : "default"
             }

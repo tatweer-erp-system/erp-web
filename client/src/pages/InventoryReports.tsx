@@ -48,13 +48,12 @@ import {
   Tooltip as RTooltip,
   ResponsiveContainer,
 } from "recharts";
+import { StockReportStatus } from "@/constants/enums";
 
 const { Text, Title } = Typography;
 const { RangePicker } = DatePicker;
 
 // ─── Types & data ─────────────────────────────────────────────────────────────
-
-type StockStatus = "in-stock" | "low-stock" | "out-of-stock" | "overstock";
 
 interface StockRow {
   id: number;
@@ -66,7 +65,7 @@ interface StockRow {
   maxLevel: number;
   unitCost: number;
   totalValue: number;
-  status: StockStatus;
+  status: StockReportStatus;
   turnover: number;
   lastReceived: string;
 }
@@ -82,7 +81,7 @@ const DATA: StockRow[] = [
     maxLevel: 80,
     unitCost: 1299,
     totalValue: 58455,
-    status: "in-stock",
+    status: StockReportStatus.IN_STOCK,
     turnover: 4.2,
     lastReceived: "2024-12-10",
   },
@@ -96,7 +95,7 @@ const DATA: StockRow[] = [
     maxLevel: 60,
     unitCost: 29,
     totalValue: 232,
-    status: "low-stock",
+    status: StockReportStatus.LOW_STOCK,
     turnover: 6.8,
     lastReceived: "2024-11-28",
   },
@@ -110,7 +109,7 @@ const DATA: StockRow[] = [
     maxLevel: 200,
     unitCost: 12,
     totalValue: 0,
-    status: "out-of-stock",
+    status: StockReportStatus.OUT_OF_STOCK,
     turnover: 9.1,
     lastReceived: "2024-10-15",
   },
@@ -124,7 +123,7 @@ const DATA: StockRow[] = [
     maxLevel: 40,
     unitCost: 599,
     totalValue: 19168,
-    status: "in-stock",
+    status: StockReportStatus.IN_STOCK,
     turnover: 2.9,
     lastReceived: "2024-12-05",
   },
@@ -138,7 +137,7 @@ const DATA: StockRow[] = [
     maxLevel: 40,
     unitCost: 149,
     totalValue: 745,
-    status: "low-stock",
+    status: StockReportStatus.LOW_STOCK,
     turnover: 5.4,
     lastReceived: "2024-11-20",
   },
@@ -152,7 +151,7 @@ const DATA: StockRow[] = [
     maxLevel: 150,
     unitCost: 45,
     totalValue: 10800,
-    status: "overstock",
+    status: StockReportStatus.OVERSTOCK,
     turnover: 1.8,
     lastReceived: "2024-12-01",
   },
@@ -166,7 +165,7 @@ const DATA: StockRow[] = [
     maxLevel: 60,
     unitCost: 89,
     totalValue: 0,
-    status: "out-of-stock",
+    status: StockReportStatus.OUT_OF_STOCK,
     turnover: 7.3,
     lastReceived: "2024-09-30",
   },
@@ -180,7 +179,7 @@ const DATA: StockRow[] = [
     maxLevel: 60,
     unitCost: 35,
     totalValue: 805,
-    status: "in-stock",
+    status: StockReportStatus.IN_STOCK,
     turnover: 3.6,
     lastReceived: "2024-12-08",
   },
@@ -194,7 +193,7 @@ const DATA: StockRow[] = [
     maxLevel: 40,
     unitCost: 55,
     totalValue: 825,
-    status: "in-stock",
+    status: StockReportStatus.IN_STOCK,
     turnover: 4.0,
     lastReceived: "2024-11-15",
   },
@@ -208,7 +207,7 @@ const DATA: StockRow[] = [
     maxLevel: 80,
     unitCost: 25,
     totalValue: 1050,
-    status: "in-stock",
+    status: StockReportStatus.IN_STOCK,
     turnover: 5.9,
     lastReceived: "2024-12-12",
   },
@@ -222,7 +221,7 @@ const DATA: StockRow[] = [
     maxLevel: 120,
     unitCost: 18,
     totalValue: 3240,
-    status: "overstock",
+    status: StockReportStatus.OVERSTOCK,
     turnover: 2.1,
     lastReceived: "2024-11-05",
   },
@@ -236,7 +235,7 @@ const DATA: StockRow[] = [
     maxLevel: 50,
     unitCost: 89,
     totalValue: 1068,
-    status: "low-stock",
+    status: StockReportStatus.LOW_STOCK,
     turnover: 8.2,
     lastReceived: "2024-12-03",
   },
@@ -250,7 +249,7 @@ const DATA: StockRow[] = [
     maxLevel: 80,
     unitCost: 68,
     totalValue: 1904,
-    status: "in-stock",
+    status: StockReportStatus.IN_STOCK,
     turnover: 5.1,
     lastReceived: "2024-12-09",
   },
@@ -264,7 +263,7 @@ const DATA: StockRow[] = [
     maxLevel: 80,
     unitCost: 22,
     totalValue: 88,
-    status: "low-stock",
+    status: StockReportStatus.LOW_STOCK,
     turnover: 3.3,
     lastReceived: "2024-10-28",
   },
@@ -278,14 +277,14 @@ const DATA: StockRow[] = [
     maxLevel: 40,
     unitCost: 79,
     totalValue: 1501,
-    status: "in-stock",
+    status: StockReportStatus.IN_STOCK,
     turnover: 4.7,
     lastReceived: "2024-11-22",
   },
 ];
 
 const STATUS_META: Record<
-  StockStatus,
+  StockReportStatus,
   { color: string; label: string; tagColor: string }
 > = {
   "in-stock": { color: "#10B981", label: "In Stock", tagColor: "success" },
@@ -314,11 +313,11 @@ function fmtCurrency(n: number) {
 function StockGauge({ row }: { row: StockRow }) {
   const pct = Math.min((row.quantity / row.maxLevel) * 100, 130);
   const color =
-    row.status === "out-of-stock"
+    row.status === StockReportStatus.OUT_OF_STOCK
       ? "#EF4444"
-      : row.status === "low-stock"
+      : row.status === StockReportStatus.LOW_STOCK
         ? "#F59E0B"
-        : row.status === "overstock"
+        : row.status === StockReportStatus.OVERSTOCK
           ? "#8B5CF6"
           : "#10B981";
   return (
@@ -367,9 +366,15 @@ export default function InventoryReports() {
   // KPIs
   const totalValue = DATA.reduce((s, r) => s + r.totalValue, 0);
   const totalProducts = DATA.length;
-  const lowStock = DATA.filter(r => r.status === "low-stock").length;
-  const outOfStock = DATA.filter(r => r.status === "out-of-stock").length;
-  const overstock = DATA.filter(r => r.status === "overstock").length;
+  const lowStock = DATA.filter(
+    r => r.status === StockReportStatus.LOW_STOCK
+  ).length;
+  const outOfStock = DATA.filter(
+    r => r.status === StockReportStatus.OUT_OF_STOCK
+  ).length;
+  const overstock = DATA.filter(
+    r => r.status === StockReportStatus.OVERSTOCK
+  ).length;
   const avgTurnover = (
     DATA.reduce((s, r) => s + r.turnover, 0) / DATA.length
   ).toFixed(1);
@@ -390,22 +395,23 @@ export default function InventoryReports() {
   const statusData = [
     {
       status: "In Stock",
-      count: DATA.filter(r => r.status === "in-stock").length,
+      count: DATA.filter(r => r.status === StockReportStatus.IN_STOCK).length,
       color: "#10B981",
     },
     {
       status: "Low Stock",
-      count: DATA.filter(r => r.status === "low-stock").length,
+      count: DATA.filter(r => r.status === StockReportStatus.LOW_STOCK).length,
       color: "#F59E0B",
     },
     {
       status: "Out of Stock",
-      count: DATA.filter(r => r.status === "out-of-stock").length,
+      count: DATA.filter(r => r.status === StockReportStatus.OUT_OF_STOCK)
+        .length,
       color: "#EF4444",
     },
     {
       status: "Overstock",
-      count: DATA.filter(r => r.status === "overstock").length,
+      count: DATA.filter(r => r.status === StockReportStatus.OVERSTOCK).length,
       color: "#8B5CF6",
     },
   ];
@@ -551,7 +557,7 @@ export default function InventoryReports() {
         value: k,
       })),
       onFilter: (val, rec) => rec.status === val,
-      render: (v: StockStatus) => (
+      render: (v: StockReportStatus) => (
         <Tag color={STATUS_META[v].tagColor} style={{ borderRadius: 20 }}>
           {STATUS_META[v].label}
         </Tag>

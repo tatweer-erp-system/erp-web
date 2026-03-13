@@ -21,6 +21,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useSettings } from "@/contexts/SettingsContext";
+import { InvoiceStatus } from "@/constants/enums";
 
 const purchaseInvoicesData = [
   {
@@ -28,7 +29,7 @@ const purchaseInvoicesData = [
     invoiceNo: "PI-2024-001",
     vendor: "Tech Supplies Inc.",
     amount: "$5,000",
-    status: "paid",
+    status: InvoiceStatus.PAID,
     date: "2024-02-20",
     dueDate: "2024-03-20",
   },
@@ -37,7 +38,7 @@ const purchaseInvoicesData = [
     invoiceNo: "PI-2024-002",
     vendor: "Global Electronics",
     amount: "$12,500",
-    status: "pending",
+    status: InvoiceStatus.PENDING,
     date: "2024-02-19",
     dueDate: "2024-03-19",
   },
@@ -46,7 +47,7 @@ const purchaseInvoicesData = [
     invoiceNo: "PI-2024-003",
     vendor: "Premium Logistics",
     amount: "$3,200",
-    status: "overdue",
+    status: InvoiceStatus.OVERDUE,
     date: "2024-02-18",
     dueDate: "2024-03-18",
   },
@@ -55,7 +56,7 @@ const purchaseInvoicesData = [
     invoiceNo: "PI-2024-004",
     vendor: "Industrial Parts Co.",
     amount: "$25,000",
-    status: "paid",
+    status: InvoiceStatus.PAID,
     date: "2024-02-17",
     dueDate: "2024-03-17",
   },
@@ -64,7 +65,7 @@ const purchaseInvoicesData = [
     invoiceNo: "PI-2024-005",
     vendor: "Office Supplies Ltd.",
     amount: "$8,750",
-    status: "pending",
+    status: InvoiceStatus.PENDING,
     date: "2024-02-16",
     dueDate: "2024-03-16",
   },
@@ -72,13 +73,13 @@ const purchaseInvoicesData = [
 
 function getStatusColor(status: string) {
   switch (status) {
-    case "paid":
+    case InvoiceStatus.PAID:
       return "bg-green-50 text-green-600";
-    case "pending":
+    case InvoiceStatus.PENDING:
       return "bg-orange-50 text-orange-600";
-    case "overdue":
+    case InvoiceStatus.OVERDUE:
       return "bg-red-50 text-red-600";
-    case "cancelled":
+    case InvoiceStatus.CANCELLED:
       return "dark:bg-secondary bg-secondary text-gray-600";
     default:
       return "dark:bg-secondary bg-secondary text-gray-600";

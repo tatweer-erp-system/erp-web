@@ -9,6 +9,13 @@ import {
 } from "../data/mockCustomers";
 import type { CashierRole } from "../services/cashierAuthService";
 import type { RestaurantTable } from "../data/mockRestaurant";
+import {
+  CashMovementType,
+  DiscountType,
+  POSPaymentMethod,
+} from "@/constants/enums";
+
+export type PaymentMethod = POSPaymentMethod;
 
 export interface CartItem {
   product: Product;
@@ -18,9 +25,6 @@ export interface CartItem {
   /** Restaurant: kitchen special note */
   note?: string;
 }
-
-export type PaymentMethod = "cash" | "card" | "split";
-export type DiscountType = "percent" | "fixed";
 
 export interface Discount {
   type: DiscountType;
@@ -39,7 +43,7 @@ export interface HeldOrder {
 // ── Voucher / Gift Card applied to cart ──────────────────────────────────────
 export interface AppliedVoucher {
   code: string;
-  discountType: "percent" | "fixed";
+  discountType: DiscountType;
   discountValue: number;
   description: string;
   /** Pre-computed discount amount in currency, set at apply time */
@@ -65,7 +69,7 @@ export interface CashierSession {
 // ── Cash drawer movement ──────────────────────────────────────────────────────
 export interface CashMovement {
   id: string;
-  type: "in" | "out";
+  type: CashMovementType;
   amount: number;
   reason: string;
   note: string;
@@ -127,7 +131,7 @@ export function createEmptyOrder(id?: string): OrderTab {
     splitCash: 0,
     splitCard: 0,
     splitCardRef: "",
-    discount: { type: "percent", value: 0 },
+    discount: { type: DiscountType.PERCENT, value: 0 },
     attachedTable: null,
     guestCount: 1,
   };
@@ -506,7 +510,7 @@ export const usePOSStore = create<POSState>()((set, get) => ({
         redeemPoints: 0,
         appliedVoucher: null,
         appliedGiftCards: [],
-        discount: { type: "percent", value: 0 },
+        discount: { type: DiscountType.PERCENT, value: 0 },
         paymentMethod: "cash",
         cashGiven: 0,
         cardRef: "",
@@ -640,7 +644,7 @@ export const usePOSStore = create<POSState>()((set, get) => ({
   },
 
   // ── Discount ──────────────────────────────────────────────────────────────
-  discount: { type: "percent", value: 0 },
+  discount: { type: DiscountType.PERCENT, value: 0 },
 
   setDiscount(discount) {
     set(state => ({

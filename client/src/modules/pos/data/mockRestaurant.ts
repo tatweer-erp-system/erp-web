@@ -1,3 +1,12 @@
+import {
+  CourseStatus,
+  PrinterConnection,
+  PrinterStatus,
+  PrinterType,
+  TableShape,
+  TableStatus,
+} from "@/constants/enums";
+
 // ── Restaurant types ──────────────────────────────────────────────────────────
 
 export interface RestaurantSection {
@@ -11,8 +20,8 @@ export interface RestaurantTable {
   name: string;
   sectionId: string;
   capacity: number;
-  shape: "square" | "round";
-  status: "available" | "occupied" | "reserved";
+  shape: TableShape;
+  status: TableStatus;
   /** ISO timestamp when guests were seated */
   seatedAt?: string;
   guestCount?: number;
@@ -26,17 +35,15 @@ export interface CourseType {
   order: number;
 }
 
-export type CourseStatus = "pending" | "sent" | "ready" | "served";
-
 export interface KitchenPrinter {
   id: string;
   name: string;
-  type: "receipt" | "kitchen";
-  connection: "usb" | "network";
+  type: PrinterType;
+  connection: PrinterConnection;
   ipAddress?: string;
   /** Product category IDs this printer handles */
   categories: string[];
-  status: "active" | "inactive";
+  status: PrinterStatus;
 }
 
 // ── Mock sections ─────────────────────────────────────────────────────────────
@@ -58,7 +65,7 @@ export const mockTables: RestaurantTable[] = [
     sectionId: "sec-1",
     capacity: 4,
     shape: "square",
-    status: "available",
+    status: TableStatus.AVAILABLE,
   },
   {
     id: "tbl-2",
@@ -66,7 +73,7 @@ export const mockTables: RestaurantTable[] = [
     sectionId: "sec-1",
     capacity: 2,
     shape: "round",
-    status: "occupied",
+    status: TableStatus.OCCUPIED,
     seatedAt: new Date(Date.now() - 42 * 60000).toISOString(),
     guestCount: 2,
     orderTotal: 38.5,
@@ -77,7 +84,7 @@ export const mockTables: RestaurantTable[] = [
     sectionId: "sec-1",
     capacity: 6,
     shape: "square",
-    status: "reserved",
+    status: TableStatus.RESERVED,
   },
   {
     id: "tbl-4",
@@ -85,7 +92,7 @@ export const mockTables: RestaurantTable[] = [
     sectionId: "sec-1",
     capacity: 4,
     shape: "square",
-    status: "occupied",
+    status: TableStatus.OCCUPIED,
     seatedAt: new Date(Date.now() - 18 * 60000).toISOString(),
     guestCount: 3,
     orderTotal: 72.0,
@@ -96,7 +103,7 @@ export const mockTables: RestaurantTable[] = [
     sectionId: "sec-1",
     capacity: 8,
     shape: "square",
-    status: "available",
+    status: TableStatus.AVAILABLE,
   },
   {
     id: "tbl-6",
@@ -104,7 +111,7 @@ export const mockTables: RestaurantTable[] = [
     sectionId: "sec-1",
     capacity: 2,
     shape: "round",
-    status: "available",
+    status: TableStatus.AVAILABLE,
   },
 
   // Terrace
@@ -114,7 +121,7 @@ export const mockTables: RestaurantTable[] = [
     sectionId: "sec-2",
     capacity: 4,
     shape: "square",
-    status: "occupied",
+    status: TableStatus.OCCUPIED,
     seatedAt: new Date(Date.now() - 65 * 60000).toISOString(),
     guestCount: 4,
     orderTotal: 124.75,
@@ -125,7 +132,7 @@ export const mockTables: RestaurantTable[] = [
     sectionId: "sec-2",
     capacity: 4,
     shape: "square",
-    status: "available",
+    status: TableStatus.AVAILABLE,
   },
   {
     id: "tbl-9",
@@ -133,7 +140,7 @@ export const mockTables: RestaurantTable[] = [
     sectionId: "sec-2",
     capacity: 2,
     shape: "round",
-    status: "reserved",
+    status: TableStatus.RESERVED,
   },
   {
     id: "tbl-10",
@@ -141,7 +148,7 @@ export const mockTables: RestaurantTable[] = [
     sectionId: "sec-2",
     capacity: 6,
     shape: "square",
-    status: "available",
+    status: TableStatus.AVAILABLE,
   },
 
   // Bar
@@ -151,7 +158,7 @@ export const mockTables: RestaurantTable[] = [
     sectionId: "sec-3",
     capacity: 2,
     shape: "round",
-    status: "occupied",
+    status: TableStatus.OCCUPIED,
     seatedAt: new Date(Date.now() - 12 * 60000).toISOString(),
     guestCount: 1,
     orderTotal: 15.0,
@@ -162,7 +169,7 @@ export const mockTables: RestaurantTable[] = [
     sectionId: "sec-3",
     capacity: 2,
     shape: "round",
-    status: "available",
+    status: TableStatus.AVAILABLE,
   },
   {
     id: "tbl-13",
@@ -170,7 +177,7 @@ export const mockTables: RestaurantTable[] = [
     sectionId: "sec-3",
     capacity: 2,
     shape: "round",
-    status: "available",
+    status: TableStatus.AVAILABLE,
   },
 
   // VIP Room
@@ -180,7 +187,7 @@ export const mockTables: RestaurantTable[] = [
     sectionId: "sec-4",
     capacity: 10,
     shape: "square",
-    status: "reserved",
+    status: TableStatus.RESERVED,
   },
   {
     id: "tbl-15",
@@ -188,7 +195,7 @@ export const mockTables: RestaurantTable[] = [
     sectionId: "sec-4",
     capacity: 8,
     shape: "square",
-    status: "available",
+    status: TableStatus.AVAILABLE,
   },
 ];
 
@@ -206,27 +213,27 @@ export const mockKitchenPrinters: KitchenPrinter[] = [
   {
     id: "kp-1",
     name: "Main Kitchen",
-    type: "kitchen",
+    type: PrinterType.KITCHEN,
     connection: "network",
     ipAddress: "192.168.1.50",
     categories: ["cat-food"],
-    status: "active",
+    status: PrinterStatus.ACTIVE,
   },
   {
     id: "kp-2",
     name: "Bar Printer",
-    type: "kitchen",
+    type: PrinterType.KITCHEN,
     connection: "usb",
     categories: ["cat-drinks"],
-    status: "active",
+    status: PrinterStatus.ACTIVE,
   },
   {
     id: "kp-3",
     name: "Receipt Desk",
-    type: "receipt",
+    type: PrinterType.RECEIPT,
     connection: "usb",
     categories: [],
-    status: "active",
+    status: PrinterStatus.ACTIVE,
   },
 ];
 

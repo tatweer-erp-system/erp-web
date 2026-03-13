@@ -40,10 +40,9 @@ import type {
   ColumnDef,
   PaginationState,
 } from "@/components/common/DataTable/types";
+import { InvoiceStatus } from "@/constants/enums";
 
 // ── Types ────────────────────────────────────────────────────────────────────
-
-type InvoiceStatus = "paid" | "pending" | "overdue" | "cancelled";
 
 interface Invoice {
   id: number;
@@ -63,7 +62,7 @@ const DATA: Invoice[] = [
     invoiceNo: "SI-2024-001",
     customer: "Tech Corp",
     amount: "$5,000",
-    status: "paid",
+    status: InvoiceStatus.PAID,
     date: "2024-02-20",
     dueDate: "2024-03-20",
   },
@@ -72,7 +71,7 @@ const DATA: Invoice[] = [
     invoiceNo: "SI-2024-002",
     customer: "Global Industries",
     amount: "$12,500",
-    status: "pending",
+    status: InvoiceStatus.PENDING,
     date: "2024-02-19",
     dueDate: "2024-03-19",
   },
@@ -81,7 +80,7 @@ const DATA: Invoice[] = [
     invoiceNo: "SI-2024-003",
     customer: "Local Business",
     amount: "$3,200",
-    status: "overdue",
+    status: InvoiceStatus.OVERDUE,
     date: "2024-02-18",
     dueDate: "2024-03-18",
   },
@@ -90,7 +89,7 @@ const DATA: Invoice[] = [
     invoiceNo: "SI-2024-004",
     customer: "Enterprise Ltd",
     amount: "$25,000",
-    status: "paid",
+    status: InvoiceStatus.PAID,
     date: "2024-02-17",
     dueDate: "2024-03-17",
   },
@@ -99,7 +98,7 @@ const DATA: Invoice[] = [
     invoiceNo: "SI-2024-005",
     customer: "Startup Inc",
     amount: "$8,750",
-    status: "pending",
+    status: InvoiceStatus.PENDING,
     date: "2024-02-16",
     dueDate: "2024-03-16",
   },
@@ -108,7 +107,7 @@ const DATA: Invoice[] = [
     invoiceNo: "SI-2024-006",
     customer: "Mega Corp",
     amount: "$19,200",
-    status: "paid",
+    status: InvoiceStatus.PAID,
     date: "2024-02-15",
     dueDate: "2024-03-15",
   },
@@ -117,7 +116,7 @@ const DATA: Invoice[] = [
     invoiceNo: "SI-2024-007",
     customer: "Alpha LLC",
     amount: "$6,400",
-    status: "overdue",
+    status: InvoiceStatus.OVERDUE,
     date: "2024-02-14",
     dueDate: "2024-03-14",
   },
@@ -126,7 +125,7 @@ const DATA: Invoice[] = [
     invoiceNo: "SI-2024-008",
     customer: "Beta Solutions",
     amount: "$2,900",
-    status: "cancelled",
+    status: InvoiceStatus.CANCELLED,
     date: "2024-02-13",
     dueDate: "2024-03-13",
   },
@@ -135,11 +134,13 @@ const DATA: Invoice[] = [
 // ── Status badge ──────────────────────────────────────────────────────────────
 
 const STATUS_STYLES: Record<InvoiceStatus, string> = {
-  paid: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-  pending:
+  [InvoiceStatus.PAID]:
+    "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+  [InvoiceStatus.PENDING]:
     "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
-  overdue: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
-  cancelled: "bg-secondary text-muted-foreground",
+  [InvoiceStatus.OVERDUE]:
+    "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
+  [InvoiceStatus.CANCELLED]: "bg-secondary text-muted-foreground",
 };
 
 function StatusBadge({ status }: { status: InvoiceStatus }) {
@@ -154,11 +155,18 @@ function StatusBadge({ status }: { status: InvoiceStatus }) {
 
 // ── Empty form state ──────────────────────────────────────────────────────────
 
-const EMPTY_FORM = {
+const EMPTY_FORM: {
+  invoiceNo: string;
+  customer: string;
+  amount: string;
+  status: InvoiceStatus;
+  date: string;
+  dueDate: string;
+} = {
   invoiceNo: "",
   customer: "",
   amount: "",
-  status: "pending" as InvoiceStatus,
+  status: InvoiceStatus.PENDING,
   date: "",
   dueDate: "",
 };
@@ -464,10 +472,10 @@ function InvoiceForm({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="paid">Paid</SelectItem>
-              <SelectItem value="overdue">Overdue</SelectItem>
-              <SelectItem value="cancelled">Cancelled</SelectItem>
+              <SelectItem value={InvoiceStatus.PENDING}>Pending</SelectItem>
+              <SelectItem value={InvoiceStatus.PAID}>Paid</SelectItem>
+              <SelectItem value={InvoiceStatus.OVERDUE}>Overdue</SelectItem>
+              <SelectItem value={InvoiceStatus.CANCELLED}>Cancelled</SelectItem>
             </SelectContent>
           </Select>
         </div>

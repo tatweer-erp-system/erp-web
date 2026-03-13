@@ -19,6 +19,7 @@ import {
 } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import { getAllVouchers, type Voucher } from "../../services/voucherService";
+import { VoucherStatus } from "@/constants/enums";
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -59,10 +60,14 @@ export default function VouchersReport() {
 
   // Summary stats
   const totalIssued = vouchers.length;
-  const totalRedeemed = vouchers.filter(v => v.status === "used").length;
-  const totalActive = vouchers.filter(v => v.status === "active").length;
+  const totalRedeemed = vouchers.filter(
+    v => v.status === VoucherStatus.USED
+  ).length;
+  const totalActive = vouchers.filter(
+    v => v.status === VoucherStatus.ACTIVE
+  ).length;
   const totalDiscountGiven = vouchers
-    .filter(v => v.status === "used")
+    .filter(v => v.status === VoucherStatus.USED)
     .reduce((sum, v) => sum + v.discountValue, 0);
 
   // Filtered rows

@@ -57,9 +57,9 @@ const { Text } = Typography;
 
 export interface EntityRecord {
   id: string;
-  name_ar: string;
-  name_en: string;
-  is_active: boolean;
+  nameAr: string;
+  nameEn: string;
+  isActive: boolean;
   [key: string]: any;
 }
 
@@ -121,7 +121,7 @@ function renderField(field: FieldDef) {
         <Input.TextArea
           rows={3}
           placeholder={field.label}
-          dir={field.key === "name_ar" ? "rtl" : undefined}
+          dir={field.key === "nameAr" ? "rtl" : undefined}
         />
       );
     case "select":
@@ -165,7 +165,7 @@ function renderField(field: FieldDef) {
       return (
         <Input
           placeholder={field.label}
-          dir={field.key === "name_ar" ? "rtl" : undefined}
+          dir={field.key === "nameAr" ? "rtl" : undefined}
         />
       );
   }
@@ -488,7 +488,7 @@ function DrawerForm({
               </div>
             </div>
             <Form.Item
-              name="is_active"
+              name="isActive"
               valuePropName="checked"
               style={{ margin: 0 }}
             >
@@ -576,10 +576,10 @@ function ModalForm({
     f => ["switch", "textarea"].includes(f.type) || f.fullWidth
   );
   const nameFields = fields.filter(
-    f => f.key === "name_en" || f.key === "name_ar"
+    f => f.key === "nameEn" || f.key === "nameAr"
   );
   const detailFields = fields.filter(
-    f => f.key !== "name_en" && f.key !== "name_ar"
+    f => f.key !== "nameEn" && f.key !== "nameAr"
   );
 
   // Shared field item renderer with card wrapper
@@ -917,7 +917,7 @@ function ModalForm({
                     </div>
                   </div>
                   <Form.Item
-                    name="is_active"
+                    name="isActive"
                     valuePropName="checked"
                     style={{ margin: 0 }}
                   >
@@ -995,7 +995,7 @@ function ModalForm({
                   </div>
                 </div>
                 <Form.Item
-                  name="is_active"
+                  name="isActive"
                   valuePropName="checked"
                   style={{ margin: 0 }}
                 >
@@ -1082,8 +1082,8 @@ function DefinitionsTab({
     if (!q) return data;
     return data.filter(
       r =>
-        r.name_en?.toLowerCase().includes(q) ||
-        r.name_ar?.toLowerCase().includes(q) ||
+        r.nameEn?.toLowerCase().includes(q) ||
+        r.nameAr?.toLowerCase().includes(q) ||
         Object.values(r).some(
           v => typeof v === "string" && v.toLowerCase().includes(q)
         )
@@ -1102,7 +1102,7 @@ function DefinitionsTab({
       if (f.defaultValue !== undefined)
         form.setFieldValue(f.key, f.defaultValue);
     });
-    form.setFieldValue("is_active", true);
+    form.setFieldValue("isActive", true);
     setFormOpen(true);
   }, [form, tab.fields]);
 
@@ -1169,9 +1169,9 @@ function DefinitionsTab({
 
   const handleToggleActive = useCallback(
     (record: EntityRecord) => {
-      const next = !record.is_active;
+      const next = !record.isActive;
       setData(prev =>
-        prev.map(r => (r.id === record.id ? { ...r, is_active: next } : r))
+        prev.map(r => (r.id === record.id ? { ...r, isActive: next } : r))
       );
       message.success(
         next
@@ -1206,8 +1206,8 @@ function DefinitionsTab({
         : undefined,
     })),
     {
-      key: "is_active",
-      dataIndex: "is_active",
+      key: "isActive",
+      dataIndex: "isActive",
       title: isRTL ? "الحالة" : "Status",
       width: 100,
       render: (val: boolean) =>
@@ -1241,7 +1241,7 @@ function DefinitionsTab({
           {/* Toggle Active / Inactive */}
           <Popconfirm
             title={
-              record.is_active
+              record.isActive
                 ? isRTL
                   ? "هل تريد إلغاء تفعيل هذا السجل؟"
                   : "Deactivate this record?"
@@ -1251,12 +1251,12 @@ function DefinitionsTab({
             }
             okText={isRTL ? "نعم" : "Yes"}
             cancelText={isRTL ? "لا" : "No"}
-            okButtonProps={{ danger: record.is_active, type: "primary" }}
+            okButtonProps={{ danger: record.isActive, type: "primary" }}
             onConfirm={() => handleToggleActive(record)}
           >
             <Tooltip
               title={
-                record.is_active
+                record.isActive
                   ? isRTL
                     ? "إلغاء التفعيل"
                     : "Deactivate"
@@ -1269,10 +1269,10 @@ function DefinitionsTab({
                 type="text"
                 size="small"
                 icon={
-                  record.is_active ? <StopOutlined /> : <CheckCircleOutlined />
+                  record.isActive ? <StopOutlined /> : <CheckCircleOutlined />
                 }
                 style={{
-                  color: record.is_active
+                  color: record.isActive
                     ? token.colorWarning
                     : token.colorSuccess,
                 }}
@@ -1357,7 +1357,7 @@ function DefinitionsTab({
         rowKey="id"
         size="small"
         pagination={false}
-        rowClassName={record => (!record.is_active ? "opacity-50" : "")}
+        rowClassName={record => (!record.isActive ? "opacity-50" : "")}
       />
 
       {/* ── Pagination Bar ─────────────────────────────────────────────── */}

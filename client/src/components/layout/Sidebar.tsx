@@ -1,6 +1,5 @@
 import { memo, useState, useEffect, useRef } from "react";
-import { useLocation } from "wouter";
-import { Link } from "wouter";
+import { useLocation, Link } from "wouter";
 import { Menu, Dropdown, Tooltip, theme as antTheme } from "antd";
 import type { MenuProps } from "antd";
 import {
@@ -571,7 +570,7 @@ function SidebarInner({ isOpen, isRTL, language }: SidebarProps) {
       el?.scrollIntoView({ block: "nearest", behavior: "instant" });
     });
     return () => cancelAnimationFrame(frame);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   function handleOpenChange(keys: string[]) {
     setOpenKeys(keys);

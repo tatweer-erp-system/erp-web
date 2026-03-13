@@ -53,6 +53,7 @@ import {
 import DashboardLayout from "@/components/DashboardLayout";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
 import { Link } from "wouter";
+import { OrderStatus } from "@/constants/enums";
 
 const { Title, Text } = Typography;
 
@@ -90,7 +91,7 @@ const recentOrders = [
     order: "ORD-2024-091",
     customer: "Acme Corp",
     amount: "$4,200",
-    status: "completed",
+    status: OrderStatus.COMPLETED,
     date: "Today 10:24",
   },
   {
@@ -98,7 +99,7 @@ const recentOrders = [
     order: "ORD-2024-090",
     customer: "TechStart LLC",
     amount: "$1,800",
-    status: "pending",
+    status: OrderStatus.PENDING,
     date: "Today 09:11",
   },
   {
@@ -106,7 +107,7 @@ const recentOrders = [
     order: "ORD-2024-089",
     customer: "Global Trade Co",
     amount: "$9,560",
-    status: "processing",
+    status: OrderStatus.PROCESSING,
     date: "Yesterday",
   },
   {
@@ -114,7 +115,7 @@ const recentOrders = [
     order: "ORD-2024-088",
     customer: "Bright Retail",
     amount: "$640",
-    status: "completed",
+    status: OrderStatus.COMPLETED,
     date: "Yesterday",
   },
   {
@@ -122,7 +123,7 @@ const recentOrders = [
     order: "ORD-2024-087",
     customer: "Nova Systems",
     amount: "$3,100",
-    status: "cancelled",
+    status: OrderStatus.CANCELLED,
     date: "Mar 8",
   },
 ];

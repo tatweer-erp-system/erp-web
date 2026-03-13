@@ -19,6 +19,7 @@ import {
 } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import { getAllGiftCards, type GiftCard } from "../../services/giftCardService";
+import { GiftCardStatus } from "@/constants/enums";
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -66,7 +67,9 @@ export default function GiftCardsReport() {
     (sum, c) => sum + c.remainingBalance,
     0
   );
-  const activeCount = cards.filter(c => c.status === "active").length;
+  const activeCount = cards.filter(
+    c => c.status === GiftCardStatus.ACTIVE
+  ).length;
 
   // Filtered rows
   const filtered = cards.filter(c => {
@@ -183,7 +186,7 @@ export default function GiftCardsReport() {
           return (
             <span style={{ color: token.colorTextTertiary }}>No expiry</span>
           );
-        const expired = record?.status === "expired";
+        const expired = record?.status === GiftCardStatus.EXPIRED;
         return (
           <span
             style={{

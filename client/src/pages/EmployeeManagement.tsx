@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useSettings } from "@/contexts/SettingsContext";
 import { t } from "@/i18n";
+import { EmployeeStatus } from "@/constants/enums";
 
 const employeesData = [
   {
@@ -44,7 +45,7 @@ const employeesData = [
     department: "Sales",
     email: "sarah@company.com",
     phone: "+1 (555) 123-4567",
-    status: "active",
+    status: EmployeeStatus.ACTIVE,
     joinDate: "Jan 15, 2023",
     branch: "Riyadh HQ",
   },
@@ -56,7 +57,7 @@ const employeesData = [
     department: "IT",
     email: "michael@company.com",
     phone: "+1 (555) 234-5678",
-    status: "active",
+    status: EmployeeStatus.ACTIVE,
     joinDate: "Mar 20, 2023",
     branch: "Jeddah",
   },
@@ -68,7 +69,7 @@ const employeesData = [
     department: "Human Resources",
     email: "emily@company.com",
     phone: "+1 (555) 345-6789",
-    status: "active",
+    status: EmployeeStatus.ACTIVE,
     joinDate: "Feb 10, 2023",
     branch: "Riyadh HQ",
   },
@@ -80,7 +81,7 @@ const employeesData = [
     department: "Finance",
     email: "david@company.com",
     phone: "+1 (555) 456-7890",
-    status: "on-leave",
+    status: EmployeeStatus.ON_LEAVE,
     joinDate: "May 5, 2022",
     branch: "Dammam",
   },
@@ -92,7 +93,7 @@ const employeesData = [
     department: "Marketing",
     email: "jessica@company.com",
     phone: "+1 (555) 567-8901",
-    status: "active",
+    status: EmployeeStatus.ACTIVE,
     joinDate: "Jul 12, 2023",
     branch: "Riyadh HQ",
   },
@@ -100,11 +101,11 @@ const employeesData = [
 
 function getStatusColor(status: string) {
   switch (status) {
-    case "active":
+    case EmployeeStatus.ACTIVE:
       return "bg-green-50 text-green-600";
-    case "on-leave":
+    case EmployeeStatus.ON_LEAVE:
       return "bg-orange-50 text-orange-600";
-    case "inactive":
+    case EmployeeStatus.INACTIVE:
       return "dark:bg-secondary bg-secondary text-gray-600";
     default:
       return "dark:bg-secondary bg-secondary text-gray-600";
@@ -438,7 +439,7 @@ export default function EmployeeManagement() {
                         <span
                           className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(item.status)}`}
                         >
-                          {item.status === "on-leave"
+                          {item.status === EmployeeStatus.ON_LEAVE
                             ? "On Leave"
                             : item.status.charAt(0).toUpperCase() +
                               item.status.slice(1)}
@@ -575,7 +576,7 @@ export default function EmployeeManagement() {
                   <span
                     className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(item.status)}`}
                   >
-                    {item.status === "on-leave"
+                    {item.status === EmployeeStatus.ON_LEAVE
                       ? "On Leave"
                       : item.status.charAt(0).toUpperCase() +
                         item.status.slice(1)}

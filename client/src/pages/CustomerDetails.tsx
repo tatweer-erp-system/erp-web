@@ -41,6 +41,7 @@ import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import AnimatedModal from "@/components/AnimatedModal";
 import AttachmentsTab from "@/components/AttachmentsTab";
 import { useLocation } from "wouter";
+import { CustomerStatus } from "@/constants/enums";
 
 // ── Mock customer data ────────────────────────────────────────────────────────
 
@@ -52,7 +53,7 @@ const CUSTOMER = {
   company: "Tech Corp",
   address: "123 Business Ave, San Francisco, CA 94105",
   segment: "Premium",
-  status: "active" as const,
+  status: CustomerStatus.ACTIVE,
   since: "Jan 2021",
   totalOrders: 15,
   totalSpent: "$42,100",

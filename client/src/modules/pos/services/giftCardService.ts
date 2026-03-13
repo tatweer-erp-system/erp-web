@@ -1,10 +1,12 @@
+import { GiftCardDenominationStatus, GiftCardStatus } from "@/constants/enums";
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface GiftCardDenomination {
   id: string;
   amount: number;
   label: string;
-  status: "active" | "inactive";
+  status: GiftCardDenominationStatus;
 }
 
 export interface GiftCard {
@@ -15,7 +17,7 @@ export interface GiftCard {
   issuedTo?: string; // customer name
   issuedDate: string;
   expiryDate?: string;
-  status: "active" | "depleted" | "expired";
+  status: GiftCardStatus;
 }
 
 export interface IssueGiftCardPayload {
@@ -33,12 +35,42 @@ export interface GiftCardBalanceResult {
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
 export const mockDenominations: GiftCardDenomination[] = [
-  { id: "D001", amount: 10, label: "$10 Gift Card", status: "active" },
-  { id: "D002", amount: 25, label: "$25 Gift Card", status: "active" },
-  { id: "D003", amount: 50, label: "$50 Gift Card", status: "active" },
-  { id: "D004", amount: 100, label: "$100 Gift Card", status: "active" },
-  { id: "D005", amount: 200, label: "$200 Gift Card", status: "active" },
-  { id: "D006", amount: 500, label: "$500 Gift Card", status: "inactive" },
+  {
+    id: "D001",
+    amount: 10,
+    label: "$10 Gift Card",
+    status: GiftCardDenominationStatus.ACTIVE,
+  },
+  {
+    id: "D002",
+    amount: 25,
+    label: "$25 Gift Card",
+    status: GiftCardDenominationStatus.ACTIVE,
+  },
+  {
+    id: "D003",
+    amount: 50,
+    label: "$50 Gift Card",
+    status: GiftCardDenominationStatus.ACTIVE,
+  },
+  {
+    id: "D004",
+    amount: 100,
+    label: "$100 Gift Card",
+    status: GiftCardDenominationStatus.ACTIVE,
+  },
+  {
+    id: "D005",
+    amount: 200,
+    label: "$200 Gift Card",
+    status: GiftCardDenominationStatus.ACTIVE,
+  },
+  {
+    id: "D006",
+    amount: 500,
+    label: "$500 Gift Card",
+    status: GiftCardDenominationStatus.INACTIVE,
+  },
 ];
 
 let mockGiftCards: GiftCard[] = [
@@ -50,7 +82,7 @@ let mockGiftCards: GiftCard[] = [
     issuedTo: "Emma Wilson",
     issuedDate: "2026-01-10",
     expiryDate: "2027-01-10",
-    status: "active",
+    status: GiftCardStatus.ACTIVE,
   },
   {
     id: "GC002",
@@ -60,7 +92,7 @@ let mockGiftCards: GiftCard[] = [
     issuedTo: "Carlos Mendez",
     issuedDate: "2025-12-15",
     expiryDate: "2026-12-15",
-    status: "active",
+    status: GiftCardStatus.ACTIVE,
   },
   {
     id: "GC003",
@@ -69,7 +101,7 @@ let mockGiftCards: GiftCard[] = [
     remainingBalance: 0,
     issuedDate: "2025-11-01",
     expiryDate: "2026-11-01",
-    status: "depleted",
+    status: GiftCardStatus.DEPLETED,
   },
   {
     id: "GC004",
@@ -77,7 +109,7 @@ let mockGiftCards: GiftCard[] = [
     issuedAmount: 25,
     remainingBalance: 25,
     issuedDate: "2026-02-20",
-    status: "active",
+    status: GiftCardStatus.ACTIVE,
   },
   {
     id: "GC005",
@@ -86,7 +118,7 @@ let mockGiftCards: GiftCard[] = [
     remainingBalance: 30,
     issuedDate: "2024-01-01",
     expiryDate: "2025-01-01",
-    status: "expired",
+    status: GiftCardStatus.EXPIRED,
   },
   {
     id: "GC006",
@@ -96,7 +128,7 @@ let mockGiftCards: GiftCard[] = [
     issuedTo: "Sarah Johnson",
     issuedDate: "2026-03-01",
     expiryDate: "2027-03-01",
-    status: "active",
+    status: GiftCardStatus.ACTIVE,
   },
 ];
 
@@ -133,7 +165,7 @@ export async function issueGiftCard(
     issuedTo: payload.issuedTo,
     issuedDate: new Date().toISOString().split("T")[0],
     expiryDate: payload.expiryDate,
-    status: "active",
+    status: GiftCardStatus.ACTIVE,
   };
   mockGiftCards = [...mockGiftCards, newCard];
   return newCard;
@@ -151,7 +183,7 @@ export async function redeemGiftCard(
     return {
       ...gc,
       remainingBalance: newBalance,
-      status: newBalance === 0 ? ("depleted" as const) : gc.status,
+      status: newBalance === 0 ? GiftCardStatus.DEPLETED : gc.status,
     };
   });
 

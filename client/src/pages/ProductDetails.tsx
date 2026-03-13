@@ -39,6 +39,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useSettings } from "@/contexts/SettingsContext";
+import { StockStatus } from "@/constants/enums";
 
 const productsData = [
   {
@@ -48,7 +49,7 @@ const productsData = [
     category: "Electronics",
     price: "$1,299",
     stock: 45,
-    status: "in-stock",
+    status: StockStatus.IN_STOCK,
   },
   {
     id: 2,
@@ -57,7 +58,7 @@ const productsData = [
     category: "Accessories",
     price: "$29",
     stock: 8,
-    status: "low-stock",
+    status: StockStatus.LOW_STOCK,
   },
   {
     id: 3,
@@ -66,7 +67,7 @@ const productsData = [
     category: "Cables",
     price: "$12",
     stock: 0,
-    status: "out-of-stock",
+    status: StockStatus.OUT_OF_STOCK,
   },
   {
     id: 4,
@@ -75,7 +76,7 @@ const productsData = [
     category: "Electronics",
     price: "$599",
     stock: 32,
-    status: "in-stock",
+    status: StockStatus.IN_STOCK,
   },
   {
     id: 5,
@@ -84,17 +85,17 @@ const productsData = [
     category: "Accessories",
     price: "$149",
     stock: 5,
-    status: "low-stock",
+    status: StockStatus.LOW_STOCK,
   },
 ];
 
 function getStatusColor(status: string) {
   switch (status) {
-    case "in-stock":
+    case StockStatus.IN_STOCK:
       return "bg-green-50 text-green-600";
-    case "low-stock":
+    case StockStatus.LOW_STOCK:
       return "bg-orange-50 text-orange-600";
-    case "out-of-stock":
+    case StockStatus.OUT_OF_STOCK:
       return "bg-red-50 text-red-600";
     default:
       return "dark:bg-secondary bg-secondary text-gray-600";
@@ -621,7 +622,10 @@ export default function ProductDetails() {
                   Low Stock Alert
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  {productsData.filter(p => p.status === "low-stock").length}{" "}
+                  {
+                    productsData.filter(p => p.status === StockStatus.LOW_STOCK)
+                      .length
+                  }{" "}
                   products need attention
                 </p>
               </div>

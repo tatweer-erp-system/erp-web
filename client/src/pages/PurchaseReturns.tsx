@@ -20,6 +20,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useSettings } from "@/contexts/SettingsContext";
+import { ReturnStatus } from "@/constants/enums";
 
 const purchaseReturnsData = [
   {
@@ -29,7 +30,7 @@ const purchaseReturnsData = [
     amount: "$500",
     reason: "Defective",
     date: "2024-02-20",
-    status: "processed",
+    status: ReturnStatus.PROCESSED,
   },
   {
     id: 2,
@@ -38,7 +39,7 @@ const purchaseReturnsData = [
     amount: "$1,250",
     reason: "Wrong item",
     date: "2024-02-19",
-    status: "pending",
+    status: ReturnStatus.PENDING,
   },
   {
     id: 3,
@@ -47,17 +48,17 @@ const purchaseReturnsData = [
     amount: "$320",
     reason: "Damaged",
     date: "2024-02-18",
-    status: "processed",
+    status: ReturnStatus.PROCESSED,
   },
 ];
 
 function getStatusColor(status: string) {
   switch (status) {
-    case "processed":
+    case ReturnStatus.PROCESSED:
       return "bg-green-50 text-green-600";
-    case "pending":
+    case ReturnStatus.PENDING:
       return "bg-orange-50 text-orange-600";
-    case "rejected":
+    case ReturnStatus.REJECTED:
       return "bg-red-50 text-red-600";
     default:
       return "dark:bg-secondary bg-secondary text-gray-600";

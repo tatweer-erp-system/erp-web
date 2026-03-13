@@ -44,6 +44,7 @@ import {
   DesktopOutlined,
   GlobalOutlined,
 } from "@ant-design/icons";
+import { LoginResult, UserStatus } from "@/constants/enums";
 
 const { Title, Text } = Typography;
 
@@ -118,7 +119,7 @@ const USERS = [
     email: "john@corp.com",
     role: "Admin",
     dept: "IT",
-    status: "active",
+    status: UserStatus.ACTIVE,
     last: "2 min ago",
   },
   {
@@ -127,7 +128,7 @@ const USERS = [
     email: "sarah@corp.com",
     role: "Manager",
     dept: "Sales",
-    status: "active",
+    status: UserStatus.ACTIVE,
     last: "1 hr ago",
   },
   {
@@ -136,7 +137,7 @@ const USERS = [
     email: "omar@corp.com",
     role: "Staff",
     dept: "Finance",
-    status: "active",
+    status: UserStatus.ACTIVE,
     last: "Yesterday",
   },
   {
@@ -145,7 +146,7 @@ const USERS = [
     email: "lisa@corp.com",
     role: "Staff",
     dept: "HR",
-    status: "inactive",
+    status: UserStatus.INACTIVE,
     last: "3 days ago",
   },
   {
@@ -154,7 +155,7 @@ const USERS = [
     email: "mark@corp.com",
     role: "Viewer",
     dept: "Sales",
-    status: "active",
+    status: UserStatus.ACTIVE,
     last: "5 hrs ago",
   },
 ];
@@ -198,35 +199,35 @@ const DEPARTMENTS = [
     name: "Information Technology",
     manager: "John Doe",
     headcount: 12,
-    status: "active",
+    status: UserStatus.ACTIVE,
   },
   {
     key: "2",
     name: "Sales & Marketing",
     manager: "Sarah Ahmed",
     headcount: 18,
-    status: "active",
+    status: UserStatus.ACTIVE,
   },
   {
     key: "3",
     name: "Finance & Accounting",
     manager: "Omar Hassan",
     headcount: 8,
-    status: "active",
+    status: UserStatus.ACTIVE,
   },
   {
     key: "4",
     name: "Human Resources",
     manager: "Lisa Chen",
     headcount: 5,
-    status: "active",
+    status: UserStatus.ACTIVE,
   },
   {
     key: "5",
     name: "Operations",
     manager: "Mark Johnson",
     headcount: 15,
-    status: "active",
+    status: UserStatus.ACTIVE,
   },
 ];
 
@@ -238,7 +239,7 @@ const ACTIVITY_LOG = [
     module: "Accounting",
     ip: "192.168.1.1",
     time: "2 min ago",
-    status: "success",
+    status: LoginResult.SUCCESS,
   },
   {
     key: "2",
@@ -247,7 +248,7 @@ const ACTIVITY_LOG = [
     module: "Sales",
     ip: "10.0.0.42",
     time: "15 min ago",
-    status: "success",
+    status: LoginResult.SUCCESS,
   },
   {
     key: "3",
@@ -256,7 +257,7 @@ const ACTIVITY_LOG = [
     module: "Auth",
     ip: "185.44.2.10",
     time: "1 hr ago",
-    status: "failed",
+    status: LoginResult.FAILED,
   },
   {
     key: "4",
@@ -265,7 +266,7 @@ const ACTIVITY_LOG = [
     module: "Purchases",
     ip: "10.0.0.8",
     time: "2 hrs ago",
-    status: "success",
+    status: LoginResult.SUCCESS,
   },
   {
     key: "5",
@@ -274,7 +275,7 @@ const ACTIVITY_LOG = [
     module: "HR",
     ip: "192.168.1.5",
     time: "Yesterday",
-    status: "success",
+    status: LoginResult.SUCCESS,
   },
 ];
 
@@ -289,7 +290,7 @@ function ManagementTab() {
             {v[0]}
           </Avatar>
           <Text style={{ fontSize: 13 }}>{v}</Text>
-          {r.status === "inactive" && (
+          {r.status === UserStatus.INACTIVE && (
             <Tag color="default" style={{ fontSize: 11 }}>
               Inactive
             </Tag>
@@ -335,7 +336,10 @@ function ManagementTab() {
       title: "Status",
       dataIndex: "status",
       render: (v: string) => (
-        <Badge status={v === "active" ? "success" : "default"} text={v} />
+        <Badge
+          status={v === UserStatus.ACTIVE ? "success" : "default"}
+          text={v}
+        />
       ),
     },
     {

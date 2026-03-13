@@ -47,6 +47,7 @@ import {
   LoadingOutlined,
   CloseCircleOutlined,
 } from "@ant-design/icons";
+import { UploadStatus } from "@/constants/enums";
 
 const { Text } = Typography;
 const { Dragger } = Upload;
@@ -104,7 +105,7 @@ interface PendingFile {
   description: string;
   tags: string[];
   progress: number;
-  status: "pending" | "uploading" | "done" | "error";
+  status: UploadStatus;
 }
 
 // ─── Upload Modal ─────────────────────────────────────────────────────────────
@@ -143,7 +144,7 @@ function AttachUploadModal({
           description: "",
           tags: [],
           progress: 0,
-          status: "pending",
+          status: UploadStatus.PENDING,
         },
       ]);
       return false;
@@ -164,12 +165,12 @@ function AttachUploadModal({
     setUploading(true);
     // Simulate upload progress per file
     for (const file of pendingFiles) {
-      updateFile(file.uid, { status: "uploading" });
+      updateFile(file.uid, { status: UploadStatus.UPLOADING });
       for (let p = 10; p <= 100; p += 20) {
         await new Promise<void>(r => setTimeout(r, 80));
         updateFile(file.uid, { progress: p });
       }
-      updateFile(file.uid, { status: "done", progress: 100 });
+      updateFile(file.uid, { status: UploadStatus.DONE, progress: 100 });
     }
     setUploading(false);
     onUploaded(
@@ -277,9 +278,9 @@ function AttachUploadModal({
                     </Space>
                   </Col>
                   <Col>
-                    {file.status === "done" ? (
+                    {file.status === UploadStatus.DONE ? (
                       <CheckCircleOutlined style={{ color: "#52c41a" }} />
-                    ) : file.status === "error" ? (
+                    ) : file.status === UploadStatus.ERROR ? (
                       <CloseCircleOutlined style={{ color: "#f5222d" }} />
                     ) : (
                       !uploading && (
@@ -296,7 +297,7 @@ function AttachUploadModal({
                 </Row>
 
                 {/* Progress bar when uploading */}
-                {file.status === "uploading" && (
+                {file.status === UploadStatus.UPLOADING && (
                   <Progress
                     percent={file.progress}
                     size="small"
@@ -305,7 +306,7 @@ function AttachUploadModal({
                 )}
 
                 {/* Metadata fields (only before upload starts) */}
-                {file.status === "pending" && (
+                {file.status === UploadStatus.PENDING && (
                   <Row gutter={[8, 8]}>
                     <Col xs={24} sm={14}>
                       <Input

@@ -16,6 +16,7 @@ import {
   Switch,
   Table,
   Tag,
+  Tooltip,
   Typography,
   message,
   theme as antTheme,
@@ -681,9 +682,6 @@ function QuietHoursTab() {
     </>
   );
 }
-
-// ─── Tooltip import ──────────────────────────────────────────────────────────
-import { Tooltip } from "antd";
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function NotificationsConfig() {

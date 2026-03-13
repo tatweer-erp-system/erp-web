@@ -44,6 +44,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
+import { PurchaseReportStatus } from "@/constants/enums";
 
 const { Text, Title } = Typography;
 const { RangePicker } = DatePicker;
@@ -138,7 +139,7 @@ const orders: PurchaseOrder[] = [
     category: "Raw Materials",
     amount: 42800,
     items: 12,
-    status: "received",
+    status: PurchaseReportStatus.RECEIVED,
     dueDate: "2024-12-20",
   },
   {
@@ -148,7 +149,7 @@ const orders: PurchaseOrder[] = [
     category: "Machinery Parts",
     amount: 31200,
     items: 5,
-    status: "pending",
+    status: PurchaseReportStatus.PENDING,
     dueDate: "2024-12-28",
   },
   {
@@ -158,7 +159,7 @@ const orders: PurchaseOrder[] = [
     category: "Packaging",
     amount: 18500,
     items: 8,
-    status: "received",
+    status: PurchaseReportStatus.RECEIVED,
     dueDate: "2024-12-18",
   },
   {
@@ -168,7 +169,7 @@ const orders: PurchaseOrder[] = [
     category: "Office Supplies",
     amount: 7400,
     items: 20,
-    status: "overdue",
+    status: PurchaseReportStatus.OVERDUE,
     dueDate: "2024-12-10",
   },
   {
@@ -178,7 +179,7 @@ const orders: PurchaseOrder[] = [
     category: "Services",
     amount: 24600,
     items: 3,
-    status: "pending",
+    status: PurchaseReportStatus.PENDING,
     dueDate: "2025-01-05",
   },
   {
@@ -188,7 +189,7 @@ const orders: PurchaseOrder[] = [
     category: "Raw Materials",
     amount: 38900,
     items: 9,
-    status: "received",
+    status: PurchaseReportStatus.RECEIVED,
     dueDate: "2024-12-15",
   },
   {
@@ -198,7 +199,7 @@ const orders: PurchaseOrder[] = [
     category: "Machinery Parts",
     amount: 56700,
     items: 4,
-    status: "cancelled",
+    status: PurchaseReportStatus.CANCELLED,
     dueDate: "2024-12-25",
   },
   {
@@ -208,7 +209,7 @@ const orders: PurchaseOrder[] = [
     category: "Raw Materials",
     amount: 29100,
     items: 7,
-    status: "received",
+    status: PurchaseReportStatus.RECEIVED,
     dueDate: "2024-12-12",
   },
 ];

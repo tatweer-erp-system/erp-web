@@ -55,6 +55,23 @@ server/                   # Express static server
 - **Code splitting:** All route components are lazy-loaded
 - **State:** Server state in React Query, client state in Context/Zustand, persisted in localStorage
 
+## Enums — No Magic Strings (MANDATORY)
+
+All status, type, and action values must use constants from `client/src/constants/enums.ts`.
+Never hardcode string literals like `'active'`, `'paid'`, `'pending'` in components or services.
+
+```typescript
+// ✅ CORRECT
+import { LeadStatus } from '@/constants/enums';
+if (lead.status === LeadStatus.WON) { ... }
+
+// ❌ WRONG — never do this
+if (lead.status === 'won') { ... }
+```
+
+**What to replace:** status comparisons, color/badge maps, case statements, filter option values, inline arrays of statuses.
+**What NOT to replace:** i18n keys (`t('...')`), CSS classes, route paths, API endpoints, localStorage keys, object property names in configs.
+
 ## Auth & Roles
 
 - 6 roles: SuperAdmin (`*`), Admin, Manager, Accountant, Viewer, Cashier (POS-only)

@@ -1,13 +1,7 @@
 import { create } from "zustand";
+import { NotifModule, NotifType } from "@/constants/enums";
 
-export type NotifType = "success" | "warning" | "info" | "error";
-export type NotifModule =
-  | "Orders"
-  | "Inventory"
-  | "Finance"
-  | "HR"
-  | "POS"
-  | "System";
+export type { NotifType, NotifModule };
 
 export interface NotificationMeta {
   notifKind?: string;
@@ -34,8 +28,8 @@ const now = Date.now();
 const INITIAL: Notification[] = [
   {
     id: "1",
-    type: "success",
-    module: "Orders",
+    type: NotifType.SUCCESS,
+    module: NotifModule.ORDERS,
     title: "Order Completed",
     message: "Order #POS-123456 has been successfully processed and closed.",
     timestamp: new Date(now - 4 * 60000),
@@ -44,8 +38,8 @@ const INITIAL: Notification[] = [
   },
   {
     id: "2",
-    type: "warning",
-    module: "Inventory",
+    type: NotifType.WARNING,
+    module: NotifModule.INVENTORY,
     title: "Low Stock Alert",
     message:
       "Wireless Headphones (SKU-001) has only 3 units remaining (reorder point: 15).",
@@ -61,8 +55,8 @@ const INITIAL: Notification[] = [
   },
   {
     id: "3",
-    type: "error",
-    module: "Finance",
+    type: NotifType.ERROR,
+    module: NotifModule.FINANCE,
     title: "Payment Failed",
     message: "Invoice #INV-4821 payment of $1,240 failed — card declined.",
     timestamp: new Date(now - 45 * 60000),
@@ -71,8 +65,8 @@ const INITIAL: Notification[] = [
   },
   {
     id: "4",
-    type: "info",
-    module: "HR",
+    type: NotifType.INFO,
+    module: NotifModule.HR,
     title: "Leave Request",
     message:
       "Ahmed Al-Rashid submitted a leave request for 3 days (Mar 15–17).",
@@ -82,8 +76,8 @@ const INITIAL: Notification[] = [
   },
   {
     id: "5",
-    type: "success",
-    module: "POS",
+    type: NotifType.SUCCESS,
+    module: NotifModule.POS,
     title: "Daily Report Ready",
     message:
       "Today's POS session closed with $8,420 in total sales across 47 transactions.",
@@ -93,8 +87,8 @@ const INITIAL: Notification[] = [
   },
   {
     id: "6",
-    type: "warning",
-    module: "Finance",
+    type: NotifType.WARNING,
+    module: NotifModule.FINANCE,
     title: "Invoice Overdue",
     message: "Invoice #INV-4810 from Acme Supplies is 5 days overdue ($3,500).",
     timestamp: new Date(now - 5 * 3600000),
@@ -103,8 +97,8 @@ const INITIAL: Notification[] = [
   },
   {
     id: "7",
-    type: "info",
-    module: "System",
+    type: NotifType.INFO,
+    module: NotifModule.SYSTEM,
     title: "System Maintenance",
     message:
       "Scheduled maintenance tonight at 02:00–04:00 UTC. Services may be briefly unavailable.",
@@ -113,8 +107,8 @@ const INITIAL: Notification[] = [
   },
   {
     id: "8",
-    type: "success",
-    module: "Inventory",
+    type: NotifType.SUCCESS,
+    module: NotifModule.INVENTORY,
     title: "Stock Replenished",
     message:
       "Purchase order PO-2091 received — 200 units of USB-C Hub added to warehouse.",
@@ -124,8 +118,8 @@ const INITIAL: Notification[] = [
   },
   {
     id: "9",
-    type: "error",
-    module: "System",
+    type: NotifType.ERROR,
+    module: NotifModule.SYSTEM,
     title: "Backup Failed",
     message:
       "Nightly database backup failed at 02:00. Manual backup recommended.",
@@ -134,8 +128,8 @@ const INITIAL: Notification[] = [
   },
   {
     id: "10",
-    type: "info",
-    module: "HR",
+    type: NotifType.INFO,
+    module: NotifModule.HR,
     title: "New Employee Onboarded",
     message:
       "Sara Ali has been added to the Finance department and is ready for system access.",

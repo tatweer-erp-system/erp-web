@@ -33,12 +33,18 @@ import {
 import { useSettings } from "@/contexts/SettingsContext";
 import { useLocation } from "wouter";
 import { t } from "@/i18n";
+import {
+  AttendanceStatus,
+  EmployeeStatus,
+  KpiStatus,
+  PerformanceStatus,
+} from "@/constants/enums";
 
 const employee = {
   id: "EMP-00142",
   name: "Sarah Johnson",
   photo: "https://i.pravatar.cc/150?img=47",
-  status: "active",
+  status: EmployeeStatus.ACTIVE,
   role: "Sales Manager",
   department: "Sales",
   gender: "Female",
@@ -101,26 +107,31 @@ const employee = {
       date: "04 Mar 2026",
       checkIn: "08:55 AM",
       checkOut: "06:05 PM",
-      status: "present",
+      status: AttendanceStatus.PRESENT,
     },
     {
       date: "03 Mar 2026",
       checkIn: "09:02 AM",
       checkOut: "06:00 PM",
-      status: "present",
+      status: AttendanceStatus.PRESENT,
     },
-    { date: "02 Mar 2026", checkIn: "-", checkOut: "-", status: "absent" },
+    {
+      date: "02 Mar 2026",
+      checkIn: "-",
+      checkOut: "-",
+      status: AttendanceStatus.ABSENT,
+    },
     {
       date: "01 Mar 2026",
       checkIn: "08:50 AM",
       checkOut: "03:30 PM",
-      status: "half-day",
+      status: AttendanceStatus.HALF_DAY,
     },
     {
       date: "28 Feb 2026",
       checkIn: "09:00 AM",
       checkOut: "06:00 PM",
-      status: "present",
+      status: AttendanceStatus.PRESENT,
     },
   ],
   payroll: {
@@ -141,10 +152,26 @@ const employee = {
   performance: {
     overallRating: 4.3,
     kpis: [
-      { label: "Sales Target", achieved: "92%", status: "good" },
-      { label: "Client Retention", achieved: "88%", status: "good" },
-      { label: "Report Submission", achieved: "100%", status: "excellent" },
-      { label: "Team Collaboration", achieved: "75%", status: "average" },
+      {
+        label: "Sales Target",
+        achieved: "92%",
+        status: PerformanceStatus.GOOD,
+      },
+      {
+        label: "Client Retention",
+        achieved: "88%",
+        status: PerformanceStatus.GOOD,
+      },
+      {
+        label: "Report Submission",
+        achieved: "100%",
+        status: PerformanceStatus.EXCELLENT,
+      },
+      {
+        label: "Team Collaboration",
+        achieved: "75%",
+        status: PerformanceStatus.AVERAGE,
+      },
     ],
     lastReviewDate: "15 Jan 2026",
     nextReviewDate: "15 Jul 2026",
@@ -254,7 +281,9 @@ export default function EmployeeDetails() {
             <span
               className={`text-xs font-medium px-2 py-0.5 rounded-full mb-2 ${statusBadge(employee.status)}`}
             >
-              {employee.status === "active" ? "Active" : employee.status}
+              {employee.status === EmployeeStatus.ACTIVE
+                ? "Active"
+                : employee.status}
             </span>
             <h2 className="text-base font-bold text-foreground">
               {employee.name}
@@ -887,9 +916,9 @@ export default function EmployeeDetails() {
                           className="flex items-center justify-between p-4 rounded-xl border border-border bg-secondary/20"
                         >
                           <div className="flex items-center gap-3">
-                            {kpi.status === "excellent" ? (
+                            {kpi.status === KpiStatus.EXCELLENT ? (
                               <CheckCircle size={18} className="text-primary" />
-                            ) : kpi.status === "good" ? (
+                            ) : kpi.status === KpiStatus.GOOD ? (
                               <CheckCircle
                                 size={18}
                                 className="text-green-500"

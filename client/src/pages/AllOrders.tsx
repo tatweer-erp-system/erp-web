@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useSettings } from "@/contexts/SettingsContext";
 import { t } from "@/i18n";
+import { OrderStatus } from "@/constants/enums";
 
 const salesOrdersData = [
   {
@@ -35,7 +36,7 @@ const salesOrdersData = [
     date: "Mar 5, 2024",
     items: 3,
     total: "$8,450",
-    status: "completed",
+    status: OrderStatus.COMPLETED,
     branch: "Riyadh HQ",
   },
   {
@@ -45,7 +46,7 @@ const salesOrdersData = [
     date: "Mar 4, 2024",
     items: 7,
     total: "$15,920",
-    status: "processing",
+    status: OrderStatus.PROCESSING,
     branch: "Jeddah",
   },
   {
@@ -55,7 +56,7 @@ const salesOrdersData = [
     date: "Mar 3, 2024",
     items: 2,
     total: "$3,200",
-    status: "pending",
+    status: OrderStatus.PENDING,
     branch: "Riyadh HQ",
   },
   {
@@ -65,7 +66,7 @@ const salesOrdersData = [
     date: "Mar 2, 2024",
     items: 5,
     total: "$12,340",
-    status: "completed",
+    status: OrderStatus.COMPLETED,
     branch: "Dammam",
   },
   {
@@ -75,20 +76,20 @@ const salesOrdersData = [
     date: "Mar 1, 2024",
     items: 4,
     total: "$6,780",
-    status: "cancelled",
+    status: OrderStatus.CANCELLED,
     branch: "Riyadh HQ",
   },
 ];
 
 function getStatusColor(status: string) {
   switch (status) {
-    case "completed":
+    case OrderStatus.COMPLETED:
       return "bg-green-50 text-green-600";
-    case "processing":
+    case OrderStatus.PROCESSING:
       return "bg-blue-50 text-blue-600";
-    case "pending":
+    case OrderStatus.PENDING:
       return "bg-orange-50 text-orange-600";
-    case "cancelled":
+    case OrderStatus.CANCELLED:
       return "bg-red-50 text-red-600";
     default:
       return "dark:bg-secondary bg-secondary text-gray-600";

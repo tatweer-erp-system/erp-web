@@ -52,6 +52,7 @@ import {
   CloseCircleOutlined,
 } from "@ant-design/icons";
 import DashboardLayout from "@/components/layout/DashboardLayout";
+import { DocumentStatus, UploadStatus } from "@/constants/enums";
 
 const { Title, Text } = Typography;
 const { Dragger } = Upload;
@@ -78,7 +79,7 @@ interface Document {
   uploadedBy: string;
   uploadedAt: string; // ISO date string
   tags: string[];
-  status: "active" | "archived";
+  status: DocumentStatus;
 }
 
 // ─── Mock Data ────────────────────────────────────────────────────────────────
@@ -94,7 +95,7 @@ const DOCUMENTS: Document[] = [
     uploadedBy: "Ahmed Ali",
     uploadedAt: "2025-03-15",
     tags: ["report", "q1"],
-    status: "active",
+    status: DocumentStatus.ACTIVE,
   },
   {
     id: "2",
@@ -106,7 +107,7 @@ const DOCUMENTS: Document[] = [
     uploadedBy: "Sara Hassan",
     uploadedAt: "2025-03-10",
     tags: ["invoice"],
-    status: "active",
+    status: DocumentStatus.ACTIVE,
   },
   {
     id: "3",
@@ -118,7 +119,7 @@ const DOCUMENTS: Document[] = [
     uploadedBy: "Omar Khalid",
     uploadedAt: "2025-02-28",
     tags: ["contract", "vendor"],
-    status: "active",
+    status: DocumentStatus.ACTIVE,
   },
   {
     id: "4",
@@ -130,7 +131,7 @@ const DOCUMENTS: Document[] = [
     uploadedBy: "Mona Saad",
     uploadedAt: "2025-02-25",
     tags: ["po"],
-    status: "active",
+    status: DocumentStatus.ACTIVE,
   },
   {
     id: "5",
@@ -142,7 +143,7 @@ const DOCUMENTS: Document[] = [
     uploadedBy: "Ahmed Ali",
     uploadedAt: "2025-02-20",
     tags: ["layout", "warehouse"],
-    status: "active",
+    status: DocumentStatus.ACTIVE,
   },
   {
     id: "6",
@@ -154,7 +155,7 @@ const DOCUMENTS: Document[] = [
     uploadedBy: "Youssef Nasr",
     uploadedAt: "2025-02-18",
     tags: ["stock", "count"],
-    status: "active",
+    status: DocumentStatus.ACTIVE,
   },
   {
     id: "7",
@@ -166,7 +167,7 @@ const DOCUMENTS: Document[] = [
     uploadedBy: "Sara Hassan",
     uploadedAt: "2025-02-15",
     tags: ["bank", "statement"],
-    status: "active",
+    status: DocumentStatus.ACTIVE,
   },
   {
     id: "8",
@@ -178,7 +179,7 @@ const DOCUMENTS: Document[] = [
     uploadedBy: "Omar Khalid",
     uploadedAt: "2025-01-30",
     tags: ["tax", "certificate"],
-    status: "active",
+    status: DocumentStatus.ACTIVE,
   },
   {
     id: "9",
@@ -190,7 +191,7 @@ const DOCUMENTS: Document[] = [
     uploadedBy: "Mona Saad",
     uploadedAt: "2025-01-20",
     tags: ["treasury", "q4"],
-    status: "active",
+    status: DocumentStatus.ACTIVE,
   },
   {
     id: "10",
@@ -202,7 +203,7 @@ const DOCUMENTS: Document[] = [
     uploadedBy: "Ahmed Ali",
     uploadedAt: "2025-01-15",
     tags: ["contract", "hr"],
-    status: "active",
+    status: DocumentStatus.ACTIVE,
   },
   {
     id: "11",
@@ -214,7 +215,7 @@ const DOCUMENTS: Document[] = [
     uploadedBy: "Youssef Nasr",
     uploadedAt: "2025-02-01",
     tags: ["payroll"],
-    status: "active",
+    status: DocumentStatus.ACTIVE,
   },
   {
     id: "12",
@@ -226,7 +227,7 @@ const DOCUMENTS: Document[] = [
     uploadedBy: "Sara Hassan",
     uploadedAt: "2025-01-10",
     tags: ["policy", "general"],
-    status: "active",
+    status: DocumentStatus.ACTIVE,
   },
   {
     id: "13",
@@ -238,7 +239,7 @@ const DOCUMENTS: Document[] = [
     uploadedBy: "Omar Khalid",
     uploadedAt: "2025-01-05",
     tags: ["photo"],
-    status: "archived",
+    status: DocumentStatus.ARCHIVED,
   },
   {
     id: "14",
@@ -250,7 +251,7 @@ const DOCUMENTS: Document[] = [
     uploadedBy: "Mona Saad",
     uploadedAt: "2024-12-20",
     tags: ["audit", "2024"],
-    status: "archived",
+    status: DocumentStatus.ARCHIVED,
   },
   {
     id: "15",
@@ -262,7 +263,7 @@ const DOCUMENTS: Document[] = [
     uploadedBy: "Ahmed Ali",
     uploadedAt: "2024-12-15",
     tags: ["agreement", "customer"],
-    status: "active",
+    status: DocumentStatus.ACTIVE,
   },
 ];
 
@@ -328,7 +329,7 @@ interface PendingUpload {
   description: string;
   tags: string[];
   progress: number;
-  status: "pending" | "uploading" | "done" | "error";
+  status: UploadStatus;
 }
 
 const UPLOAD_FILE_ICONS: Record<string, React.ReactNode> = {
@@ -388,7 +389,7 @@ function UploadModal({
           description: "",
           tags: [],
           progress: 0,
-          status: "pending",
+          status: UploadStatus.PENDING,
         },
       ]);
       return false;
@@ -398,12 +399,12 @@ function UploadModal({
   async function handleUpload() {
     setUploading(true);
     for (const file of pendingFiles) {
-      updateFile(file.uid, { status: "uploading" });
+      updateFile(file.uid, { status: UploadStatus.UPLOADING });
       for (let p = 15; p <= 100; p += 17) {
         await new Promise<void>(r => setTimeout(r, 90));
         updateFile(file.uid, { progress: Math.min(p, 100) });
       }
-      updateFile(file.uid, { status: "done", progress: 100 });
+      updateFile(file.uid, { status: UploadStatus.DONE, progress: 100 });
     }
     setUploading(false);
     // Brief pause so user sees all green, then close
@@ -421,7 +422,8 @@ function UploadModal({
   }
 
   const allDone =
-    pendingFiles.length > 0 && pendingFiles.every(f => f.status === "done");
+    pendingFiles.length > 0 &&
+    pendingFiles.every(f => f.status === UploadStatus.DONE);
 
   return (
     <Modal
@@ -483,7 +485,7 @@ function UploadModal({
                 // Only update pending files that haven't been individually changed
                 setPendingFiles(prev =>
                   prev.map(f =>
-                    f.status === "pending" ? { ...f, module: v } : f
+                    f.status === UploadStatus.PENDING ? { ...f, module: v } : f
                   )
                 );
               }}
@@ -533,9 +535,9 @@ function UploadModal({
                 key={file.uid}
                 style={{
                   border: `1px solid ${
-                    file.status === "done"
+                    file.status === UploadStatus.DONE
                       ? token.colorSuccess
-                      : file.status === "error"
+                      : file.status === UploadStatus.ERROR
                         ? token.colorError
                         : token.colorBorderSecondary
                   }`,
@@ -568,15 +570,15 @@ function UploadModal({
                     </Space>
                   </Col>
                   <Col>
-                    {file.status === "done" ? (
+                    {file.status === UploadStatus.DONE ? (
                       <CheckCircleOutlined
                         style={{ color: token.colorSuccess, fontSize: 18 }}
                       />
-                    ) : file.status === "error" ? (
+                    ) : file.status === UploadStatus.ERROR ? (
                       <CloseCircleOutlined
                         style={{ color: token.colorError, fontSize: 18 }}
                       />
-                    ) : file.status === "uploading" ? (
+                    ) : file.status === UploadStatus.UPLOADING ? (
                       <LoadingOutlined
                         style={{ color: token.colorPrimary, fontSize: 18 }}
                       />
@@ -595,7 +597,7 @@ function UploadModal({
                 </Row>
 
                 {/* Progress bar */}
-                {file.status === "uploading" && (
+                {file.status === UploadStatus.UPLOADING && (
                   <Progress
                     percent={file.progress}
                     size="small"
@@ -603,7 +605,7 @@ function UploadModal({
                     style={{ marginBottom: 6 }}
                   />
                 )}
-                {file.status === "done" && (
+                {file.status === UploadStatus.DONE && (
                   <Progress
                     percent={100}
                     size="small"
@@ -613,7 +615,7 @@ function UploadModal({
                 )}
 
                 {/* Metadata fields (only for pending files) */}
-                {file.status === "pending" && (
+                {file.status === UploadStatus.PENDING && (
                   <Row gutter={[8, 6]}>
                     <Col xs={24} sm={10}>
                       <Select
@@ -695,8 +697,12 @@ export default function Documents() {
   });
 
   // Stats
-  const active = DOCUMENTS.filter(d => d.status === "active").length;
-  const archived = DOCUMENTS.filter(d => d.status === "archived").length;
+  const active = DOCUMENTS.filter(
+    d => d.status === DocumentStatus.ACTIVE
+  ).length;
+  const archived = DOCUMENTS.filter(
+    d => d.status === DocumentStatus.ARCHIVED
+  ).length;
   const totalSize = totalBytes(DOCUMENTS);
   const usedPercent = Math.round((totalSize / (200 * 1_048_576)) * 100); // assume 200 MB quota
 
@@ -790,7 +796,7 @@ export default function Documents() {
       key: "status",
       width: 100,
       render: (s: string) =>
-        s === "active" ? (
+        s === DocumentStatus.ACTIVE ? (
           <Tag icon={<CheckCircleOutlined />} color="success">
             Active
           </Tag>
@@ -819,12 +825,13 @@ export default function Documents() {
               {
                 key: "archive",
                 icon:
-                  doc.status === "active" ? (
+                  doc.status === DocumentStatus.ACTIVE ? (
                     <WarningOutlined />
                   ) : (
                     <CheckCircleOutlined />
                   ),
-                label: doc.status === "active" ? "Archive" : "Restore",
+                label:
+                  doc.status === DocumentStatus.ACTIVE ? "Archive" : "Restore",
               },
               {
                 key: "delete",

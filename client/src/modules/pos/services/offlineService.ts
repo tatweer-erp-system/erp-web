@@ -1,6 +1,7 @@
 import { openDB, type IDBPDatabase } from "idb";
 import type { Product } from "../data/mockProducts";
 import type { OrderPayload } from "./posService";
+import { OfflineTxStatus } from "@/constants/enums";
 
 const DB_NAME = "pos-offline-db";
 const DB_VERSION = 1;
@@ -10,7 +11,7 @@ export interface QueuedTransaction {
   payload: OrderPayload;
   cashierName: string;
   cashierId: string;
-  status: "pending" | "syncing" | "synced" | "failed";
+  status: OfflineTxStatus;
   retries: number;
   timestamp: string;
   localOrderNumber: string;
@@ -73,7 +74,11 @@ export async function enqueueTransaction(
   txn: Omit<QueuedTransaction, "status" | "retries">
 ): Promise<void> {
   const db = await getDB();
-  await db.put("transactions", { ...txn, status: "pending", retries: 0 });
+  await db.put("transactions", {
+    ...txn,
+    status: OfflineTxStatus.PENDING,
+    retries: 0,
+  });
 }
 
 export async function getAllTransactions(): Promise<QueuedTransaction[]> {
@@ -91,7 +96,7 @@ export async function deleteSyncedTransactions(): Promise<void> {
   const all = await db.getAll("transactions");
   const tx = db.transaction("transactions", "readwrite");
   for (const t of all) {
-    if (t.status === "synced") await tx.store.delete(t.id);
+    if (t.status === OfflineTxStatus.SYNCED) await tx.store.delete(t.id);
   }
   await tx.done;
 }
@@ -101,10 +106,10 @@ export async function resetFailedToRetry(): Promise<void> {
   const all = await db.getAll("transactions");
   const tx = db.transaction("transactions", "readwrite");
   for (const t of all) {
-    if (t.status === "failed") {
+    if (t.status === OfflineTxStatus.FAILED) {
       await tx.store.put({
         ...t,
-        status: "pending",
+        status: OfflineTxStatus.PENDING,
         retries: 0,
         errorMessage: undefined,
       });

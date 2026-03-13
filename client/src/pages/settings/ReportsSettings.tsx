@@ -1,5 +1,4 @@
-import { useParams } from "wouter";
-import { useLocation } from "wouter";
+import { useParams, useLocation } from "wouter";
 import {
   Alert,
   Button,
