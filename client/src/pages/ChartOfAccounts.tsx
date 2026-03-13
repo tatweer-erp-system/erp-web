@@ -1,19 +1,20 @@
 import { useState } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import {
-  Tree, Table, Card, Row, Col, Tag, Space, Typography, Button, Input, Select,
-  Drawer, Descriptions, Statistic, Tabs, Badge, Dropdown, Grid, Tooltip, Segmented,
-  Modal, Form, Switch, Divider, theme as antTheme, Alert,
+  Tree, Card, Row, Col, Tag, Space, Typography, Button, Input,
+  Drawer, Descriptions, Statistic, Tabs, Badge, Grid, Tooltip,
+  Divider, theme as antTheme, Modal, Form, Select, Switch, message,
 } from "antd";
-import type { TableColumnsType, TreeDataNode } from "antd";
+import type { TreeDataNode } from "antd";
 import {
   SearchOutlined, PlusOutlined, EditOutlined, DeleteOutlined, DownloadOutlined,
-  FolderOutlined, FileTextOutlined, ExportOutlined, BankOutlined,
+  FolderOutlined, FileTextOutlined, BankOutlined,
   DollarOutlined, LineChartOutlined, PercentageOutlined, ApartmentOutlined,
-  SettingOutlined, EyeOutlined, ReloadOutlined,
+  SettingOutlined, EyeOutlined, CloseOutlined, SaveOutlined,
+  ArrowLeftOutlined, SubnodeOutlined,
 } from "@ant-design/icons";
 
-const { Text, Title } = Typography;
+const { Text } = Typography;
 
 // ─── Shared account data ───────────────────────────────────────────────────────
 
@@ -131,6 +132,14 @@ const TYPE_META: Record<string, { color: string; label: string }> = {
   expense:   { color: "#EF4444", label: "Expense"   },
 };
 
+const SUBTYPE_OPTIONS: Record<string, string[]> = {
+  asset:     ["Cash", "Receivable", "Inventory", "Prepaid", "Investment", "Fixed", "Contra", "Intangible", "Other"],
+  liability: ["Payable", "Accrued", "Tax", "Loan", "Other"],
+  equity:    ["Capital", "Retained", "Earnings", "Other"],
+  revenue:   ["Sales", "Service", "Other"],
+  expense:   ["COGS", "Payroll", "Overhead", "Marketing", "Non-cash", "Finance", "Services", "Other"],
+};
+
 function fmtAmt(n: number) {
   const abs = Math.abs(n);
   const s = abs >= 1_000_000 ? `$${(abs / 1_000_000).toFixed(2)}M`
@@ -139,415 +148,361 @@ function fmtAmt(n: number) {
   return n < 0 ? `(${s})` : s;
 }
 
-function flattenAccounts(accounts: Account[]): Account[] {
-  return accounts.flatMap((a) => [a, ...(a.children ? flattenAccounts(a.children) : [])]);
+function nextChildCode(parent: Account): string {
+  const existing = parent.children?.map((c) => parseInt(c.code, 10)) ?? [];
+  const parentNum = parseInt(parent.code, 10);
+  const step = parent.code.length === 4 ? 10 : 1;
+  const next = existing.length > 0 ? Math.max(...existing) + step : parentNum + step;
+  return String(next).padStart(parent.code.length, "0");
 }
 
-const ALL_FLAT = flattenAccounts(ACCOUNTS);
+// ─── Create Child Account Modal ───────────────────────────────────────────────
 
-// Convert to Ant Design TreeDataNode
-function toTreeNodes(accounts: Account[]): TreeDataNode[] {
-  return accounts.map((a) => ({
-    key: a.code,
-    title: a.code + " — " + a.name,
-    children: a.children ? toTreeNodes(a.children) : undefined,
-    isLeaf: !a.children || a.children.length === 0,
-  }));
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-//  DESIGN 1 — Explorer: vertical tree panel + detail panel
-// ─────────────────────────────────────────────────────────────────────────────
-
-function Design1() {
+function CreateChildModal({
+  open,
+  parent,
+  onClose,
+}: {
+  open: boolean;
+  parent: Account | null;
+  onClose: () => void;
+}) {
   const { token } = antTheme.useToken();
-  const [selected, setSelected] = useState<Account | null>(null);
-  const [search, setSearch] = useState("");
-  const [expandedKeys, setExpandedKeys] = useState<React.Key[]>(["1000","2000","3000","4000","5000"]);
+  const [form] = Form.useForm();
+  const [submitting, setSubmitting] = useState(false);
 
-  const filtered = search
-    ? ALL_FLAT.filter((a) => a.code.includes(search) || a.name.toLowerCase().includes(search.toLowerCase()))
-    : null;
+  const handleSave = async () => {
+    try {
+      await form.validateFields();
+      setSubmitting(true);
+      // TODO: API call to create child account
+      await new Promise((r) => setTimeout(r, 600));
+      message.success("Child account created successfully");
+      form.resetFields();
+      onClose();
+    } catch {
+      // validation failed
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
-  const treeData = toTreeNodes(ACCOUNTS);
-
-  function onSelect(keys: React.Key[]) {
-    const code = keys[0] as string;
-    setSelected(ALL_FLAT.find((a) => a.code === code) ?? null);
-  }
-
-  const TypeIcon = ({ type }: { type: string }) => (
-    <span style={{ color: TYPE_META[type]?.color, marginRight: 6, fontSize: 13 }}>
-      {type === "asset" ? "A" : type === "liability" ? "L" : type === "equity" ? "E" : type === "revenue" ? "R" : "X"}
-    </span>
-  );
+  const typeColor = parent ? TYPE_META[parent.type]?.color : token.colorPrimary;
+  const suggestedCode = parent ? nextChildCode(parent) : "";
 
   return (
-    <div style={{ display: "flex", gap: 16, height: "calc(100vh - 180px)", minHeight: 600 }}>
-      {/* ── Tree panel ───────────────────────────────────────────────────── */}
-      <Card
-        style={{ width: 340, flexShrink: 0, display: "flex", flexDirection: "column", overflow: "hidden" }}
-        styles={{ body: { padding: 0, flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" } }}
-        title={
-          <Space>
-            <ApartmentOutlined style={{ color: token.colorPrimary }} />
-            <Text strong>Account Tree</Text>
-          </Space>
-        }
-        extra={
-          <Button size="small" type="primary" icon={<PlusOutlined />}>New</Button>
-        }
-      >
-        <div style={{ padding: "10px 12px", borderBottom: `1px solid ${token.colorBorderSecondary}` }}>
-          <Input
-            prefix={<SearchOutlined style={{ color: token.colorTextQuaternary }} />}
-            placeholder="Search by code or name…"
-            size="small"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            allowClear
-          />
-        </div>
-
-        <div style={{ flex: 1, overflowY: "auto", padding: "8px 4px" }}>
-          {search && filtered ? (
-            // Flat search results
-            <Space direction="vertical" size={2} style={{ width: "100%", padding: "0 8px" }}>
-              {filtered.map((a) => (
-                <div
-                  key={a.code}
-                  onClick={() => setSelected(a)}
-                  style={{
-                    padding: "7px 10px", borderRadius: 8, cursor: "pointer",
-                    background: selected?.code === a.code ? token.colorPrimaryBg : "transparent",
-                    border: `1px solid ${selected?.code === a.code ? token.colorPrimary : "transparent"}`,
-                    transition: "all 0.15s",
-                  }}
-                >
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <Space size={6}>
-                      <Text style={{ fontFamily: "monospace", fontSize: 11, color: token.colorTextSecondary }}>{a.code}</Text>
-                      <Text style={{ fontSize: 13 }}>{a.name}</Text>
-                    </Space>
-                    <Tag color={TYPE_META[a.type]?.color} style={{ borderRadius: 20, fontSize: 10, margin: 0 }}>
-                      {TYPE_META[a.type]?.label}
-                    </Tag>
-                  </div>
-                </div>
-              ))}
-            </Space>
-          ) : (
-            <Tree
-              treeData={treeData}
-              expandedKeys={expandedKeys}
-              onExpand={(keys) => setExpandedKeys(keys)}
-              onSelect={onSelect}
-              selectedKeys={selected ? [selected.code] : []}
-              blockNode
-              style={{ fontSize: 13 }}
-              titleRender={(node) => {
-                const a = ALL_FLAT.find((x) => x.code === (node.key as string));
-                if (!a) return <span>{node.title as string}</span>;
-                const isHeader = !!a.children?.length;
-                return (
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingRight: 8, width: "100%" }}>
-                    <Space size={4}>
-                      {isHeader ? <FolderOutlined style={{ color: TYPE_META[a.type]?.color, fontSize: 13 }} /> : <FileTextOutlined style={{ color: token.colorTextTertiary, fontSize: 12 }} />}
-                      <Text style={{ fontFamily: "monospace", fontSize: 11, color: token.colorTextSecondary }}>{a.code}</Text>
-                      <Text style={{ fontSize: 13, fontWeight: isHeader ? 600 : 400 }}>{a.name}</Text>
-                    </Space>
-                    {!a.children?.length && !a.active && <Badge status="default" text={<Text style={{ fontSize: 10 }} type="secondary">Inactive</Text>} />}
-                  </div>
-                );
+    <Modal
+      open={open}
+      onCancel={onClose}
+      footer={null}
+      closable={false}
+      destroyOnClose
+      width={520}
+      styles={{
+        body: { padding: 0 },
+        mask: { backdropFilter: "blur(2px)", background: "rgba(0,0,0,0.35)" },
+      }}
+    >
+      {/* ── Gradient header ─────────────────────────────────────────── */}
+      <div style={{ position: "relative", overflow: "hidden" }}>
+        <div style={{
+          background: `linear-gradient(135deg, ${typeColor} 0%, ${typeColor}dd 100%)`,
+          padding: "22px 24px 56px",
+        }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+            <div style={{
+              background: "rgba(255,255,255,0.18)",
+              borderRadius: 6,
+              padding: "3px 10px",
+              fontSize: 11,
+              fontWeight: 700,
+              color: "#fff",
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+            }}>
+              New Child Account
+            </div>
+            <button
+              onClick={onClose}
+              style={{
+                width: 30, height: 30, borderRadius: 8,
+                background: "rgba(255,255,255,0.18)",
+                border: "none", cursor: "pointer",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                color: "#fff", fontSize: 13,
               }}
-            />
-          )}
+            >
+              <CloseOutlined />
+            </button>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+            <div style={{
+              width: 48, height: 48, borderRadius: 14,
+              background: "rgba(255,255,255,0.22)",
+              border: "2px solid rgba(255,255,255,0.35)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 17, fontWeight: 800, color: "#fff",
+              flexShrink: 0,
+            }}>
+              <SubnodeOutlined />
+            </div>
+            <div>
+              <div style={{ fontSize: 20, fontWeight: 800, color: "#fff", lineHeight: 1.2 }}>
+                Add Sub-account
+              </div>
+              {parent && (
+                <div style={{ fontSize: 12, color: "rgba(255,255,255,0.72)", marginTop: 3 }}>
+                  Under {parent.code} &middot; {parent.name}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-      </Card>
+        <div style={{
+          position: "absolute", bottom: 0, left: 0, right: 0, height: 28,
+          background: token.colorBgContainer,
+          borderRadius: "24px 24px 0 0",
+        }} />
+      </div>
 
-      {/* ── Detail panel ─────────────────────────────────────────────────── */}
-      {selected ? (
-        <Card
-          style={{ flex: 1, overflow: "auto" }}
-          title={
-            <Space>
-              <span style={{ fontFamily: "monospace", color: token.colorTextSecondary }}>{selected.code}</span>
-              <Title level={5} style={{ margin: 0 }}>{selected.name}</Title>
-              <Tag color={TYPE_META[selected.type]?.color} style={{ borderRadius: 20 }}>{TYPE_META[selected.type]?.label}</Tag>
-              {!selected.active && <Tag style={{ borderRadius: 20 }}>Inactive</Tag>}
-            </Space>
-          }
-          extra={
-            <Space>
-              <Button size="small" icon={<EditOutlined />}>Edit</Button>
-              <Button size="small" danger icon={<DeleteOutlined />}>Delete</Button>
-            </Space>
-          }
+      {/* ── Form body ───────────────────────────────────────────────── */}
+      <div style={{ padding: "4px 24px 8px" }}>
+        <Form
+          form={form}
+          layout="vertical"
+          initialValues={{
+            code: suggestedCode,
+            type: parent?.type,
+            normalBal: parent?.normalBal,
+            active: true,
+          }}
         >
-          <Row gutter={[16, 16]}>
-            <Col xs={24} sm={8}>
-              <Statistic title="Balance" value={fmtAmt(selected.balance)} valueStyle={{ color: selected.balance >= 0 ? token.colorSuccess : token.colorError, fontSize: 28, fontWeight: 700 }} />
+          {/* Account Code */}
+          <div style={{
+            background: token.colorBgLayout,
+            borderRadius: 10,
+            padding: "14px 16px 4px",
+            marginBottom: 10,
+            border: `1px solid ${token.colorBorderSecondary}`,
+            boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+          }}>
+            <Form.Item
+              name="code"
+              label={
+                <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
+                  <span style={{ fontSize: 12, fontWeight: 700 }}>Account Code</span>
+                  <span style={{
+                    fontSize: 9, fontWeight: 700, color: token.colorError,
+                    background: `${token.colorError}14`, borderRadius: 4,
+                    padding: "1px 5px", textTransform: "uppercase", letterSpacing: "0.05em",
+                  }}>req</span>
+                </div>
+              }
+              rules={[{ required: true, message: "Account code is required" }]}
+              style={{ marginBottom: 14 }}
+            >
+              <Input placeholder={suggestedCode} style={{ fontFamily: "monospace" }} />
+            </Form.Item>
+          </div>
+
+          {/* Account Name */}
+          <div style={{
+            background: token.colorBgLayout,
+            borderRadius: 10,
+            padding: "14px 16px 4px",
+            marginBottom: 10,
+            border: `1px solid ${token.colorBorderSecondary}`,
+            boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+          }}>
+            <Form.Item
+              name="name"
+              label={
+                <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
+                  <span style={{ fontSize: 12, fontWeight: 700 }}>Account Name</span>
+                  <span style={{
+                    fontSize: 9, fontWeight: 700, color: token.colorError,
+                    background: `${token.colorError}14`, borderRadius: 4,
+                    padding: "1px 5px", textTransform: "uppercase", letterSpacing: "0.05em",
+                  }}>req</span>
+                </div>
+              }
+              rules={[{ required: true, message: "Account name is required" }]}
+              style={{ marginBottom: 14 }}
+            >
+              <Input placeholder="e.g. Petty Cash" />
+            </Form.Item>
+          </div>
+
+          {/* Type + Subtype row */}
+          <Row gutter={10}>
+            <Col span={12}>
+              <div style={{
+                background: token.colorBgLayout,
+                borderRadius: 10,
+                padding: "14px 16px 4px",
+                marginBottom: 10,
+                border: `1px solid ${token.colorBorderSecondary}`,
+                boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+              }}>
+                <Form.Item
+                  name="type"
+                  label={<span style={{ fontSize: 12, fontWeight: 700 }}>Account Type</span>}
+                  style={{ marginBottom: 14 }}
+                >
+                  <Select disabled>
+                    {Object.entries(TYPE_META).map(([k, v]) => (
+                      <Select.Option key={k} value={k}>
+                        <Tag color={v.color} style={{ borderRadius: 20, marginRight: 4 }}>{v.label}</Tag>
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </div>
             </Col>
-            <Col xs={24} sm={8}>
-              <Statistic title="YTD Debit"  value={fmtAmt(selected.ytdDebit)}  valueStyle={{ color: "#3B82F6", fontSize: 20 }} />
-            </Col>
-            <Col xs={24} sm={8}>
-              <Statistic title="YTD Credit" value={fmtAmt(selected.ytdCredit)} valueStyle={{ color: "#10B981", fontSize: 20 }} />
+            <Col span={12}>
+              <div style={{
+                background: token.colorBgLayout,
+                borderRadius: 10,
+                padding: "14px 16px 4px",
+                marginBottom: 10,
+                border: `1px solid ${token.colorBorderSecondary}`,
+                boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+              }}>
+                <Form.Item
+                  name="subtype"
+                  label={
+                    <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
+                      <span style={{ fontSize: 12, fontWeight: 700 }}>Sub-type</span>
+                      <span style={{
+                        fontSize: 9, fontWeight: 700, color: token.colorError,
+                        background: `${token.colorError}14`, borderRadius: 4,
+                        padding: "1px 5px", textTransform: "uppercase", letterSpacing: "0.05em",
+                      }}>req</span>
+                    </div>
+                  }
+                  rules={[{ required: true, message: "Sub-type is required" }]}
+                  style={{ marginBottom: 14 }}
+                >
+                  <Select placeholder="Select…">
+                    {(SUBTYPE_OPTIONS[parent?.type ?? "asset"] ?? []).map((s) => (
+                      <Select.Option key={s} value={s}>{s}</Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </div>
             </Col>
           </Row>
 
-          <Divider />
-
-          <Descriptions column={2} bordered size="small">
-            <Descriptions.Item label="Account Code">{selected.code}</Descriptions.Item>
-            <Descriptions.Item label="Account Type"><Tag color={TYPE_META[selected.type]?.color}>{TYPE_META[selected.type]?.label}</Tag></Descriptions.Item>
-            <Descriptions.Item label="Sub-type">{selected.subtype}</Descriptions.Item>
-            <Descriptions.Item label="Normal Balance"><Tag>{selected.normalBal === "debit" ? "Debit (Dr)" : "Credit (Cr)"}</Tag></Descriptions.Item>
-            <Descriptions.Item label="Status"><Switch checked={selected.active} disabled /></Descriptions.Item>
-            <Descriptions.Item label="Description" span={2}>{selected.description}</Descriptions.Item>
-          </Descriptions>
-
-          {selected.children && (
-            <>
-              <Divider><Text type="secondary" style={{ fontSize: 12 }}>Sub-accounts ({selected.children.length})</Text></Divider>
-              <Space direction="vertical" size={6} style={{ width: "100%" }}>
-                {selected.children.map((child) => (
-                  <div
-                    key={child.code}
-                    onClick={() => setSelected(child)}
-                    style={{
-                      display: "flex", justifyContent: "space-between", alignItems: "center",
-                      padding: "10px 14px", borderRadius: 10, cursor: "pointer",
-                      border: `1px solid ${token.colorBorderSecondary}`,
-                      background: token.colorFillAlter,
-                      transition: "all 0.15s",
-                    }}
-                  >
-                    <Space size={8}>
-                      <Text style={{ fontFamily: "monospace", fontSize: 12, color: token.colorTextSecondary }}>{child.code}</Text>
-                      <Text strong>{child.name}</Text>
-                    </Space>
-                    <Space>
-                      {!child.active && <Tag style={{ borderRadius: 20, fontSize: 10 }}>Inactive</Tag>}
-                      <Text style={{ fontFamily: "monospace", fontWeight: 600, color: child.balance >= 0 ? token.colorSuccess : token.colorError }}>
-                        {fmtAmt(child.balance)}
-                      </Text>
-                    </Space>
-                  </div>
-                ))}
-              </Space>
-            </>
-          )}
-        </Card>
-      ) : (
-        <Card style={{ flex: 1 }} styles={{ body: { display: "flex", alignItems: "center", justifyContent: "center", height: "100%" } }}>
-          <div style={{ textAlign: "center" }}>
-            <ApartmentOutlined style={{ fontSize: 48, color: token.colorTextQuaternary, marginBottom: 12 }} />
-            <Title level={5} style={{ color: token.colorTextSecondary }}>Select an account</Title>
-            <Text type="secondary">Click any account in the tree to view its details</Text>
+          {/* Normal Balance */}
+          <div style={{
+            background: token.colorBgLayout,
+            borderRadius: 10,
+            padding: "14px 16px 4px",
+            marginBottom: 10,
+            border: `1px solid ${token.colorBorderSecondary}`,
+            boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+          }}>
+            <Form.Item
+              name="normalBal"
+              label={<span style={{ fontSize: 12, fontWeight: 700 }}>Normal Balance</span>}
+              style={{ marginBottom: 14 }}
+            >
+              <Select>
+                <Select.Option value="debit">Debit (Dr)</Select.Option>
+                <Select.Option value="credit">Credit (Cr)</Select.Option>
+              </Select>
+            </Form.Item>
           </div>
-        </Card>
-      )}
-    </div>
-  );
-}
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  DESIGN 2 — Spreadsheet: TreeTable with all data inline
-// ─────────────────────────────────────────────────────────────────────────────
+          {/* Description */}
+          <div style={{
+            background: token.colorBgLayout,
+            borderRadius: 10,
+            padding: "14px 16px 4px",
+            marginBottom: 10,
+            border: `1px solid ${token.colorBorderSecondary}`,
+            boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+          }}>
+            <Form.Item
+              name="description"
+              label={<span style={{ fontSize: 12, fontWeight: 700 }}>Description</span>}
+              style={{ marginBottom: 14 }}
+            >
+              <Input.TextArea rows={2} placeholder="Brief description of this account…" />
+            </Form.Item>
+          </div>
 
-interface FlatRow extends Account {
-  key: string;
-  isHeader: boolean;
-  depth: number;
-  children?: FlatRow[];
-}
-
-function toFlatRows(accounts: Account[], depth = 0): FlatRow[] {
-  return accounts.map((a) => ({
-    ...a,
-    key: a.code,
-    isHeader: !!(a.children && a.children.length > 0),
-    depth,
-    children: a.children ? toFlatRows(a.children, depth + 1) : undefined,
-  }));
-}
-
-function Design2() {
-  const { token } = antTheme.useToken();
-  const screens = Grid.useBreakpoint();
-  const isMobile = !screens.md;
-  const [search, setSearch] = useState("");
-  const [typeFilter, setTypeFilter] = useState("all");
-  const [editing, setEditing] = useState<Account | null>(null);
-
-  const treeData = toFlatRows(ACCOUNTS);
-
-  const columns: TableColumnsType<FlatRow> = [
-    {
-      title: "Code", dataIndex: "code", width: 90,
-      render: (v, row) => (
-        <Text style={{ fontFamily: "monospace", fontSize: 12, color: row.isHeader ? token.colorPrimary : token.colorTextSecondary }}>
-          {v}
-        </Text>
-      ),
-    },
-    {
-      title: "Account Name", dataIndex: "name",
-      render: (v, row) => (
-        <Text style={{ fontWeight: row.isHeader ? 700 : 400, color: row.depth === 0 ? TYPE_META[row.type]?.color : undefined }}>
-          {v}
-        </Text>
-      ),
-    },
-    {
-      title: "Type", dataIndex: "type", width: 100,
-      render: (v) => (
-        <Tag style={{ borderRadius: 20, fontSize: 11, background: `${TYPE_META[v]?.color}18`, color: TYPE_META[v]?.color, border: `1px solid ${TYPE_META[v]?.color}40` }}>
-          {TYPE_META[v]?.label}
-        </Tag>
-      ),
-    },
-    { title: "Sub-type", dataIndex: "subtype", width: 110, render: (v) => <Text type="secondary" style={{ fontSize: 12 }}>{v}</Text> },
-    {
-      title: "Normal Bal", dataIndex: "normalBal", align: "center", width: 100,
-      render: (v) => <Tag color={v === "debit" ? "blue" : "green"} style={{ borderRadius: 20 }}>{v === "debit" ? "Dr" : "Cr"}</Tag>,
-    },
-    {
-      title: "YTD Debit", dataIndex: "ytdDebit", align: "right", width: 120,
-      render: (v) => v ? <Text style={{ color: "#3B82F6", fontFamily: "monospace" }}>{fmtAmt(v)}</Text> : <Text type="secondary">—</Text>,
-    },
-    {
-      title: "YTD Credit", dataIndex: "ytdCredit", align: "right", width: 120,
-      render: (v) => v ? <Text style={{ color: "#10B981", fontFamily: "monospace" }}>{fmtAmt(v)}</Text> : <Text type="secondary">—</Text>,
-    },
-    {
-      title: "Balance", dataIndex: "balance", align: "right", width: 120,
-      sorter: (a, b) => a.balance - b.balance,
-      render: (v, row) => row.isHeader
-        ? <Text strong style={{ fontFamily: "monospace", color: TYPE_META[row.type]?.color }}>{fmtAmt(v)}</Text>
-        : <Text style={{ fontFamily: "monospace", color: v < 0 ? token.colorError : token.colorSuccess }}>{fmtAmt(v)}</Text>,
-    },
-    {
-      title: "Status", dataIndex: "active", align: "center", width: 80,
-      render: (v) => <Badge status={v ? "success" : "default"} text={<Text style={{ fontSize: 11 }}>{v ? "Active" : "Off"}</Text>} />,
-    },
-    {
-      title: "", key: "actions", width: 80, align: "center",
-      render: (_, row) => !row.isHeader && (
-        <Space size={4}>
-          <Tooltip title="Edit">
-            <Button size="small" type="text" icon={<EditOutlined />} onClick={() => setEditing(row)} />
-          </Tooltip>
-          <Tooltip title="Delete">
-            <Button size="small" type="text" danger icon={<DeleteOutlined />} />
-          </Tooltip>
-        </Space>
-      ),
-    },
-  ];
-
-  return (
-    <>
-      <Card
-        title={<Space><LineChartOutlined style={{ color: token.colorPrimary }} /><Text strong>Chart of Accounts</Text></Space>}
-        styles={{ body: { padding: 0 } }}
-        extra={
-          <Space>
-            <Input
-              prefix={<SearchOutlined style={{ color: token.colorTextQuaternary }} />}
-              placeholder="Search code or name…"
-              size="small"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              allowClear
-              style={{ width: 200 }}
-            />
-            <Select
-              size="small"
-              value={typeFilter}
-              onChange={setTypeFilter}
-              style={{ width: 130 }}
-              options={[
-                { value: "all",       label: "All Types" },
-                { value: "asset",     label: "Assets" },
-                { value: "liability", label: "Liabilities" },
-                { value: "equity",    label: "Equity" },
-                { value: "revenue",   label: "Revenue" },
-                { value: "expense",   label: "Expenses" },
-              ]}
-            />
-            <Tooltip title="Reload"><Button size="small" icon={<ReloadOutlined />} /></Tooltip>
-            <Dropdown menu={{ items: [
-              { key: "csv",  label: "Export CSV",   icon: <ExportOutlined /> },
-              { key: "xlsx", label: "Export Excel", icon: <ExportOutlined /> },
-            ]}}>
-              <Button size="small" icon={<DownloadOutlined />}>Export</Button>
-            </Dropdown>
-            <Button size="small" type="primary" icon={<PlusOutlined />}>Add Account</Button>
-          </Space>
-        }
-      >
-        {/* Summary row */}
-        <div style={{ display: "flex", gap: 0, borderBottom: `1px solid ${token.colorBorderSecondary}` }}>
-          {ACCOUNTS.map((a) => (
-            <div key={a.code} style={{ flex: 1, padding: "12px 16px", borderRight: `1px solid ${token.colorBorderSecondary}`, textAlign: "center" }}>
-              <Text type="secondary" style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.05em", display: "block" }}>{a.name}</Text>
-              <div style={{ fontSize: 18, fontWeight: 700, color: TYPE_META[a.type]?.color, marginTop: 4 }}>{fmtAmt(a.balance)}</div>
+          {/* Active status card */}
+          <div style={{
+            background: token.colorBgLayout,
+            borderRadius: 10,
+            padding: "14px 16px",
+            marginBottom: 4,
+            border: `1px solid ${token.colorBorderSecondary}`,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+          }}>
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 2 }}>
+                <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#10B981" }} />
+                <span style={{ fontSize: 13, fontWeight: 700, color: token.colorText }}>Active Status</span>
+              </div>
+              <div style={{ fontSize: 11, color: token.colorTextSecondary, paddingInlineStart: 16 }}>
+                Toggle to enable or disable this account
+              </div>
             </div>
-          ))}
-        </div>
-        <Table
-          rowKey="code"
-          size="small"
-          columns={columns}
-          dataSource={treeData}
-          pagination={false}
-          scroll={{ x: "max-content", y: 480 }}
-          expandable={{ defaultExpandAllRows: true }}
-          onRow={(row) => ({
-            style: {
-              background: row.depth === 0 ? `${TYPE_META[row.type]?.color}08`
-                         : row.isHeader  ? token.colorFillAlter
-                         : undefined,
-            },
-          })}
-        />
-      </Card>
+            <Form.Item name="active" valuePropName="checked" style={{ margin: 0 }}>
+              <Switch />
+            </Form.Item>
+          </div>
+        </Form>
+      </div>
 
-      {/* Edit Drawer */}
-      <Drawer
-        title={editing ? `Edit: ${editing.code} — ${editing.name}` : ""}
-        open={!!editing}
-        onClose={() => setEditing(null)}
-        width={isMobile ? "100%" : 400}
-        extra={<Button type="primary" onClick={() => setEditing(null)}>Save</Button>}
-      >
-        {editing && (
-          <Form layout="vertical">
-            <Form.Item label="Account Code"><Input defaultValue={editing.code} /></Form.Item>
-            <Form.Item label="Account Name"><Input defaultValue={editing.name} /></Form.Item>
-            <Form.Item label="Type">
-              <Select defaultValue={editing.type} options={["asset","liability","equity","revenue","expense"].map((v) => ({ value: v, label: TYPE_META[v].label }))} />
-            </Form.Item>
-            <Form.Item label="Sub-type"><Input defaultValue={editing.subtype} /></Form.Item>
-            <Form.Item label="Normal Balance">
-              <Select defaultValue={editing.normalBal} options={[{ value: "debit", label: "Debit (Dr)" }, { value: "credit", label: "Credit (Cr)" }]} />
-            </Form.Item>
-            <Form.Item label="Description"><Input.TextArea defaultValue={editing.description} rows={3} /></Form.Item>
-            <Form.Item label="Active"><Switch defaultChecked={editing.active} /></Form.Item>
-          </Form>
-        )}
-      </Drawer>
-    </>
+      {/* ── Footer ──────────────────────────────────────────────────── */}
+      <div style={{
+        background: token.colorBgContainer,
+        borderTop: `1px solid ${token.colorBorderSecondary}`,
+        padding: "14px 24px",
+        display: "flex",
+        gap: 10,
+      }}>
+        <Button
+          type="primary"
+          icon={<SaveOutlined />}
+          loading={submitting}
+          onClick={handleSave}
+          size="large"
+          style={{
+            flex: 1,
+            height: 42,
+            fontWeight: 700,
+            background: `linear-gradient(135deg, ${typeColor}, ${typeColor}dd)`,
+            border: "none",
+            boxShadow: `0 4px 12px ${typeColor}44`,
+          }}
+        >
+          Create Account
+        </Button>
+        <Button
+          icon={<CloseOutlined />}
+          onClick={onClose}
+          size="large"
+          style={{ height: 42, fontWeight: 600, minWidth: 100 }}
+        >
+          Cancel
+        </Button>
+      </div>
+    </Modal>
   );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  DESIGN 3 — Dashboard + Tree tabs with type filter
+//  Chart of Accounts — Dashboard + Tree tabs with type filter
 // ─────────────────────────────────────────────────────────────────────────────
 
-function Design3() {
+function ChartOfAccountsContent() {
   const { token } = antTheme.useToken();
   const screens = Grid.useBreakpoint();
   const isMobile = !screens.md;
@@ -556,9 +511,32 @@ function Design3() {
   const [drawerOpen,   setDrawerOpen]   = useState(false);
   const [selected,     setSelected]     = useState<Account | null>(null);
   const [search,       setSearch]       = useState("");
+  const [history,      setHistory]      = useState<Account[]>([]);
+  const [childModalOpen, setChildModalOpen] = useState(false);
 
   const typeFilter = activeTab === "all" ? null : activeTab;
   const visibleRoots = typeFilter ? ACCOUNTS.filter((a) => a.type === typeFilter) : ACCOUNTS;
+
+  const openAccount = (acct: Account, pushHistory = true) => {
+    if (pushHistory && selected) {
+      setHistory((prev) => [...prev, selected]);
+    }
+    setSelected(acct);
+    setDrawerOpen(true);
+  };
+
+  const goBack = () => {
+    const prev = history[history.length - 1];
+    if (prev) {
+      setHistory((h) => h.slice(0, -1));
+      setSelected(prev);
+    }
+  };
+
+  const closeDrawer = () => {
+    setDrawerOpen(false);
+    setHistory([]);
+  };
 
   function buildTree(accounts: Account[]): TreeDataNode[] {
     return accounts.map((a) => {
@@ -570,7 +548,7 @@ function Design3() {
         title: (
           <div
             style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingRight: 12, width: "100%" }}
-            onClick={() => { setSelected(a); setDrawerOpen(true); }}
+            onClick={() => openAccount(a, false)}
           >
             <Space size={6}>
               {isHeader
@@ -602,6 +580,8 @@ function Design3() {
     { key: "revenue",   label: <Space><LineChartOutlined style={{ color: TYPE_META.revenue.color   }} />Revenue</Space>    },
     { key: "expense",   label: <Space><SettingOutlined   style={{ color: TYPE_META.expense.color   }} />Expenses</Space>   },
   ];
+
+  const typeColor = selected ? TYPE_META[selected.type]?.color : token.colorPrimary;
 
   return (
     <>
@@ -663,110 +643,291 @@ function Design3() {
         </div>
       </Card>
 
-      {/* ── Account detail drawer ────────────────────────────────────────── */}
+      {/* ── Enhanced Account Detail Drawer ──────────────────────────────── */}
       <Drawer
-        title={
-          selected ? (
-            <Space>
-              <Text style={{ fontFamily: "monospace", color: token.colorTextSecondary }}>{selected.code}</Text>
-              <Text strong>{selected.name}</Text>
-              <Tag color={TYPE_META[selected.type]?.color} style={{ borderRadius: 20 }}>{TYPE_META[selected.type]?.label}</Tag>
-            </Space>
-          ) : null
-        }
         open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        width={isMobile ? "100%" : 420}
-        extra={<Space><Button icon={<EditOutlined />}>Edit</Button><Button danger icon={<DeleteOutlined />}>Delete</Button></Space>}
+        onClose={closeDrawer}
+        width={isMobile ? "100%" : 480}
+        title={null}
+        closable={false}
+        destroyOnClose
+        styles={{
+          body: { padding: 0, background: token.colorBgLayout, display: "flex", flexDirection: "column" },
+          mask: { backdropFilter: "blur(2px)", background: "rgba(0,0,0,0.35)" },
+        }}
       >
         {selected && (
-          <Space direction="vertical" size={20} style={{ width: "100%" }}>
-            <Row gutter={16}>
-              <Col span={24}>
-                <Card size="small" style={{ background: `${TYPE_META[selected.type]?.color}10`, border: `1px solid ${TYPE_META[selected.type]?.color}40` }}>
-                  <Statistic
-                    title="Current Balance"
-                    value={fmtAmt(selected.balance)}
-                    valueStyle={{ fontSize: 28, fontWeight: 800, color: TYPE_META[selected.type]?.color }}
-                  />
-                </Card>
-              </Col>
-              <Col xs={24} sm={12}><Card size="small"><Statistic title="YTD Debit" value={fmtAmt(selected.ytdDebit)} valueStyle={{ color: "#3B82F6", fontSize: 18 }} /></Card></Col>
-              <Col xs={24} sm={12}><Card size="small"><Statistic title="YTD Credit" value={fmtAmt(selected.ytdCredit)} valueStyle={{ color: "#10B981", fontSize: 18 }} /></Card></Col>
-            </Row>
-
-            <Descriptions column={1} bordered size="small">
-              <Descriptions.Item label="Code">{selected.code}</Descriptions.Item>
-              <Descriptions.Item label="Type"><Tag color={TYPE_META[selected.type]?.color}>{TYPE_META[selected.type]?.label}</Tag></Descriptions.Item>
-              <Descriptions.Item label="Sub-type">{selected.subtype}</Descriptions.Item>
-              <Descriptions.Item label="Normal Balance">{selected.normalBal === "debit" ? "Debit (Dr)" : "Credit (Cr)"}</Descriptions.Item>
-              <Descriptions.Item label="Status"><Badge status={selected.active ? "success" : "default"} text={selected.active ? "Active" : "Inactive"} /></Descriptions.Item>
-              <Descriptions.Item label="Description">{selected.description}</Descriptions.Item>
-            </Descriptions>
-
-            {selected.children && (
-              <>
-                <Divider><Text type="secondary" style={{ fontSize: 12 }}>Sub-accounts</Text></Divider>
-                {selected.children.map((c) => (
-                  <div
-                    key={c.code}
-                    style={{ display: "flex", justifyContent: "space-between", padding: "8px 12px", borderRadius: 8, border: `1px solid ${token.colorBorderSecondary}`, cursor: "pointer" }}
-                    onClick={() => setSelected(c)}
-                  >
-                    <Space>
-                      <Text style={{ fontFamily: "monospace", fontSize: 11 }} type="secondary">{c.code}</Text>
-                      <Text>{c.name}</Text>
-                    </Space>
-                    <Text style={{ fontFamily: "monospace", fontWeight: 600 }}>{fmtAmt(c.balance)}</Text>
+          <>
+            {/* ── Gradient header ─────────────────────────────────────── */}
+            <div style={{ position: "relative", overflow: "hidden", flexShrink: 0 }}>
+              <div style={{
+                background: `linear-gradient(135deg, ${typeColor} 0%, ${typeColor}dd 100%)`,
+                padding: "22px 24px 60px",
+              }}>
+                {/* top bar */}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    {history.length > 0 && (
+                      <button
+                        onClick={goBack}
+                        style={{
+                          width: 30, height: 30, borderRadius: 8,
+                          background: "rgba(255,255,255,0.18)",
+                          border: "none", cursor: "pointer",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          color: "#fff", fontSize: 13,
+                        }}
+                      >
+                        <ArrowLeftOutlined />
+                      </button>
+                    )}
+                    <div style={{
+                      background: "rgba(255,255,255,0.18)",
+                      borderRadius: 6,
+                      padding: "3px 10px",
+                      fontSize: 11,
+                      fontWeight: 700,
+                      color: "#fff",
+                      letterSpacing: "0.08em",
+                      textTransform: "uppercase",
+                    }}>
+                      {selected.children?.length ? "Group Account" : "Leaf Account"}
+                    </div>
                   </div>
-                ))}
-              </>
-            )}
-          </Space>
+                  <button
+                    onClick={closeDrawer}
+                    style={{
+                      width: 30, height: 30, borderRadius: 8,
+                      background: "rgba(255,255,255,0.18)",
+                      border: "none", cursor: "pointer",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      color: "#fff", fontSize: 13,
+                    }}
+                  >
+                    <CloseOutlined />
+                  </button>
+                </div>
+                {/* account info */}
+                <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                  <div style={{
+                    width: 52, height: 52, borderRadius: 14,
+                    background: "rgba(255,255,255,0.22)",
+                    border: "2px solid rgba(255,255,255,0.35)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: 15, fontWeight: 800, color: "#fff", fontFamily: "monospace",
+                    flexShrink: 0,
+                  }}>
+                    {selected.code}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 20, fontWeight: 800, color: "#fff", lineHeight: 1.2 }}>
+                      {selected.name}
+                    </div>
+                    <div style={{ fontSize: 12, color: "rgba(255,255,255,0.72)", marginTop: 3, display: "flex", alignItems: "center", gap: 8 }}>
+                      <span>{TYPE_META[selected.type]?.label}</span>
+                      <span>&middot;</span>
+                      <span>{selected.subtype}</span>
+                      {!selected.active && (
+                        <>
+                          <span>&middot;</span>
+                          <Tag style={{ borderRadius: 20, fontSize: 10, background: "rgba(255,255,255,0.2)", color: "#fff", border: "none", margin: 0 }}>Inactive</Tag>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                {/* balance in header */}
+                <div style={{ marginTop: 18, display: "flex", gap: 16, flexWrap: "wrap" }}>
+                  <div style={{
+                    background: "rgba(255,255,255,0.15)",
+                    borderRadius: 10,
+                    padding: "10px 16px",
+                    flex: 1,
+                    minWidth: 120,
+                  }}>
+                    <div style={{ fontSize: 10, fontWeight: 600, color: "rgba(255,255,255,0.6)", textTransform: "uppercase", letterSpacing: "0.06em" }}>Balance</div>
+                    <div style={{ fontSize: 22, fontWeight: 800, color: "#fff", marginTop: 2, fontFamily: "monospace" }}>{fmtAmt(selected.balance)}</div>
+                  </div>
+                  {(selected.ytdDebit > 0 || selected.ytdCredit > 0) && (
+                    <>
+                      <div style={{
+                        background: "rgba(255,255,255,0.15)",
+                        borderRadius: 10,
+                        padding: "10px 16px",
+                        flex: 1,
+                        minWidth: 90,
+                      }}>
+                        <div style={{ fontSize: 10, fontWeight: 600, color: "rgba(255,255,255,0.6)", textTransform: "uppercase", letterSpacing: "0.06em" }}>YTD Debit</div>
+                        <div style={{ fontSize: 16, fontWeight: 700, color: "#fff", marginTop: 2, fontFamily: "monospace" }}>{fmtAmt(selected.ytdDebit)}</div>
+                      </div>
+                      <div style={{
+                        background: "rgba(255,255,255,0.15)",
+                        borderRadius: 10,
+                        padding: "10px 16px",
+                        flex: 1,
+                        minWidth: 90,
+                      }}>
+                        <div style={{ fontSize: 10, fontWeight: 600, color: "rgba(255,255,255,0.6)", textTransform: "uppercase", letterSpacing: "0.06em" }}>YTD Credit</div>
+                        <div style={{ fontSize: 16, fontWeight: 700, color: "#fff", marginTop: 2, fontFamily: "monospace" }}>{fmtAmt(selected.ytdCredit)}</div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+              {/* curved bottom mask */}
+              <div style={{
+                position: "absolute", bottom: 0, left: 0, right: 0, height: 28,
+                background: token.colorBgLayout,
+                borderRadius: "24px 24px 0 0",
+              }} />
+            </div>
+
+            {/* ── Scrollable content ──────────────────────────────────── */}
+            <div style={{ flex: 1, overflowY: "auto", padding: "4px 20px 20px" }}>
+              <Space direction="vertical" size={14} style={{ width: "100%" }}>
+                {/* Account details card */}
+                <div style={{
+                  background: token.colorBgContainer,
+                  borderRadius: 10,
+                  padding: "16px",
+                  border: `1px solid ${token.colorBorderSecondary}`,
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+                }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: token.colorTextSecondary, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 12 }}>
+                    Account Details
+                  </div>
+                  <Descriptions column={1} size="small" colon={false}
+                    labelStyle={{ fontWeight: 600, color: token.colorTextSecondary, fontSize: 12, width: 130 }}
+                    contentStyle={{ fontSize: 13 }}
+                  >
+                    <Descriptions.Item label="Code">
+                      <Text style={{ fontFamily: "monospace", fontWeight: 600 }}>{selected.code}</Text>
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Type">
+                      <Tag color={typeColor} style={{ borderRadius: 20 }}>{TYPE_META[selected.type]?.label}</Tag>
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Sub-type">{selected.subtype}</Descriptions.Item>
+                    <Descriptions.Item label="Normal Balance">
+                      <Tag color={selected.normalBal === "debit" ? "blue" : "green"} style={{ borderRadius: 20 }}>
+                        {selected.normalBal === "debit" ? "Debit (Dr)" : "Credit (Cr)"}
+                      </Tag>
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Status">
+                      <Badge status={selected.active ? "success" : "default"} text={selected.active ? "Active" : "Inactive"} />
+                    </Descriptions.Item>
+                  </Descriptions>
+                  {selected.description && (
+                    <div style={{ marginTop: 10, padding: "10px 12px", background: token.colorBgLayout, borderRadius: 8, fontSize: 12, color: token.colorTextSecondary, lineHeight: 1.6 }}>
+                      {selected.description}
+                    </div>
+                  )}
+                </div>
+
+                {/* Sub-accounts section */}
+                {selected.children && selected.children.length > 0 && (
+                  <div style={{
+                    background: token.colorBgContainer,
+                    borderRadius: 10,
+                    padding: "16px",
+                    border: `1px solid ${token.colorBorderSecondary}`,
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+                  }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: token.colorTextSecondary, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                        Sub-accounts ({selected.children.length})
+                      </div>
+                      <Button
+                        type="link"
+                        size="small"
+                        icon={<PlusOutlined />}
+                        style={{ fontSize: 12, fontWeight: 600, color: typeColor }}
+                        onClick={() => setChildModalOpen(true)}
+                      >
+                        Add
+                      </Button>
+                    </div>
+                    <Space direction="vertical" size={6} style={{ width: "100%" }}>
+                      {selected.children.map((c) => (
+                        <div
+                          key={c.code}
+                          onClick={() => openAccount(c)}
+                          style={{
+                            display: "flex", justifyContent: "space-between", alignItems: "center",
+                            padding: "10px 12px", borderRadius: 8,
+                            border: `1px solid ${token.colorBorderSecondary}`,
+                            cursor: "pointer",
+                            transition: "all 0.15s",
+                            background: token.colorBgLayout,
+                          }}
+                          onMouseEnter={(e) => { e.currentTarget.style.borderColor = typeColor + "60"; e.currentTarget.style.background = typeColor + "08"; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.borderColor = token.colorBorderSecondary; e.currentTarget.style.background = token.colorBgLayout; }}
+                        >
+                          <Space size={8}>
+                            {c.children?.length
+                              ? <FolderOutlined style={{ color: typeColor, fontSize: 13 }} />
+                              : <FileTextOutlined style={{ color: token.colorTextTertiary, fontSize: 12 }} />}
+                            <Text style={{ fontFamily: "monospace", fontSize: 11 }} type="secondary">{c.code}</Text>
+                            <Text style={{ fontSize: 13 }}>{c.name}</Text>
+                            {!c.active && <Tag style={{ borderRadius: 20, fontSize: 10 }}>Off</Tag>}
+                          </Space>
+                          <Text style={{ fontFamily: "monospace", fontWeight: 600, fontSize: 12, color: c.balance < 0 ? token.colorError : token.colorTextSecondary }}>
+                            {fmtAmt(c.balance)}
+                          </Text>
+                        </div>
+                      ))}
+                    </Space>
+                  </div>
+                )}
+              </Space>
+            </div>
+
+            {/* ── Sticky footer ───────────────────────────────────────── */}
+            <div style={{
+              background: token.colorBgContainer,
+              borderTop: `1px solid ${token.colorBorderSecondary}`,
+              padding: "12px 20px",
+              display: "flex",
+              gap: 8,
+              flexShrink: 0,
+            }}>
+              <Button
+                type="primary"
+                icon={<SubnodeOutlined />}
+                onClick={() => setChildModalOpen(true)}
+                style={{
+                  flex: 1,
+                  fontWeight: 700,
+                  background: `linear-gradient(135deg, ${typeColor}, ${typeColor}dd)`,
+                  border: "none",
+                  boxShadow: `0 4px 12px ${typeColor}44`,
+                }}
+              >
+                Add Child Account
+              </Button>
+              <Button icon={<EditOutlined />}>Edit</Button>
+              <Button danger icon={<DeleteOutlined />}>Delete</Button>
+            </div>
+          </>
         )}
       </Drawer>
+
+      {/* ── Create Child Account Modal ──────────────────────────────────── */}
+      <CreateChildModal
+        open={childModalOpen}
+        parent={selected}
+        onClose={() => setChildModalOpen(false)}
+      />
     </>
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  Main page — design switcher
-// ─────────────────────────────────────────────────────────────────────────────
-
 export default function ChartOfAccounts() {
-  const [design, setDesign] = useState<"1" | "2" | "3">("1");
-
   return (
     <DashboardLayout
       currentPage="Chart of Accounts"
       breadcrumbs={[{ label: "Dashboard", href: "/" }, { label: "Accounting" }, { label: "Chart of Accounts" }]}
     >
-      <Space direction="vertical" size={16} style={{ width: "100%" }}>
-        {/* Design picker — remove once you pick one */}
-        <Alert
-          type="info"
-          showIcon
-          message={
-            <Space>
-              <Text strong>Preview Mode — Pick your preferred design:</Text>
-              <Segmented
-                value={design}
-                onChange={(v) => setDesign(v as "1" | "2" | "3")}
-                options={[
-                  { value: "1", label: "Design 1 — Explorer (Tree + Detail Panel)" },
-                  { value: "2", label: "Design 2 — Spreadsheet (Tree Table)" },
-                  { value: "3", label: "Design 3 — Dashboard + Tabbed Tree + Drawer" },
-                ]}
-              />
-            </Space>
-          }
-          style={{ borderRadius: 8 }}
-        />
-
-        {design === "1" && <Design1 />}
-        {design === "2" && <Design2 />}
-        {design === "3" && <Design3 />}
-      </Space>
+      <ChartOfAccountsContent />
     </DashboardLayout>
   );
 }
