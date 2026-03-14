@@ -89,3 +89,66 @@ if (lead.status === 'won') { ... }
 - `t(key, lang)` with `en.ts` / `ar.ts` dictionaries
 - RTL support: `document.dir` set automatically for Arabic
 - Language stored in localStorage (`app-language`)
+
+## Bilingual Fields (API Data)
+
+The backend returns bilingual data as **two separate flat fields** — never as a JSONB object.
+
+### API Response Shape
+
+```typescript
+// ✅ How the API returns bilingual data (flat fields)
+{ nameEn: "Main Branch", nameAr: "الفرع الرئيسي", ... }
+
+// ❌ OLD format (no longer used) — never expect this
+{ name: { en: "Main Branch", ar: "الفرع الرئيسي" } }
+```
+
+### TypeScript Types
+
+All types/interfaces must use flat `En`/`Ar` suffix — never nested `{ en, ar }`:
+
+```typescript
+// ✅ CORRECT
+interface Branch {
+  id: string;
+  nameEn: string;
+  nameAr: string;
+  descriptionEn?: string;
+  descriptionAr?: string;
+}
+
+// ❌ WRONG
+interface Branch {
+  id: string;
+  name: { en: string; ar: string };
+}
+```
+
+### Displaying Bilingual Fields
+
+Use the current language to pick the right field:
+
+```typescript
+const name = lang === "ar" ? item.nameAr : item.nameEn;
+```
+
+### Forms (Create/Edit)
+
+Forms must always collect **both languages** as separate fields:
+
+```tsx
+<Form.Item label={t('common.nameEn')} name="nameEn" rules={[{ required: true }]}>
+  <Input dir="ltr" />
+</Form.Item>
+<Form.Item label={t('common.nameAr')} name="nameAr" rules={[{ required: true }]}>
+  <Input dir="rtl" />
+</Form.Item>
+```
+
+### Rules
+
+- Never use `name.en` or `name?.en` accessor syntax — fields are flat
+- Never send `{ name: { en, ar } }` to the API — send `{ nameEn, nameAr }` directly
+- All bilingual fields follow the same pattern: `nameEn`/`nameAr`, `titleEn`/`titleAr`, `descriptionEn`/`descriptionAr`
+- Arabic input fields should have `dir="rtl"`, English fields should have `dir="ltr"`
