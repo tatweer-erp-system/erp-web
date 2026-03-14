@@ -1851,13 +1851,6 @@ export default function Settings() {
           const NAV_ITEMS = [
             { key: "general", icon: <SettingOutlined />, label: "General" },
             { key: "profile", icon: <UserOutlined />, label: "Profile" },
-            {
-              key: "notifications",
-              icon: <BellOutlined />,
-              label: "Notifications",
-              badge: activeNotifCount,
-              badgeColor: token.colorPrimary,
-            },
             { key: "security", icon: <SafetyOutlined />, label: "Security" },
             {
               key: "appearance",
@@ -1870,16 +1863,6 @@ export default function Settings() {
               label: "Integrations",
               badge: connectedCount,
               badgeColor: "#10B981",
-            },
-            {
-              key: "loyalty",
-              icon: <GiftOutlined />,
-              label: "Loyalty Settings",
-            },
-            {
-              key: "vouchers-gc",
-              icon: <TagsOutlined />,
-              label: "Vouchers & Gift Cards",
             },
           ];
 
@@ -1895,12 +1878,9 @@ export default function Settings() {
             >
               {activeTab === "general" && GeneralTab}
               {activeTab === "profile" && ProfileTab}
-              {activeTab === "notifications" && NotificationsTab}
               {activeTab === "security" && SecurityTab}
               {activeTab === "appearance" && AppearanceTab}
               {activeTab === "integrations" && IntegrationsTab}
-              {activeTab === "loyalty" && LoyaltySettingsTab}
-              {activeTab === "vouchers-gc" && VouchersGiftCardsTab}
               {activeTab === "pos-session" && POSSessionTab}
             </Card>
           );

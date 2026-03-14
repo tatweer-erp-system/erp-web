@@ -246,6 +246,208 @@ export const ar: Record<string, string> = {
   "inventory.lowStockNotifDesc":
     "يتبقى فقط {qty} وحدات (نقطة إعادة الطلب: {reorderPoint})",
 
+  // ── My Settings ──────────────────────────────────────────────────────────────
+  "mySettings.title": "إعداداتي",
+  "mySettings.subtitle": "إدارة تفضيلاتك الشخصية وإعدادات حسابك",
+
+  // Tabs
+  "mySettings.tabs.general": "عام",
+  "mySettings.tabs.profile": "الملف الشخصي",
+  "mySettings.tabs.notifications": "الإشعارات",
+  "mySettings.tabs.security": "الأمان",
+  "mySettings.tabs.appearance": "المظهر",
+  "mySettings.tabs.integrations": "التكاملات",
+  "mySettings.tabs.loyalty": "إعدادات الولاء",
+  "mySettings.tabs.vouchers": "القسائم وبطاقات الهدايا",
+
+  // Coming Soon
+  "mySettings.comingSoon": "قريباً",
+  "mySettings.comingSoon.tooltip": "هذه الميزة قادمة قريباً",
+  "mySettings.comingSoon.description":
+    "هذا القسم قيد التطوير وسيكون متاحاً قريباً",
+
+  // Profile tab
+  "mySettings.profile.title": "المعلومات الشخصية",
+  "mySettings.profile.subtitle": "تحديث بياناتك الشخصية وصورة الملف الشخصي",
+  "mySettings.profile.avatar": "صورة الملف الشخصي",
+  "mySettings.profile.avatarHint":
+    "PNG أو JPG، 256×256 بكسل موصى، حد أقصى 2 ميجابايت",
+  "mySettings.profile.uploadNew": "رفع جديد",
+  "mySettings.profile.remove": "إزالة",
+  "mySettings.profile.fullName": "الاسم الكامل",
+  "mySettings.profile.fullNamePlaceholder": "أدخل اسمك الكامل",
+  "mySettings.profile.email": "البريد الإلكتروني",
+  "mySettings.profile.emailReadonly": "لا يمكن تغيير البريد الإلكتروني هنا",
+  "mySettings.profile.jobTitle": "المسمى الوظيفي",
+  "mySettings.profile.jobTitlePlaceholder": "مثال: مدير فرع",
+  "mySettings.profile.phone": "رقم الهاتف",
+  "mySettings.profile.phonePlaceholder": "+966 5xx xxx xxxx",
+  "mySettings.profile.bio": "نبذة",
+  "mySettings.profile.bioPlaceholder": "اكتب نبذة مختصرة عنك...",
+  "mySettings.profile.saveProfile": "حفظ الملف الشخصي",
+  "mySettings.profile.saved": "تم حفظ الملف الشخصي بنجاح",
+  "mySettings.profile.avatarUploaded": "تم تحديث صورة الملف الشخصي",
+
+  // General tab
+  "mySettings.general.regional": "الإقليمية والمحلية",
+  "mySettings.general.regionalDesc":
+    "إعداد اللغة والمنطقة الزمنية وتنسيقات العرض",
+  "mySettings.general.language": "لغة النظام",
+  "mySettings.general.timezone": "المنطقة الزمنية",
+  "mySettings.general.dateFormat": "تنسيق التاريخ",
+  "mySettings.general.currency": "العملة",
+  "mySettings.general.financialYear": "السنة المالية",
+  "mySettings.general.numberFormat": "تنسيق الأرقام",
+  "mySettings.general.saved": "تم حفظ الإعداد",
+  "mySettings.general.dataBackup": "البيانات والنسخ الاحتياطي",
+  "mySettings.general.dataBackupDesc":
+    "إدارة تصدير البيانات وجداول النسخ الاحتياطي",
+  "mySettings.general.posConfig": "إعدادات نقطة البيع",
+  "mySettings.general.posConfigDesc": "ضبط إعدادات محطة نقطة البيع",
+  "mySettings.general.autoBackup": "النسخ الاحتياطي التلقائي",
+  "mySettings.general.backupFrequency": "تكرار النسخ الاحتياطي",
+  "mySettings.general.backupDaily": "يومي",
+  "mySettings.general.backupWeekly": "أسبوعي",
+  "mySettings.general.backupMonthly": "شهري",
+  "mySettings.general.retentionPeriod": "فترة الاحتفاظ",
+  "mySettings.general.retentionDays": "{days} يوم",
+  "mySettings.general.retention30": "30 يوم",
+  "mySettings.general.retention60": "60 يوم",
+  "mySettings.general.retention90": "90 يوم",
+  "mySettings.general.retention365": "365 يوم",
+  "mySettings.general.exportData": "تصدير البيانات",
+  "mySettings.general.defaultTaxRate": "نسبة الضريبة الافتراضية",
+  "mySettings.general.allowNegativeStock": "السماح بالمخزون السالب",
+  "mySettings.general.maxHeldOrders": "الحد الأقصى للطلبات المعلقة",
+  "mySettings.general.loyaltyEnabled": "تفعيل الولاء",
+
+  // Notifications tab
+  "mySettings.notifications.channels": "قنوات الإشعارات",
+  "mySettings.notifications.channelsDesc": "اختر الإشعارات التي ترغب في تلقيها",
+  "mySettings.notifications.emailNotifications": "إشعارات البريد الإلكتروني",
+  "mySettings.notifications.orderUpdates": "تحديثات الطلبات",
+  "mySettings.notifications.inventoryAlerts": "تنبيهات المخزون",
+  "mySettings.notifications.systemAlerts": "تنبيهات النظام",
+  "mySettings.notifications.systemAlertsLocked":
+    "تنبيهات النظام مفعلة دائماً للأمان",
+  "mySettings.notifications.weeklyReports": "التقارير الأسبوعية",
+  "mySettings.notifications.billingReminders": "تذكيرات الفوترة",
+  "mySettings.notifications.productUpdates": "تحديثات المنتجات",
+  "mySettings.notifications.delivery": "تفضيلات التسليم",
+  "mySettings.notifications.deliveryDesc": "ضبط كيفية ووقت تلقي الإشعارات",
+  "mySettings.notifications.digestFrequency": "تكرار ملخص البريد",
+  "mySettings.notifications.realtime": "فوري",
+  "mySettings.notifications.daily": "ملخص يومي",
+  "mySettings.notifications.weekly": "ملخص أسبوعي",
+  "mySettings.notifications.quietHours": "ساعات الهدوء",
+  "mySettings.notifications.quietHoursDesc":
+    "لن يتم إرسال إشعارات خلال هذا الوقت",
+  "mySettings.notifications.saved": "تم حفظ تفضيلات الإشعارات",
+
+  // Security tab
+  "mySettings.security.changePassword": "تغيير كلمة المرور",
+  "mySettings.security.changePasswordDesc":
+    "حدّث كلمة مرور حسابك بانتظام للأمان",
+  "mySettings.security.currentPassword": "كلمة المرور الحالية",
+  "mySettings.security.newPassword": "كلمة المرور الجديدة",
+  "mySettings.security.confirmPassword": "تأكيد كلمة المرور الجديدة",
+  "mySettings.security.updatePassword": "تحديث كلمة المرور",
+  "mySettings.security.passwordUpdated": "تم تحديث كلمة المرور بنجاح",
+  "mySettings.security.passwordMismatch": "كلمتا المرور غير متطابقتين",
+  "mySettings.security.twoFactor": "المصادقة الثنائية",
+  "mySettings.security.twoFactorDesc": "أضف طبقة أمان إضافية لحسابك",
+  "mySettings.security.twoFactorNotEnabled": "المصادقة الثنائية غير مفعلة",
+  "mySettings.security.twoFactorNotEnabledDesc":
+    "حسابك أقل أماناً بدون المصادقة الثنائية",
+  "mySettings.security.enable2fa": "تفعيل المصادقة الثنائية",
+  "mySettings.security.disable2fa": "تعطيل المصادقة الثنائية",
+  "mySettings.security.twoFactorEnabled": "المصادقة الثنائية مفعلة",
+  "mySettings.security.twoFactorEnabledDesc": "حسابك محمي بالمصادقة الثنائية",
+  "mySettings.security.setup2fa": "إعداد المصادقة الثنائية",
+  "mySettings.security.scanQrCode": "امسح رمز QR باستخدام تطبيق المصادقة",
+  "mySettings.security.enterCode": "أدخل رمز التحقق",
+  "mySettings.security.verifyAndEnable": "تحقق وفعّل",
+  "mySettings.security.confirmDisable2fa":
+    "أدخل كلمة المرور لتعطيل المصادقة الثنائية",
+  "mySettings.security.activeSessions": "الجلسات النشطة",
+  "mySettings.security.activeSessionsDesc": "إدارة جلساتك النشطة عبر الأجهزة",
+  "mySettings.security.thisDevice": "هذا الجهاز",
+  "mySettings.security.revoke": "إلغاء",
+  "mySettings.security.revokeAll": "إلغاء جميع الجلسات الأخرى",
+  "mySettings.security.sessionRevoked": "تم إلغاء الجلسة",
+  "mySettings.security.allSessionsRevoked": "تم إلغاء جميع الجلسات الأخرى",
+  "mySettings.security.ago": "مضت",
+  "mySettings.security.setup2faSubtitle":
+    "امسح رمز QR أدناه باستخدام تطبيق المصادقة",
+  "mySettings.security.disable2faTitle": "تعطيل المصادقة الثنائية",
+  "mySettings.security.disable2faWarning":
+    "سيجعل تعطيل المصادقة الثنائية حسابك أقل أمانًا. هل أنت متأكد؟",
+  "mySettings.security.enterPassword": "أدخل كلمة المرور",
+  "mySettings.security.confirmDisableBtn": "تأكيد التعطيل",
+  "mySettings.security.twoFactorEnableSuccess":
+    "تم تفعيل المصادقة الثنائية بنجاح",
+  "mySettings.security.twoFactorDisableSuccess": "تم تعطيل المصادقة الثنائية",
+  "mySettings.security.updatePasswordError": "فشل تحديث كلمة المرور",
+  "mySettings.security.twoFactorError": "فشلت عملية المصادقة الثنائية",
+  "mySettings.security.revokeError": "فشل إلغاء الجلسة",
+  "mySettings.security.revokeAllError": "فشل إلغاء الجلسات",
+  "mySettings.security.cancel": "إلغاء",
+
+  // Appearance tab
+  "mySettings.appearance.title": "العرض والمظهر",
+  "mySettings.appearance.subtitle": "تخصيص مظهر التطبيق وشكله",
+  "mySettings.appearance.theme": "السمة",
+  "mySettings.appearance.themeLight": "فاتح",
+  "mySettings.appearance.themeDark": "داكن",
+  "mySettings.appearance.themeSystem": "النظام",
+  "mySettings.appearance.primaryColor": "اللون الأساسي",
+  "mySettings.appearance.language": "اللغة",
+  "mySettings.appearance.density": "كثافة العرض",
+  "mySettings.appearance.densityCompact": "مضغوط",
+  "mySettings.appearance.densityDefault": "افتراضي",
+  "mySettings.appearance.densityComfortable": "مريح",
+  "mySettings.appearance.saved": "تم حفظ المظهر",
+
+  // Integrations tab
+  "mySettings.integrations.title": "التكاملات",
+  "mySettings.integrations.subtitle": "الاتصال بالخدمات والأدوات الخارجية",
+  "mySettings.integrations.connected": "متصل",
+  "mySettings.integrations.notConnected": "غير متصل",
+  "mySettings.integrations.connect": "اتصال",
+  "mySettings.integrations.slack": "سلاك",
+  "mySettings.integrations.slackDesc":
+    "إرسال الإشعارات والتحديثات إلى قنوات سلاك الخاصة بك",
+  "mySettings.integrations.google": "جوجل ووركسبيس",
+  "mySettings.integrations.googleDesc":
+    "مزامنة التقويمات وجهات الاتصال والمستندات مع جوجل ووركسبيس",
+  "mySettings.integrations.zapier": "زابير",
+  "mySettings.integrations.zapierDesc":
+    "أتمتة سير العمل عبر الاتصال بأكثر من 5000 تطبيق عبر زابير",
+
+  // Loyalty tab
+  "mySettings.loyalty.title": "إعدادات الولاء",
+  "mySettings.loyalty.subtitle": "ضبط قواعد برنامج الولاء وإعدادات النقاط",
+  "mySettings.loyalty.programName": "اسم البرنامج",
+  "mySettings.loyalty.pointsPerUnit": "النقاط لكل وحدة عملة",
+  "mySettings.loyalty.redemptionRate": "معدل الاستبدال",
+  "mySettings.loyalty.expiryDays": "انتهاء النقاط (أيام)",
+  "mySettings.loyalty.enabled": "برنامج الولاء مفعل",
+
+  // Vouchers tab
+  "mySettings.vouchers.title": "القسائم وبطاقات الهدايا",
+  "mySettings.vouchers.subtitle": "إدارة أنواع القسائم وإعدادات بطاقات الهدايا",
+  "mySettings.vouchers.voucherTypes": "أنواع القسائم",
+  "mySettings.vouchers.percentage": "نسبة مئوية",
+  "mySettings.vouchers.fixedAmount": "مبلغ ثابت",
+  "mySettings.vouchers.giftCardSettings": "إعدادات بطاقات الهدايا",
+  "mySettings.vouchers.minimumValue": "الحد الأدنى للقيمة",
+  "mySettings.vouchers.maximumValue": "الحد الأقصى للقيمة",
+  "mySettings.vouchers.expiryMonths": "فترة الانتهاء (أشهر)",
+
+  // Common
+  "mySettings.error.network": "خطأ في الاتصال، حاول مرة أخرى",
+  "mySettings.error.save": "فشل حفظ التغييرات",
+
   // Cross-Module Navigation
   "nav.relatedLeads": "العملاء المحتملون ذوو الصلة",
   "nav.relatedSalesOrders": "أوامر البيع ذات الصلة",

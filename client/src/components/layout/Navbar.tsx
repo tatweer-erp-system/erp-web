@@ -248,19 +248,6 @@ function NavbarInner({ sidebarOpen, setSidebarOpen, isRTL }: NavbarProps) {
         {/* Notifications */}
         <NotificationCenter />
 
-        {/* Settings shortcut */}
-        <Tooltip title="Settings">
-          <Button
-            type="text"
-            icon={<SettingOutlined style={{ fontSize: 16 }} />}
-            style={iconBtnStyle}
-          >
-            <Link href="/settings" style={{ position: "absolute", inset: 0 }} />
-          </Button>
-        </Tooltip>
-
-        <Divider type="vertical" style={{ height: 20, margin: "0 4px" }} />
-
         {/* Language */}
         <Tooltip title={isRTL ? "Switch to English" : "التبديل إلى العربية"}>
           {isMobile ? (

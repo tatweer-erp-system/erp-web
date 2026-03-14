@@ -73,6 +73,7 @@ import {
   TrophyOutlined,
   TagOutlined,
   GiftOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 import { t } from "@/i18n";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
@@ -378,6 +379,11 @@ const NAV_ITEMS: NavItem[] = [
   },
 
   { name: "SETTINGS", isHeader: true },
+  {
+    name: "My Settings",
+    icon: <UserOutlined />,
+    href: "/my-settings",
+  },
   {
     name: "Company Profile",
     icon: <ApartmentOutlined />,

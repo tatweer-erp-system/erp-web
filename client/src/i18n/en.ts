@@ -231,6 +231,221 @@ export const en: Record<string, string> = {
   "inventory.lowStockNotifDesc":
     "has only {qty} units remaining (reorder point: {reorderPoint})",
 
+  // ── My Settings ──────────────────────────────────────────────────────────────
+  "mySettings.title": "My Settings",
+  "mySettings.subtitle":
+    "Manage your personal preferences and account settings",
+
+  // Tabs
+  "mySettings.tabs.general": "General",
+  "mySettings.tabs.profile": "Profile",
+  "mySettings.tabs.notifications": "Notifications",
+  "mySettings.tabs.security": "Security",
+  "mySettings.tabs.appearance": "Appearance",
+  "mySettings.tabs.integrations": "Integrations",
+  "mySettings.tabs.loyalty": "Loyalty Settings",
+  "mySettings.tabs.vouchers": "Vouchers & Gift Cards",
+
+  // Coming Soon
+  "mySettings.comingSoon": "Coming Soon",
+  "mySettings.comingSoon.tooltip": "This feature is coming soon",
+  "mySettings.comingSoon.description":
+    "This section is under development and will be available soon",
+
+  // Profile tab
+  "mySettings.profile.title": "Personal Information",
+  "mySettings.profile.subtitle":
+    "Update your personal details and profile photo",
+  "mySettings.profile.avatar": "Profile Photo",
+  "mySettings.profile.avatarHint": "PNG or JPG, 256×256px recommended, max 2MB",
+  "mySettings.profile.uploadNew": "Upload new",
+  "mySettings.profile.remove": "Remove",
+  "mySettings.profile.fullName": "Full Name",
+  "mySettings.profile.fullNamePlaceholder": "Enter your full name",
+  "mySettings.profile.email": "Email Address",
+  "mySettings.profile.emailReadonly": "Email cannot be changed here",
+  "mySettings.profile.jobTitle": "Job Title",
+  "mySettings.profile.jobTitlePlaceholder": "e.g. Branch Manager",
+  "mySettings.profile.phone": "Phone Number",
+  "mySettings.profile.phonePlaceholder": "+966 5xx xxx xxxx",
+  "mySettings.profile.bio": "Bio",
+  "mySettings.profile.bioPlaceholder": "Write a short bio about yourself...",
+  "mySettings.profile.saveProfile": "Save Profile",
+  "mySettings.profile.saved": "Profile saved successfully",
+  "mySettings.profile.avatarUploaded": "Profile photo updated",
+
+  // General tab
+  "mySettings.general.regional": "Regional & Locale",
+  "mySettings.general.regionalDesc":
+    "Configure language, timezone, and display formats",
+  "mySettings.general.language": "System Language",
+  "mySettings.general.timezone": "Timezone",
+  "mySettings.general.dateFormat": "Date Format",
+  "mySettings.general.currency": "Currency",
+  "mySettings.general.financialYear": "Financial Year",
+  "mySettings.general.numberFormat": "Number Format",
+  "mySettings.general.saved": "Setting saved",
+  "mySettings.general.dataBackup": "Data & Backup",
+  "mySettings.general.dataBackupDesc":
+    "Manage data exports and backup schedules",
+  "mySettings.general.posConfig": "POS Configuration",
+  "mySettings.general.posConfigDesc":
+    "Configure point-of-sale terminal settings",
+  "mySettings.general.autoBackup": "Auto Backup",
+  "mySettings.general.backupFrequency": "Backup Frequency",
+  "mySettings.general.backupDaily": "Daily",
+  "mySettings.general.backupWeekly": "Weekly",
+  "mySettings.general.backupMonthly": "Monthly",
+  "mySettings.general.retentionPeriod": "Retention Period",
+  "mySettings.general.retentionDays": "{days} Days",
+  "mySettings.general.retention30": "30 Days",
+  "mySettings.general.retention60": "60 Days",
+  "mySettings.general.retention90": "90 Days",
+  "mySettings.general.retention365": "365 Days",
+  "mySettings.general.exportData": "Export Data",
+  "mySettings.general.defaultTaxRate": "Default Tax Rate",
+  "mySettings.general.allowNegativeStock": "Allow Negative Stock",
+  "mySettings.general.maxHeldOrders": "Max Held Orders",
+  "mySettings.general.loyaltyEnabled": "Loyalty Enabled",
+
+  // Notifications tab
+  "mySettings.notifications.channels": "Notification Channels",
+  "mySettings.notifications.channelsDesc":
+    "Choose which notifications you want to receive",
+  "mySettings.notifications.emailNotifications": "Email Notifications",
+  "mySettings.notifications.orderUpdates": "Order Updates",
+  "mySettings.notifications.inventoryAlerts": "Inventory Alerts",
+  "mySettings.notifications.systemAlerts": "System Alerts",
+  "mySettings.notifications.systemAlertsLocked":
+    "System alerts are always enabled for security",
+  "mySettings.notifications.weeklyReports": "Weekly Reports",
+  "mySettings.notifications.billingReminders": "Billing Reminders",
+  "mySettings.notifications.productUpdates": "Product Updates",
+  "mySettings.notifications.delivery": "Delivery Preferences",
+  "mySettings.notifications.deliveryDesc":
+    "Configure how and when you receive notifications",
+  "mySettings.notifications.digestFrequency": "Email Digest Frequency",
+  "mySettings.notifications.realtime": "Real-time",
+  "mySettings.notifications.daily": "Daily digest",
+  "mySettings.notifications.weekly": "Weekly digest",
+  "mySettings.notifications.quietHours": "Quiet Hours",
+  "mySettings.notifications.quietHoursDesc":
+    "No notifications will be sent during this time",
+  "mySettings.notifications.saved": "Notification preferences saved",
+
+  // Security tab
+  "mySettings.security.changePassword": "Change Password",
+  "mySettings.security.changePasswordDesc":
+    "Update your account password regularly for security",
+  "mySettings.security.currentPassword": "Current Password",
+  "mySettings.security.newPassword": "New Password",
+  "mySettings.security.confirmPassword": "Confirm New Password",
+  "mySettings.security.updatePassword": "Update Password",
+  "mySettings.security.passwordUpdated": "Password updated successfully",
+  "mySettings.security.passwordMismatch": "Passwords do not match",
+  "mySettings.security.twoFactor": "Two-Factor Authentication",
+  "mySettings.security.twoFactorDesc":
+    "Add an extra layer of security to your account",
+  "mySettings.security.twoFactorNotEnabled": "2FA is not enabled",
+  "mySettings.security.twoFactorNotEnabledDesc":
+    "Your account is less secure without two-factor authentication",
+  "mySettings.security.enable2fa": "Enable 2FA",
+  "mySettings.security.disable2fa": "Disable 2FA",
+  "mySettings.security.twoFactorEnabled": "2FA is enabled",
+  "mySettings.security.twoFactorEnabledDesc":
+    "Your account is protected with two-factor authentication",
+  "mySettings.security.setup2fa": "Set Up Two-Factor Authentication",
+  "mySettings.security.scanQrCode":
+    "Scan this QR code with your authenticator app",
+  "mySettings.security.enterCode": "Enter verification code",
+  "mySettings.security.verifyAndEnable": "Verify & Enable",
+  "mySettings.security.confirmDisable2fa": "Enter your password to disable 2FA",
+  "mySettings.security.activeSessions": "Active Sessions",
+  "mySettings.security.activeSessionsDesc":
+    "Manage your active sessions across devices",
+  "mySettings.security.thisDevice": "This device",
+  "mySettings.security.revoke": "Revoke",
+  "mySettings.security.revokeAll": "Revoke All Other Sessions",
+  "mySettings.security.sessionRevoked": "Session revoked",
+  "mySettings.security.allSessionsRevoked": "All other sessions revoked",
+  "mySettings.security.ago": "ago",
+  "mySettings.security.setup2faSubtitle":
+    "Scan the QR code below with your authenticator app",
+  "mySettings.security.disable2faTitle": "Disable Two-Factor Authentication",
+  "mySettings.security.disable2faWarning":
+    "Disabling 2FA will make your account less secure. Are you sure?",
+  "mySettings.security.enterPassword": "Enter your password",
+  "mySettings.security.confirmDisableBtn": "Confirm Disable",
+  "mySettings.security.twoFactorEnableSuccess":
+    "Two-factor authentication enabled successfully",
+  "mySettings.security.twoFactorDisableSuccess":
+    "Two-factor authentication disabled",
+  "mySettings.security.updatePasswordError": "Failed to update password",
+  "mySettings.security.twoFactorError":
+    "Two-factor authentication operation failed",
+  "mySettings.security.revokeError": "Failed to revoke session",
+  "mySettings.security.revokeAllError": "Failed to revoke sessions",
+  "mySettings.security.cancel": "Cancel",
+
+  // Appearance tab
+  "mySettings.appearance.title": "Display & Appearance",
+  "mySettings.appearance.subtitle":
+    "Customize how the application looks and feels",
+  "mySettings.appearance.theme": "Theme",
+  "mySettings.appearance.themeLight": "Light",
+  "mySettings.appearance.themeDark": "Dark",
+  "mySettings.appearance.themeSystem": "System",
+  "mySettings.appearance.primaryColor": "Primary Color",
+  "mySettings.appearance.language": "Language",
+  "mySettings.appearance.density": "Display Density",
+  "mySettings.appearance.densityCompact": "Compact",
+  "mySettings.appearance.densityDefault": "Default",
+  "mySettings.appearance.densityComfortable": "Comfortable",
+  "mySettings.appearance.saved": "Appearance saved",
+
+  // Integrations tab
+  "mySettings.integrations.title": "Integrations",
+  "mySettings.integrations.subtitle":
+    "Connect with third-party services and tools",
+  "mySettings.integrations.connected": "Connected",
+  "mySettings.integrations.notConnected": "Not connected",
+  "mySettings.integrations.connect": "Connect",
+  "mySettings.integrations.slack": "Slack",
+  "mySettings.integrations.slackDesc":
+    "Send notifications and updates to your Slack workspace channels",
+  "mySettings.integrations.google": "Google Workspace",
+  "mySettings.integrations.googleDesc":
+    "Sync calendars, contacts, and documents with Google Workspace",
+  "mySettings.integrations.zapier": "Zapier",
+  "mySettings.integrations.zapierDesc":
+    "Automate workflows by connecting with 5,000+ apps via Zapier",
+
+  // Loyalty tab
+  "mySettings.loyalty.title": "Loyalty Settings",
+  "mySettings.loyalty.subtitle":
+    "Configure loyalty program rules and point settings",
+  "mySettings.loyalty.programName": "Program Name",
+  "mySettings.loyalty.pointsPerUnit": "Points Per Currency Unit",
+  "mySettings.loyalty.redemptionRate": "Redemption Rate",
+  "mySettings.loyalty.expiryDays": "Points Expiry (Days)",
+  "mySettings.loyalty.enabled": "Loyalty Program Enabled",
+
+  // Vouchers tab
+  "mySettings.vouchers.title": "Vouchers & Gift Cards",
+  "mySettings.vouchers.subtitle":
+    "Manage voucher types and gift card configuration",
+  "mySettings.vouchers.voucherTypes": "Voucher Types",
+  "mySettings.vouchers.percentage": "Percentage",
+  "mySettings.vouchers.fixedAmount": "Fixed Amount",
+  "mySettings.vouchers.giftCardSettings": "Gift Card Settings",
+  "mySettings.vouchers.minimumValue": "Minimum Value",
+  "mySettings.vouchers.maximumValue": "Maximum Value",
+  "mySettings.vouchers.expiryMonths": "Expiry Period (Months)",
+
+  // Common
+  "mySettings.error.network": "Connection error, please try again",
+  "mySettings.error.save": "Failed to save changes",
+
   // Cross-Module Navigation
   "nav.relatedLeads": "Related Leads",
   "nav.relatedSalesOrders": "Related Sales Orders",

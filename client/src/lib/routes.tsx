@@ -557,6 +557,18 @@ export const routes: RouteConfig[] = [
     breadcrumb: ["HR", "Training"],
   },
 
+  // ── My Settings (user-level) ────────────────────────────────────────────────
+  {
+    path: "/my-settings/:tab",
+    component: lz(() => import("@/pages/settings/my-settings/MySettings")),
+    breadcrumb: ["Settings", "My Settings"],
+  },
+  {
+    path: "/my-settings",
+    component: lz(() => import("@/pages/settings/my-settings/MySettings")),
+    breadcrumb: ["Settings", "My Settings"],
+  },
+
   // ── Settings pages ──────────────────────────────────────────────────────────
   {
     path: "/financial-settings",
