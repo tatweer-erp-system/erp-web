@@ -454,7 +454,7 @@ export default function Inventory() {
       currentPage="Inventory"
       breadcrumbs={[{ label: "Dashboard", href: "/" }, { label: "Inventory" }]}
     >
-      <Space direction="vertical" size={20} style={{ width: "100%" }}>
+      <Space orientation="vertical" size={20} style={{ width: "100%" }}>
         {/* ── KPI Cards ──────────────────────────────────────────────────── */}
         <Row gutter={[16, 16]}>
           {[
@@ -875,7 +875,7 @@ export default function Inventory() {
         }}
         okText="Add Product"
         width={isMobile ? "95vw" : 520}
-        destroyOnClose
+        destroyOnHidden
       >
         <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
           <Row gutter={16}>
@@ -971,7 +971,7 @@ export default function Inventory() {
         onCancel={() => setIsEditOpen(false)}
         okText="Save Changes"
         width={isMobile ? "95vw" : 520}
-        destroyOnClose
+        destroyOnHidden
       >
         <Form form={editForm} layout="vertical" style={{ marginTop: 16 }}>
           <Row gutter={16}>

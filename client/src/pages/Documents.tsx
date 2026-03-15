@@ -468,7 +468,7 @@ function UploadModal({
       ]}
       width={680}
     >
-      <Space direction="vertical" style={{ width: "100%" }} size={16}>
+      <Space orientation="vertical" style={{ width: "100%" }} size={16}>
         {/* Global module selector */}
         <Row gutter={12} align="middle">
           <Col flex="auto">

@@ -4,7 +4,8 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Pencil, Trash2, Plus, RefreshCw } from "lucide-react";
-import { useSettings } from "@/contexts/SettingsContext";
+import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { t } from "@/i18n";
 
 interface Tax {
   id: string;
@@ -14,8 +15,9 @@ interface Tax {
 }
 
 export default function Taxes() {
-  const { language } = useSettings();
-  const isRTL = language === "ar";
+  const { language } = useAppSettings();
+  const lang = language;
+  const isRTL = lang === "ar";
 
   const [taxes, setTaxes] = useState<Tax[]>([
     { id: "1", name: "VAT", code: "465456", rate: 0 },
@@ -30,11 +32,11 @@ export default function Taxes() {
   const menuItems = [
     {
       id: "tax-rates",
-      label: language === "ar" ? "معدلات الضريبة" : "Tax Rates",
+      label: t("accounting.taxes.title", lang),
     },
     {
       id: "payment-gateway",
-      label: language === "ar" ? "بوابة الدفع" : "Payment Gateway",
+      label: t("accounting.taxes.paymentGateway", lang),
     },
   ];
 
@@ -74,17 +76,20 @@ export default function Taxes() {
 
   return (
     <DashboardLayout
-      currentPage="Taxes"
+      currentPage={t("Taxes", lang)}
       breadcrumbs={[
-        { label: language === "ar" ? "لوحة التحكم" : "Dashboard", href: "/" },
+        { label: t("Dashboard", lang), href: "/" },
         {
-          label: language === "ar" ? "الإعدادات" : "Settings",
+          label: t("Settings", lang),
           href: "/settings",
         },
-        { label: language === "ar" ? "الضرائب" : "Taxes" },
+        { label: t("Taxes", lang) },
       ]}
     >
-      <div className={`flex gap-6`}>
+      <div
+        className={`flex gap-6`}
+        style={{ direction: isRTL ? "rtl" : "ltr" }}
+      >
         {/* Left Sidebar */}
         <div className="w-64 flex-shrink-0">
           <Card className="p-4 dark:bg-card bg-card shadow-sm border-0">
@@ -93,11 +98,11 @@ export default function Taxes() {
                 <button
                   key={item.id}
                   onClick={() => setSelectedTab(item.id)}
-                  className={`w-full text-left px-4 py-3 rounded-lg transition-all ${
+                  className={`w-full ${isRTL ? "text-right" : "text-left"} px-4 py-3 rounded-lg transition-all ${
                     selectedTab === item.id
                       ? "bg-gray-200 dark:bg-gray-700 text-primary font-medium"
                       : "hover:dark:bg-secondary bg-secondary dark:hover:bg-gray-800"
-                  } ${isRTL ? "text-right" : ""}`}
+                  }`}
                 >
                   {item.label}
                 </button>
@@ -115,14 +120,12 @@ export default function Taxes() {
                 <h2
                   className={`text-2xl font-bold text-foreground mb-1 ${isRTL ? "text-right" : ""}`}
                 >
-                  {language === "ar" ? "معدلات الضريبة" : "Tax Rates"}
+                  {t("accounting.taxes.title", lang)}
                 </h2>
                 <p
                   className={`text-sm text-muted-foreground ${isRTL ? "text-right" : ""}`}
                 >
-                  {language === "ar"
-                    ? "تكوين معدلات الضريبة"
-                    : "Tax Rates Configuration"}
+                  {t("accounting.taxes.subtitle", lang)}
                 </p>
               </div>
               <div className={`flex gap-2`}>
@@ -155,7 +158,7 @@ export default function Taxes() {
                     <div className="space-y-3">
                       <div>
                         <label className="text-xs font-medium text-muted-foreground">
-                          {language === "ar" ? "الاسم" : "Name"}
+                          {t("accounting.taxes.name", lang)}
                         </label>
                         <Input
                           value={editValues.name || ""}
@@ -166,12 +169,12 @@ export default function Taxes() {
                             })
                           }
                           className="mt-1 border-0 dark:bg-card bg-card h-9"
-                          placeholder="Tax Name"
+                          placeholder={t("accounting.taxes.name", lang)}
                         />
                       </div>
                       <div>
                         <label className="text-xs font-medium text-muted-foreground">
-                          {language === "ar" ? "الكود" : "Code"}
+                          {t("accounting.taxes.code", lang)}
                         </label>
                         <Input
                           value={editValues.code || ""}
@@ -182,12 +185,12 @@ export default function Taxes() {
                             })
                           }
                           className="mt-1 border-0 dark:bg-card bg-card h-9"
-                          placeholder="Tax Code"
+                          placeholder={t("accounting.taxes.code", lang)}
                         />
                       </div>
                       <div>
                         <label className="text-xs font-medium text-muted-foreground">
-                          {language === "ar" ? "المعدل (%)" : "Rate (%)"}
+                          {t("accounting.taxes.rate", lang)}
                         </label>
                         <Input
                           type="number"
@@ -208,7 +211,7 @@ export default function Taxes() {
                           className="flex-1 bg-primary hover:bg-primary/90 text-white"
                           onClick={handleSave}
                         >
-                          {language === "ar" ? "حفظ" : "Save"}
+                          {t("accounting.taxes.save", lang)}
                         </Button>
                         <Button
                           size="sm"
@@ -216,7 +219,7 @@ export default function Taxes() {
                           className="flex-1 border-0 hover:bg-gray-200"
                           onClick={handleCancel}
                         >
-                          {language === "ar" ? "إلغاء" : "Cancel"}
+                          {t("accounting.taxes.cancel", lang)}
                         </Button>
                       </div>
                     </div>
@@ -229,7 +232,7 @@ export default function Taxes() {
                         {tax.code && (
                           <div className="text-sm">
                             <span className="text-muted-foreground">
-                              {language === "ar" ? "الكود: " : "Code: "}
+                              {t("accounting.taxes.codeLabel", lang)}
                             </span>
                             <span className="font-medium text-foreground">
                               {tax.code}
@@ -239,7 +242,7 @@ export default function Taxes() {
                         {tax.rate > 0 && (
                           <div className="text-sm">
                             <span className="text-muted-foreground">
-                              {language === "ar" ? "المعدل: " : "Rate: "}
+                              {t("accounting.taxes.rateLabel", lang)}
                             </span>
                             <span className="font-medium text-foreground">
                               {tax.rate}%
@@ -251,14 +254,14 @@ export default function Taxes() {
                         <button
                           onClick={() => handleEdit(tax)}
                           className="p-2 hover:bg-gray-200 dark:hover:bg-gray-800 rounded transition-colors"
-                          title={language === "ar" ? "تحرير" : "Edit"}
+                          title={t("accounting.taxes.edit", lang)}
                         >
                           <Pencil className="w-4 h-4 text-primary" />
                         </button>
                         <button
                           onClick={() => handleDelete(tax.id)}
                           className="p-2 hover:bg-gray-200 dark:hover:bg-gray-800 rounded transition-colors"
-                          title={language === "ar" ? "حذف" : "Delete"}
+                          title={t("accounting.taxes.delete", lang)}
                         >
                           <Trash2 className="w-4 h-4 text-red-500" />
                         </button>
@@ -275,10 +278,10 @@ export default function Taxes() {
                 variant="outline"
                 className="border-0 hover:dark:bg-secondary bg-secondary"
               >
-                {language === "ar" ? "إلغاء" : "Cancel"}
+                {t("accounting.taxes.cancel", lang)}
               </Button>
               <Button className="bg-primary hover:bg-primary/90 text-white">
-                {language === "ar" ? "حفظ" : "Save"}
+                {t("accounting.taxes.save", lang)}
               </Button>
             </div>
           </Card>

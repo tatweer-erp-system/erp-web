@@ -12,6 +12,7 @@ import {
   Select,
   Space,
   Switch,
+  Tag,
   Typography,
   message,
   theme as antTheme,
@@ -22,6 +23,7 @@ import {
   FileTextOutlined,
   SaveOutlined,
   SettingOutlined,
+  ShopOutlined,
   TagsOutlined,
   TeamOutlined,
   PercentageOutlined,
@@ -29,14 +31,66 @@ import {
 
 const { Title, Text } = Typography;
 
+const SOON = (
+  <Tag
+    color="blue"
+    style={{
+      fontSize: 9,
+      lineHeight: "16px",
+      padding: "0 4px",
+      marginInlineStart: 6,
+      borderRadius: 4,
+      verticalAlign: "middle",
+    }}
+  >
+    Soon
+  </Tag>
+);
+
 const TABS = [
-  { key: "general", label: "General", icon: <SettingOutlined /> },
-  { key: "invoicing", label: "Invoicing", icon: <FileProtectOutlined /> },
-  { key: "customers", label: "Customers", icon: <TeamOutlined /> },
-  { key: "pricing", label: "Pricing & Discounts", icon: <TagsOutlined /> },
-  { key: "numbering", label: "Numbering Series", icon: <FileTextOutlined /> },
-  { key: "returns", label: "Returns & Refunds", icon: <DollarOutlined /> },
-  { key: "tax", label: "Tax Settings", icon: <PercentageOutlined /> },
+  {
+    key: "general",
+    label: "General",
+    icon: <SettingOutlined />,
+    comingSoon: true,
+  },
+  {
+    key: "invoicing",
+    label: "Invoicing",
+    icon: <FileProtectOutlined />,
+    comingSoon: true,
+  },
+  {
+    key: "customers",
+    label: "Customers",
+    icon: <TeamOutlined />,
+    comingSoon: true,
+  },
+  {
+    key: "pricing",
+    label: "Pricing & Discounts",
+    icon: <TagsOutlined />,
+    comingSoon: true,
+  },
+  {
+    key: "numbering",
+    label: "Numbering Series",
+    icon: <FileTextOutlined />,
+    comingSoon: true,
+  },
+  {
+    key: "returns",
+    label: "Returns & Refunds",
+    icon: <DollarOutlined />,
+    comingSoon: true,
+  },
+  {
+    key: "tax",
+    label: "Tax Settings",
+    icon: <PercentageOutlined />,
+    comingSoon: true,
+  },
+  { key: "pos", label: "POS", icon: <ShopOutlined />, comingSoon: true },
 ];
 
 function Section({
@@ -87,7 +141,7 @@ function Section({
 function SaveRow({ onSave }: { onSave: () => void }) {
   return (
     <div style={{ display: "flex", justifyContent: "flex-end" }}>
-      <Button type="primary" icon={<SaveOutlined />} onClick={onSave}>
+      <Button disabled type="primary" icon={<SaveOutlined />} onClick={onSave}>
         Save Changes
       </Button>
     </div>
@@ -102,10 +156,11 @@ function GeneralTab() {
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Default Price List"
+                label={<>Default Price List {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
+                  disabled
                   defaultValue="retail"
                   options={[
                     { value: "retail", label: "Retail Price List" },
@@ -117,10 +172,11 @@ function GeneralTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Default Payment Terms"
+                label={<>Default Payment Terms {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
+                  disabled
                   defaultValue="net30"
                   options={[
                     { value: "immediate", label: "Immediate" },
@@ -134,10 +190,11 @@ function GeneralTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Default Salesperson"
+                label={<>Default Salesperson {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
+                  disabled
                   defaultValue="none"
                   options={[
                     { value: "none", label: "— None —" },
@@ -148,10 +205,11 @@ function GeneralTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Sales Order Approval"
+                label={<>Sales Order Approval {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
+                  disabled
                   defaultValue="auto"
                   options={[
                     { value: "auto", label: "Auto-confirm" },
@@ -162,18 +220,18 @@ function GeneralTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Lock confirmed orders"
+                label={<>Lock confirmed orders {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch disabled defaultChecked />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Send order confirmation email"
+                label={<>Send order confirmation email {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch disabled defaultChecked />
               </Form.Item>
             </Col>
           </Row>
@@ -191,8 +249,12 @@ function InvoicingTab() {
         <Form layout="vertical">
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
-              <Form.Item label="Invoice Policy" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label={<>Invoice Policy {SOON}</>}
+                style={{ marginBottom: 16 }}
+              >
                 <Select
+                  disabled
                   defaultValue="order"
                   options={[
                     { value: "order", label: "Invoice on Order" },
@@ -203,10 +265,11 @@ function InvoicingTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Default Due Date (days)"
+                label={<>Default Due Date (days) {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
                 <InputNumber
+                  disabled
                   defaultValue={30}
                   min={0}
                   style={{ width: "100%" }}
@@ -216,10 +279,11 @@ function InvoicingTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Default Invoice Template"
+                label={<>Default Invoice Template {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
+                  disabled
                   defaultValue="standard"
                   options={[
                     { value: "standard", label: "Standard" },
@@ -231,34 +295,35 @@ function InvoicingTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Include taxes in line total"
+                label={<>Include taxes in line total {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch disabled defaultChecked />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Show bank details on invoice"
+                label={<>Show bank details on invoice {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch disabled defaultChecked />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Auto-send invoice on confirmation"
+                label={<>Auto-send invoice on confirmation {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch />
+                <Switch disabled />
               </Form.Item>
             </Col>
             <Col xs={24}>
               <Form.Item
-                label="Invoice Footer Note"
+                label={<>Invoice Footer Note {SOON}</>}
                 style={{ marginBottom: 0 }}
               >
                 <Input.TextArea
+                  disabled
                   rows={2}
                   defaultValue="Thank you for your business. Payment is due within the specified terms."
                 />
@@ -280,10 +345,11 @@ function CustomersTab() {
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Default Credit Limit"
+                label={<>Default Credit Limit {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
                 <InputNumber
+                  disabled
                   defaultValue={5000}
                   min={0}
                   style={{ width: "100%" }}
@@ -293,10 +359,11 @@ function CustomersTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Enforce Credit Limit"
+                label={<>Enforce Credit Limit {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
+                  disabled
                   defaultValue="warn"
                   options={[
                     { value: "none", label: "No restriction" },
@@ -308,18 +375,18 @@ function CustomersTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Allow walk-in (no customer)"
+                label={<>Allow walk-in (no customer) {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch disabled defaultChecked />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Require customer address on invoice"
+                label={<>Require customer address on invoice {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch />
+                <Switch disabled />
               </Form.Item>
             </Col>
           </Row>
@@ -330,18 +397,18 @@ function CustomersTab() {
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Enable customer portal"
+                label={<>Enable customer portal {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch />
+                <Switch disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Allow online payment"
+                label={<>Allow online payment {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch />
+                <Switch disabled />
               </Form.Item>
             </Col>
           </Row>
@@ -360,23 +427,27 @@ function PricingTab() {
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Price includes tax"
+                label={<>Price includes tax {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch />
+                <Switch disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Allow manual price override"
+                label={<>Allow manual price override {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch disabled defaultChecked />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Price rounding" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label={<>Price rounding {SOON}</>}
+                style={{ marginBottom: 16 }}
+              >
                 <Select
+                  disabled
                   defaultValue="0.01"
                   options={[
                     { value: "0.01", label: "0.01 (2 decimal places)" },
@@ -388,10 +459,11 @@ function PricingTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Default Margin (%)"
+                label={<>Default Margin (%) {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
                 <InputNumber
+                  disabled
                   defaultValue={30}
                   min={0}
                   max={100}
@@ -408,26 +480,27 @@ function PricingTab() {
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Allow line discounts"
+                label={<>Allow line discounts {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch disabled defaultChecked />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Allow global discount"
+                label={<>Allow global discount {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch disabled defaultChecked />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Maximum discount (%)"
+                label={<>Maximum discount (%) {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
                 <InputNumber
+                  disabled
                   defaultValue={20}
                   min={0}
                   max={100}
@@ -438,10 +511,10 @@ function PricingTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Require approval above max discount"
+                label={<>Require approval above max discount {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch disabled defaultChecked />
               </Form.Item>
             </Col>
           </Row>
@@ -473,13 +546,20 @@ function NumberingTab() {
           <Form layout="vertical">
             <Row gutter={[16, 0]}>
               <Col xs={24} sm={8}>
-                <Form.Item label="Prefix" style={{ marginBottom: 0 }}>
-                  <Input defaultValue={s.prefix} maxLength={10} />
+                <Form.Item
+                  label={<>Prefix {SOON}</>}
+                  style={{ marginBottom: 0 }}
+                >
+                  <Input disabled defaultValue={s.prefix} maxLength={10} />
                 </Form.Item>
               </Col>
               <Col xs={24} sm={8}>
-                <Form.Item label="Next Number" style={{ marginBottom: 0 }}>
+                <Form.Item
+                  label={<>Next Number {SOON}</>}
+                  style={{ marginBottom: 0 }}
+                >
                   <InputNumber
+                    disabled
                     defaultValue={s.next}
                     min={1}
                     style={{ width: "100%" }}
@@ -487,8 +567,12 @@ function NumberingTab() {
                 </Form.Item>
               </Col>
               <Col xs={24} sm={8}>
-                <Form.Item label="Padding" style={{ marginBottom: 0 }}>
+                <Form.Item
+                  label={<>Padding {SOON}</>}
+                  style={{ marginBottom: 0 }}
+                >
                   <Select
+                    disabled
                     defaultValue={4}
                     options={[3, 4, 5, 6].map(v => ({
                       value: v,
@@ -514,18 +598,19 @@ function ReturnsTab() {
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Allow sales returns"
+                label={<>Allow sales returns {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch disabled defaultChecked />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Return window (days)"
+                label={<>Return window (days) {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
                 <InputNumber
+                  disabled
                   defaultValue={30}
                   min={0}
                   style={{ width: "100%" }}
@@ -535,23 +620,27 @@ function ReturnsTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Require reason for return"
+                label={<>Require reason for return {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch disabled defaultChecked />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Require approval for returns"
+                label={<>Require approval for returns {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch />
+                <Switch disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Refund method" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label={<>Refund method {SOON}</>}
+                style={{ marginBottom: 16 }}
+              >
                 <Select
+                  disabled
                   defaultValue="credit"
                   options={[
                     { value: "credit", label: "Credit Note" },
@@ -563,10 +652,10 @@ function ReturnsTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Restock returned items"
+                label={<>Restock returned items {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch disabled defaultChecked />
               </Form.Item>
             </Col>
           </Row>
@@ -584,8 +673,12 @@ function TaxTab() {
         <Form layout="vertical">
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
-              <Form.Item label="Default Sales Tax" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label={<>Default Sales Tax {SOON}</>}
+                style={{ marginBottom: 16 }}
+              >
                 <Select
+                  disabled
                   defaultValue="vat15"
                   options={[
                     { value: "none", label: "No Tax" },
@@ -597,8 +690,11 @@ function TaxTab() {
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Tax calculation" style={{ marginBottom: 16 }}>
-                <Radio.Group defaultValue="exclusive">
+              <Form.Item
+                label={<>Tax calculation {SOON}</>}
+                style={{ marginBottom: 16 }}
+              >
+                <Radio.Group disabled defaultValue="exclusive">
                   <Space>
                     <Radio value="exclusive">
                       Tax exclusive (added on top)
@@ -612,24 +708,132 @@ function TaxTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Show tax breakdown on invoice"
+                label={<>Show tax breakdown on invoice {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch disabled defaultChecked />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Apply tax to shipping"
+                label={<>Apply tax to shipping {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch disabled defaultChecked />
               </Form.Item>
             </Col>
           </Row>
         </Form>
       </Section>
       <SaveRow onSave={() => message.success("Tax settings saved")} />
+    </>
+  );
+}
+
+function POSTab() {
+  return (
+    <>
+      <Section title="Stock & Sales">
+        <Form layout="vertical">
+          <Row gutter={[16, 0]}>
+            <Col xs={24} sm={12}>
+              <Form.Item
+                label={<>Allow Negative Stock {SOON}</>}
+                style={{ marginBottom: 16 }}
+              >
+                <Switch disabled />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12}>
+              <Form.Item
+                label={<>Default Tax Rate (%) {SOON}</>}
+                style={{ marginBottom: 16 }}
+              >
+                <InputNumber
+                  disabled
+                  defaultValue={15}
+                  min={0}
+                  max={100}
+                  style={{ width: "100%" }}
+                  addonAfter="%"
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form>
+      </Section>
+      <Section title="Loyalty & Orders">
+        <Form layout="vertical">
+          <Row gutter={[16, 0]}>
+            <Col xs={24} sm={12}>
+              <Form.Item
+                label={<>Enable Loyalty Program {SOON}</>}
+                style={{ marginBottom: 16 }}
+              >
+                <Switch disabled />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12}>
+              <Form.Item
+                label={<>Max Held Orders {SOON}</>}
+                style={{ marginBottom: 16 }}
+              >
+                <InputNumber
+                  disabled
+                  defaultValue={5}
+                  min={1}
+                  style={{ width: "100%" }}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form>
+      </Section>
+      <Section title="Receipt">
+        <Form layout="vertical">
+          <Row gutter={[16, 0]}>
+            <Col xs={24} sm={12}>
+              <Form.Item
+                label={<>Receipt Header Text {SOON}</>}
+                style={{ marginBottom: 16 }}
+              >
+                <Input disabled defaultValue="Welcome to our store" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12}>
+              <Form.Item
+                label={<>Receipt Footer Text {SOON}</>}
+                style={{ marginBottom: 16 }}
+              >
+                <Input disabled defaultValue="Thank you for your purchase!" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12}>
+              <Form.Item
+                label={<>Auto-print Receipt {SOON}</>}
+                style={{ marginBottom: 16 }}
+              >
+                <Switch disabled defaultChecked />
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form>
+      </Section>
+      <Section title="Kitchen Display">
+        <Form layout="vertical">
+          <Row gutter={[16, 0]}>
+            <Col xs={24} sm={12}>
+              <Form.Item
+                label={<>Enable Kitchen Display {SOON}</>}
+                style={{ marginBottom: 16 }}
+              >
+                <Switch disabled />
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form>
+      </Section>
+      <SaveRow onSave={() => message.success("POS settings saved")} />
     </>
   );
 }
@@ -648,6 +852,7 @@ export default function SalesSettings() {
     numbering: <NumberingTab />,
     returns: <ReturnsTab />,
     tax: <TaxTab />,
+    pos: <POSTab />,
   };
 
   return (
@@ -727,7 +932,10 @@ export default function SalesSettings() {
               >
                 {tab.icon}
               </span>
-              <span style={{ flex: 1 }}>{tab.label}</span>
+              <span style={{ flex: 1 }}>
+                {tab.label}
+                {tab.comingSoon && SOON}
+              </span>
             </button>
           ))}
         </Card>

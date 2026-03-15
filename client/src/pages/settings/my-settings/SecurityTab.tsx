@@ -43,7 +43,7 @@ function Section({
   description,
   children,
 }: {
-  title?: string;
+  title?: React.ReactNode;
   description?: string;
   children: React.ReactNode;
 }) {
@@ -274,7 +274,24 @@ export default function SecurityTab() {
 
       {/* ── Section 2: Two-Factor Authentication ────────────────────────────── */}
       <Section
-        title={t("mySettings.security.twoFactor", lang)}
+        title={
+          <>
+            {t("mySettings.security.twoFactor", lang)}
+            <Tag
+              color="blue"
+              style={{
+                fontSize: 9,
+                lineHeight: "16px",
+                padding: "0 4px",
+                marginInlineStart: 8,
+                borderRadius: 4,
+                verticalAlign: "middle",
+              }}
+            >
+              Soon
+            </Tag>
+          </>
+        }
         description={t("mySettings.security.twoFactorDesc", lang)}
       >
         {is2faEnabled ? (
@@ -296,16 +313,11 @@ export default function SecurityTab() {
         )}
 
         {is2faEnabled ? (
-          <Button danger onClick={() => setDisable2faModalOpen(true)}>
+          <Button danger disabled>
             {t("mySettings.security.disable2fa", lang)}
           </Button>
         ) : (
-          <Button
-            type="primary"
-            icon={<SafetyOutlined />}
-            loading={setup2faMutation.isPending}
-            onClick={() => setup2faMutation.mutate()}
-          >
+          <Button type="primary" icon={<SafetyOutlined />} disabled>
             {t("mySettings.security.enable2fa", lang)}
           </Button>
         )}
@@ -400,7 +412,7 @@ export default function SecurityTab() {
           setTotpCode("");
         }}
         width={480}
-        destroyOnClose
+        destroyOnHidden
         title={null}
         footer={null}
         closeIcon={<CloseOutlined style={{ color: "#fff", fontSize: 14 }} />}
@@ -567,7 +579,7 @@ export default function SecurityTab() {
           setDisablePassword("");
         }}
         width={480}
-        destroyOnClose
+        destroyOnHidden
         title={null}
         footer={null}
         closeIcon={<CloseOutlined style={{ color: "#fff", fontSize: 14 }} />}

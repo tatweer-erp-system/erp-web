@@ -31,17 +31,16 @@ import {
   CheckCircleOutlined,
   ClockCircleOutlined,
   CloudUploadOutlined,
+  DollarOutlined,
   DeleteOutlined,
   EditOutlined,
   EnvironmentOutlined,
-  GlobalOutlined,
   PlusOutlined,
   PercentageOutlined,
   PhoneOutlined,
   SaveOutlined,
   ShopOutlined,
   FileProtectOutlined,
-  AppstoreOutlined,
   LinkOutlined,
 } from "@ant-design/icons";
 import { UserStatus } from "@/constants/enums";
@@ -57,12 +56,11 @@ const TABS = [
     icon: <FileProtectOutlined />,
   },
   { key: "tax", label: "Tax / VAT Number", icon: <PercentageOutlined /> },
-  { key: "industry", label: "Industry & Type", icon: <AppstoreOutlined /> },
   { key: "address", label: "Company Address", icon: <EnvironmentOutlined /> },
   { key: "contact", label: "Contact Info", icon: <PhoneOutlined /> },
-  { key: "social", label: "Social Media", icon: <GlobalOutlined /> },
   { key: "hours", label: "Working Hours", icon: <ClockCircleOutlined /> },
   { key: "branches", label: "Branches", icon: <BranchesOutlined /> },
+  { key: "billing", label: "Billing & Subscription", icon: <DollarOutlined /> },
 ];
 
 const DAYS = [
@@ -452,117 +450,6 @@ function TaxTab() {
   );
 }
 
-function IndustryTab() {
-  return (
-    <>
-      <Section title="Industry & Business Classification">
-        <Form layout="vertical">
-          <Row gutter={[16, 0]}>
-            <Col xs={24} sm={12}>
-              <Form.Item label="Industry" style={{ marginBottom: 16 }}>
-                <Select
-                  defaultValue="tech"
-                  options={[
-                    { value: "tech", label: "Information Technology" },
-                    { value: "retail", label: "Retail & E-commerce" },
-                    { value: "manufacturing", label: "Manufacturing" },
-                    { value: "healthcare", label: "Healthcare" },
-                    { value: "finance", label: "Finance & Banking" },
-                    { value: "education", label: "Education" },
-                    { value: "logistics", label: "Logistics & Supply Chain" },
-                    {
-                      value: "construction",
-                      label: "Construction & Real Estate",
-                    },
-                    { value: "hospitality", label: "Hospitality & Tourism" },
-                    { value: "other", label: "Other" },
-                  ]}
-                />
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={12}>
-              <Form.Item label="Business Type" style={{ marginBottom: 16 }}>
-                <Select
-                  defaultValue="llc"
-                  options={[
-                    { value: "llc", label: "Limited Liability Company (LLC)" },
-                    { value: "corp", label: "Corporation (Corp)" },
-                    { value: "sole", label: "Sole Proprietorship" },
-                    { value: "partnership", label: "Partnership" },
-                    { value: "nonprofit", label: "Non-profit Organization" },
-                    { value: "gov", label: "Government Entity" },
-                  ]}
-                />
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={12}>
-              <Form.Item label="Company Size" style={{ marginBottom: 16 }}>
-                <Select
-                  defaultValue="medium"
-                  options={[
-                    { value: "micro", label: "Micro (1–9 employees)" },
-                    { value: "small", label: "Small (10–49 employees)" },
-                    { value: "medium", label: "Medium (50–249 employees)" },
-                    { value: "large", label: "Large (250+ employees)" },
-                    {
-                      value: "enterprise",
-                      label: "Enterprise (1000+ employees)",
-                    },
-                  ]}
-                />
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={12}>
-              <Form.Item label="Year Founded" style={{ marginBottom: 16 }}>
-                <Input
-                  defaultValue="2015"
-                  type="number"
-                  min={1800}
-                  max={2030}
-                />
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={12}>
-              <Form.Item
-                label="Number of Employees"
-                style={{ marginBottom: 16 }}
-              >
-                <Input defaultValue="120" type="number" />
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={12}>
-              <Form.Item
-                label="Annual Revenue Range"
-                style={{ marginBottom: 16 }}
-              >
-                <Select
-                  defaultValue="5-25m"
-                  options={[
-                    { value: "under1m", label: "Under $1M" },
-                    { value: "1-5m", label: "$1M – $5M" },
-                    { value: "5-25m", label: "$5M – $25M" },
-                    { value: "25-100m", label: "$25M – $100M" },
-                    { value: "over100m", label: "Over $100M" },
-                  ]}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-        </Form>
-      </Section>
-      <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button
-          type="primary"
-          icon={<SaveOutlined />}
-          onClick={() => message.success("Industry details saved")}
-        >
-          Save Changes
-        </Button>
-      </div>
-    </>
-  );
-}
-
 function AddressTab() {
   return (
     <>
@@ -689,80 +576,6 @@ function ContactTab() {
           type="primary"
           icon={<SaveOutlined />}
           onClick={() => message.success("Contact info saved")}
-        >
-          Save Changes
-        </Button>
-      </div>
-    </>
-  );
-}
-
-function SocialTab() {
-  const socials = [
-    {
-      key: "linkedin",
-      label: "LinkedIn",
-      placeholder: "https://linkedin.com/company/...",
-      defaultValue: "https://linkedin.com/company/techsol",
-    },
-    {
-      key: "twitter",
-      label: "X (Twitter)",
-      placeholder: "https://x.com/...",
-      defaultValue: "https://x.com/techsol",
-    },
-    {
-      key: "facebook",
-      label: "Facebook",
-      placeholder: "https://facebook.com/...",
-      defaultValue: "",
-    },
-    {
-      key: "instagram",
-      label: "Instagram",
-      placeholder: "https://instagram.com/...",
-      defaultValue: "",
-    },
-    {
-      key: "youtube",
-      label: "YouTube",
-      placeholder: "https://youtube.com/@...",
-      defaultValue: "",
-    },
-    {
-      key: "whatsapp",
-      label: "WhatsApp Business",
-      placeholder: "+1 555 000 0000",
-      defaultValue: "",
-    },
-  ];
-  return (
-    <>
-      <Section
-        title="Social Media Profiles"
-        description="Add your official company social media links"
-      >
-        <Form layout="vertical">
-          <Row gutter={[16, 0]}>
-            {socials.map(s => (
-              <Col xs={24} sm={12} key={s.key}>
-                <Form.Item label={s.label} style={{ marginBottom: 16 }}>
-                  <Input
-                    prefix={<GlobalOutlined />}
-                    placeholder={s.placeholder}
-                    defaultValue={s.defaultValue}
-                  />
-                </Form.Item>
-              </Col>
-            ))}
-          </Row>
-        </Form>
-      </Section>
-      <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button
-          type="primary"
-          icon={<SaveOutlined />}
-          onClick={() => message.success("Social media links saved")}
         >
           Save Changes
         </Button>
@@ -975,10 +788,8 @@ export default function CompanyProfile() {
     profile: <ProfileTab />,
     registration: <RegistrationTab />,
     tax: <TaxTab />,
-    industry: <IndustryTab />,
     address: <AddressTab />,
     contact: <ContactTab />,
-    social: <SocialTab />,
     hours: <HoursTab />,
     branches: <BranchesTab />,
   };
@@ -1034,7 +845,13 @@ export default function CompanyProfile() {
             {TABS.map(tab => (
               <button
                 key={tab.key}
-                onClick={() => setLocation(`/settings/company/${tab.key}`)}
+                onClick={() => {
+                  if (tab.key === "billing") {
+                    setLocation("/settings/billing");
+                    return;
+                  }
+                  setLocation(`/settings/company/${tab.key}`);
+                }}
                 style={{
                   width: "100%",
                   display: "flex",

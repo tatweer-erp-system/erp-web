@@ -579,8 +579,8 @@ function CustomerDrawer({
     <Drawer
       open={open}
       onClose={onClose}
-      width={isMobile ? "100%" : 620}
-      destroyOnClose
+      size={isMobile ? "100%" : 620}
+      destroyOnHidden
       title={
         <Space size={12}>
           <Avatar
@@ -706,8 +706,10 @@ function CustomerDrawer({
                   size="small"
                   bordered
                   column={2}
-                  labelStyle={{ fontWeight: 500, fontSize: 12 }}
-                  contentStyle={{ fontSize: 12 }}
+                  styles={{
+                    label: { fontWeight: 500, fontSize: 12 },
+                    content: { fontSize: 12 },
+                  }}
                 >
                   <Descriptions.Item
                     label={
@@ -1058,7 +1060,7 @@ function CustomerFormModal({
       }
       okText={isEdit ? "Save Changes" : "Create Customer"}
       width={isMobile ? "95vw" : 680}
-      destroyOnClose
+      destroyOnHidden
       okButtonProps={{ size: "large" }}
       cancelButtonProps={{ size: "large" }}
     >

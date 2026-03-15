@@ -1694,8 +1694,13 @@ export default function Login() {
   const { login, branches, selectBranch } = useAuthContext();
   const lang = localStorage.getItem("app-language") ?? "en";
 
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(
+    () => localStorage.getItem("remembered-email") ?? ""
+  );
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(
+    () => !!localStorage.getItem("remembered-email")
+  );
   const [showPassword, setShowPassword] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
   const [eyePos, setEyePos] = useState<EyePos>({ x: 0, y: 0 });
@@ -1741,6 +1746,12 @@ export default function Login() {
 
     setError(null);
     setIsLoading(true);
+
+    if (rememberMe) {
+      localStorage.setItem("remembered-email", email.trim());
+    } else {
+      localStorage.removeItem("remembered-email");
+    }
 
     try {
       await login(email.trim(), password);
@@ -2128,6 +2139,23 @@ export default function Login() {
                         )}
                       </button>
                     </div>
+                  </div>
+
+                  {/* Remember me */}
+                  <div className="flex items-center gap-2">
+                    <input
+                      id="remember-me"
+                      type="checkbox"
+                      checked={rememberMe}
+                      onChange={e => setRememberMe(e.target.checked)}
+                      className="w-4 h-4 rounded border-slate-300 text-[#006C35] focus:ring-[#006C35] cursor-pointer"
+                    />
+                    <label
+                      htmlFor="remember-me"
+                      className="text-sm text-slate-600 cursor-pointer select-none"
+                    >
+                      {t("login.rememberMe", lang)}
+                    </label>
                   </div>
 
                   {/* Submit */}

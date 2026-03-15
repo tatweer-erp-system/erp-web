@@ -405,10 +405,10 @@ export function CreateQuotationModal({
           </Space>
         </div>
       }
-      destroyOnClose
+      destroyOnHidden
     >
       <Form form={form} layout="vertical" colon={false}>
-        <Space direction="vertical" size={16} style={{ width: "100%" }}>
+        <Space orientation="vertical" size={16} style={{ width: "100%" }}>
           {/* ── Quotation Info ─────────────────────────────────────────────── */}
           <SectionCard icon={<NumberOutlined />} title="Quotation Info">
             <Row gutter={[16, 0]}>

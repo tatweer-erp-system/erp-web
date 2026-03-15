@@ -343,7 +343,7 @@ export default function Quotations() {
         { label: "Quotations" },
       ]}
     >
-      <Space direction="vertical" size={20} style={{ width: "100%" }}>
+      <Space orientation="vertical" size={20} style={{ width: "100%" }}>
         {/* ── KPI Cards ──────────────────────────────────────────────────── */}
         <Row gutter={[16, 16]}>
           {[
@@ -776,7 +776,7 @@ export default function Quotations() {
         onCancel={() => setIsEditOpen(false)}
         okText="Save Changes"
         width={isMobile ? "95vw" : 480}
-        destroyOnClose
+        destroyOnHidden
       >
         <Form form={editForm} layout="vertical" style={{ marginTop: 16 }}>
           <Form.Item label="Quote Number" name="quoteNo">

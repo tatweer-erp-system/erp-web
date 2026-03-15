@@ -32,14 +32,60 @@ import {
 
 const { Title, Text } = Typography;
 
+const SOON_TAG = (
+  <Tag
+    color="blue"
+    style={{
+      fontSize: 9,
+      lineHeight: "16px",
+      padding: "0 4px",
+      marginInlineStart: 6,
+      borderRadius: 4,
+      verticalAlign: "middle",
+    }}
+  >
+    Soon
+  </Tag>
+);
+
 const TABS = [
-  { key: "general", label: "General", icon: <SettingOutlined /> },
-  { key: "costing", label: "Costing Method", icon: <BarChartOutlined /> },
-  { key: "numbering", label: "Numbering Series", icon: <BarcodeOutlined /> },
+  {
+    key: "general",
+    label: "General",
+    icon: <SettingOutlined />,
+    comingSoon: true,
+  },
+  {
+    key: "costing",
+    label: "Costing Method",
+    icon: <BarChartOutlined />,
+    comingSoon: true,
+  },
+  {
+    key: "numbering",
+    label: "Numbering Series",
+    icon: <BarcodeOutlined />,
+    comingSoon: true,
+  },
   { key: "stock", label: "Stock Management", icon: <InboxOutlined /> },
-  { key: "warehouse", label: "Warehouses", icon: <HomeOutlined /> },
-  { key: "transfers", label: "Transfers", icon: <SwapOutlined /> },
-  { key: "alerts", label: "Alerts & Thresholds", icon: <WarningOutlined /> },
+  {
+    key: "warehouse",
+    label: "Warehouses",
+    icon: <HomeOutlined />,
+    comingSoon: true,
+  },
+  {
+    key: "transfers",
+    label: "Transfers",
+    icon: <SwapOutlined />,
+    comingSoon: true,
+  },
+  {
+    key: "alerts",
+    label: "Alerts & Thresholds",
+    icon: <WarningOutlined />,
+    comingSoon: true,
+  },
 ];
 
 function Section({
@@ -87,10 +133,21 @@ function Section({
   );
 }
 
-function SaveRow({ onSave }: { onSave: () => void }) {
+function SaveRow({
+  onSave,
+  disabled,
+}: {
+  onSave: () => void;
+  disabled?: boolean;
+}) {
   return (
     <div style={{ display: "flex", justifyContent: "flex-end" }}>
-      <Button type="primary" icon={<SaveOutlined />} onClick={onSave}>
+      <Button
+        type="primary"
+        icon={<SaveOutlined />}
+        onClick={onSave}
+        disabled={disabled}
+      >
         Save Changes
       </Button>
     </div>
@@ -105,11 +162,12 @@ function GeneralTab() {
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Default Unit of Measure"
+                label={<>Default Unit of Measure{SOON_TAG}</>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
                   defaultValue="pcs"
+                  disabled
                   options={[
                     { value: "pcs", label: "Pieces (pcs)" },
                     { value: "kg", label: "Kilogram (kg)" },
@@ -122,9 +180,13 @@ function GeneralTab() {
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Default Currency" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label={<>Default Currency{SOON_TAG}</>}
+                style={{ marginBottom: 16 }}
+              >
                 <Select
                   defaultValue="USD"
+                  disabled
                   options={[
                     { value: "USD", label: "US Dollar (USD)" },
                     { value: "EUR", label: "Euro (EUR)" },
@@ -138,11 +200,12 @@ function GeneralTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Default Product Type"
+                label={<>Default Product Type{SOON_TAG}</>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
                   defaultValue="storable"
+                  disabled
                   options={[
                     { value: "storable", label: "Storable Product" },
                     { value: "consumable", label: "Consumable" },
@@ -152,9 +215,13 @@ function GeneralTab() {
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Default Tax" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label={<>Default Tax{SOON_TAG}</>}
+                style={{ marginBottom: 16 }}
+              >
                 <Select
                   defaultValue="vat15"
+                  disabled
                   options={[
                     { value: "none", label: "No Tax" },
                     { value: "vat5", label: "VAT 5%" },
@@ -172,40 +239,43 @@ function GeneralTab() {
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Show product images in lists"
+                label={<>Show product images in lists{SOON_TAG}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch defaultChecked disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Enable product variants"
+                label={<>Enable product variants{SOON_TAG}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch defaultChecked disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Enable serial number tracking"
+                label={<>Enable serial number tracking{SOON_TAG}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch />
+                <Switch disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Enable lot / batch tracking"
+                label={<>Enable lot / batch tracking{SOON_TAG}</>}
                 style={{ marginBottom: 0 }}
               >
-                <Switch />
+                <Switch disabled />
               </Form.Item>
             </Col>
           </Row>
         </Form>
       </Section>
-      <SaveRow onSave={() => message.success("General settings saved")} />
+      <SaveRow
+        onSave={() => message.success("General settings saved")}
+        disabled
+      />
     </>
   );
 }
@@ -221,9 +291,12 @@ function CostingTab() {
       />
       <Section title="Inventory Costing Method">
         <Form layout="vertical">
-          <Form.Item label="Costing Method" style={{ marginBottom: 24 }}>
-            <Radio.Group defaultValue="avg">
-              <Space direction="vertical" size={14}>
+          <Form.Item
+            label={<>Costing Method{SOON_TAG}</>}
+            style={{ marginBottom: 24 }}
+          >
+            <Radio.Group defaultValue="avg" disabled>
+              <Space orientation="vertical" size={14}>
                 <Radio value="fifo">
                   <Text strong>FIFO — First In, First Out</Text>
                   <br />
@@ -260,16 +333,16 @@ function CostingTab() {
             </Radio.Group>
           </Form.Item>
           <Form.Item
-            label="Include Landed Costs in Product Cost"
+            label={<>Include Landed Costs in Product Cost{SOON_TAG}</>}
             style={{ marginBottom: 16 }}
           >
-            <Switch defaultChecked />
+            <Switch defaultChecked disabled />
           </Form.Item>
           <Form.Item
-            label="Revaluation on Currency Change"
+            label={<>Revaluation on Currency Change{SOON_TAG}</>}
             style={{ marginBottom: 0 }}
           >
-            <Switch />
+            <Switch disabled />
           </Form.Item>
         </Form>
       </Section>
@@ -277,9 +350,13 @@ function CostingTab() {
         <Form layout="vertical">
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
-              <Form.Item label="Inventory Account" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label={<>Inventory Account{SOON_TAG}</>}
+                style={{ marginBottom: 16 }}
+              >
                 <Select
                   defaultValue="1300"
+                  disabled
                   options={[
                     { value: "1300", label: "1300 · Inventory" },
                     { value: "1310", label: "1310 · Raw Materials" },
@@ -289,9 +366,13 @@ function CostingTab() {
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="COGS Account" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label={<>COGS Account{SOON_TAG}</>}
+                style={{ marginBottom: 16 }}
+              >
                 <Select
                   defaultValue="5100"
+                  disabled
                   options={[
                     { value: "5100", label: "5100 · Cost of Goods Sold" },
                     { value: "5200", label: "5200 · Direct Materials" },
@@ -302,7 +383,10 @@ function CostingTab() {
           </Row>
         </Form>
       </Section>
-      <SaveRow onSave={() => message.success("Costing settings saved")} />
+      <SaveRow
+        onSave={() => message.success("Costing settings saved")}
+        disabled
+      />
     </>
   );
 }
@@ -315,36 +399,41 @@ function NumberingTab() {
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Auto-generate Product Code"
+                label={<>Auto-generate Product Code{SOON_TAG}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch defaultChecked disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Product Code Prefix"
+                label={<>Product Code Prefix{SOON_TAG}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Input defaultValue="PRD-" maxLength={10} />
+                <Input defaultValue="PRD-" maxLength={10} disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Next Sequence Number"
+                label={<>Next Sequence Number{SOON_TAG}</>}
                 style={{ marginBottom: 16 }}
               >
                 <InputNumber
                   defaultValue={1001}
                   min={1}
                   style={{ width: "100%" }}
+                  disabled
                 />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Padding (digits)" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label={<>Padding (digits){SOON_TAG}</>}
+                style={{ marginBottom: 16 }}
+              >
                 <Select
                   defaultValue={4}
+                  disabled
                   options={[3, 4, 5, 6].map(v => ({
                     value: v,
                     label: `${v} digits (e.g. ${String(1).padStart(v, "0")})`,
@@ -359,9 +448,13 @@ function NumberingTab() {
         <Form layout="vertical">
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
-              <Form.Item label="Barcode Type" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label={<>Barcode Type{SOON_TAG}</>}
+                style={{ marginBottom: 16 }}
+              >
                 <Select
                   defaultValue="ean13"
+                  disabled
                   options={[
                     { value: "ean13", label: "EAN-13" },
                     { value: "ean8", label: "EAN-8" },
@@ -374,16 +467,19 @@ function NumberingTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Auto-generate Barcode"
+                label={<>Auto-generate Barcode{SOON_TAG}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch defaultChecked disabled />
               </Form.Item>
             </Col>
           </Row>
         </Form>
       </Section>
-      <SaveRow onSave={() => message.success("Numbering settings saved")} />
+      <SaveRow
+        onSave={() => message.success("Numbering settings saved")}
+        disabled
+      />
     </>
   );
 }
@@ -395,6 +491,7 @@ function StockTab() {
         <Form layout="vertical">
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
+              {/* Allow Negative Stock — has backend support, kept enabled */}
               <Form.Item
                 label="Allow Negative Stock"
                 style={{ marginBottom: 16 }}
@@ -404,26 +501,26 @@ function StockTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Auto-deduct stock on invoice"
+                label={<>Auto-deduct stock on invoice{SOON_TAG}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch defaultChecked disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Auto-replenishment (reorder rules)"
+                label={<>Auto-replenishment (reorder rules){SOON_TAG}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch defaultChecked disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Require quality check before receiving"
+                label={<>Require quality check before receiving{SOON_TAG}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch />
+                <Switch disabled />
               </Form.Item>
             </Col>
           </Row>
@@ -434,52 +531,60 @@ function StockTab() {
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Default Reorder Point (units)"
+                label={<>Default Reorder Point (units){SOON_TAG}</>}
                 style={{ marginBottom: 16 }}
               >
                 <InputNumber
                   defaultValue={10}
                   min={0}
                   style={{ width: "100%" }}
+                  disabled
                 />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Default Reorder Quantity (units)"
+                label={<>Default Reorder Quantity (units){SOON_TAG}</>}
                 style={{ marginBottom: 16 }}
               >
                 <InputNumber
                   defaultValue={50}
                   min={1}
                   style={{ width: "100%" }}
-                />
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={12}>
-              <Form.Item label="Lead Time (days)" style={{ marginBottom: 16 }}>
-                <InputNumber
-                  defaultValue={7}
-                  min={0}
-                  style={{ width: "100%" }}
+                  disabled
                 />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Safety Stock (units)"
+                label={<>Lead Time (days){SOON_TAG}</>}
+                style={{ marginBottom: 16 }}
+              >
+                <InputNumber
+                  defaultValue={7}
+                  min={0}
+                  style={{ width: "100%" }}
+                  disabled
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12}>
+              <Form.Item
+                label={<>Safety Stock (units){SOON_TAG}</>}
                 style={{ marginBottom: 16 }}
               >
                 <InputNumber
                   defaultValue={5}
                   min={0}
                   style={{ width: "100%" }}
+                  disabled
                 />
               </Form.Item>
             </Col>
           </Row>
         </Form>
       </Section>
+      {/* Save enabled — Allow Negative Stock has backend support */}
       <SaveRow onSave={() => message.success("Stock settings saved")} />
     </>
   );
@@ -492,9 +597,13 @@ function WarehouseTab() {
         <Form layout="vertical">
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
-              <Form.Item label="Default Warehouse" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label={<>Default Warehouse{SOON_TAG}</>}
+                style={{ marginBottom: 16 }}
+              >
                 <Select
                   defaultValue="main"
+                  disabled
                   options={[
                     { value: "main", label: "Main Warehouse" },
                     { value: "store1", label: "Store 1" },
@@ -505,32 +614,35 @@ function WarehouseTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Multi-warehouse Mode"
+                label={<>Multi-warehouse Mode{SOON_TAG}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch defaultChecked disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Enable bin / location tracking"
+                label={<>Enable bin / location tracking{SOON_TAG}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch />
+                <Switch disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Require approval for warehouse creation"
+                label={<>Require approval for warehouse creation{SOON_TAG}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch />
+                <Switch disabled />
               </Form.Item>
             </Col>
           </Row>
         </Form>
       </Section>
-      <SaveRow onSave={() => message.success("Warehouse settings saved")} />
+      <SaveRow
+        onSave={() => message.success("Warehouse settings saved")}
+        disabled
+      />
     </>
   );
 }
@@ -543,37 +655,43 @@ function TransfersTab() {
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Require approval for transfers"
+                label={<>Require approval for transfers{SOON_TAG}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch />
+                <Switch disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Allow partial transfers"
+                label={<>Allow partial transfers{SOON_TAG}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch defaultChecked disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Auto-validate transfers"
+                label={<>Auto-validate transfers{SOON_TAG}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch />
+                <Switch disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Transfer Prefix" style={{ marginBottom: 16 }}>
-                <Input defaultValue="TRF-" maxLength={10} />
+              <Form.Item
+                label={<>Transfer Prefix{SOON_TAG}</>}
+                style={{ marginBottom: 16 }}
+              >
+                <Input defaultValue="TRF-" maxLength={10} disabled />
               </Form.Item>
             </Col>
           </Row>
         </Form>
       </Section>
-      <SaveRow onSave={() => message.success("Transfer settings saved")} />
+      <SaveRow
+        onSave={() => message.success("Transfer settings saved")}
+        disabled
+      />
     </>
   );
 }
@@ -585,38 +703,45 @@ function AlertsTab() {
         <Form layout="vertical">
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
-              <Form.Item label="Low Stock Alert" style={{ marginBottom: 16 }}>
-                <Switch defaultChecked />
+              <Form.Item
+                label={<>Low Stock Alert{SOON_TAG}</>}
+                style={{ marginBottom: 16 }}
+              >
+                <Switch defaultChecked disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Low Stock Threshold (units)"
+                label={<>Low Stock Threshold (units){SOON_TAG}</>}
                 style={{ marginBottom: 16 }}
               >
                 <InputNumber
                   defaultValue={10}
                   min={0}
                   style={{ width: "100%" }}
+                  disabled
                 />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Out-of-Stock Alert"
+                label={<>Out-of-Stock Alert{SOON_TAG}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={12}>
-              <Form.Item label="Overstock Alert" style={{ marginBottom: 16 }}>
-                <Switch />
+                <Switch defaultChecked disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Expiry Date Alert (days before)"
+                label={<>Overstock Alert{SOON_TAG}</>}
+                style={{ marginBottom: 16 }}
+              >
+                <Switch disabled />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12}>
+              <Form.Item
+                label={<>Expiry Date Alert (days before){SOON_TAG}</>}
                 style={{ marginBottom: 16 }}
               >
                 <InputNumber
@@ -624,17 +749,19 @@ function AlertsTab() {
                   min={0}
                   style={{ width: "100%" }}
                   addonAfter="days"
+                  disabled
                 />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Alert Notification Channel"
+                label={<>Alert Notification Channel{SOON_TAG}</>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
                   defaultValue="email"
                   mode="multiple"
+                  disabled
                   options={[
                     { value: "email", label: "Email" },
                     { value: "inapp", label: "In-App" },
@@ -646,7 +773,10 @@ function AlertsTab() {
           </Row>
         </Form>
       </Section>
-      <SaveRow onSave={() => message.success("Alert settings saved")} />
+      <SaveRow
+        onSave={() => message.success("Alert settings saved")}
+        disabled
+      />
     </>
   );
 }
@@ -744,7 +874,10 @@ export default function InventorySettings() {
               >
                 {tab.icon}
               </span>
-              <span style={{ flex: 1 }}>{tab.label}</span>
+              <span style={{ flex: 1 }}>
+                {tab.label}
+                {tab.comingSoon && SOON_TAG}
+              </span>
             </button>
           ))}
         </Card>

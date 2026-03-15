@@ -844,7 +844,7 @@ export default function Settings() {
             style={{ marginBottom: 16 }}
           >
             <Radio.Group defaultValue="realtime">
-              <Space direction="vertical" size={8}>
+              <Space orientation="vertical" size={8}>
                 <Radio value="realtime">Real-time (immediately)</Radio>
                 <Radio value="hourly">Hourly digest</Radio>
                 <Radio value="daily">Daily digest (08:00 AM)</Radio>
@@ -1169,7 +1169,7 @@ export default function Settings() {
 
       <Section title="Layout Density">
         <Radio.Group value={density} onChange={e => setDensity(e.target.value)}>
-          <Space direction="vertical" size={10}>
+          <Space orientation="vertical" size={10}>
             <Radio value="compact">
               <Text style={{ fontSize: 13 }}>Compact</Text>
               <Text type="secondary" style={{ fontSize: 12, marginLeft: 8 }}>

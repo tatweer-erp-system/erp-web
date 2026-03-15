@@ -227,7 +227,7 @@ function AttachUploadModal({
         </Button>,
       ]}
     >
-      <Space direction="vertical" style={{ width: "100%" }} size="middle">
+      <Space orientation="vertical" style={{ width: "100%" }} size="middle">
         {/* Drop zone */}
         <Dragger {...draggerProps} style={{ padding: "8px 0" }}>
           <p className="ant-upload-drag-icon">

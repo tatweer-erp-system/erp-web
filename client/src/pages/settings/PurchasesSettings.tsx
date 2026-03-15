@@ -11,6 +11,7 @@ import {
   Select,
   Space,
   Switch,
+  Tag,
   Typography,
   message,
   theme as antTheme,
@@ -28,14 +29,60 @@ import {
 
 const { Title, Text } = Typography;
 
+const SOON = (
+  <Tag
+    color="blue"
+    style={{
+      fontSize: 9,
+      lineHeight: "16px",
+      padding: "0 4px",
+      marginInlineStart: 6,
+      borderRadius: 4,
+      verticalAlign: "middle",
+    }}
+  >
+    Soon
+  </Tag>
+);
+
 const TABS = [
-  { key: "general", label: "General", icon: <SettingOutlined /> },
-  { key: "orders", label: "Purchase Orders", icon: <ShoppingOutlined /> },
-  { key: "vendors", label: "Vendors", icon: <CarOutlined /> },
-  { key: "receiving", label: "Receiving", icon: <FileTextOutlined /> },
-  { key: "numbering", label: "Numbering Series", icon: <FileTextOutlined /> },
-  { key: "returns", label: "Returns", icon: <UndoOutlined /> },
-  { key: "tax", label: "Tax Settings", icon: <PercentageOutlined /> },
+  {
+    key: "general",
+    label: "General",
+    icon: <SettingOutlined />,
+    comingSoon: true,
+  },
+  {
+    key: "orders",
+    label: "Purchase Orders",
+    icon: <ShoppingOutlined />,
+    comingSoon: true,
+  },
+  { key: "vendors", label: "Vendors", icon: <CarOutlined />, comingSoon: true },
+  {
+    key: "receiving",
+    label: "Receiving",
+    icon: <FileTextOutlined />,
+    comingSoon: true,
+  },
+  {
+    key: "numbering",
+    label: "Numbering Series",
+    icon: <FileTextOutlined />,
+    comingSoon: true,
+  },
+  {
+    key: "returns",
+    label: "Returns",
+    icon: <UndoOutlined />,
+    comingSoon: true,
+  },
+  {
+    key: "tax",
+    label: "Tax Settings",
+    icon: <PercentageOutlined />,
+    comingSoon: true,
+  },
 ];
 
 function Section({
@@ -86,7 +133,7 @@ function Section({
 function SaveRow({ onSave }: { onSave: () => void }) {
   return (
     <div style={{ display: "flex", justifyContent: "flex-end" }}>
-      <Button type="primary" icon={<SaveOutlined />} onClick={onSave}>
+      <Button disabled type="primary" icon={<SaveOutlined />} onClick={onSave}>
         Save Changes
       </Button>
     </div>
@@ -101,10 +148,11 @@ function GeneralTab() {
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Default Payment Terms"
+                label={<>Default Payment Terms {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
+                  disabled
                   defaultValue="net30"
                   options={[
                     { value: "immediate", label: "Immediate" },
@@ -117,8 +165,12 @@ function GeneralTab() {
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Default Currency" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label={<>Default Currency {SOON}</>}
+                style={{ marginBottom: 16 }}
+              >
                 <Select
+                  disabled
                   defaultValue="USD"
                   options={[
                     { value: "USD", label: "US Dollar (USD)" },
@@ -132,10 +184,11 @@ function GeneralTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Default Delivery Lead Time (days)"
+                label={<>Default Delivery Lead Time (days) {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
                 <InputNumber
+                  disabled
                   defaultValue={7}
                   min={0}
                   style={{ width: "100%" }}
@@ -145,10 +198,10 @@ function GeneralTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Auto-send PO to vendor"
+                label={<>Auto-send PO to vendor {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch />
+                <Switch disabled />
               </Form.Item>
             </Col>
           </Row>
@@ -167,10 +220,11 @@ function OrdersTab() {
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Purchase Order Approval"
+                label={<>Purchase Order Approval {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
+                  disabled
                   defaultValue="auto"
                   options={[
                     { value: "auto", label: "Auto-confirm" },
@@ -182,10 +236,11 @@ function OrdersTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Approval threshold amount"
+                label={<>Approval threshold amount {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
                 <InputNumber
+                  disabled
                   defaultValue={10000}
                   min={0}
                   style={{ width: "100%" }}
@@ -195,34 +250,35 @@ function OrdersTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Allow partial receiving"
+                label={<>Allow partial receiving {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch disabled defaultChecked />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Lock confirmed POs"
+                label={<>Lock confirmed POs {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch disabled defaultChecked />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Allow over-receipt (above ordered qty)"
+                label={<>Allow over-receipt (above ordered qty) {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch />
+                <Switch disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Over-receipt tolerance (%)"
+                label={<>Over-receipt tolerance (%) {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
                 <InputNumber
+                  disabled
                   defaultValue={5}
                   min={0}
                   max={100}
@@ -247,10 +303,11 @@ function VendorsTab() {
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Default Vendor Payment Method"
+                label={<>Default Vendor Payment Method {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
+                  disabled
                   defaultValue="bank"
                   options={[
                     { value: "bank", label: "Bank Transfer" },
@@ -263,10 +320,11 @@ function VendorsTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Default Tax for Purchases"
+                label={<>Default Tax for Purchases {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
+                  disabled
                   defaultValue="vat15"
                   options={[
                     { value: "none", label: "No Tax" },
@@ -278,18 +336,18 @@ function VendorsTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Require vendor approval before ordering"
+                label={<>Require vendor approval before ordering {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch />
+                <Switch disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Allow purchase from unapproved vendors"
+                label={<>Allow purchase from unapproved vendors {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch disabled defaultChecked />
               </Form.Item>
             </Col>
           </Row>
@@ -308,26 +366,27 @@ function ReceivingTab() {
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Require quality inspection on receipt"
+                label={<>Require quality inspection on receipt {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch />
+                <Switch disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Auto-validate receipt"
+                label={<>Auto-validate receipt {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch />
+                <Switch disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Default destination warehouse"
+                label={<>Default destination warehouse {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
+                  disabled
                   defaultValue="main"
                   options={[
                     { value: "main", label: "Main Warehouse" },
@@ -338,18 +397,18 @@ function ReceivingTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Create bill on receipt"
+                label={<>Create bill on receipt {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch />
+                <Switch disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="3-way matching (PO → Receipt → Invoice)"
+                label={<>3-way matching (PO → Receipt → Invoice) {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch disabled defaultChecked />
               </Form.Item>
             </Col>
           </Row>
@@ -380,13 +439,20 @@ function NumberingTab() {
           <Form layout="vertical">
             <Row gutter={[16, 0]}>
               <Col xs={24} sm={8}>
-                <Form.Item label="Prefix" style={{ marginBottom: 0 }}>
-                  <Input defaultValue={s.prefix} maxLength={10} />
+                <Form.Item
+                  label={<>Prefix {SOON}</>}
+                  style={{ marginBottom: 0 }}
+                >
+                  <Input disabled defaultValue={s.prefix} maxLength={10} />
                 </Form.Item>
               </Col>
               <Col xs={24} sm={8}>
-                <Form.Item label="Next Number" style={{ marginBottom: 0 }}>
+                <Form.Item
+                  label={<>Next Number {SOON}</>}
+                  style={{ marginBottom: 0 }}
+                >
                   <InputNumber
+                    disabled
                     defaultValue={s.next}
                     min={1}
                     style={{ width: "100%" }}
@@ -394,8 +460,12 @@ function NumberingTab() {
                 </Form.Item>
               </Col>
               <Col xs={24} sm={8}>
-                <Form.Item label="Padding" style={{ marginBottom: 0 }}>
+                <Form.Item
+                  label={<>Padding {SOON}</>}
+                  style={{ marginBottom: 0 }}
+                >
                   <Select
+                    disabled
                     defaultValue={4}
                     options={[3, 4, 5, 6].map(v => ({
                       value: v,
@@ -421,34 +491,34 @@ function ReturnsTab() {
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Allow purchase returns"
+                label={<>Allow purchase returns {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch disabled defaultChecked />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Require reason for return"
+                label={<>Require reason for return {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch disabled defaultChecked />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Require approval for returns"
+                label={<>Require approval for returns {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch />
+                <Switch disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Auto-deduct from vendor balance"
+                label={<>Auto-deduct from vendor balance {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch disabled defaultChecked />
               </Form.Item>
             </Col>
           </Row>
@@ -467,10 +537,11 @@ function TaxTab() {
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Default Input Tax (VAT)"
+                label={<>Default Input Tax (VAT) {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
+                  disabled
                   defaultValue="vat15"
                   options={[
                     { value: "none", label: "No Tax" },
@@ -483,23 +554,27 @@ function TaxTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Show tax on purchase documents"
+                label={<>Show tax on purchase documents {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={12}>
-              <Form.Item label="Withholding Tax" style={{ marginBottom: 16 }}>
-                <Switch />
+                <Switch disabled defaultChecked />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Withholding Tax Rate (%)"
+                label={<>Withholding Tax {SOON}</>}
+                style={{ marginBottom: 16 }}
+              >
+                <Switch disabled />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12}>
+              <Form.Item
+                label={<>Withholding Tax Rate (%) {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
                 <InputNumber
+                  disabled
                   defaultValue={5}
                   min={0}
                   max={100}
@@ -609,7 +684,10 @@ export default function PurchasesSettings() {
               >
                 {tab.icon}
               </span>
-              <span style={{ flex: 1 }}>{tab.label}</span>
+              <span style={{ flex: 1 }}>
+                {tab.label}
+                {tab.comingSoon && SOON}
+              </span>
             </button>
           ))}
         </Card>

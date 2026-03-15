@@ -56,12 +56,6 @@ export const routes: RouteConfig[] = [
     ),
     breadcrumb: ["POS", "Table Turnover"],
   },
-  {
-    path: "/pos/settings",
-    component: lz(() => import("@/pages/POSSettings")),
-    breadcrumb: ["POS", "Settings"],
-  },
-
   // ── Main ────────────────────────────────────────────────────────────────────
   {
     path: "/",
@@ -305,22 +299,10 @@ export const routes: RouteConfig[] = [
     breadcrumb: ["Accounting", "Journal Entries"],
   },
   {
-    path: "/journal-types",
-    component: lz(() => import("@/pages/JournalTypes")),
-    permissions: ["accounting:write"],
-    breadcrumb: ["Accounting", "Journal Types"],
-  },
-  {
     path: "/opening-balances",
     component: lz(() => import("@/pages/OpeningBalances")),
     permissions: ["accounting:write"],
     breadcrumb: ["Accounting", "Opening Balances"],
-  },
-  {
-    path: "/fiscal-years",
-    component: lz(() => import("@/pages/FiscalYears")),
-    permissions: ["accounting:write"],
-    breadcrumb: ["Accounting", "Fiscal Years"],
   },
   {
     path: "/period-closing",
@@ -449,18 +431,6 @@ export const routes: RouteConfig[] = [
     breadcrumb: ["Settings", "Branches"],
   },
   {
-    path: "/currencies",
-    component: lz(() => import("@/pages/Currencies")),
-    permissions: ["settings:read"],
-    breadcrumb: ["Settings", "Currencies"],
-  },
-  {
-    path: "/exchange-rates",
-    component: lz(() => import("@/pages/ExchangeRates")),
-    permissions: ["settings:read"],
-    breadcrumb: ["Settings", "Exchange Rates"],
-  },
-  {
     path: "/taxes",
     component: lz(() => import("@/pages/Taxes")),
     permissions: ["settings:write"],
@@ -479,22 +449,10 @@ export const routes: RouteConfig[] = [
     breadcrumb: ["Settings", "Sequence Settings"],
   },
   {
-    path: "/payment-methods",
-    component: lz(() => import("@/pages/PaymentMethods")),
-    permissions: ["settings:write"],
-    breadcrumb: ["Settings", "Payment Methods"],
-  },
-  {
     path: "/price-lists",
     component: lz(() => import("@/pages/PriceLists")),
     permissions: ["settings:write"],
     breadcrumb: ["Settings", "Price Lists"],
-  },
-  {
-    path: "/cost-centers",
-    component: lz(() => import("@/pages/CostCenters")),
-    permissions: ["settings:write"],
-    breadcrumb: ["Settings", "Cost Centers"],
   },
   {
     path: "/users",
@@ -570,12 +528,6 @@ export const routes: RouteConfig[] = [
   },
 
   // ── Settings pages ──────────────────────────────────────────────────────────
-  {
-    path: "/financial-settings",
-    component: lz(() => import("@/pages/FinancialSettings")),
-    permissions: ["settings:write"],
-    breadcrumb: ["Settings", "Financial Settings"],
-  },
   {
     path: "/app-settings",
     component: lz(() => import("@/pages/AppSettings")),
@@ -739,11 +691,6 @@ export const routes: RouteConfig[] = [
 
   // ── Definitions ─────────────────────────────────────────────────────────────
   {
-    path: "/pos-definitions",
-    component: lz(() => import("@/pages/definitions/POSDefinitions")),
-    breadcrumb: ["POS", "Definitions"],
-  },
-  {
     path: "/inventory-definitions",
     component: lz(() => import("@/pages/definitions/InventoryDefinitions")),
     permissions: ["inventory:read"],
@@ -790,11 +737,6 @@ export const routes: RouteConfig[] = [
     path: "/invoice",
     component: lz(() => import("@/pages/Invoice")),
     breadcrumb: ["Invoice"],
-  },
-  {
-    path: "/financial",
-    component: lz(() => import("@/pages/FinancialDashboard")),
-    breadcrumb: ["Financial Dashboard"],
   },
   {
     path: "/reports",

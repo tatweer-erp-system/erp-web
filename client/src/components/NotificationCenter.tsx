@@ -599,7 +599,9 @@ export default function NotificationCenter() {
         onOpenChange={setOpen}
         placement="bottomRight"
         arrow={false}
-        overlayInnerStyle={{ padding: 0, borderRadius: 12, overflow: "hidden" }}
+        styles={{
+          container: { padding: 0, borderRadius: 12, overflow: "hidden" },
+        }}
         overlayStyle={{ boxShadow: "0 8px 32px rgba(0,0,0,0.14)" }}
       >
         <Badge

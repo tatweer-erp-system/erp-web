@@ -196,7 +196,7 @@ export function ThemeCustomizer() {
           </Tooltip>
         }
         placement="right"
-        width={300}
+        size={300}
         open={open}
         onClose={() => setOpen(false)}
         styles={{

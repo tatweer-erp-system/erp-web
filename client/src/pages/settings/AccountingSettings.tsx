@@ -12,6 +12,8 @@ import {
   Select,
   Space,
   Switch,
+  Tag,
+  Tooltip,
   Typography,
   message,
   theme as antTheme,
@@ -20,8 +22,8 @@ import {
   CalculatorOutlined,
   CalendarOutlined,
   BookOutlined,
+  DollarOutlined,
   FundOutlined,
-  GlobalOutlined,
   LockOutlined,
   PercentageOutlined,
   SaveOutlined,
@@ -30,14 +32,55 @@ import {
 
 const { Title, Text } = Typography;
 
+const SoonTag = (
+  <Tag
+    color="blue"
+    style={{
+      fontSize: 9,
+      lineHeight: "16px",
+      padding: "0 4px",
+      marginInlineStart: 6,
+      borderRadius: 4,
+      verticalAlign: "middle",
+    }}
+  >
+    Soon
+  </Tag>
+);
+
 const TABS = [
-  { key: "general", label: "General", icon: <SettingOutlined /> },
-  { key: "accounts", label: "Default Accounts", icon: <BookOutlined /> },
-  { key: "journal", label: "Journal Settings", icon: <FundOutlined /> },
+  {
+    key: "general",
+    label: "General",
+    icon: <SettingOutlined />,
+    comingSoon: true,
+  },
+  {
+    key: "accounts",
+    label: "Default Accounts",
+    icon: <BookOutlined />,
+    comingSoon: true,
+  },
+  {
+    key: "journal",
+    label: "Journal Settings",
+    icon: <FundOutlined />,
+    comingSoon: true,
+  },
   { key: "fiscal", label: "Fiscal Year", icon: <CalendarOutlined /> },
   { key: "tax", label: "Tax Settings", icon: <PercentageOutlined /> },
-  { key: "currency", label: "Currency", icon: <GlobalOutlined /> },
-  { key: "closing", label: "Period Closing", icon: <LockOutlined /> },
+  {
+    key: "currency",
+    label: "Currencies",
+    icon: <DollarOutlined />,
+    comingSoon: true,
+  },
+  {
+    key: "closing",
+    label: "Period Closing",
+    icon: <LockOutlined />,
+    comingSoon: true,
+  },
 ];
 
 function Section({
@@ -45,7 +88,7 @@ function Section({
   description,
   children,
 }: {
-  title?: string;
+  title?: React.ReactNode;
   description?: string;
   children: React.ReactNode;
 }) {
@@ -85,12 +128,26 @@ function Section({
   );
 }
 
-function SaveRow({ onSave }: { onSave: () => void }) {
+function SaveRow({
+  onSave,
+  disabled,
+}: {
+  onSave: () => void;
+  disabled?: boolean;
+}) {
+  const btn = (
+    <Button
+      type="primary"
+      icon={<SaveOutlined />}
+      onClick={onSave}
+      disabled={disabled}
+    >
+      Save Changes
+    </Button>
+  );
   return (
     <div style={{ display: "flex", justifyContent: "flex-end" }}>
-      <Button type="primary" icon={<SaveOutlined />} onClick={onSave}>
-        Save Changes
-      </Button>
+      {disabled ? <Tooltip title="Coming Soon">{btn}</Tooltip> : btn}
     </div>
   );
 }
@@ -103,11 +160,12 @@ function GeneralTab() {
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Accounting Standard"
+                label={<span>Accounting Standard{SoonTag}</span>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
                   defaultValue="ifrs"
+                  disabled
                   options={[
                     { value: "ifrs", label: "IFRS (International)" },
                     { value: "gaap", label: "US GAAP" },
@@ -118,11 +176,12 @@ function GeneralTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Functional Currency"
+                label={<span>Functional Currency{SoonTag}</span>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
-                  defaultValue="USD"
+                  defaultValue="SAR"
+                  disabled
                   options={[
                     { value: "USD", label: "US Dollar (USD)" },
                     { value: "EUR", label: "Euro (EUR)" },
@@ -136,40 +195,47 @@ function GeneralTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Auto-post journal entries"
+                label={<span>Auto-post journal entries{SoonTag}</span>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch />
+                <Switch disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Require narration on journal entries"
+                label={
+                  <span>Require narration on journal entries{SoonTag}</span>
+                }
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch defaultChecked disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Allow back-dated entries"
+                label={<span>Allow back-dated entries{SoonTag}</span>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch defaultChecked disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Require approval for manual entries"
+                label={
+                  <span>Require approval for manual entries{SoonTag}</span>
+                }
                 style={{ marginBottom: 16 }}
               >
-                <Switch />
+                <Switch disabled />
               </Form.Item>
             </Col>
           </Row>
         </Form>
       </Section>
-      <SaveRow onSave={() => message.success("General settings saved")} />
+      <SaveRow
+        onSave={() => message.success("General settings saved")}
+        disabled
+      />
     </>
   );
 }
@@ -195,7 +261,7 @@ function AccountsTab() {
         message="These default accounts are used when no specific account is assigned to a transaction."
         style={{ marginBottom: 16, fontSize: 12 }}
       />
-      <Section title="Default Chart of Accounts Mapping">
+      <Section title={<span>Default Chart of Accounts Mapping{SoonTag}</span>}>
         <Form layout="vertical">
           <Row gutter={[16, 0]}>
             {accounts.map(a => (
@@ -203,6 +269,7 @@ function AccountsTab() {
                 <Form.Item label={a.label} style={{ marginBottom: 16 }}>
                   <Select
                     defaultValue={a.default}
+                    disabled
                     options={[{ value: a.default, label: a.default }]}
                   />
                 </Form.Item>
@@ -211,7 +278,10 @@ function AccountsTab() {
           </Row>
         </Form>
       </Section>
-      <SaveRow onSave={() => message.success("Default accounts saved")} />
+      <SaveRow
+        onSave={() => message.success("Default accounts saved")}
+        disabled
+      />
     </>
   );
 }
@@ -224,11 +294,12 @@ function JournalTab() {
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Default Journal Type"
+                label={<span>Default Journal Type{SoonTag}</span>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
                   defaultValue="general"
+                  disabled
                   options={[
                     { value: "general", label: "General Journal" },
                     { value: "sales", label: "Sales Journal" },
@@ -241,27 +312,28 @@ function JournalTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Journal Entry Prefix"
+                label={<span>Journal Entry Prefix{SoonTag}</span>}
                 style={{ marginBottom: 16 }}
               >
-                <Input defaultValue="JE-" maxLength={10} />
+                <Input defaultValue="JE-" maxLength={10} disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Next Journal Number"
+                label={<span>Next Journal Number{SoonTag}</span>}
                 style={{ marginBottom: 16 }}
               >
                 <InputNumber
                   defaultValue={1001}
                   min={1}
+                  disabled
                   style={{ width: "100%" }}
                 />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Require balanced entries"
+                label={<span>Require balanced entries{SoonTag}</span>}
                 style={{ marginBottom: 16 }}
               >
                 <Switch defaultChecked disabled />
@@ -269,24 +341,27 @@ function JournalTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Allow multi-currency journals"
+                label={<span>Allow multi-currency journals{SoonTag}</span>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch defaultChecked disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Attach documents to entries"
+                label={<span>Attach documents to entries{SoonTag}</span>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch defaultChecked disabled />
               </Form.Item>
             </Col>
           </Row>
         </Form>
       </Section>
-      <SaveRow onSave={() => message.success("Journal settings saved")} />
+      <SaveRow
+        onSave={() => message.success("Journal settings saved")}
+        disabled
+      />
     </>
   );
 }
@@ -317,11 +392,12 @@ function FiscalTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Fiscal Year Duration"
+                label={<span>Fiscal Year Duration{SoonTag}</span>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
                   defaultValue="12"
+                  disabled
                   options={[
                     { value: "12", label: "12 months (Annual)" },
                     { value: "6", label: "6 months (Semi-annual)" },
@@ -330,9 +406,13 @@ function FiscalTab() {
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Period Type" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label={<span>Period Type{SoonTag}</span>}
+                style={{ marginBottom: 16 }}
+              >
                 <Select
                   defaultValue="monthly"
+                  disabled
                   options={[
                     { value: "monthly", label: "Monthly" },
                     { value: "quarterly", label: "Quarterly" },
@@ -342,10 +422,10 @@ function FiscalTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Auto-create periods"
+                label={<span>Auto-create periods{SoonTag}</span>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch defaultChecked disabled />
               </Form.Item>
             </Col>
           </Row>
@@ -375,11 +455,12 @@ function TaxTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Tax Filing Frequency"
+                label={<span>Tax Filing Frequency{SoonTag}</span>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
                   defaultValue="quarterly"
+                  disabled
                   options={[
                     { value: "monthly", label: "Monthly" },
                     { value: "quarterly", label: "Quarterly" },
@@ -389,9 +470,12 @@ function TaxTab() {
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Tax Basis" style={{ marginBottom: 16 }}>
-                <Radio.Group defaultValue="accrual">
-                  <Space direction="vertical" size={8}>
+              <Form.Item
+                label={<span>Tax Basis{SoonTag}</span>}
+                style={{ marginBottom: 16 }}
+              >
+                <Radio.Group defaultValue="accrual" disabled>
+                  <Space orientation="vertical" size={8}>
                     <Radio value="accrual">Accrual Basis</Radio>
                     <Radio value="cash">Cash Basis</Radio>
                   </Space>
@@ -399,8 +483,11 @@ function TaxTab() {
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Enable tax groups" style={{ marginBottom: 16 }}>
-                <Switch defaultChecked />
+              <Form.Item
+                label={<span>Enable tax groups{SoonTag}</span>}
+                style={{ marginBottom: 16 }}
+              >
+                <Switch defaultChecked disabled />
               </Form.Item>
             </Col>
           </Row>
@@ -414,71 +501,76 @@ function TaxTab() {
 function CurrencyTab() {
   return (
     <>
-      <Section title="Multi-Currency Settings">
+      <Section title="Multi-Currency">
         <Form layout="vertical">
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Enable multi-currency"
+                label={<span>Functional Currency{SoonTag}</span>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Select
+                  defaultValue="SAR"
+                  disabled
+                  options={[
+                    { value: "SAR", label: "Saudi Riyal (SAR)" },
+                    { value: "USD", label: "US Dollar (USD)" },
+                    { value: "EUR", label: "Euro (EUR)" },
+                    { value: "AED", label: "UAE Dirham (AED)" },
+                  ]}
+                />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Exchange rate source"
+                label={<span>Enable Multi-Currency{SoonTag}</span>}
+                style={{ marginBottom: 16 }}
+              >
+                <Switch defaultChecked disabled />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12}>
+              <Form.Item
+                label={<span>Exchange Rate Source{SoonTag}</span>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
                   defaultValue="manual"
+                  disabled
                   options={[
-                    { value: "manual", label: "Manual entry" },
-                    { value: "auto", label: "Auto-fetch (live rates)" },
+                    { value: "manual", label: "Manual Entry" },
+                    { value: "auto", label: "Auto-fetch (Live Rates)" },
                   ]}
                 />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Exchange rate update frequency"
+                label={<span>Rate Update Frequency{SoonTag}</span>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
                   defaultValue="daily"
+                  disabled
                   options={[
                     { value: "realtime", label: "Real-time" },
                     { value: "daily", label: "Daily" },
                     { value: "weekly", label: "Weekly" },
-                    { value: "monthly", label: "Monthly" },
                   ]}
                 />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Unrealised FX gains/losses account"
+                label={<span>FX Gain/Loss Account{SoonTag}</span>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
-                  defaultValue="6100"
+                  defaultValue="5301"
+                  disabled
                   options={[
-                    { value: "6100", label: "6100 · FX Gain/Loss" },
-                    { value: "6110", label: "6110 · Unrealised FX" },
-                  ]}
-                />
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={12}>
-              <Form.Item
-                label="Realised FX gains/losses account"
-                style={{ marginBottom: 16 }}
-              >
-                <Select
-                  defaultValue="6100"
-                  options={[
-                    { value: "6100", label: "6100 · FX Gain/Loss" },
-                    { value: "6120", label: "6120 · Realised FX" },
+                    { value: "5301", label: "5301 · Foreign Exchange Losses" },
+                    { value: "4202", label: "4202 · Foreign Exchange Gains" },
                   ]}
                 />
               </Form.Item>
@@ -486,7 +578,10 @@ function CurrencyTab() {
           </Row>
         </Form>
       </Section>
-      <SaveRow onSave={() => message.success("Currency settings saved")} />
+      <SaveRow
+        onSave={() => message.success("Currency settings saved")}
+        disabled
+      />
     </>
   );
 }
@@ -505,27 +600,32 @@ function ClosingTab() {
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Require approval to close period"
+                label={<span>Require approval to close period{SoonTag}</span>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch defaultChecked disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Allow posting to closed periods (with override)"
+                label={
+                  <span>
+                    Allow posting to closed periods (with override){SoonTag}
+                  </span>
+                }
                 style={{ marginBottom: 16 }}
               >
-                <Switch />
+                <Switch disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Closing journal type"
+                label={<span>Closing journal type{SoonTag}</span>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
                   defaultValue="closing"
+                  disabled
                   options={[
                     { value: "closing", label: "Closing Journal" },
                     { value: "general", label: "General Journal" },
@@ -535,10 +635,10 @@ function ClosingTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Auto-reverse adjustment entries"
+                label={<span>Auto-reverse adjustment entries{SoonTag}</span>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch />
+                <Switch disabled />
               </Form.Item>
             </Col>
           </Row>
@@ -546,6 +646,7 @@ function ClosingTab() {
       </Section>
       <SaveRow
         onSave={() => message.success("Period closing settings saved")}
+        disabled
       />
     </>
   );
@@ -644,7 +745,10 @@ export default function AccountingSettings() {
               >
                 {tab.icon}
               </span>
-              <span style={{ flex: 1 }}>{tab.label}</span>
+              <span style={{ flex: 1 }}>
+                {tab.label}
+                {tab.comingSoon && SoonTag}
+              </span>
             </button>
           ))}
         </Card>

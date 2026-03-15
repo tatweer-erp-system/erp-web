@@ -516,7 +516,7 @@ export default function SequenceSettings() {
         { label: t("seq.title", lang) },
       ]}
     >
-      <Space direction="vertical" size={20} style={{ width: "100%" }}>
+      <Space orientation="vertical" size={20} style={{ width: "100%" }}>
         {/* Page header */}
         <div
           style={{
@@ -601,7 +601,7 @@ export default function SequenceSettings() {
         onCancel={() => setIsEditOpen(false)}
         okText={t("seq.saveChanges", lang)}
         width={isMobile ? "95vw" : 480}
-        destroyOnClose
+        destroyOnHidden
         title={
           <div
             style={{
@@ -688,7 +688,7 @@ export default function SequenceSettings() {
         okText={t("seq.confirmReset", lang)}
         okButtonProps={{ danger: true }}
         width={isMobile ? "95vw" : 460}
-        destroyOnClose
+        destroyOnHidden
         title={
           <div
             style={{

@@ -29,8 +29,6 @@ import {
   PayCircleOutlined,
   UserOutlined,
   FileTextOutlined,
-  ApartmentOutlined,
-  BankOutlined,
   ReloadOutlined,
   ControlOutlined,
   HistoryOutlined,
@@ -51,11 +49,6 @@ const TABS = [
   { key: "plan", label: "Subscription Plan", icon: <StarOutlined /> },
   { key: "contact", label: "Billing Contact", icon: <UserOutlined /> },
   { key: "invoices", label: "Invoice Preferences", icon: <FileTextOutlined /> },
-  {
-    key: "cost-centers",
-    label: "Cost Center Billing",
-    icon: <ApartmentOutlined />,
-  },
   { key: "payment", label: "Payment Method", icon: <PayCircleOutlined /> },
   { key: "renewal", label: "Auto-Renewal", icon: <ReloadOutlined /> },
   { key: "limits", label: "Spending Limits", icon: <ControlOutlined /> },
@@ -391,108 +384,6 @@ function InvoicePreferencesTab() {
           onClick={() => message.success("Invoice preferences saved")}
         >
           Save Preferences
-        </Button>
-      </div>
-    </>
-  );
-}
-
-function CostCentersTab() {
-  const { token } = antTheme.useToken();
-  const centers = [
-    {
-      key: "1",
-      dept: "Information Technology",
-      allocation: 30,
-      manager: "John Doe",
-      budget: "$1,440",
-    },
-    {
-      key: "2",
-      dept: "Sales & Marketing",
-      allocation: 35,
-      manager: "Sarah Ahmed",
-      budget: "$1,680",
-    },
-    {
-      key: "3",
-      dept: "Finance",
-      allocation: 20,
-      manager: "Omar Hassan",
-      budget: "$960",
-    },
-    {
-      key: "4",
-      dept: "Human Resources",
-      allocation: 15,
-      manager: "Lisa Chen",
-      budget: "$720",
-    },
-  ];
-  const cols = [
-    {
-      title: "Department",
-      dataIndex: "dept",
-      render: (v: string) => (
-        <Text strong style={{ fontSize: 13 }}>
-          {v}
-        </Text>
-      ),
-    },
-    {
-      title: "Budget Manager",
-      dataIndex: "manager",
-      render: (v: string) => <Text style={{ fontSize: 13 }}>{v}</Text>,
-    },
-    {
-      title: "Allocation",
-      dataIndex: "allocation",
-      render: (v: number) => (
-        <Space>
-          <Progress
-            percent={v}
-            size="small"
-            style={{ width: 80 }}
-            showInfo={false}
-          />
-          <Text style={{ fontSize: 12 }}>{v}%</Text>
-        </Space>
-      ),
-    },
-    {
-      title: "Est. Annual Cost",
-      dataIndex: "budget",
-      render: (v: string) => (
-        <Text strong style={{ fontSize: 13 }}>
-          {v}
-        </Text>
-      ),
-    },
-    { title: "Actions", render: () => <Button size="small">Edit</Button> },
-  ];
-  return (
-    <>
-      <Alert
-        type="info"
-        showIcon
-        message="Total allocations must equal 100%. Adjust percentages before saving."
-        style={{ marginBottom: 12, fontSize: 12 }}
-      />
-      <Table
-        size="small"
-        dataSource={centers}
-        columns={cols}
-        pagination={false}
-      />
-      <div
-        style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}
-      >
-        <Button
-          type="primary"
-          icon={<SaveOutlined />}
-          onClick={() => message.success("Cost center allocation saved")}
-        >
-          Save Allocation
         </Button>
       </div>
     </>
@@ -868,7 +759,6 @@ export default function BillingSubscription() {
     plan: <PlanTab />,
     contact: <BillingContactTab />,
     invoices: <InvoicePreferencesTab />,
-    "cost-centers": <CostCentersTab />,
     payment: <PaymentMethodTab />,
     renewal: <RenewalTab />,
     limits: <SpendingLimitsTab />,

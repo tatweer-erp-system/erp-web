@@ -12,6 +12,7 @@ import {
   Select,
   Space,
   Switch,
+  Tag,
   Typography,
   message,
   theme as antTheme,
@@ -30,14 +31,60 @@ import {
 
 const { Title, Text } = Typography;
 
+const SOON_TAG = (
+  <Tag
+    color="blue"
+    style={{
+      fontSize: 9,
+      lineHeight: "16px",
+      padding: "0 4px",
+      marginInlineStart: 6,
+      borderRadius: 4,
+      verticalAlign: "middle",
+    }}
+  >
+    Soon
+  </Tag>
+);
+
 const TABS = [
-  { key: "general", label: "General", icon: <SettingOutlined /> },
-  { key: "employees", label: "Employees", icon: <UsergroupAddOutlined /> },
-  { key: "attendance", label: "Attendance", icon: <ClockCircleOutlined /> },
-  { key: "leave", label: "Leave Management", icon: <CalendarOutlined /> },
+  {
+    key: "general",
+    label: "General",
+    icon: <SettingOutlined />,
+    comingSoon: true,
+  },
+  {
+    key: "employees",
+    label: "Employees",
+    icon: <UsergroupAddOutlined />,
+    comingSoon: true,
+  },
+  {
+    key: "attendance",
+    label: "Attendance",
+    icon: <ClockCircleOutlined />,
+    comingSoon: true,
+  },
+  {
+    key: "leave",
+    label: "Leave Management",
+    icon: <CalendarOutlined />,
+    comingSoon: true,
+  },
   { key: "payroll", label: "Payroll", icon: <DollarOutlined /> },
-  { key: "departments", label: "Departments", icon: <ApartmentOutlined /> },
-  { key: "performance", label: "Performance", icon: <TrophyOutlined /> },
+  {
+    key: "departments",
+    label: "Departments",
+    icon: <ApartmentOutlined />,
+    comingSoon: true,
+  },
+  {
+    key: "performance",
+    label: "Performance",
+    icon: <TrophyOutlined />,
+    comingSoon: true,
+  },
 ];
 
 function Section({
@@ -85,10 +132,21 @@ function Section({
   );
 }
 
-function SaveRow({ onSave }: { onSave: () => void }) {
+function SaveRow({
+  onSave,
+  disabled,
+}: {
+  onSave: () => void;
+  disabled?: boolean;
+}) {
   return (
     <div style={{ display: "flex", justifyContent: "flex-end" }}>
-      <Button type="primary" icon={<SaveOutlined />} onClick={onSave}>
+      <Button
+        type="primary"
+        icon={<SaveOutlined />}
+        onClick={onSave}
+        disabled={disabled}
+      >
         Save Changes
       </Button>
     </div>
@@ -102,9 +160,13 @@ function GeneralTab() {
         <Form layout="vertical">
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
-              <Form.Item label="Work Week" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label={<span>Work Week{SOON_TAG}</span>}
+                style={{ marginBottom: 16 }}
+              >
                 <Select
                   defaultValue="5"
+                  disabled
                   options={[
                     { value: "5", label: "5 days (Mon–Fri)" },
                     { value: "6", label: "6 days (Mon–Sat)" },
@@ -115,13 +177,14 @@ function GeneralTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Work Hours per Day"
+                label={<span>Work Hours per Day{SOON_TAG}</span>}
                 style={{ marginBottom: 16 }}
               >
                 <InputNumber
                   defaultValue={8}
                   min={1}
                   max={24}
+                  disabled
                   style={{ width: "100%" }}
                   addonAfter="hrs"
                 />
@@ -129,33 +192,35 @@ function GeneralTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Employee ID Prefix"
+                label={<span>Employee ID Prefix{SOON_TAG}</span>}
                 style={{ marginBottom: 16 }}
               >
-                <Input defaultValue="EMP-" maxLength={10} />
+                <Input defaultValue="EMP-" maxLength={10} disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Next Employee Number"
+                label={<span>Next Employee Number{SOON_TAG}</span>}
                 style={{ marginBottom: 16 }}
               >
                 <InputNumber
                   defaultValue={1001}
                   min={1}
+                  disabled
                   style={{ width: "100%" }}
                 />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Probation Period (months)"
+                label={<span>Probation Period (months){SOON_TAG}</span>}
                 style={{ marginBottom: 16 }}
               >
                 <InputNumber
                   defaultValue={3}
                   min={0}
                   max={12}
+                  disabled
                   style={{ width: "100%" }}
                   addonAfter="months"
                 />
@@ -163,12 +228,13 @@ function GeneralTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Notice Period (days)"
+                label={<span>Notice Period (days){SOON_TAG}</span>}
                 style={{ marginBottom: 16 }}
               >
                 <InputNumber
                   defaultValue={30}
                   min={0}
+                  disabled
                   style={{ width: "100%" }}
                   addonAfter="days"
                 />
@@ -177,7 +243,10 @@ function GeneralTab() {
           </Row>
         </Form>
       </Section>
-      <SaveRow onSave={() => message.success("General settings saved")} />
+      <SaveRow
+        onSave={() => message.success("General settings saved")}
+        disabled
+      />
     </>
   );
 }
@@ -190,25 +259,31 @@ function EmployeesTab() {
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Require manager approval for new hires"
+                label={
+                  <span>Require manager approval for new hires{SOON_TAG}</span>
+                }
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch defaultChecked disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Auto-create user account on hire"
+                label={<span>Auto-create user account on hire{SOON_TAG}</span>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch />
+                <Switch disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Mandatory fields" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label={<span>Mandatory fields{SOON_TAG}</span>}
+                style={{ marginBottom: 16 }}
+              >
                 <Select
                   mode="multiple"
                   defaultValue={["name", "department", "position"]}
+                  disabled
                   options={[
                     { value: "name", label: "Full Name" },
                     { value: "department", label: "Department" },
@@ -223,16 +298,21 @@ function EmployeesTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Enable employee self-service portal"
+                label={
+                  <span>Enable employee self-service portal{SOON_TAG}</span>
+                }
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch defaultChecked disabled />
               </Form.Item>
             </Col>
           </Row>
         </Form>
       </Section>
-      <SaveRow onSave={() => message.success("Employee settings saved")} />
+      <SaveRow
+        onSave={() => message.success("Employee settings saved")}
+        disabled
+      />
     </>
   );
 }
@@ -244,9 +324,13 @@ function AttendanceTab() {
         <Form layout="vertical">
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
-              <Form.Item label="Attendance Method" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label={<span>Attendance Method{SOON_TAG}</span>}
+                style={{ marginBottom: 16 }}
+              >
                 <Select
                   defaultValue="manual"
+                  disabled
                   options={[
                     { value: "manual", label: "Manual Entry" },
                     { value: "biometric", label: "Biometric Device" },
@@ -258,22 +342,29 @@ function AttendanceTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Late arrival grace period (minutes)"
+                label={
+                  <span>Late arrival grace period (minutes){SOON_TAG}</span>
+                }
                 style={{ marginBottom: 16 }}
               >
                 <InputNumber
                   defaultValue={15}
                   min={0}
                   max={60}
+                  disabled
                   style={{ width: "100%" }}
                   addonAfter="min"
                 />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Overtime policy" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label={<span>Overtime policy{SOON_TAG}</span>}
+                style={{ marginBottom: 16 }}
+              >
                 <Select
                   defaultValue="approval"
+                  disabled
                   options={[
                     { value: "auto", label: "Auto-calculate" },
                     { value: "approval", label: "Require approval" },
@@ -284,35 +375,42 @@ function AttendanceTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Overtime rate multiplier"
+                label={<span>Overtime rate multiplier{SOON_TAG}</span>}
                 style={{ marginBottom: 16 }}
               >
                 <InputNumber
                   defaultValue={1.5}
                   min={1}
                   step={0.25}
+                  disabled
                   style={{ width: "100%" }}
                   addonAfter="x"
                 />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Track break time" style={{ marginBottom: 16 }}>
-                <Switch />
+              <Form.Item
+                label={<span>Track break time{SOON_TAG}</span>}
+                style={{ marginBottom: 16 }}
+              >
+                <Switch disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Geolocation check-in required"
+                label={<span>Geolocation check-in required{SOON_TAG}</span>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch />
+                <Switch disabled />
               </Form.Item>
             </Col>
           </Row>
         </Form>
       </Section>
-      <SaveRow onSave={() => message.success("Attendance settings saved")} />
+      <SaveRow
+        onSave={() => message.success("Attendance settings saved")}
+        disabled
+      />
     </>
   );
 }
@@ -325,12 +423,13 @@ function LeaveTab() {
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Annual Leave (days/year)"
+                label={<span>Annual Leave (days/year){SOON_TAG}</span>}
                 style={{ marginBottom: 16 }}
               >
                 <InputNumber
                   defaultValue={21}
                   min={0}
+                  disabled
                   style={{ width: "100%" }}
                   addonAfter="days"
                 />
@@ -338,12 +437,13 @@ function LeaveTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Sick Leave (days/year)"
+                label={<span>Sick Leave (days/year){SOON_TAG}</span>}
                 style={{ marginBottom: 16 }}
               >
                 <InputNumber
                   defaultValue={10}
                   min={0}
+                  disabled
                   style={{ width: "100%" }}
                   addonAfter="days"
                 />
@@ -351,11 +451,12 @@ function LeaveTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Leave accrual period"
+                label={<span>Leave accrual period{SOON_TAG}</span>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
                   defaultValue="monthly"
+                  disabled
                   options={[
                     { value: "monthly", label: "Monthly" },
                     { value: "quarterly", label: "Quarterly" },
@@ -366,20 +467,21 @@ function LeaveTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Allow leave carryover"
+                label={<span>Allow leave carryover{SOON_TAG}</span>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch defaultChecked disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Max carryover days"
+                label={<span>Max carryover days{SOON_TAG}</span>}
                 style={{ marginBottom: 16 }}
               >
                 <InputNumber
                   defaultValue={10}
                   min={0}
+                  disabled
                   style={{ width: "100%" }}
                   addonAfter="days"
                 />
@@ -387,12 +489,15 @@ function LeaveTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Minimum notice for leave request (days)"
+                label={
+                  <span>Minimum notice for leave request (days){SOON_TAG}</span>
+                }
                 style={{ marginBottom: 16 }}
               >
                 <InputNumber
                   defaultValue={3}
                   min={0}
+                  disabled
                   style={{ width: "100%" }}
                   addonAfter="days"
                 />
@@ -400,24 +505,29 @@ function LeaveTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Require manager approval for leave"
+                label={
+                  <span>Require manager approval for leave{SOON_TAG}</span>
+                }
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch defaultChecked disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Allow negative leave balance"
+                label={<span>Allow negative leave balance{SOON_TAG}</span>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch />
+                <Switch disabled />
               </Form.Item>
             </Col>
           </Row>
         </Form>
       </Section>
-      <SaveRow onSave={() => message.success("Leave settings saved")} />
+      <SaveRow
+        onSave={() => message.success("Leave settings saved")}
+        disabled
+      />
     </>
   );
 }
@@ -455,9 +565,13 @@ function PayrollTab() {
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Payroll Currency" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label={<span>Payroll Currency{SOON_TAG}</span>}
+                style={{ marginBottom: 16 }}
+              >
                 <Select
                   defaultValue="USD"
+                  disabled
                   options={[
                     { value: "USD", label: "US Dollar (USD)" },
                     { value: "EUR", label: "Euro (EUR)" },
@@ -470,11 +584,12 @@ function PayrollTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Income Tax Calculation"
+                label={<span>Income Tax Calculation{SOON_TAG}</span>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
                   defaultValue="auto"
+                  disabled
                   options={[
                     { value: "auto", label: "Auto-calculate" },
                     { value: "manual", label: "Manual entry" },
@@ -485,13 +600,14 @@ function PayrollTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Social Insurance (%)"
+                label={<span>Social Insurance (%){SOON_TAG}</span>}
                 style={{ marginBottom: 16 }}
               >
                 <InputNumber
                   defaultValue={14}
                   min={0}
                   max={100}
+                  disabled
                   style={{ width: "100%" }}
                   addonAfter="%"
                 />
@@ -499,10 +615,10 @@ function PayrollTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Require payroll approval"
+                label={<span>Require payroll approval{SOON_TAG}</span>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch defaultChecked disabled />
               </Form.Item>
             </Col>
           </Row>
@@ -521,40 +637,45 @@ function DepartmentsTab() {
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Require department for all employees"
+                label={
+                  <span>Require department for all employees{SOON_TAG}</span>
+                }
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch defaultChecked disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Require department head"
+                label={<span>Require department head{SOON_TAG}</span>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch defaultChecked disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Department budget tracking"
+                label={<span>Department budget tracking{SOON_TAG}</span>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch />
+                <Switch disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Cost center per department"
+                label={<span>Cost center per department{SOON_TAG}</span>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch defaultChecked disabled />
               </Form.Item>
             </Col>
           </Row>
         </Form>
       </Section>
-      <SaveRow onSave={() => message.success("Department settings saved")} />
+      <SaveRow
+        onSave={() => message.success("Department settings saved")}
+        disabled
+      />
     </>
   );
 }
@@ -562,13 +683,22 @@ function DepartmentsTab() {
 function PerformanceTab() {
   return (
     <>
+      <Alert
+        type="info"
+        message="Performance evaluation module is coming soon."
+        style={{ marginBottom: 16 }}
+      />
       <Section title="Performance Review Settings">
         <Form layout="vertical">
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
-              <Form.Item label="Review Cycle" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label={<span>Review Cycle{SOON_TAG}</span>}
+                style={{ marginBottom: 16 }}
+              >
                 <Select
                   defaultValue="annually"
+                  disabled
                   options={[
                     { value: "monthly", label: "Monthly" },
                     { value: "quarterly", label: "Quarterly" },
@@ -579,8 +709,11 @@ function PerformanceTab() {
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Rating Scale" style={{ marginBottom: 16 }}>
-                <Radio.Group defaultValue="5">
+              <Form.Item
+                label={<span>Rating Scale{SOON_TAG}</span>}
+                style={{ marginBottom: 16 }}
+              >
+                <Radio.Group defaultValue="5" disabled>
                   <Space>
                     <Radio value="3">3-point</Radio>
                     <Radio value="5">5-point</Radio>
@@ -591,32 +724,37 @@ function PerformanceTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Enable 360° feedback"
+                label={<span>Enable 360° feedback{SOON_TAG}</span>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch />
+                <Switch disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Self-assessment required"
+                label={<span>Self-assessment required{SOON_TAG}</span>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch defaultChecked disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Link performance to salary increment"
+                label={
+                  <span>Link performance to salary increment{SOON_TAG}</span>
+                }
                 style={{ marginBottom: 16 }}
               >
-                <Switch />
+                <Switch disabled />
               </Form.Item>
             </Col>
           </Row>
         </Form>
       </Section>
-      <SaveRow onSave={() => message.success("Performance settings saved")} />
+      <SaveRow
+        onSave={() => message.success("Performance settings saved")}
+        disabled
+      />
     </>
   );
 }
@@ -714,7 +852,10 @@ export default function HRSettings() {
               >
                 {tab.icon}
               </span>
-              <span style={{ flex: 1 }}>{tab.label}</span>
+              <span style={{ flex: 1 }}>
+                {tab.label}
+                {tab.comingSoon && SOON_TAG}
+              </span>
             </button>
           ))}
         </Card>

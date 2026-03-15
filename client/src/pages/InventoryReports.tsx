@@ -574,7 +574,7 @@ export default function InventoryReports() {
         { label: "Inventory" },
       ]}
     >
-      <Space direction="vertical" size={20} style={{ width: "100%" }}>
+      <Space orientation="vertical" size={20} style={{ width: "100%" }}>
         {/* ── Alerts ──────────────────────────────────────────────────────── */}
         {(outOfStock > 0 || lowStock > 0) && (
           <Alert
@@ -706,7 +706,7 @@ export default function InventoryReports() {
                   <RTooltip formatter={(v: number) => fmtCurrency(v)} />
                 </PieChart>
               </ResponsiveContainer>
-              <Space direction="vertical" size={4} style={{ width: "100%" }}>
+              <Space orientation="vertical" size={4} style={{ width: "100%" }}>
                 {categoryData.map(c => (
                   <div
                     key={c.name}

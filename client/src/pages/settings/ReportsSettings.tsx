@@ -10,6 +10,7 @@ import {
   Select,
   Space,
   Switch,
+  Tag,
   Typography,
   message,
   theme as antTheme,
@@ -27,14 +28,65 @@ import {
 
 const { Title, Text } = Typography;
 
+const SOON = (
+  <Tag
+    color="blue"
+    style={{
+      fontSize: 9,
+      lineHeight: "16px",
+      padding: "0 4px",
+      marginInlineStart: 6,
+      borderRadius: 4,
+      verticalAlign: "middle",
+    }}
+  >
+    Soon
+  </Tag>
+);
+
 const TABS = [
-  { key: "general", label: "General", icon: <SettingOutlined /> },
-  { key: "display", label: "Display Options", icon: <BarChartOutlined /> },
-  { key: "scheduling", label: "Scheduling", icon: <CalendarOutlined /> },
-  { key: "export", label: "Export Settings", icon: <CloudDownloadOutlined /> },
-  { key: "email", label: "Email Delivery", icon: <MailOutlined /> },
-  { key: "print", label: "Print Settings", icon: <PrinterOutlined /> },
-  { key: "access", label: "Access Control", icon: <FileTextOutlined /> },
+  {
+    key: "general",
+    label: "General",
+    icon: <SettingOutlined />,
+    comingSoon: true,
+  },
+  {
+    key: "display",
+    label: "Display Options",
+    icon: <BarChartOutlined />,
+    comingSoon: true,
+  },
+  {
+    key: "scheduling",
+    label: "Scheduling",
+    icon: <CalendarOutlined />,
+    comingSoon: true,
+  },
+  {
+    key: "export",
+    label: "Export Settings",
+    icon: <CloudDownloadOutlined />,
+    comingSoon: true,
+  },
+  {
+    key: "email",
+    label: "Email Delivery",
+    icon: <MailOutlined />,
+    comingSoon: true,
+  },
+  {
+    key: "print",
+    label: "Print Settings",
+    icon: <PrinterOutlined />,
+    comingSoon: true,
+  },
+  {
+    key: "access",
+    label: "Access Control",
+    icon: <FileTextOutlined />,
+    comingSoon: true,
+  },
 ];
 
 function Section({
@@ -85,7 +137,7 @@ function Section({
 function SaveRow({ onSave }: { onSave: () => void }) {
   return (
     <div style={{ display: "flex", justifyContent: "flex-end" }}>
-      <Button type="primary" icon={<SaveOutlined />} onClick={onSave}>
+      <Button disabled type="primary" icon={<SaveOutlined />} onClick={onSave}>
         Save Changes
       </Button>
     </div>
@@ -100,10 +152,11 @@ function GeneralTab() {
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Default Date Range"
+                label={<>Default Date Range {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
+                  disabled
                   defaultValue="thisMonth"
                   options={[
                     { value: "today", label: "Today" },
@@ -119,10 +172,11 @@ function GeneralTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Default Comparison Period"
+                label={<>Default Comparison Period {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
+                  disabled
                   defaultValue="lastYear"
                   options={[
                     { value: "none", label: "No Comparison" },
@@ -133,8 +187,12 @@ function GeneralTab() {
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Default Currency" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label={<>Default Currency {SOON}</>}
+                style={{ marginBottom: 16 }}
+              >
                 <Select
+                  disabled
                   defaultValue="functional"
                   options={[
                     { value: "functional", label: "Functional Currency" },
@@ -146,10 +204,11 @@ function GeneralTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Number of decimal places"
+                label={<>Number of decimal places {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
+                  disabled
                   defaultValue="2"
                   options={[
                     { value: "0", label: "0 (1,234)" },
@@ -161,18 +220,18 @@ function GeneralTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Show zero-value rows"
+                label={<>Show zero-value rows {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch />
+                <Switch disabled />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Auto-refresh report data"
+                label={<>Auto-refresh report data {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch disabled defaultChecked />
               </Form.Item>
             </Col>
           </Row>
@@ -191,10 +250,11 @@ function DisplayTab() {
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Default Chart Type"
+                label={<>Default Chart Type {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
+                  disabled
                   defaultValue="bar"
                   options={[
                     { value: "bar", label: "Bar Chart" },
@@ -208,26 +268,27 @@ function DisplayTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Show charts by default"
+                label={<>Show charts by default {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch disabled defaultChecked />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Enable data labels on charts"
+                label={<>Enable data labels on charts {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch disabled defaultChecked />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Rows per page (tables)"
+                label={<>Rows per page (tables) {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
+                  disabled
                   defaultValue="25"
                   options={[
                     { value: "10", label: "10 rows" },
@@ -239,13 +300,19 @@ function DisplayTab() {
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Show totals row" style={{ marginBottom: 16 }}>
-                <Switch defaultChecked />
+              <Form.Item
+                label={<>Show totals row {SOON}</>}
+                style={{ marginBottom: 16 }}
+              >
+                <Switch disabled defaultChecked />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Show subtotals" style={{ marginBottom: 16 }}>
-                <Switch defaultChecked />
+              <Form.Item
+                label={<>Show subtotals {SOON}</>}
+                style={{ marginBottom: 16 }}
+              >
+                <Switch disabled defaultChecked />
               </Form.Item>
             </Col>
           </Row>
@@ -264,15 +331,19 @@ function SchedulingTab() {
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Enable scheduled reports"
+                label={<>Enable scheduled reports {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch disabled defaultChecked />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Daily report time" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label={<>Daily report time {SOON}</>}
+                style={{ marginBottom: 16 }}
+              >
                 <Select
+                  disabled
                   defaultValue="08:00"
                   options={Array.from({ length: 24 }, (_, i) => ({
                     value: `${String(i).padStart(2, "0")}:00`,
@@ -282,8 +353,12 @@ function SchedulingTab() {
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Weekly report day" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label={<>Weekly report day {SOON}</>}
+                style={{ marginBottom: 16 }}
+              >
                 <Select
+                  disabled
                   defaultValue="monday"
                   options={[
                     { value: "monday", label: "Monday" },
@@ -299,10 +374,11 @@ function SchedulingTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Monthly report date"
+                label={<>Monthly report date {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
+                  disabled
                   defaultValue="1"
                   options={Array.from({ length: 28 }, (_, i) => ({
                     value: String(i + 1),
@@ -327,10 +403,11 @@ function ExportTab() {
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Default Export Format"
+                label={<>Default Export Format {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
+                  disabled
                   defaultValue="xlsx"
                   options={[
                     { value: "xlsx", label: "Excel (.xlsx)" },
@@ -343,18 +420,19 @@ function ExportTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Include header row in exports"
+                label={<>Include header row in exports {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch disabled defaultChecked />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Date format in exports"
+                label={<>Date format in exports {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
+                  disabled
                   defaultValue="YYYY-MM-DD"
                   options={[
                     { value: "YYYY-MM-DD", label: "YYYY-MM-DD" },
@@ -366,18 +444,18 @@ function ExportTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Include company logo in PDF exports"
+                label={<>Include company logo in PDF exports {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch disabled defaultChecked />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Compress exported files (ZIP)"
+                label={<>Compress exported files (ZIP) {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch />
+                <Switch disabled />
               </Form.Item>
             </Col>
           </Row>
@@ -396,31 +474,39 @@ function EmailTab() {
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Enable email delivery"
+                label={<>Enable email delivery {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch disabled defaultChecked />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Default recipients"
+                label={<>Default recipients {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Select mode="tags" placeholder="Add email addresses" />
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={12}>
-              <Form.Item
-                label="Report email subject prefix"
-                style={{ marginBottom: 16 }}
-              >
-                <Input defaultValue="[Report]" />
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={12}>
-              <Form.Item label="Attach report as" style={{ marginBottom: 16 }}>
                 <Select
+                  disabled
+                  mode="tags"
+                  placeholder="Add email addresses"
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12}>
+              <Form.Item
+                label={<>Report email subject prefix {SOON}</>}
+                style={{ marginBottom: 16 }}
+              >
+                <Input disabled defaultValue="[Report]" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12}>
+              <Form.Item
+                label={<>Attach report as {SOON}</>}
+                style={{ marginBottom: 16 }}
+              >
+                <Select
+                  disabled
                   defaultValue="pdf"
                   options={[
                     { value: "pdf", label: "PDF attachment" },
@@ -432,10 +518,11 @@ function EmailTab() {
             </Col>
             <Col xs={24}>
               <Form.Item
-                label="Email body template"
+                label={<>Email body template {SOON}</>}
                 style={{ marginBottom: 0 }}
               >
                 <Input.TextArea
+                  disabled
                   rows={3}
                   defaultValue="Please find the attached report. This is an automated message from the ERP system."
                 />
@@ -457,10 +544,11 @@ function PrintTab() {
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Default Paper Size"
+                label={<>Default Paper Size {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
+                  disabled
                   defaultValue="A4"
                   options={[
                     { value: "A4", label: "A4 (210 × 297 mm)" },
@@ -473,10 +561,11 @@ function PrintTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Default Orientation"
+                label={<>Default Orientation {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
+                  disabled
                   defaultValue="portrait"
                   options={[
                     { value: "portrait", label: "Portrait" },
@@ -486,32 +575,35 @@ function PrintTab() {
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Show page numbers" style={{ marginBottom: 16 }}>
-                <Switch defaultChecked />
+              <Form.Item
+                label={<>Show page numbers {SOON}</>}
+                style={{ marginBottom: 16 }}
+              >
+                <Switch disabled defaultChecked />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Show print date/time"
+                label={<>Show print date/time {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch disabled defaultChecked />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Include company header"
+                label={<>Include company header {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch disabled defaultChecked />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Include footer note"
+                label={<>Include footer note {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
-                <Switch defaultChecked />
+                <Switch disabled defaultChecked />
               </Form.Item>
             </Col>
           </Row>
@@ -542,8 +634,12 @@ function AccessTab() {
       {reportModules.map(r => (
         <Section key={r.label} title={r.label}>
           <Form layout="vertical">
-            <Form.Item label="Allowed Roles" style={{ marginBottom: 0 }}>
+            <Form.Item
+              label={<>Allowed Roles {SOON}</>}
+              style={{ marginBottom: 0 }}
+            >
               <Select
+                disabled
                 mode="multiple"
                 defaultValue={r.roles}
                 options={[
@@ -657,7 +753,10 @@ export default function ReportsSettings() {
               >
                 {tab.icon}
               </span>
-              <span style={{ flex: 1 }}>{tab.label}</span>
+              <span style={{ flex: 1 }}>
+                {tab.label}
+                {tab.comingSoon && SOON}
+              </span>
             </button>
           ))}
         </Card>

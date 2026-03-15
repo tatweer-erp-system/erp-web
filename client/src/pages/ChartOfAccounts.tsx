@@ -1,4 +1,8 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { t } from "@/i18n";
+import { accountsService } from "@/services/accounting.service";
 import DashboardLayout from "@/components/DashboardLayout";
 import {
   Tree,
@@ -24,6 +28,7 @@ import {
   Select,
   Switch,
   message,
+  notification,
 } from "antd";
 import type { TreeDataNode } from "antd";
 import {
@@ -52,485 +57,25 @@ const { Text } = Typography;
 // ─── Shared account data ───────────────────────────────────────────────────────
 
 interface Account {
+  id?: string;
   code: string;
-  name: string;
+  nameEn: string;
+  nameAr: string;
   type: "asset" | "liability" | "equity" | "revenue" | "expense";
-  subtype: string;
-  normalBal: "debit" | "credit";
-  balance: number;
-  ytdDebit: number;
-  ytdCredit: number;
-  active: boolean;
-  description: string;
+  subType?: string;
+  normalBalance: "debit" | "credit";
+  balance?: number;
+  isActive: boolean;
+  allowDirectPosting?: boolean;
+  description?: string;
+  descriptionEn?: string;
+  descriptionAr?: string;
+  openingBalance?: number;
   children?: Account[];
+  version?: number;
 }
 
-const ACCOUNTS: Account[] = [
-  {
-    code: "1000",
-    name: "Assets",
-    type: "asset",
-    subtype: "Header",
-    normalBal: "debit",
-    balance: 4820000,
-    ytdDebit: 0,
-    ytdCredit: 0,
-    active: true,
-    description: "All company assets",
-    children: [
-      {
-        code: "1100",
-        name: "Current Assets",
-        type: "asset",
-        subtype: "Header",
-        normalBal: "debit",
-        balance: 1940000,
-        ytdDebit: 0,
-        ytdCredit: 0,
-        active: true,
-        description: "Assets expected to be converted to cash within one year",
-        children: [
-          {
-            code: "1110",
-            name: "Cash & Bank",
-            type: "asset",
-            subtype: "Cash",
-            normalBal: "debit",
-            balance: 842000,
-            ytdDebit: 3840000,
-            ytdCredit: 2998000,
-            active: true,
-            description: "Cash on hand and bank balances",
-          },
-          {
-            code: "1120",
-            name: "Accounts Receivable",
-            type: "asset",
-            subtype: "Receivable",
-            normalBal: "debit",
-            balance: 634000,
-            ytdDebit: 2960000,
-            ytdCredit: 2326000,
-            active: true,
-            description: "Amounts owed by customers",
-          },
-          {
-            code: "1130",
-            name: "Inventory",
-            type: "asset",
-            subtype: "Inventory",
-            normalBal: "debit",
-            balance: 348000,
-            ytdDebit: 1240000,
-            ytdCredit: 892000,
-            active: true,
-            description: "Goods held for sale",
-          },
-          {
-            code: "1140",
-            name: "Prepaid Expenses",
-            type: "asset",
-            subtype: "Prepaid",
-            normalBal: "debit",
-            balance: 84000,
-            ytdDebit: 192000,
-            ytdCredit: 108000,
-            active: true,
-            description: "Expenses paid in advance",
-          },
-          {
-            code: "1150",
-            name: "Short-term Investments",
-            type: "asset",
-            subtype: "Investment",
-            normalBal: "debit",
-            balance: 132000,
-            ytdDebit: 480000,
-            ytdCredit: 348000,
-            active: false,
-            description: "Investments maturing within 12 months",
-          },
-        ],
-      },
-      {
-        code: "1200",
-        name: "Fixed Assets",
-        type: "asset",
-        subtype: "Header",
-        normalBal: "debit",
-        balance: 2880000,
-        ytdDebit: 0,
-        ytdCredit: 0,
-        active: true,
-        description: "Long-term tangible assets",
-        children: [
-          {
-            code: "1210",
-            name: "Property & Equipment",
-            type: "asset",
-            subtype: "Fixed",
-            normalBal: "debit",
-            balance: 3480000,
-            ytdDebit: 480000,
-            ytdCredit: 0,
-            active: true,
-            description: "Land, buildings, and equipment",
-          },
-          {
-            code: "1220",
-            name: "Accumulated Depreciation",
-            type: "asset",
-            subtype: "Contra",
-            normalBal: "credit",
-            balance: -600000,
-            ytdDebit: 0,
-            ytdCredit: 120000,
-            active: true,
-            description: "Accumulated depreciation contra account",
-          },
-          {
-            code: "1230",
-            name: "Intangible Assets",
-            type: "asset",
-            subtype: "Intangible",
-            normalBal: "debit",
-            balance: 180000,
-            ytdDebit: 60000,
-            ytdCredit: 0,
-            active: true,
-            description: "Patents, trademarks, goodwill",
-          },
-        ],
-      },
-    ],
-  },
-  {
-    code: "2000",
-    name: "Liabilities",
-    type: "liability",
-    subtype: "Header",
-    normalBal: "credit",
-    balance: 1940000,
-    ytdDebit: 0,
-    ytdCredit: 0,
-    active: true,
-    description: "All company obligations",
-    children: [
-      {
-        code: "2100",
-        name: "Current Liabilities",
-        type: "liability",
-        subtype: "Header",
-        normalBal: "credit",
-        balance: 840000,
-        ytdDebit: 0,
-        ytdCredit: 0,
-        active: true,
-        description: "Obligations due within one year",
-        children: [
-          {
-            code: "2110",
-            name: "Accounts Payable",
-            type: "liability",
-            subtype: "Payable",
-            normalBal: "credit",
-            balance: 412000,
-            ytdDebit: 1820000,
-            ytdCredit: 2232000,
-            active: true,
-            description: "Amounts owed to vendors",
-          },
-          {
-            code: "2120",
-            name: "Accrued Expenses",
-            type: "liability",
-            subtype: "Accrued",
-            normalBal: "credit",
-            balance: 184000,
-            ytdDebit: 640000,
-            ytdCredit: 824000,
-            active: true,
-            description: "Expenses incurred but not yet paid",
-          },
-          {
-            code: "2130",
-            name: "VAT Payable",
-            type: "liability",
-            subtype: "Tax",
-            normalBal: "credit",
-            balance: 98000,
-            ytdDebit: 342000,
-            ytdCredit: 440000,
-            active: true,
-            description: "VAT collected from customers",
-          },
-          {
-            code: "2140",
-            name: "Short-term Loans",
-            type: "liability",
-            subtype: "Loan",
-            normalBal: "credit",
-            balance: 146000,
-            ytdDebit: 200000,
-            ytdCredit: 346000,
-            active: true,
-            description: "Loans due within one year",
-          },
-        ],
-      },
-      {
-        code: "2200",
-        name: "Long-term Liabilities",
-        type: "liability",
-        subtype: "Header",
-        normalBal: "credit",
-        balance: 1100000,
-        ytdDebit: 0,
-        ytdCredit: 0,
-        active: true,
-        description: "Obligations due beyond one year",
-        children: [
-          {
-            code: "2210",
-            name: "Bank Loans",
-            type: "liability",
-            subtype: "Loan",
-            normalBal: "credit",
-            balance: 840000,
-            ytdDebit: 120000,
-            ytdCredit: 960000,
-            active: true,
-            description: "Long-term bank financing",
-          },
-          {
-            code: "2220",
-            name: "Deferred Tax",
-            type: "liability",
-            subtype: "Tax",
-            normalBal: "credit",
-            balance: 260000,
-            ytdDebit: 48000,
-            ytdCredit: 308000,
-            active: false,
-            description: "Deferred tax liability",
-          },
-        ],
-      },
-    ],
-  },
-  {
-    code: "3000",
-    name: "Equity",
-    type: "equity",
-    subtype: "Header",
-    normalBal: "credit",
-    balance: 2880000,
-    ytdDebit: 0,
-    ytdCredit: 0,
-    active: true,
-    description: "Owners' equity",
-    children: [
-      {
-        code: "3100",
-        name: "Share Capital",
-        type: "equity",
-        subtype: "Capital",
-        normalBal: "credit",
-        balance: 1800000,
-        ytdDebit: 0,
-        ytdCredit: 0,
-        active: true,
-        description: "Paid-in share capital",
-      },
-      {
-        code: "3200",
-        name: "Retained Earnings",
-        type: "equity",
-        subtype: "Retained",
-        normalBal: "credit",
-        balance: 823000,
-        ytdDebit: 0,
-        ytdCredit: 757000,
-        active: true,
-        description: "Accumulated profits",
-      },
-      {
-        code: "3300",
-        name: "Current Year Earnings",
-        type: "equity",
-        subtype: "Earnings",
-        normalBal: "credit",
-        balance: 257000,
-        ytdDebit: 0,
-        ytdCredit: 257000,
-        active: true,
-        description: "Net income for current period",
-      },
-    ],
-  },
-  {
-    code: "4000",
-    name: "Revenue",
-    type: "revenue",
-    subtype: "Header",
-    normalBal: "credit",
-    balance: 3256000,
-    ytdDebit: 0,
-    ytdCredit: 0,
-    active: true,
-    description: "Income from operations",
-    children: [
-      {
-        code: "4100",
-        name: "Product Sales",
-        type: "revenue",
-        subtype: "Sales",
-        normalBal: "credit",
-        balance: 2692000,
-        ytdDebit: 148000,
-        ytdCredit: 2840000,
-        active: true,
-        description: "Revenue from product sales",
-      },
-      {
-        code: "4200",
-        name: "Service Revenue",
-        type: "revenue",
-        subtype: "Service",
-        normalBal: "credit",
-        balance: 478000,
-        ytdDebit: 24000,
-        ytdCredit: 502000,
-        active: true,
-        description: "Revenue from services rendered",
-      },
-      {
-        code: "4300",
-        name: "Other Income",
-        type: "revenue",
-        subtype: "Other",
-        normalBal: "credit",
-        balance: 86000,
-        ytdDebit: 4000,
-        ytdCredit: 90000,
-        active: true,
-        description: "Miscellaneous income",
-      },
-    ],
-  },
-  {
-    code: "5000",
-    name: "Expenses",
-    type: "expense",
-    subtype: "Header",
-    normalBal: "debit",
-    balance: 2499000,
-    ytdDebit: 0,
-    ytdCredit: 0,
-    active: true,
-    description: "Operating costs",
-    children: [
-      {
-        code: "5100",
-        name: "Cost of Goods Sold",
-        type: "expense",
-        subtype: "COGS",
-        normalBal: "debit",
-        balance: 1522000,
-        ytdDebit: 1522000,
-        ytdCredit: 0,
-        active: true,
-        description: "Direct cost of products sold",
-      },
-      {
-        code: "5200",
-        name: "Operating Expenses",
-        type: "expense",
-        subtype: "Header",
-        normalBal: "debit",
-        balance: 977000,
-        ytdDebit: 0,
-        ytdCredit: 0,
-        active: true,
-        description: "General operating expenses",
-        children: [
-          {
-            code: "5210",
-            name: "Salaries & Benefits",
-            type: "expense",
-            subtype: "Payroll",
-            normalBal: "debit",
-            balance: 648000,
-            ytdDebit: 648000,
-            ytdCredit: 0,
-            active: true,
-            description: "Employee compensation",
-          },
-          {
-            code: "5220",
-            name: "Rent & Utilities",
-            type: "expense",
-            subtype: "Overhead",
-            normalBal: "debit",
-            balance: 87000,
-            ytdDebit: 87000,
-            ytdCredit: 0,
-            active: true,
-            description: "Office rent and utilities",
-          },
-          {
-            code: "5230",
-            name: "Marketing",
-            type: "expense",
-            subtype: "Marketing",
-            normalBal: "debit",
-            balance: 124000,
-            ytdDebit: 124000,
-            ytdCredit: 0,
-            active: true,
-            description: "Advertising and marketing spend",
-          },
-          {
-            code: "5240",
-            name: "Depreciation Expense",
-            type: "expense",
-            subtype: "Non-cash",
-            normalBal: "debit",
-            balance: 54000,
-            ytdDebit: 54000,
-            ytdCredit: 0,
-            active: true,
-            description: "Periodic asset depreciation",
-          },
-          {
-            code: "5250",
-            name: "Interest Expense",
-            type: "expense",
-            subtype: "Finance",
-            normalBal: "debit",
-            balance: 34000,
-            ytdDebit: 34000,
-            ytdCredit: 0,
-            active: true,
-            description: "Interest on borrowings",
-          },
-          {
-            code: "5260",
-            name: "Professional Services",
-            type: "expense",
-            subtype: "Services",
-            normalBal: "debit",
-            balance: 30000,
-            ytdDebit: 30000,
-            ytdCredit: 0,
-            active: false,
-            description: "Legal, audit, consulting fees",
-          },
-        ],
-      },
-    ],
-  },
-];
+// ACCOUNTS is now fetched from API inside ChartOfAccountsContent
 
 // ─── Shared helpers ────────────────────────────────────────────────────────────
 
@@ -594,34 +139,103 @@ function nextChildCode(parent: Account): string {
 function CreateChildModal({
   open,
   parent,
+  editAccount,
   onClose,
+  acctName,
+  lang,
 }: {
   open: boolean;
   parent: Account | null;
+  editAccount?: Account | null;
   onClose: () => void;
+  acctName: (a: Account) => string;
+  lang: string;
 }) {
   const { token } = antTheme.useToken();
   const [form] = Form.useForm();
-  const [submitting, setSubmitting] = useState(false);
+  const queryClient = useQueryClient();
+  const isRTL = lang === "ar";
+  const isEdit = !!editAccount;
+
+  const createMutation = useMutation({
+    mutationFn: (dto: Record<string, unknown>) =>
+      accountsService.create(dto as never),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["accounts-tree"] });
+      message.success(t("accounting.coa.childCreated", lang));
+      form.resetFields();
+      onClose();
+    },
+    onError: (err: any) => {
+      notification.error({
+        message: t("mySettings.error.save", "en"),
+        description: err?.message,
+        direction: document.dir as "rtl" | "ltr",
+      });
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: (dto: Record<string, unknown>) =>
+      accountsService.update(editAccount!.id!, dto as never),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["accounts-tree"] });
+      message.success(t("accounting.coa.accountUpdated", lang));
+      form.resetFields();
+      onClose();
+    },
+    onError: (err: any) => {
+      notification.error({
+        message: t("mySettings.error.save", "en"),
+        description: err?.message,
+        direction: document.dir as "rtl" | "ltr",
+      });
+    },
+  });
 
   const handleSave = async () => {
     try {
-      await form.validateFields();
-      setSubmitting(true);
-      // TODO: API call to create child account
-      await new Promise(r => setTimeout(r, 600));
-      message.success("Child account created successfully");
-      form.resetFields();
-      onClose();
+      const values = await form.validateFields();
+      if (isEdit) {
+        updateMutation.mutate({
+          ...values,
+          version: editAccount!.version ?? 0,
+        });
+      } else {
+        createMutation.mutate({
+          ...values,
+          parentId: parent?.id,
+        });
+      }
     } catch {
       // validation failed
-    } finally {
-      setSubmitting(false);
     }
   };
 
-  const typeColor = parent ? TYPE_META[parent.type]?.color : token.colorPrimary;
+  const isSaving = isEdit ? updateMutation.isPending : createMutation.isPending;
+
+  React.useEffect(() => {
+    if (isEdit && editAccount && open) {
+      form.setFieldsValue({
+        code: editAccount.code,
+        nameEn: editAccount.nameEn,
+        nameAr: editAccount.nameAr,
+        type: editAccount.type,
+        subType: editAccount.subType,
+        normalBalance: editAccount.normalBalance,
+        isActive: editAccount.isActive ?? true,
+        descriptionEn: editAccount.descriptionEn || "",
+        descriptionAr: editAccount.descriptionAr || "",
+      });
+    }
+  }, [isEdit, editAccount, open, form]);
+
+  const effectiveAccount = isEdit ? editAccount : parent;
+  const typeColor = effectiveAccount
+    ? TYPE_META[effectiveAccount.type]?.color
+    : token.colorPrimary;
   const suggestedCode = parent ? nextChildCode(parent) : "";
+  const isTopLevel = !parent && !isEdit;
 
   return (
     <Modal
@@ -629,8 +243,8 @@ function CreateChildModal({
       onCancel={onClose}
       footer={null}
       closable={false}
-      destroyOnClose
-      width={520}
+      destroyOnHidden
+      width={640}
       styles={{
         body: { padding: 0 },
         mask: { backdropFilter: "blur(2px)", background: "rgba(0,0,0,0.35)" },
@@ -664,7 +278,11 @@ function CreateChildModal({
                 textTransform: "uppercase",
               }}
             >
-              New Child Account
+              {isEdit
+                ? t("accounting.coa.editAccount", lang)
+                : isTopLevel
+                  ? t("accounting.coa.newAccount", lang)
+                  : t("accounting.coa.newChildAccount", lang)}
             </div>
             <button
               onClick={onClose}
@@ -702,7 +320,13 @@ function CreateChildModal({
                 flexShrink: 0,
               }}
             >
-              <SubnodeOutlined />
+              {isEdit ? (
+                <EditOutlined />
+              ) : isTopLevel ? (
+                <PlusOutlined />
+              ) : (
+                <SubnodeOutlined />
+              )}
             </div>
             <div>
               <div
@@ -713,7 +337,11 @@ function CreateChildModal({
                   lineHeight: 1.2,
                 }}
               >
-                Add Sub-account
+                {isEdit
+                  ? t("accounting.coa.editAccount", lang)
+                  : isTopLevel
+                    ? t("accounting.coa.addAccount", lang)
+                    : t("accounting.coa.addSubAccount", lang)}
               </div>
               {parent && (
                 <div
@@ -723,7 +351,8 @@ function CreateChildModal({
                     marginTop: 3,
                   }}
                 >
-                  Under {parent.code} &middot; {parent.name}
+                  {t("accounting.coa.under", lang)} {parent.code} &middot;{" "}
+                  {acctName(parent)}
                 </div>
               )}
             </div>
@@ -749,9 +378,9 @@ function CreateChildModal({
           layout="vertical"
           initialValues={{
             code: suggestedCode,
-            type: parent?.type,
-            normalBal: parent?.normalBal,
-            active: true,
+            type: parent?.type ?? undefined,
+            normalBalance: parent?.normalBalance ?? "debit",
+            isActive: true,
           }}
         >
           {/* Account Code */}
@@ -772,7 +401,7 @@ function CreateChildModal({
                   style={{ display: "flex", alignItems: "baseline", gap: 6 }}
                 >
                   <span style={{ fontSize: 12, fontWeight: 700 }}>
-                    Account Code
+                    {t("accounting.coa.accountCode", lang)}
                   </span>
                   <span
                     style={{
@@ -786,21 +415,26 @@ function CreateChildModal({
                       letterSpacing: "0.05em",
                     }}
                   >
-                    req
+                    {t("accounting.coa.required", lang)}
                   </span>
                 </div>
               }
-              rules={[{ required: true, message: "Account code is required" }]}
+              rules={[
+                {
+                  required: true,
+                  message: t("accounting.coa.accountCodeRequired", lang),
+                },
+              ]}
               style={{ marginBottom: 14 }}
             >
               <Input
-                placeholder={suggestedCode}
+                placeholder={suggestedCode || "e.g. 1100"}
                 style={{ fontFamily: "monospace" }}
               />
             </Form.Item>
           </div>
 
-          {/* Account Name */}
+          {/* Account Name (English) */}
           <div
             style={{
               background: token.colorBgLayout,
@@ -812,13 +446,13 @@ function CreateChildModal({
             }}
           >
             <Form.Item
-              name="name"
+              name="nameEn"
               label={
                 <div
                   style={{ display: "flex", alignItems: "baseline", gap: 6 }}
                 >
                   <span style={{ fontSize: 12, fontWeight: 700 }}>
-                    Account Name
+                    {t("accounting.coa.nameEn", lang)}
                   </span>
                   <span
                     style={{
@@ -832,14 +466,75 @@ function CreateChildModal({
                       letterSpacing: "0.05em",
                     }}
                   >
-                    req
+                    {t("accounting.coa.required", lang)}
                   </span>
                 </div>
               }
-              rules={[{ required: true, message: "Account name is required" }]}
+              rules={[
+                {
+                  required: true,
+                  message: t("accounting.coa.nameEnRequired", lang),
+                },
+              ]}
               style={{ marginBottom: 14 }}
             >
-              <Input placeholder="e.g. Petty Cash" />
+              <Input
+                placeholder={t("accounting.coa.nameEnPlaceholder", lang)}
+                dir="ltr"
+              />
+            </Form.Item>
+          </div>
+
+          {/* Account Name (Arabic) */}
+          <div
+            style={{
+              background: token.colorBgLayout,
+              borderRadius: 10,
+              padding: "14px 16px 4px",
+              marginBottom: 10,
+              border: `1px solid ${token.colorBorderSecondary}`,
+              boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+            }}
+          >
+            <Form.Item
+              name="nameAr"
+              label={
+                <div
+                  style={{ display: "flex", alignItems: "baseline", gap: 6 }}
+                >
+                  <span style={{ fontSize: 12, fontWeight: 700 }}>
+                    {t("accounting.coa.nameAr", lang)}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: 9,
+                      fontWeight: 700,
+                      color: token.colorError,
+                      background: `${token.colorError}14`,
+                      borderRadius: 4,
+                      padding: "1px 5px",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.05em",
+                    }}
+                  >
+                    {t("accounting.coa.required", lang)}
+                  </span>
+                </div>
+              }
+              rules={[
+                {
+                  required: true,
+                  message: t("accounting.coa.nameArRequired", lang),
+                },
+              ]}
+              style={{ marginBottom: 14 }}
+            >
+              <Input
+                placeholder={
+                  "\u0645\u062B\u0644: \u0635\u0646\u062F\u0648\u0642 \u0627\u0644\u0645\u0635\u0627\u0631\u064A\u0641 \u0627\u0644\u0646\u062B\u0631\u064A\u0629"
+                }
+                dir="rtl"
+              />
             </Form.Item>
           </div>
 
@@ -860,19 +555,35 @@ function CreateChildModal({
                   name="type"
                   label={
                     <span style={{ fontSize: 12, fontWeight: 700 }}>
-                      Account Type
+                      {t("accounting.coa.accountType", lang)}
                     </span>
+                  }
+                  rules={
+                    isTopLevel || isEdit
+                      ? [
+                          {
+                            required: true,
+                            message: t("accounting.coa.typeRequired", lang),
+                          },
+                        ]
+                      : undefined
                   }
                   style={{ marginBottom: 14 }}
                 >
-                  <Select disabled>
+                  <Select
+                    disabled={!isTopLevel && !isEdit}
+                    placeholder={t("accounting.coa.selectPlaceholder", lang)}
+                  >
                     {Object.entries(TYPE_META).map(([k, v]) => (
                       <Select.Option key={k} value={k}>
                         <Tag
                           color={v.color}
                           style={{ borderRadius: 20, marginRight: 4 }}
                         >
-                          {v.label}
+                          {t(
+                            `accounting.coa.type${k.charAt(0).toUpperCase() + k.slice(1)}`,
+                            lang
+                          )}
                         </Tag>
                       </Select.Option>
                     ))}
@@ -892,44 +603,65 @@ function CreateChildModal({
                 }}
               >
                 <Form.Item
-                  name="subtype"
-                  label={
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "baseline",
-                        gap: 6,
-                      }}
-                    >
-                      <span style={{ fontSize: 12, fontWeight: 700 }}>
-                        Sub-type
-                      </span>
-                      <span
-                        style={{
-                          fontSize: 9,
-                          fontWeight: 700,
-                          color: token.colorError,
-                          background: `${token.colorError}14`,
-                          borderRadius: 4,
-                          padding: "1px 5px",
-                          textTransform: "uppercase",
-                          letterSpacing: "0.05em",
-                        }}
-                      >
-                        req
-                      </span>
-                    </div>
-                  }
-                  rules={[{ required: true, message: "Sub-type is required" }]}
-                  style={{ marginBottom: 14 }}
+                  noStyle
+                  shouldUpdate={(prev, cur) => prev.type !== cur.type}
                 >
-                  <Select placeholder="Select…">
-                    {(SUBTYPE_OPTIONS[parent?.type ?? "asset"] ?? []).map(s => (
-                      <Select.Option key={s} value={s}>
-                        {s}
-                      </Select.Option>
-                    ))}
-                  </Select>
+                  {({ getFieldValue }) => {
+                    const selectedType =
+                      getFieldValue("type") ?? parent?.type ?? "asset";
+                    return (
+                      <Form.Item
+                        name="subType"
+                        label={
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "baseline",
+                              gap: 6,
+                            }}
+                          >
+                            <span style={{ fontSize: 12, fontWeight: 700 }}>
+                              {t("accounting.coa.subType", lang)}
+                            </span>
+                            <span
+                              style={{
+                                fontSize: 9,
+                                fontWeight: 700,
+                                color: token.colorError,
+                                background: `${token.colorError}14`,
+                                borderRadius: 4,
+                                padding: "1px 5px",
+                                textTransform: "uppercase",
+                                letterSpacing: "0.05em",
+                              }}
+                            >
+                              {t("accounting.coa.required", lang)}
+                            </span>
+                          </div>
+                        }
+                        rules={[
+                          {
+                            required: true,
+                            message: t("accounting.coa.subTypeRequired", lang),
+                          },
+                        ]}
+                        style={{ marginBottom: 14 }}
+                      >
+                        <Select
+                          placeholder={t(
+                            "accounting.coa.selectPlaceholder",
+                            lang
+                          )}
+                        >
+                          {(SUBTYPE_OPTIONS[selectedType] ?? []).map(s => (
+                            <Select.Option key={s} value={s}>
+                              {s}
+                            </Select.Option>
+                          ))}
+                        </Select>
+                      </Form.Item>
+                    );
+                  }}
                 </Form.Item>
               </div>
             </Col>
@@ -947,22 +679,26 @@ function CreateChildModal({
             }}
           >
             <Form.Item
-              name="normalBal"
+              name="normalBalance"
               label={
                 <span style={{ fontSize: 12, fontWeight: 700 }}>
-                  Normal Balance
+                  {t("accounting.coa.normalBalance", lang)}
                 </span>
               }
               style={{ marginBottom: 14 }}
             >
               <Select>
-                <Select.Option value="debit">Debit (Dr)</Select.Option>
-                <Select.Option value="credit">Credit (Cr)</Select.Option>
+                <Select.Option value="debit">
+                  {t("accounting.coa.debitDr", lang)}
+                </Select.Option>
+                <Select.Option value="credit">
+                  {t("accounting.coa.creditCr", lang)}
+                </Select.Option>
               </Select>
             </Form.Item>
           </div>
 
-          {/* Description */}
+          {/* Description (English) */}
           <div
             style={{
               background: token.colorBgLayout,
@@ -974,17 +710,48 @@ function CreateChildModal({
             }}
           >
             <Form.Item
-              name="description"
+              name="descriptionEn"
               label={
                 <span style={{ fontSize: 12, fontWeight: 700 }}>
-                  Description
+                  {t("accounting.coa.descriptionEn", lang)}
                 </span>
               }
               style={{ marginBottom: 14 }}
             >
               <Input.TextArea
                 rows={2}
-                placeholder="Brief description of this account…"
+                placeholder={t("accounting.coa.descriptionEnPlaceholder", lang)}
+                dir="ltr"
+              />
+            </Form.Item>
+          </div>
+
+          {/* Description (Arabic) */}
+          <div
+            style={{
+              background: token.colorBgLayout,
+              borderRadius: 10,
+              padding: "14px 16px 4px",
+              marginBottom: 10,
+              border: `1px solid ${token.colorBorderSecondary}`,
+              boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+            }}
+          >
+            <Form.Item
+              name="descriptionAr"
+              label={
+                <span style={{ fontSize: 12, fontWeight: 700 }}>
+                  {t("accounting.coa.descriptionAr", lang)}
+                </span>
+              }
+              style={{ marginBottom: 14 }}
+            >
+              <Input.TextArea
+                rows={2}
+                placeholder={
+                  "\u0648\u0635\u0641 \u0645\u062E\u062A\u0635\u0631 \u0644\u0647\u0630\u0627 \u0627\u0644\u062D\u0633\u0627\u0628..."
+                }
+                dir="rtl"
               />
             </Form.Item>
           </div>
@@ -1027,7 +794,7 @@ function CreateChildModal({
                     color: token.colorText,
                   }}
                 >
-                  Active Status
+                  {t("accounting.coa.activeStatus", lang)}
                 </span>
               </div>
               <div
@@ -1037,11 +804,11 @@ function CreateChildModal({
                   paddingInlineStart: 16,
                 }}
               >
-                Toggle to enable or disable this account
+                {t("accounting.coa.activeStatusHint", lang)}
               </div>
             </div>
             <Form.Item
-              name="active"
+              name="isActive"
               valuePropName="checked"
               style={{ margin: 0 }}
             >
@@ -1064,7 +831,7 @@ function CreateChildModal({
         <Button
           type="primary"
           icon={<SaveOutlined />}
-          loading={submitting}
+          loading={isSaving}
           onClick={handleSave}
           size="large"
           style={{
@@ -1076,7 +843,9 @@ function CreateChildModal({
             boxShadow: `0 4px 12px ${typeColor}44`,
           }}
         >
-          Create Account
+          {isEdit
+            ? t("accounting.coa.saveChanges", lang)
+            : t("accounting.coa.createAccount", lang)}
         </Button>
         <Button
           icon={<CloseOutlined />}
@@ -1084,7 +853,7 @@ function CreateChildModal({
           size="large"
           style={{ height: 42, fontWeight: 600, minWidth: 100 }}
         >
-          Cancel
+          {t("accounting.coa.cancel", lang)}
         </Button>
       </div>
     </Modal>
@@ -1099,6 +868,43 @@ function ChartOfAccountsContent() {
   const { token } = antTheme.useToken();
   const screens = Grid.useBreakpoint();
   const isMobile = !screens.md;
+  const { language } = useAppSettings();
+  const lang = language;
+  const isRTL = lang === "ar";
+  const queryClient = useQueryClient();
+
+  const { data: accountsFromApi, isLoading: accountsLoading } = useQuery({
+    queryKey: ["accounts-tree"],
+    queryFn: () => accountsService.tree(),
+    staleTime: 5 * 60_000,
+  });
+  const ACCOUNTS: Account[] = (accountsFromApi ?? []) as Account[];
+
+  const acctName = (a: Account) =>
+    lang === "ar" ? a.nameAr || a.nameEn : a.nameEn;
+
+  const acctDescription = (a: Account) =>
+    lang === "ar"
+      ? a.descriptionAr || a.descriptionEn || ""
+      : a.descriptionEn || a.description || "";
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => accountsService.remove(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["accounts-tree"] });
+      message.success(t("accounting.coa.accountDeleted", lang));
+      setDrawerOpen(false);
+      setSelected(null);
+    },
+    onError: (err: any) => {
+      notification.error({
+        message: t("mySettings.error.save", lang),
+        description: err?.message,
+        direction: document.dir as "rtl" | "ltr",
+      });
+    },
+  });
+
   const [activeTab, setActiveTab] = useState("all");
   const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([
     "1000",
@@ -1117,6 +923,8 @@ function ChartOfAccountsContent() {
   const [search, setSearch] = useState("");
   const [history, setHistory] = useState<Account[]>([]);
   const [childModalOpen, setChildModalOpen] = useState(false);
+  const [newAccountModalOpen, setNewAccountModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
 
   const typeFilter = activeTab === "all" ? null : activeTab;
   const visibleRoots = typeFilter
@@ -1179,10 +987,12 @@ function ChartOfAccountsContent() {
               >
                 {a.code}
               </Text>
-              <Text style={{ fontWeight: isHeader ? 600 : 400 }}>{a.name}</Text>
-              {!a.active && (
+              <Text style={{ fontWeight: isHeader ? 600 : 400 }}>
+                {acctName(a)}
+              </Text>
+              {!a.isActive && (
                 <Tag style={{ borderRadius: 20, fontSize: 10, marginLeft: 4 }}>
-                  Off
+                  {t("accounting.coa.off", lang)}
                 </Tag>
               )}
             </Space>
@@ -1192,12 +1002,14 @@ function ChartOfAccountsContent() {
                   fontFamily: "monospace",
                   fontSize: 12,
                   color:
-                    a.balance < 0 ? token.colorError : token.colorTextSecondary,
+                    (a.balance ?? 0) < 0
+                      ? token.colorError
+                      : token.colorTextSecondary,
                 }}
               >
-                {a.ytdDebit || a.ytdCredit ? fmtAmt(a.balance) : ""}
+                {a.balance ? fmtAmt(a.balance) : ""}
               </Text>
-              <Tooltip title="View details">
+              <Tooltip title={t("accounting.coa.viewDetails", lang)}>
                 <EyeOutlined
                   style={{ color: token.colorTextQuaternary, fontSize: 12 }}
                 />
@@ -1215,7 +1027,7 @@ function ChartOfAccountsContent() {
       label: (
         <Space>
           <ApartmentOutlined />
-          All
+          {t("accounting.coa.tabAll", lang)}
         </Space>
       ),
     },
@@ -1224,7 +1036,7 @@ function ChartOfAccountsContent() {
       label: (
         <Space>
           <BankOutlined style={{ color: TYPE_META.asset.color }} />
-          Assets
+          {t("accounting.coa.tabAssets", lang)}
         </Space>
       ),
     },
@@ -1233,7 +1045,7 @@ function ChartOfAccountsContent() {
       label: (
         <Space>
           <DollarOutlined style={{ color: TYPE_META.liability.color }} />
-          Liabilities
+          {t("accounting.coa.tabLiabilities", lang)}
         </Space>
       ),
     },
@@ -1242,7 +1054,7 @@ function ChartOfAccountsContent() {
       label: (
         <Space>
           <PercentageOutlined style={{ color: TYPE_META.equity.color }} />
-          Equity
+          {t("accounting.coa.tabEquity", lang)}
         </Space>
       ),
     },
@@ -1251,7 +1063,7 @@ function ChartOfAccountsContent() {
       label: (
         <Space>
           <LineChartOutlined style={{ color: TYPE_META.revenue.color }} />
-          Revenue
+          {t("accounting.coa.tabRevenue", lang)}
         </Space>
       ),
     },
@@ -1260,7 +1072,7 @@ function ChartOfAccountsContent() {
       label: (
         <Space>
           <SettingOutlined style={{ color: TYPE_META.expense.color }} />
-          Expenses
+          {t("accounting.coa.tabExpenses", lang)}
         </Space>
       ),
     },
@@ -1293,7 +1105,7 @@ function ChartOfAccountsContent() {
                   letterSpacing: "0.06em",
                 }}
               >
-                {a.name}
+                {acctName(a)}
               </Text>
               <div
                 style={{
@@ -1303,10 +1115,11 @@ function ChartOfAccountsContent() {
                   marginTop: 6,
                 }}
               >
-                {fmtAmt(a.balance)}
+                {fmtAmt(a.balance ?? 0)}
               </div>
               <Text type="secondary" style={{ fontSize: 11 }}>
-                {a.children?.length ?? 0} sub-accounts
+                {a.children?.length ?? 0}{" "}
+                {t("accounting.coa.subAccounts", lang)}
               </Text>
             </Card>
           </Col>
@@ -1331,7 +1144,7 @@ function ChartOfAccountsContent() {
               prefix={
                 <SearchOutlined style={{ color: token.colorTextQuaternary }} />
               }
-              placeholder="Search…"
+              placeholder={t("accounting.coa.searchPlaceholder", lang)}
               size="small"
               value={search}
               onChange={e => setSearch(e.target.value)}
@@ -1339,10 +1152,15 @@ function ChartOfAccountsContent() {
               style={{ width: 180 }}
             />
             <Button size="small" icon={<DownloadOutlined />}>
-              Export
+              {t("accounting.coa.export", lang)}
             </Button>
-            <Button size="small" type="primary" icon={<PlusOutlined />}>
-              New Account
+            <Button
+              size="small"
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => setNewAccountModalOpen(true)}
+            >
+              {t("accounting.coa.newAccount", lang)}
             </Button>
           </Space>
         }
@@ -1363,10 +1181,11 @@ function ChartOfAccountsContent() {
       <Drawer
         open={drawerOpen}
         onClose={closeDrawer}
-        width={isMobile ? "100%" : 480}
+        placement={isRTL ? "left" : "right"}
+        size={isMobile ? "100%" : 480}
         title={null}
         closable={false}
-        destroyOnClose
+        destroyOnHidden
         styles={{
           body: {
             padding: 0,
@@ -1438,8 +1257,8 @@ function ChartOfAccountsContent() {
                       }}
                     >
                       {selected.children?.length
-                        ? "Group Account"
-                        : "Leaf Account"}
+                        ? t("accounting.coa.groupAccount", lang)
+                        : t("accounting.coa.leafAccount", lang)}
                     </div>
                   </div>
                   <button
@@ -1491,7 +1310,7 @@ function ChartOfAccountsContent() {
                         lineHeight: 1.2,
                       }}
                     >
-                      {selected.name}
+                      {acctName(selected)}
                     </div>
                     <div
                       style={{
@@ -1503,10 +1322,15 @@ function ChartOfAccountsContent() {
                         gap: 8,
                       }}
                     >
-                      <span>{TYPE_META[selected.type]?.label}</span>
+                      <span>
+                        {t(
+                          `accounting.coa.type${selected.type.charAt(0).toUpperCase() + selected.type.slice(1)}`,
+                          lang
+                        )}
+                      </span>
                       <span>&middot;</span>
-                      <span>{selected.subtype}</span>
-                      {!selected.active && (
+                      <span>{selected.subType}</span>
+                      {!selected.isActive && (
                         <>
                           <span>&middot;</span>
                           <Tag
@@ -1519,7 +1343,7 @@ function ChartOfAccountsContent() {
                               margin: 0,
                             }}
                           >
-                            Inactive
+                            {t("accounting.coa.inactive", lang)}
                           </Tag>
                         </>
                       )}
@@ -1553,7 +1377,7 @@ function ChartOfAccountsContent() {
                         letterSpacing: "0.06em",
                       }}
                     >
-                      Balance
+                      {t("accounting.coa.balance", lang)}
                     </div>
                     <div
                       style={{
@@ -1564,77 +1388,9 @@ function ChartOfAccountsContent() {
                         fontFamily: "monospace",
                       }}
                     >
-                      {fmtAmt(selected.balance)}
+                      {fmtAmt(selected.balance ?? 0)}
                     </div>
                   </div>
-                  {(selected.ytdDebit > 0 || selected.ytdCredit > 0) && (
-                    <>
-                      <div
-                        style={{
-                          background: "rgba(255,255,255,0.15)",
-                          borderRadius: 10,
-                          padding: "10px 16px",
-                          flex: 1,
-                          minWidth: 90,
-                        }}
-                      >
-                        <div
-                          style={{
-                            fontSize: 10,
-                            fontWeight: 600,
-                            color: "rgba(255,255,255,0.6)",
-                            textTransform: "uppercase",
-                            letterSpacing: "0.06em",
-                          }}
-                        >
-                          YTD Debit
-                        </div>
-                        <div
-                          style={{
-                            fontSize: 16,
-                            fontWeight: 700,
-                            color: "#fff",
-                            marginTop: 2,
-                            fontFamily: "monospace",
-                          }}
-                        >
-                          {fmtAmt(selected.ytdDebit)}
-                        </div>
-                      </div>
-                      <div
-                        style={{
-                          background: "rgba(255,255,255,0.15)",
-                          borderRadius: 10,
-                          padding: "10px 16px",
-                          flex: 1,
-                          minWidth: 90,
-                        }}
-                      >
-                        <div
-                          style={{
-                            fontSize: 10,
-                            fontWeight: 600,
-                            color: "rgba(255,255,255,0.6)",
-                            textTransform: "uppercase",
-                            letterSpacing: "0.06em",
-                          }}
-                        >
-                          YTD Credit
-                        </div>
-                        <div
-                          style={{
-                            fontSize: 16,
-                            fontWeight: 700,
-                            color: "#fff",
-                            marginTop: 2,
-                            fontFamily: "monospace",
-                          }}
-                        >
-                          {fmtAmt(selected.ytdCredit)}
-                        </div>
-                      </div>
-                    </>
-                  )}
                 </div>
               </div>
               {/* curved bottom mask */}
@@ -1655,7 +1411,7 @@ function ChartOfAccountsContent() {
             <div
               style={{ flex: 1, overflowY: "auto", padding: "4px 20px 20px" }}
             >
-              <Space direction="vertical" size={14} style={{ width: "100%" }}>
+              <Space orientation="vertical" size={14} style={{ width: "100%" }}>
                 {/* Account details card */}
                 <div
                   style={{
@@ -1676,55 +1432,68 @@ function ChartOfAccountsContent() {
                       marginBottom: 12,
                     }}
                   >
-                    Account Details
+                    {t("accounting.coa.accountDetails", lang)}
                   </div>
                   <Descriptions
                     column={1}
                     size="small"
                     colon={false}
-                    labelStyle={{
-                      fontWeight: 600,
-                      color: token.colorTextSecondary,
-                      fontSize: 12,
-                      width: 130,
+                    styles={{
+                      label: {
+                        fontWeight: 600,
+                        color: token.colorTextSecondary,
+                        fontSize: 12,
+                        width: 130,
+                      },
+                      content: { fontSize: 13 },
                     }}
-                    contentStyle={{ fontSize: 13 }}
                   >
-                    <Descriptions.Item label="Code">
+                    <Descriptions.Item label={t("accounting.coa.code", lang)}>
                       <Text
                         style={{ fontFamily: "monospace", fontWeight: 600 }}
                       >
                         {selected.code}
                       </Text>
                     </Descriptions.Item>
-                    <Descriptions.Item label="Type">
+                    <Descriptions.Item label={t("accounting.coa.type", lang)}>
                       <Tag color={typeColor} style={{ borderRadius: 20 }}>
-                        {TYPE_META[selected.type]?.label}
+                        {t(
+                          `accounting.coa.type${selected.type.charAt(0).toUpperCase() + selected.type.slice(1)}`,
+                          lang
+                        )}
                       </Tag>
                     </Descriptions.Item>
-                    <Descriptions.Item label="Sub-type">
-                      {selected.subtype}
+                    <Descriptions.Item
+                      label={t("accounting.coa.subType", lang)}
+                    >
+                      {selected.subType}
                     </Descriptions.Item>
-                    <Descriptions.Item label="Normal Balance">
+                    <Descriptions.Item
+                      label={t("accounting.coa.normalBalance", lang)}
+                    >
                       <Tag
                         color={
-                          selected.normalBal === "debit" ? "blue" : "green"
+                          selected.normalBalance === "debit" ? "blue" : "green"
                         }
                         style={{ borderRadius: 20 }}
                       >
-                        {selected.normalBal === "debit"
-                          ? "Debit (Dr)"
-                          : "Credit (Cr)"}
+                        {selected.normalBalance === "debit"
+                          ? t("accounting.coa.debitDr", lang)
+                          : t("accounting.coa.creditCr", lang)}
                       </Tag>
                     </Descriptions.Item>
-                    <Descriptions.Item label="Status">
+                    <Descriptions.Item label={t("accounting.coa.status", lang)}>
                       <Badge
-                        status={selected.active ? "success" : "default"}
-                        text={selected.active ? "Active" : "Inactive"}
+                        status={selected.isActive ? "success" : "default"}
+                        text={
+                          selected.isActive
+                            ? t("accounting.coa.active", lang)
+                            : t("accounting.coa.inactive", lang)
+                        }
                       />
                     </Descriptions.Item>
                   </Descriptions>
-                  {selected.description && (
+                  {acctDescription(selected) && (
                     <div
                       style={{
                         marginTop: 10,
@@ -1736,7 +1505,7 @@ function ChartOfAccountsContent() {
                         lineHeight: 1.6,
                       }}
                     >
-                      {selected.description}
+                      {acctDescription(selected)}
                     </div>
                   )}
                 </div>
@@ -1769,7 +1538,8 @@ function ChartOfAccountsContent() {
                           letterSpacing: "0.06em",
                         }}
                       >
-                        Sub-accounts ({selected.children.length})
+                        {t("accounting.coa.subAccountsSection", lang)} (
+                        {selected.children.length})
                       </div>
                       <Button
                         type="link"
@@ -1782,7 +1552,7 @@ function ChartOfAccountsContent() {
                         }}
                         onClick={() => setChildModalOpen(true)}
                       >
-                        Add
+                        {t("accounting.coa.add", lang)}
                       </Button>
                     </div>
                     <Space
@@ -1836,8 +1606,8 @@ function ChartOfAccountsContent() {
                             >
                               {c.code}
                             </Text>
-                            <Text style={{ fontSize: 13 }}>{c.name}</Text>
-                            {!c.active && (
+                            <Text style={{ fontSize: 13 }}>{acctName(c)}</Text>
+                            {!c.isActive && (
                               <Tag style={{ borderRadius: 20, fontSize: 10 }}>
                                 Off
                               </Tag>
@@ -1849,12 +1619,12 @@ function ChartOfAccountsContent() {
                               fontWeight: 600,
                               fontSize: 12,
                               color:
-                                c.balance < 0
+                                (c.balance ?? 0) < 0
                                   ? token.colorError
                                   : token.colorTextSecondary,
                             }}
                           >
-                            {fmtAmt(c.balance)}
+                            {fmtAmt(c.balance ?? 0)}
                           </Text>
                         </div>
                       ))}
@@ -1887,11 +1657,31 @@ function ChartOfAccountsContent() {
                   boxShadow: `0 4px 12px ${typeColor}44`,
                 }}
               >
-                Add Child Account
+                {t("accounting.coa.addChild", lang)}
               </Button>
-              <Button icon={<EditOutlined />}>Edit</Button>
-              <Button danger icon={<DeleteOutlined />}>
-                Delete
+              <Button
+                icon={<EditOutlined />}
+                onClick={() => setEditModalOpen(true)}
+              >
+                {t("accounting.coa.edit", lang)}
+              </Button>
+              <Button
+                danger
+                icon={<DeleteOutlined />}
+                loading={deleteMutation.isPending}
+                onClick={() => {
+                  if (selected?.id) {
+                    Modal.confirm({
+                      title: t("accounting.coa.deleteAccount", lang),
+                      content: `${t("accounting.coa.deleteConfirm", lang)} "${acctName(selected)}"?`,
+                      okText: t("accounting.coa.delete", lang),
+                      okType: "danger",
+                      onOk: () => deleteMutation.mutate(selected.id!),
+                    });
+                  }
+                }}
+              >
+                {t("accounting.coa.delete", lang)}
               </Button>
             </div>
           </>
@@ -1903,22 +1693,47 @@ function ChartOfAccountsContent() {
         open={childModalOpen}
         parent={selected}
         onClose={() => setChildModalOpen(false)}
+        acctName={acctName}
+        lang={lang}
+      />
+      <CreateChildModal
+        open={newAccountModalOpen}
+        parent={null}
+        onClose={() => setNewAccountModalOpen(false)}
+        acctName={acctName}
+        lang={lang}
+      />
+
+      {/* ── Edit Account Modal ──────────────────────────────────────────── */}
+      <CreateChildModal
+        open={editModalOpen}
+        parent={null}
+        editAccount={selected}
+        onClose={() => setEditModalOpen(false)}
+        acctName={acctName}
+        lang={lang}
       />
     </>
   );
 }
 
 export default function ChartOfAccounts() {
+  const { language } = useAppSettings();
+  const lang = language;
+  const isRTL = lang === "ar";
+
   return (
     <DashboardLayout
-      currentPage="Chart of Accounts"
+      currentPage={t("accounting.coa.title", lang)}
       breadcrumbs={[
-        { label: "Dashboard", href: "/" },
-        { label: "Accounting" },
-        { label: "Chart of Accounts" },
+        { label: t("Dashboard", lang), href: "/" },
+        { label: t("ACCOUNTING", lang) },
+        { label: t("accounting.coa.title", lang) },
       ]}
     >
-      <ChartOfAccountsContent />
+      <div style={{ direction: isRTL ? "rtl" : "ltr" }}>
+        <ChartOfAccountsContent />
+      </div>
     </DashboardLayout>
   );
 }

@@ -209,7 +209,7 @@ function DrawerForm({
       open={open}
       onClose={onClose}
       placement={isRTL ? "left" : "right"}
-      width={isMobile ? "100%" : 460}
+      size={isMobile ? "100%" : 460}
       styles={{
         body: {
           padding: 0,
@@ -221,7 +221,7 @@ function DrawerForm({
       }}
       title={null}
       closable={false}
-      destroyOnClose
+      destroyOnHidden
     >
       {/* ── Header ─────────────────────────────────────────────────────── */}
       <div
@@ -696,7 +696,7 @@ function ModalForm({
       footer={null}
       title={null}
       width={isMobile ? "95vw" : sectioned ? 700 : 640}
-      destroyOnClose
+      destroyOnHidden
       styles={{
         content: {
           padding: 0,

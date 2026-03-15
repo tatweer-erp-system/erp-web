@@ -43,6 +43,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { FilingStatus } from "@/constants/enums";
+import { t } from "@/i18n";
+import { useAppSettings } from "@/contexts/AppSettingsContext";
 
 const { Text, Title } = Typography;
 
@@ -208,31 +210,6 @@ const taxPeriods: TaxPeriod[] = [
   },
 ];
 
-const chartData = taxPeriods.map(p => ({
-  month: p.period.split(" ")[0],
-  "Output VAT": p.outputVAT,
-  "Input VAT": p.inputVAT,
-  "Net VAT": p.netVAT,
-}));
-
-const STATUS_META: Record<
-  FilingStatus,
-  { color: string; label: string; icon: React.ReactNode }
-> = {
-  filed: { color: "success", label: "Filed", icon: <CheckCircleOutlined /> },
-  pending: {
-    color: "processing",
-    label: "Pending",
-    icon: <ClockCircleOutlined />,
-  },
-  overdue: {
-    color: "error",
-    label: "Overdue",
-    icon: <ExclamationCircleOutlined />,
-  },
-  draft: { color: "default", label: "Draft", icon: <FileTextOutlined /> },
-};
-
 function fmt(n: number) {
   if (n >= 1_000) return `$${(n / 1_000).toFixed(0)}K`;
   return `$${n}`;
@@ -246,7 +223,43 @@ function fmtFull(n: number) {
 
 export default function TaxReports() {
   const { token } = antTheme.useToken();
+  const { language } = useAppSettings();
+  const lang = language;
+  const isRTL = lang === "ar";
   const [year, setYear] = useState("2024");
+
+  const chartData = taxPeriods.map(p => ({
+    month: p.period.split(" ")[0],
+    [t("accounting.tax.outputVat", lang)]: p.outputVAT,
+    [t("accounting.tax.inputVat", lang)]: p.inputVAT,
+    [t("accounting.tax.netVat", lang)]: p.netVAT,
+  }));
+
+  const STATUS_META: Record<
+    FilingStatus,
+    { color: string; label: string; icon: React.ReactNode }
+  > = {
+    filed: {
+      color: "success",
+      label: t("accounting.tax.statusFiled", lang),
+      icon: <CheckCircleOutlined />,
+    },
+    pending: {
+      color: "processing",
+      label: t("accounting.tax.statusPending", lang),
+      icon: <ClockCircleOutlined />,
+    },
+    overdue: {
+      color: "error",
+      label: t("accounting.tax.statusOverdue", lang),
+      icon: <ExclamationCircleOutlined />,
+    },
+    draft: {
+      color: "default",
+      label: t("accounting.tax.statusDraft", lang),
+      icon: <FileTextOutlined />,
+    },
+  };
 
   const totalOutputVAT = taxPeriods.reduce((s, p) => s + p.outputVAT, 0);
   const totalInputVAT = taxPeriods.reduce((s, p) => s + p.inputVAT, 0);
@@ -257,43 +270,43 @@ export default function TaxReports() {
 
   const columns: TableColumnsType<TaxPeriod> = [
     {
-      title: "Period",
+      title: t("accounting.tax.colPeriod", lang),
       dataIndex: "period",
       render: v => <Text strong>{v}</Text>,
       width: 110,
     },
     {
-      title: "Due Date",
+      title: t("accounting.tax.colDueDate", lang),
       dataIndex: "dueDate",
       render: v => <Text type="secondary">{v}</Text>,
       width: 120,
     },
     {
-      title: "Taxable Output",
+      title: t("accounting.tax.colTaxableOutput", lang),
       dataIndex: "taxableOutput",
       align: "right",
       render: v => <Text>{fmtFull(v)}</Text>,
     },
     {
-      title: "Output VAT",
+      title: t("accounting.tax.colOutputVat", lang),
       dataIndex: "outputVAT",
       align: "right",
       render: v => <Text style={{ color: "#EF4444" }}>{fmtFull(v)}</Text>,
     },
     {
-      title: "Taxable Input",
+      title: t("accounting.tax.colTaxableInput", lang),
       dataIndex: "taxableInput",
       align: "right",
       render: v => <Text>{fmtFull(v)}</Text>,
     },
     {
-      title: "Input VAT",
+      title: t("accounting.tax.colInputVat", lang),
       dataIndex: "inputVAT",
       align: "right",
       render: v => <Text style={{ color: "#10B981" }}>{fmtFull(v)}</Text>,
     },
     {
-      title: "Net VAT Payable",
+      title: t("accounting.tax.colNetVatPayable", lang),
       dataIndex: "netVAT",
       align: "right",
       sorter: (a, b) => a.netVAT - b.netVAT,
@@ -304,7 +317,7 @@ export default function TaxReports() {
       ),
     },
     {
-      title: "Status",
+      title: t("accounting.tax.colStatus", lang),
       dataIndex: "status",
       align: "center",
       width: 110,
@@ -319,7 +332,7 @@ export default function TaxReports() {
       ),
     },
     {
-      title: "Ref #",
+      title: t("accounting.tax.colRefNo", lang),
       dataIndex: "refNo",
       render: v =>
         v === "—" ? (
@@ -335,15 +348,15 @@ export default function TaxReports() {
   function handleExport() {
     const csv = [
       [
-        "Period",
-        "Due Date",
-        "Taxable Output",
-        "Output VAT",
-        "Taxable Input",
-        "Input VAT",
-        "Net VAT",
-        "Status",
-        "Ref #",
+        t("accounting.tax.colPeriod", lang),
+        t("accounting.tax.colDueDate", lang),
+        t("accounting.tax.colTaxableOutput", lang),
+        t("accounting.tax.colOutputVat", lang),
+        t("accounting.tax.colTaxableInput", lang),
+        t("accounting.tax.colInputVat", lang),
+        t("accounting.tax.netVat", lang),
+        t("accounting.tax.colStatus", lang),
+        t("accounting.tax.colRefNo", lang),
       ],
       ...taxPeriods.map(p => [
         p.period,
@@ -367,375 +380,407 @@ export default function TaxReports() {
 
   return (
     <DashboardLayout
-      currentPage="Tax Reports"
+      currentPage={t("Tax Reports", lang)}
       breadcrumbs={[
-        { label: "Dashboard", href: "/" },
-        { label: "Reports" },
-        { label: "Tax" },
+        { label: t("Dashboard", lang), href: "/" },
+        { label: t("accounting.tax.breadcrumbReports", lang) },
+        { label: t("accounting.tax.breadcrumbTax", lang) },
       ]}
     >
-      <Space direction="vertical" size={20} style={{ width: "100%" }}>
-        {/* ── Header ──────────────────────────────────────────────────────── */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            flexWrap: "wrap",
-            gap: 12,
-          }}
-        >
-          <Space>
-            <PercentageOutlined
-              style={{ fontSize: 22, color: token.colorPrimary }}
-            />
-            <div>
-              <Title level={4} style={{ margin: 0 }}>
-                VAT / Tax Report
-              </Title>
-              <Text type="secondary" style={{ fontSize: 12 }}>
-                Value Added Tax — Filing Summary
-              </Text>
-            </div>
-          </Space>
-          <Space>
-            <Select
-              value={year}
-              onChange={setYear}
-              style={{ width: 120 }}
-              options={[
-                { value: "2024", label: "FY 2024" },
-                { value: "2023", label: "FY 2023" },
-              ]}
-            />
-            <Tooltip title="Print">
-              <Button
-                icon={<PrinterOutlined />}
-                onClick={() => window.print()}
+      <div style={{ direction: isRTL ? "rtl" : "ltr" }}>
+        <Space orientation="vertical" size={20} style={{ width: "100%" }}>
+          {/* ── Header ──────────────────────────────────────────────────────── */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: 12,
+            }}
+          >
+            <Space>
+              <PercentageOutlined
+                style={{ fontSize: 22, color: token.colorPrimary }}
               />
-            </Tooltip>
-            <Dropdown
-              menu={{
-                items: [
+              <div>
+                <Title level={4} style={{ margin: 0 }}>
+                  {t("accounting.tax.title", lang)}
+                </Title>
+                <Text type="secondary" style={{ fontSize: 12 }}>
+                  {t("accounting.tax.subtitle", lang)}
+                </Text>
+              </div>
+            </Space>
+            <Space>
+              <Select
+                value={year}
+                onChange={setYear}
+                style={{ width: 120 }}
+                options={[
                   {
-                    key: "csv",
-                    label: "Export CSV",
-                    icon: <ExportOutlined />,
-                    onClick: handleExport,
+                    value: "2024",
+                    label: `${t("accounting.tax.fy", lang)} 2024`,
                   },
                   {
-                    key: "xlsx",
-                    label: "Export Excel",
-                    icon: <ExportOutlined />,
+                    value: "2023",
+                    label: `${t("accounting.tax.fy", lang)} 2023`,
                   },
-                  { key: "pdf", label: "Export PDF", icon: <ExportOutlined /> },
-                ],
-              }}
-            >
-              <Button icon={<DownloadOutlined />}>Export</Button>
-            </Dropdown>
-          </Space>
-        </div>
-
-        {/* ── Summary KPIs ────────────────────────────────────────────────── */}
-        <Row gutter={[16, 16]}>
-          {[
-            {
-              label: "Total Output VAT",
-              value: fmt(totalOutputVAT),
-              color: "#EF4444",
-              icon: <PercentageOutlined />,
-              sub: "Collected from customers",
-            },
-            {
-              label: "Total Input VAT",
-              value: fmt(totalInputVAT),
-              color: "#10B981",
-              icon: <BankOutlined />,
-              sub: "Paid to vendors",
-            },
-            {
-              label: "Net VAT Payable",
-              value: fmt(totalNetVAT),
-              color: token.colorPrimary,
-              icon: <FileTextOutlined />,
-              sub: "Total liability YTD",
-            },
-            {
-              label: "Filing Compliance",
-              value: `${filedCount}/12`,
-              color: "#F59E0B",
-              icon: <CalendarOutlined />,
-              sub: "Periods filed on time",
-            },
-          ].map(k => (
-            <Col xs={24} sm={12} lg={6} key={k.label}>
-              <Card
-                size="small"
-                styles={{ body: { padding: "20px" } }}
-                style={{ borderTop: `4px solid ${k.color}` }}
+                ]}
+              />
+              <Tooltip title={t("accounting.tax.print", lang)}>
+                <Button
+                  icon={<PrinterOutlined />}
+                  onClick={() => window.print()}
+                />
+              </Tooltip>
+              <Dropdown
+                menu={{
+                  items: [
+                    {
+                      key: "csv",
+                      label: t("accounting.tax.exportCsv", lang),
+                      icon: <ExportOutlined />,
+                      onClick: handleExport,
+                    },
+                    {
+                      key: "xlsx",
+                      label: t("accounting.tax.exportExcel", lang),
+                      icon: <ExportOutlined />,
+                    },
+                    {
+                      key: "pdf",
+                      label: t("accounting.tax.exportPdf", lang),
+                      icon: <ExportOutlined />,
+                    },
+                  ],
+                }}
               >
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "flex-start",
-                    justifyContent: "space-between",
-                  }}
+                <Button icon={<DownloadOutlined />}>
+                  {t("accounting.tax.export", lang)}
+                </Button>
+              </Dropdown>
+            </Space>
+          </div>
+
+          {/* ── Summary KPIs ────────────────────────────────────────────────── */}
+          <Row gutter={[16, 16]}>
+            {[
+              {
+                label: t("accounting.tax.totalOutputVat", lang),
+                value: fmt(totalOutputVAT),
+                color: "#EF4444",
+                icon: <PercentageOutlined />,
+                sub: t("accounting.tax.collectedFromCustomers", lang),
+              },
+              {
+                label: t("accounting.tax.totalInputVat", lang),
+                value: fmt(totalInputVAT),
+                color: "#10B981",
+                icon: <BankOutlined />,
+                sub: t("accounting.tax.paidToVendors", lang),
+              },
+              {
+                label: t("accounting.tax.netVatPayable", lang),
+                value: fmt(totalNetVAT),
+                color: token.colorPrimary,
+                icon: <FileTextOutlined />,
+                sub: t("accounting.tax.totalLiabilityYtd", lang),
+              },
+              {
+                label: t("accounting.tax.filingCompliance", lang),
+                value: `${filedCount}/12`,
+                color: "#F59E0B",
+                icon: <CalendarOutlined />,
+                sub: t("accounting.tax.periodsFiledOnTime", lang),
+              },
+            ].map(k => (
+              <Col xs={24} sm={12} lg={6} key={k.label}>
+                <Card
+                  size="small"
+                  styles={{ body: { padding: "20px" } }}
+                  style={{ borderTop: `4px solid ${k.color}` }}
                 >
-                  <div>
-                    <Text
-                      type="secondary"
-                      style={{
-                        fontSize: 11,
-                        textTransform: "uppercase",
-                        letterSpacing: "0.07em",
-                      }}
-                    >
-                      {k.label}
-                    </Text>
-                    <div
-                      style={{
-                        fontSize: 28,
-                        fontWeight: 800,
-                        color: k.color,
-                        lineHeight: 1.2,
-                        marginTop: 6,
-                      }}
-                    >
-                      {k.value}
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "flex-start",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <div>
+                      <Text
+                        type="secondary"
+                        style={{
+                          fontSize: 11,
+                          textTransform: "uppercase",
+                          letterSpacing: "0.07em",
+                        }}
+                      >
+                        {k.label}
+                      </Text>
+                      <div
+                        style={{
+                          fontSize: 28,
+                          fontWeight: 800,
+                          color: k.color,
+                          lineHeight: 1.2,
+                          marginTop: 6,
+                        }}
+                      >
+                        {k.value}
+                      </div>
+                      <Text type="secondary" style={{ fontSize: 11 }}>
+                        {k.sub}
+                      </Text>
                     </div>
-                    <Text type="secondary" style={{ fontSize: 11 }}>
-                      {k.sub}
-                    </Text>
+                    <div
+                      style={{ fontSize: 24, color: k.color, opacity: 0.25 }}
+                    >
+                      {k.icon}
+                    </div>
                   </div>
-                  <div style={{ fontSize: 24, color: k.color, opacity: 0.25 }}>
-                    {k.icon}
-                  </div>
-                </div>
-              </Card>
-            </Col>
-          ))}
-        </Row>
+                </Card>
+              </Col>
+            ))}
+          </Row>
 
-        {/* ── Pending alert ───────────────────────────────────────────────── */}
-        <Alert
-          icon={<ClockCircleOutlined />}
-          showIcon
-          type="info"
-          message="November 2024 VAT return is pending filing. Due date: December 31, 2024."
-          action={
-            <Button size="small" type="primary">
-              File Now
-            </Button>
-          }
-          style={{ borderRadius: 8 }}
-        />
+          {/* ── Pending alert ───────────────────────────────────────────────── */}
+          <Alert
+            icon={<ClockCircleOutlined />}
+            showIcon
+            type="info"
+            message={t("accounting.tax.pendingAlert", lang)}
+            action={
+              <Button size="small" type="primary">
+                {t("accounting.tax.fileNow", lang)}
+              </Button>
+            }
+            style={{ borderRadius: 8 }}
+          />
 
-        {/* ── VAT chart + Tax registration ────────────────────────────────── */}
-        <Row gutter={16}>
-          <Col xs={24} lg={16}>
-            <Card
-              title={<Text strong>VAT by Period (Monthly)</Text>}
-              styles={{ body: { paddingTop: 8 } }}
-            >
-              <ResponsiveContainer width="100%" height={260}>
-                <BarChart data={chartData}>
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    stroke="var(--border,#e2e8f0)"
-                  />
-                  <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-                  <YAxis
-                    tickFormatter={v => `$${v / 1000}K`}
-                    tick={{ fontSize: 11 }}
-                  />
-                  <RTooltip
-                    formatter={(v: number) => `$${v.toLocaleString()}`}
-                  />
-                  <Legend />
-                  <Bar
-                    dataKey="Output VAT"
-                    fill="#EF4444"
-                    radius={[4, 4, 0, 0]}
-                    opacity={0.85}
-                  />
-                  <Bar
-                    dataKey="Input VAT"
-                    fill="#10B981"
-                    radius={[4, 4, 0, 0]}
-                    opacity={0.85}
-                  />
-                  <Bar
-                    dataKey="Net VAT"
-                    fill={token.colorPrimary}
-                    radius={[4, 4, 0, 0]}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </Card>
-          </Col>
-
-          <Col xs={24} lg={8}>
-            <Space
-              direction="vertical"
-              size={12}
-              style={{ width: "100%", height: "100%" }}
-            >
-              {/* Tax registration info */}
+          {/* ── VAT chart + Tax registration ────────────────────────────────── */}
+          <Row gutter={16}>
+            <Col xs={24} lg={16}>
               <Card
                 title={
-                  <Space>
-                    <BankOutlined />
-                    <Text strong>Tax Registration</Text>
-                  </Space>
+                  <Text strong>{t("accounting.tax.vatByPeriod", lang)}</Text>
                 }
-                size="small"
-                style={{ flex: 1 }}
-              >
-                <Descriptions column={1} size="small">
-                  <Descriptions.Item label="TRN">
-                    <Text code>TRN-100248916-003</Text>
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Tax Rate">
-                    <Tag color="blue">15% VAT</Tag>
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Filing Freq">
-                    Monthly
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Reg. Date">
-                    Jan 1, 2019
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Authority">ZATCA</Descriptions.Item>
-                </Descriptions>
-              </Card>
-
-              {/* Filing timeline */}
-              <Card
-                title={
-                  <Space>
-                    <CalendarOutlined />
-                    <Text strong>Recent Activity</Text>
-                  </Space>
-                }
-                size="small"
-                style={{ flex: 1 }}
                 styles={{ body: { paddingTop: 8 } }}
               >
-                <Timeline
-                  items={[
-                    {
-                      color: "gray",
-                      children: (
-                        <Text style={{ fontSize: 12 }}>
-                          Dec 2024 return —{" "}
-                          <Text type="secondary">Draft in progress</Text>
-                        </Text>
-                      ),
-                    },
-                    {
-                      color: "blue",
-                      children: (
-                        <Text style={{ fontSize: 12 }}>
-                          Nov 2024 return —{" "}
-                          <Text type="secondary">Due Dec 31</Text>
-                        </Text>
-                      ),
-                    },
-                    {
-                      color: "green",
-                      children: (
-                        <Text style={{ fontSize: 12 }}>
-                          Oct 2024 return filed{" "}
-                          <Text type="secondary">(VAT-2024-010)</Text>
-                        </Text>
-                      ),
-                    },
-                    {
-                      color: "green",
-                      children: (
-                        <Text style={{ fontSize: 12 }}>
-                          Sep 2024 return filed{" "}
-                          <Text type="secondary">(VAT-2024-009)</Text>
-                        </Text>
-                      ),
-                    },
-                    {
-                      color: "green",
-                      children: (
-                        <Text style={{ fontSize: 12 }}>
-                          Q3 audit completed successfully
-                        </Text>
-                      ),
-                    },
-                  ]}
-                />
+                <ResponsiveContainer width="100%" height={260}>
+                  <BarChart data={chartData}>
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke="var(--border,#e2e8f0)"
+                    />
+                    <XAxis dataKey="month" tick={{ fontSize: 11 }} />
+                    <YAxis
+                      tickFormatter={v => `$${v / 1000}K`}
+                      tick={{ fontSize: 11 }}
+                    />
+                    <RTooltip
+                      formatter={(v: number) => `$${v.toLocaleString()}`}
+                    />
+                    <Legend />
+                    <Bar
+                      dataKey={t("accounting.tax.outputVat", lang)}
+                      fill="#EF4444"
+                      radius={[4, 4, 0, 0]}
+                      opacity={0.85}
+                    />
+                    <Bar
+                      dataKey={t("accounting.tax.inputVat", lang)}
+                      fill="#10B981"
+                      radius={[4, 4, 0, 0]}
+                      opacity={0.85}
+                    />
+                    <Bar
+                      dataKey={t("accounting.tax.netVat", lang)}
+                      fill={token.colorPrimary}
+                      radius={[4, 4, 0, 0]}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
               </Card>
-            </Space>
-          </Col>
-        </Row>
+            </Col>
 
-        {/* ── Detail table ────────────────────────────────────────────────── */}
-        <Card
-          title={<Text strong>Monthly VAT Filing Details</Text>}
-          styles={{ body: { padding: 0 } }}
-        >
-          <Table
-            rowKey="key"
-            size="small"
-            columns={columns}
-            dataSource={taxPeriods}
-            scroll={{ x: "max-content" }}
-            pagination={false}
-            rowClassName={row =>
-              row.status === FilingStatus.PENDING ||
-              row.status === FilingStatus.DRAFT
-                ? "opacity-80"
-                : ""
+            <Col xs={24} lg={8}>
+              <Space
+                direction="vertical"
+                size={12}
+                style={{ width: "100%", height: "100%" }}
+              >
+                {/* Tax registration info */}
+                <Card
+                  title={
+                    <Space>
+                      <BankOutlined />
+                      <Text strong>
+                        {t("accounting.tax.taxRegistration", lang)}
+                      </Text>
+                    </Space>
+                  }
+                  size="small"
+                  style={{ flex: 1 }}
+                >
+                  <Descriptions column={1} size="small">
+                    <Descriptions.Item label={t("accounting.tax.trn", lang)}>
+                      <Text code>TRN-100248916-003</Text>
+                    </Descriptions.Item>
+                    <Descriptions.Item
+                      label={t("accounting.tax.taxRate", lang)}
+                    >
+                      <Tag color="blue">15% VAT</Tag>
+                    </Descriptions.Item>
+                    <Descriptions.Item
+                      label={t("accounting.tax.filingFreq", lang)}
+                    >
+                      {t("accounting.tax.monthly", lang)}
+                    </Descriptions.Item>
+                    <Descriptions.Item
+                      label={t("accounting.tax.regDate", lang)}
+                    >
+                      Jan 1, 2019
+                    </Descriptions.Item>
+                    <Descriptions.Item
+                      label={t("accounting.tax.authority", lang)}
+                    >
+                      ZATCA
+                    </Descriptions.Item>
+                  </Descriptions>
+                </Card>
+
+                {/* Filing timeline */}
+                <Card
+                  title={
+                    <Space>
+                      <CalendarOutlined />
+                      <Text strong>
+                        {t("accounting.tax.recentActivity", lang)}
+                      </Text>
+                    </Space>
+                  }
+                  size="small"
+                  style={{ flex: 1 }}
+                  styles={{ body: { paddingTop: 8 } }}
+                >
+                  <Timeline
+                    items={[
+                      {
+                        color: "gray",
+                        children: (
+                          <Text style={{ fontSize: 12 }}>
+                            {t("accounting.tax.decReturnDraft", lang)}
+                          </Text>
+                        ),
+                      },
+                      {
+                        color: "blue",
+                        children: (
+                          <Text style={{ fontSize: 12 }}>
+                            {t("accounting.tax.novReturnDue", lang)}
+                          </Text>
+                        ),
+                      },
+                      {
+                        color: "green",
+                        children: (
+                          <Text style={{ fontSize: 12 }}>
+                            {t("accounting.tax.octReturnFiled", lang)}
+                          </Text>
+                        ),
+                      },
+                      {
+                        color: "green",
+                        children: (
+                          <Text style={{ fontSize: 12 }}>
+                            {t("accounting.tax.sepReturnFiled", lang)}
+                          </Text>
+                        ),
+                      },
+                      {
+                        color: "green",
+                        children: (
+                          <Text style={{ fontSize: 12 }}>
+                            {t("accounting.tax.q3AuditCompleted", lang)}
+                          </Text>
+                        ),
+                      },
+                    ]}
+                  />
+                </Card>
+              </Space>
+            </Col>
+          </Row>
+
+          {/* ── Detail table ────────────────────────────────────────────────── */}
+          <Card
+            title={
+              <Text strong>{t("accounting.tax.monthlyVatFiling", lang)}</Text>
             }
-            summary={() => (
-              <Table.Summary.Row style={{ background: token.colorFillAlter }}>
-                <Table.Summary.Cell index={0} colSpan={2}>
-                  <Text strong>TOTAL FY {year}</Text>
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={2} align="right">
-                  <Text strong>
-                    {fmtFull(
-                      taxPeriods.reduce((s, p) => s + p.taxableOutput, 0)
-                    )}
-                  </Text>
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={3} align="right">
-                  <Text strong style={{ color: "#EF4444" }}>
-                    {fmtFull(totalOutputVAT)}
-                  </Text>
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={4} align="right">
-                  <Text strong>
-                    {fmtFull(
-                      taxPeriods.reduce((s, p) => s + p.taxableInput, 0)
-                    )}
-                  </Text>
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={5} align="right">
-                  <Text strong style={{ color: "#10B981" }}>
-                    {fmtFull(totalInputVAT)}
-                  </Text>
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={6} align="right">
-                  <Text strong style={{ color: token.colorPrimary }}>
-                    {fmtFull(totalNetVAT)}
-                  </Text>
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={7} colSpan={2} align="center">
-                  <Tag color="success" icon={<CheckCircleOutlined />}>
-                    {filedCount} of 12 Filed
-                  </Tag>
-                </Table.Summary.Cell>
-              </Table.Summary.Row>
-            )}
-          />
-        </Card>
-      </Space>
+            styles={{ body: { padding: 0 } }}
+          >
+            <Table
+              rowKey="key"
+              size="small"
+              columns={columns}
+              dataSource={taxPeriods}
+              scroll={{ x: "max-content" }}
+              pagination={false}
+              rowClassName={row =>
+                row.status === FilingStatus.PENDING ||
+                row.status === FilingStatus.DRAFT
+                  ? "opacity-80"
+                  : ""
+              }
+              summary={() => (
+                <Table.Summary.Row style={{ background: token.colorFillAlter }}>
+                  <Table.Summary.Cell index={0} colSpan={2}>
+                    <Text strong>
+                      {t("accounting.tax.totalFy", lang)} {year}
+                    </Text>
+                  </Table.Summary.Cell>
+                  <Table.Summary.Cell index={2} align="right">
+                    <Text strong>
+                      {fmtFull(
+                        taxPeriods.reduce((s, p) => s + p.taxableOutput, 0)
+                      )}
+                    </Text>
+                  </Table.Summary.Cell>
+                  <Table.Summary.Cell index={3} align="right">
+                    <Text strong style={{ color: "#EF4444" }}>
+                      {fmtFull(totalOutputVAT)}
+                    </Text>
+                  </Table.Summary.Cell>
+                  <Table.Summary.Cell index={4} align="right">
+                    <Text strong>
+                      {fmtFull(
+                        taxPeriods.reduce((s, p) => s + p.taxableInput, 0)
+                      )}
+                    </Text>
+                  </Table.Summary.Cell>
+                  <Table.Summary.Cell index={5} align="right">
+                    <Text strong style={{ color: "#10B981" }}>
+                      {fmtFull(totalInputVAT)}
+                    </Text>
+                  </Table.Summary.Cell>
+                  <Table.Summary.Cell index={6} align="right">
+                    <Text strong style={{ color: token.colorPrimary }}>
+                      {fmtFull(totalNetVAT)}
+                    </Text>
+                  </Table.Summary.Cell>
+                  <Table.Summary.Cell index={7} colSpan={2} align="center">
+                    <Tag color="success" icon={<CheckCircleOutlined />}>
+                      {filedCount} {t("accounting.tax.ofFiled", lang)}
+                    </Tag>
+                  </Table.Summary.Cell>
+                </Table.Summary.Row>
+              )}
+            />
+          </Card>
+        </Space>
+      </div>
     </DashboardLayout>
   );
 }

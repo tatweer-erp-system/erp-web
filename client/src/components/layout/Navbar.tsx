@@ -243,10 +243,18 @@ function NavbarInner({ sidebarOpen, setSidebarOpen, isRTL }: NavbarProps) {
           />
         </Tooltip>
 
-        <Divider type="vertical" style={{ height: 20, margin: "0 4px" }} />
+        <Divider
+          orientation="vertical"
+          style={{ height: 20, margin: "0 4px" }}
+        />
 
         {/* Notifications */}
         <NotificationCenter />
+
+        <Divider
+          orientation="vertical"
+          style={{ height: 20, margin: "0 4px" }}
+        />
 
         {/* Language */}
         <Tooltip title={isRTL ? "Switch to English" : "التبديل إلى العربية"}>

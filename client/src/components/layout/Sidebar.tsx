@@ -95,34 +95,8 @@ const NAV_ITEMS: NavItem[] = [
   { name: "Chat", icon: <MessageOutlined />, href: "/chat" },
   { name: "Documents", icon: <FolderOpenOutlined />, href: "/documents" },
 
-  { name: "POS", isHeader: true },
-  {
-    name: "Loyalty Report",
-    icon: <TrophyOutlined />,
-    href: "/pos/loyalty-report",
-  },
-  {
-    name: "Vouchers Report",
-    icon: <TagOutlined />,
-    href: "/pos/reports/vouchers",
-  },
-  {
-    name: "Gift Cards Report",
-    icon: <GiftOutlined />,
-    href: "/pos/reports/gift-cards",
-  },
-  { name: "Definitions", icon: <DatabaseOutlined />, href: "/pos-definitions" },
-  { name: "POS Settings", icon: <SettingOutlined />, href: "/pos/settings" },
-
+  // ── Sales (Odoo: Sales > Orders, Customers, Invoicing) ──────────────────
   { name: "SALES", isHeader: true },
-  {
-    name: "Customers",
-    icon: <TeamOutlined />,
-    submenu: [
-      { name: "All Customers", href: "/all-customers" },
-      { name: "Customer Groups", href: "/customer-groups" },
-    ],
-  },
   { name: "Quotations", icon: <FileTextOutlined />, href: "/quotations" },
   {
     name: "Sales Orders",
@@ -134,21 +108,19 @@ const NAV_ITEMS: NavItem[] = [
     ],
   },
   {
+    name: "Customers",
+    icon: <TeamOutlined />,
+    submenu: [
+      { name: "All Customers", href: "/all-customers" },
+      { name: "Customer Groups", href: "/customer-groups" },
+    ],
+  },
+  {
     name: "Sales Invoices",
     icon: <FileProtectOutlined />,
     href: "/sales-invoices",
   },
   { name: "Sales Returns", icon: <RollbackOutlined />, href: "/sales-returns" },
-  {
-    name: "Customer Receipts",
-    icon: <WalletOutlined />,
-    href: "/customer-receipts",
-  },
-  {
-    name: "Customer Statements",
-    icon: <LineChartOutlined />,
-    href: "/customer-statements",
-  },
   {
     name: "Definitions",
     icon: <DatabaseOutlined />,
@@ -160,7 +132,13 @@ const NAV_ITEMS: NavItem[] = [
     href: "/settings/sales",
   },
 
+  // ── Purchases (Odoo: Purchase > Orders, Vendors, Bills) ─────────────────
   { name: "PURCHASES", isHeader: true },
+  {
+    name: "Purchase Orders",
+    icon: <ShoppingOutlined />,
+    href: "/purchase-orders",
+  },
   {
     name: "Vendors",
     icon: <CarOutlined />,
@@ -168,11 +146,6 @@ const NAV_ITEMS: NavItem[] = [
       { name: "All Vendors", href: "/all-vendors" },
       { name: "Vendor Groups", href: "/vendor-groups" },
     ],
-  },
-  {
-    name: "Purchase Orders",
-    icon: <ShoppingOutlined />,
-    href: "/purchase-orders",
   },
   {
     name: "Purchase Invoices",
@@ -185,16 +158,6 @@ const NAV_ITEMS: NavItem[] = [
     href: "/purchase-returns",
   },
   {
-    name: "Vendor Payments",
-    icon: <DollarOutlined />,
-    href: "/vendor-payments",
-  },
-  {
-    name: "Vendor Statements",
-    icon: <OrderedListOutlined />,
-    href: "/vendor-statements",
-  },
-  {
     name: "Definitions",
     icon: <DatabaseOutlined />,
     href: "/purchases-definitions",
@@ -205,18 +168,9 @@ const NAV_ITEMS: NavItem[] = [
     href: "/settings/purchases",
   },
 
+  // ── Inventory (Odoo: Inventory > Products, Operations, Reporting) ───────
   { name: "INVENTORY", isHeader: true },
   { name: "Products", icon: <AppstoreOutlined />, href: "/product-details" },
-  {
-    name: "Product Categories",
-    icon: <TagsOutlined />,
-    href: "/product-categories",
-  },
-  {
-    name: "Units of Measure",
-    icon: <ColumnWidthOutlined />,
-    href: "/units-of-measure",
-  },
   { name: "Warehouses", icon: <HomeOutlined />, href: "/warehouses" },
   { name: "Opening Stock", icon: <InboxOutlined />, href: "/opening-stock" },
   {
@@ -226,16 +180,6 @@ const NAV_ITEMS: NavItem[] = [
   },
   { name: "Stock Transfers", icon: <SwapOutlined />, href: "/stock-transfers" },
   { name: "Stock Count", icon: <AuditOutlined />, href: "/stock-count" },
-  {
-    name: "Inventory Valuation",
-    icon: <StockOutlined />,
-    href: "/inventory-valuation",
-  },
-  {
-    name: "Stock Movement Report",
-    icon: <BarChartOutlined />,
-    href: "/stock-movement",
-  },
   {
     name: "Definitions",
     icon: <DatabaseOutlined />,
@@ -247,6 +191,7 @@ const NAV_ITEMS: NavItem[] = [
     href: "/settings/inventory",
   },
 
+  // ── Accounting (Odoo: Accounting > Journal, Reports, Config) ────────────
   { name: "ACCOUNTING", isHeader: true },
   {
     name: "Chart of Accounts",
@@ -264,6 +209,16 @@ const NAV_ITEMS: NavItem[] = [
     name: "Account Statements",
     icon: <FileSearchOutlined />,
     href: "/account-statements",
+  },
+  {
+    name: "Customer Statements",
+    icon: <LineChartOutlined />,
+    href: "/customer-statements",
+  },
+  {
+    name: "Vendor Statements",
+    icon: <OrderedListOutlined />,
+    href: "/vendor-statements",
   },
   {
     name: "Trial Balance",
@@ -297,6 +252,7 @@ const NAV_ITEMS: NavItem[] = [
     href: "/settings/accounting",
   },
 
+  // ── Treasury (Odoo: Accounting > Bank & Cash) ───────────────────────────
   { name: "TREASURY", isHeader: true },
   {
     name: "Cash Accounts",
@@ -304,8 +260,18 @@ const NAV_ITEMS: NavItem[] = [
     href: "/cash-accounts",
   },
   { name: "Bank Accounts", icon: <BankOutlined />, href: "/bank-accounts" },
-  { name: "Receipts", icon: <MoneyCollectOutlined />, href: "/receipts" },
+  {
+    name: "Customer Receipts",
+    icon: <MoneyCollectOutlined />,
+    href: "/customer-receipts",
+  },
+  {
+    name: "Vendor Payments",
+    icon: <DollarOutlined />,
+    href: "/vendor-payments",
+  },
   { name: "Payments", icon: <PayCircleOutlined />, href: "/payments" },
+  { name: "Receipts", icon: <WalletOutlined />, href: "/receipts" },
   {
     name: "Bank Transfers",
     icon: <RetweetOutlined />,
@@ -327,15 +293,9 @@ const NAV_ITEMS: NavItem[] = [
     href: "/settings/treasury",
   },
 
+  // ── HR (Odoo: Employees > Employees, Attendance, Leaves, Payroll) ───────
   { name: "HR", isHeader: true },
-  {
-    name: "Employees",
-    icon: <UsergroupAddOutlined />,
-    submenu: [
-      { name: "All Employees", href: "/employees" },
-      { name: "Employee Details", href: "/employee-details" },
-    ],
-  },
+  { name: "Employees", icon: <UsergroupAddOutlined />, href: "/employees" },
   { name: "Job Positions", icon: <SolutionOutlined />, href: "/job-positions" },
   { name: "Attendance", icon: <ClockCircleOutlined />, href: "/attendance" },
   {
@@ -348,6 +308,7 @@ const NAV_ITEMS: NavItem[] = [
   { name: "Definitions", icon: <DatabaseOutlined />, href: "/hr-definitions" },
   { name: "HR Settings", icon: <SettingOutlined />, href: "/settings/hr" },
 
+  // ── Reports ─────────────────────────────────────────────────────────────
   { name: "REPORTS", isHeader: true },
   { name: "Sales Reports", icon: <BarChartOutlined />, href: "/sales-reports" },
   {
@@ -368,6 +329,31 @@ const NAV_ITEMS: NavItem[] = [
   { name: "Aging Reports", icon: <BarChartOutlined />, href: "/aging-reports" },
   { name: "Tax Reports", icon: <PercentageOutlined />, href: "/tax-reports" },
   {
+    name: "Loyalty Report",
+    icon: <TrophyOutlined />,
+    href: "/pos/loyalty-report",
+  },
+  {
+    name: "Vouchers Report",
+    icon: <TagOutlined />,
+    href: "/pos/reports/vouchers",
+  },
+  {
+    name: "Gift Cards Report",
+    icon: <GiftOutlined />,
+    href: "/pos/reports/gift-cards",
+  },
+  {
+    name: "Inventory Valuation",
+    icon: <StockOutlined />,
+    href: "/inventory-valuation",
+  },
+  {
+    name: "Stock Movement",
+    icon: <SwapOutlined />,
+    href: "/stock-movement",
+  },
+  {
     name: "Definitions",
     icon: <DatabaseOutlined />,
     href: "/reports-definitions",
@@ -378,6 +364,7 @@ const NAV_ITEMS: NavItem[] = [
     href: "/settings/reports",
   },
 
+  // ── Settings ────────────────────────────────────────────────────────────
   { name: "SETTINGS", isHeader: true },
   {
     name: "My Settings",
@@ -400,12 +387,7 @@ const NAV_ITEMS: NavItem[] = [
     href: "/settings/notifications",
   },
   {
-    name: "Billing & Subscription",
-    icon: <PayCircleOutlined />,
-    href: "/settings/billing",
-  },
-  {
-    name: "Sequence Settings",
+    name: "Sequences",
     icon: <OrderedListOutlined />,
     href: "/settings/sequences",
   },

@@ -433,7 +433,7 @@ export default function PurchaseReports() {
         { label: "Purchase" },
       ]}
     >
-      <Space direction="vertical" size={20} style={{ width: "100%" }}>
+      <Space orientation="vertical" size={20} style={{ width: "100%" }}>
         <KpiStrip />
 
         {/* ── Spend Trend + Category Breakdown ───────────────────────────── */}
@@ -494,7 +494,7 @@ export default function PurchaseReports() {
               style={{ height: "100%" }}
               styles={{ body: { paddingTop: 12 } }}
             >
-              <Space direction="vertical" size={14} style={{ width: "100%" }}>
+              <Space orientation="vertical" size={14} style={{ width: "100%" }}>
                 {categorySpend.map((c, i) => {
                   const colors = [
                     "#3B82F6",
@@ -553,7 +553,7 @@ export default function PurchaseReports() {
             </Space>
           }
         >
-          <Space direction="vertical" size={12} style={{ width: "100%" }}>
+          <Space orientation="vertical" size={12} style={{ width: "100%" }}>
             {topVendors.map(v => (
               <div
                 key={v.name}

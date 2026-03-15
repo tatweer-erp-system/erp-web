@@ -20,6 +20,8 @@ apiClient.interceptors.request.use(config => {
     config.headers.Authorization = `Bearer ${token}`;
   }
   config.headers["X-Request-Id"] = crypto.randomUUID();
+  config.headers["Accept-Language"] =
+    localStorage.getItem("app-language") ?? "en";
   return config;
 });
 
@@ -56,12 +58,16 @@ apiClient.interceptors.response.use(
       const status = error.response?.status ?? 0;
       const data = error.response?.data as Record<string, unknown> | undefined;
 
+      // API wraps errors as { error: { message, code, statusCode } }
+      const nested = data?.error as Record<string, unknown> | undefined;
       const apiError: ApiError = {
         message:
+          (nested?.message as string) ??
           (data?.message as string) ??
           error.message ??
           "An unexpected error occurred",
-        code: (data?.code as string) ?? "UNKNOWN_ERROR",
+        code:
+          (nested?.code as string) ?? (data?.code as string) ?? "UNKNOWN_ERROR",
         field: data?.field as string | undefined,
         status,
       };

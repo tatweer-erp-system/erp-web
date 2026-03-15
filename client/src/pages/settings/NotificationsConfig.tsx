@@ -482,7 +482,7 @@ function AnnouncementsTab() {
             </Col>
           </Row>
           <Divider style={{ margin: "4px 0 16px" }} />
-          <Space direction="vertical" size={10}>
+          <Space orientation="vertical" size={10}>
             <div>
               <Switch defaultChecked size="small" />{" "}
               <Text style={{ fontSize: 13, marginLeft: 8 }}>
@@ -654,7 +654,7 @@ function QuietHoursTab() {
             </Col>
           </Row>
           <Divider style={{ margin: "4px 0 16px" }} />
-          <Space direction="vertical" size={10}>
+          <Space orientation="vertical" size={10}>
             <div>
               <Switch defaultChecked size="small" />{" "}
               <Text style={{ fontSize: 13, marginLeft: 8 }}>

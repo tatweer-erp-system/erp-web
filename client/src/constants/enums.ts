@@ -371,3 +371,54 @@ export const PerformanceStatus = {
 } as const;
 export type PerformanceStatus =
   (typeof PerformanceStatus)[keyof typeof PerformanceStatus];
+
+// ─── Accounting ───────────────────────────────────────────────────────────────
+
+export const AccountType = {
+  ASSET: "asset",
+  LIABILITY: "liability",
+  EQUITY: "equity",
+  REVENUE: "revenue",
+  EXPENSE: "expense",
+} as const;
+export type AccountType = (typeof AccountType)[keyof typeof AccountType];
+
+export const NormalBalance = {
+  DEBIT: "debit",
+  CREDIT: "credit",
+} as const;
+export type NormalBalance = (typeof NormalBalance)[keyof typeof NormalBalance];
+
+export const JournalEntryType = {
+  MANUAL: "manual",
+  AUTO: "auto",
+  OPENING: "opening",
+  CLOSING: "closing",
+  REVERSAL: "reversal",
+} as const;
+export type JournalEntryType =
+  (typeof JournalEntryType)[keyof typeof JournalEntryType];
+
+/** Derived from isPosted + reversedBy on the frontend */
+export const JournalEntryStatus = {
+  DRAFT: "draft",
+  POSTED: "posted",
+  REVERSED: "reversed",
+} as const;
+export type JournalEntryStatus =
+  (typeof JournalEntryStatus)[keyof typeof JournalEntryStatus];
+
+export const FiscalPeriodStatus = {
+  OPEN: "open",
+  CLOSED: "closed",
+  LOCKED: "locked",
+} as const;
+export type FiscalPeriodStatus =
+  (typeof FiscalPeriodStatus)[keyof typeof FiscalPeriodStatus];
+
+export const FiscalPeriodType = {
+  MONTHLY: "monthly",
+  QUARTERLY: "quarterly",
+} as const;
+export type FiscalPeriodType =
+  (typeof FiscalPeriodType)[keyof typeof FiscalPeriodType];

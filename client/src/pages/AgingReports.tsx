@@ -426,7 +426,7 @@ export default function AgingReports() {
         { label: "Aging" },
       ]}
     >
-      <Space direction="vertical" size={20} style={{ width: "100%" }}>
+      <Space orientation="vertical" size={20} style={{ width: "100%" }}>
         {/* ── Mode toggle ─────────────────────────────────────────────────── */}
         <div
           style={{

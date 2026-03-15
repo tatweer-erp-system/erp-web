@@ -488,7 +488,7 @@ export default function SalesReports() {
         { label: "Sales" },
       ]}
     >
-      <Space direction="vertical" size={20} style={{ width: "100%" }}>
+      <Space orientation="vertical" size={20} style={{ width: "100%" }}>
         {/* ── KPI Row ────────────────────────────────────────────────────── */}
         <Row gutter={16}>
           <Col xs={24} sm={12} lg={6}>

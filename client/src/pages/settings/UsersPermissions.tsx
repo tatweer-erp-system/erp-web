@@ -18,9 +18,6 @@ import {
   Switch,
   Table,
   Tag,
-  Timeline,
-  Tooltip,
-  Transfer,
   Typography,
   message,
   theme as antTheme,
@@ -29,10 +26,7 @@ import {
   UsergroupAddOutlined,
   UserOutlined,
   LockOutlined,
-  ApartmentOutlined,
-  IdcardOutlined,
   SafetyOutlined,
-  MobileOutlined,
   ClockCircleOutlined,
   HistoryOutlined,
   PlusOutlined,
@@ -48,14 +42,43 @@ import { LoginResult, UserStatus } from "@/constants/enums";
 
 const { Title, Text } = Typography;
 
+const SOON = (
+  <Tag
+    color="blue"
+    style={{
+      fontSize: 9,
+      lineHeight: "16px",
+      padding: "0 4px",
+      marginInlineStart: 6,
+      borderRadius: 4,
+      verticalAlign: "middle",
+    }}
+  >
+    Soon
+  </Tag>
+);
+
 const TABS = [
   { key: "management", label: "User Management", icon: <UserOutlined /> },
   { key: "roles", label: "Roles & Permissions", icon: <LockOutlined /> },
-  { key: "departments", label: "Departments", icon: <ApartmentOutlined /> },
-  { key: "employees", label: "Employee Profiles", icon: <IdcardOutlined /> },
-  { key: "login", label: "Login Methods", icon: <GlobalOutlined /> },
-  { key: "session", label: "Session Policy", icon: <ClockCircleOutlined /> },
-  { key: "2fa", label: "2FA Settings", icon: <SafetyOutlined /> },
+  {
+    key: "login",
+    label: "Login Methods",
+    icon: <GlobalOutlined />,
+    comingSoon: true,
+  },
+  {
+    key: "session",
+    label: "Session Policy",
+    icon: <ClockCircleOutlined />,
+    comingSoon: true,
+  },
+  {
+    key: "2fa",
+    label: "2FA Settings",
+    icon: <SafetyOutlined />,
+    comingSoon: true,
+  },
   { key: "activity", label: "Activity Log", icon: <HistoryOutlined /> },
 ];
 
@@ -190,44 +213,6 @@ const ROLES = [
     users: 4,
     color: "#8b5cf6",
     permissions: ["All modules: Read only"],
-  },
-];
-
-const DEPARTMENTS = [
-  {
-    key: "1",
-    name: "Information Technology",
-    manager: "John Doe",
-    headcount: 12,
-    status: UserStatus.ACTIVE,
-  },
-  {
-    key: "2",
-    name: "Sales & Marketing",
-    manager: "Sarah Ahmed",
-    headcount: 18,
-    status: UserStatus.ACTIVE,
-  },
-  {
-    key: "3",
-    name: "Finance & Accounting",
-    manager: "Omar Hassan",
-    headcount: 8,
-    status: UserStatus.ACTIVE,
-  },
-  {
-    key: "4",
-    name: "Human Resources",
-    manager: "Lisa Chen",
-    headcount: 5,
-    status: UserStatus.ACTIVE,
-  },
-  {
-    key: "5",
-    name: "Operations",
-    manager: "Mark Johnson",
-    headcount: 15,
-    status: UserStatus.ACTIVE,
   },
 ];
 
@@ -487,91 +472,6 @@ function RolesTab() {
   );
 }
 
-function DepartmentsTab() {
-  const deptCols = [
-    {
-      title: "Department",
-      dataIndex: "name",
-      render: (v: string) => (
-        <Text strong style={{ fontSize: 13 }}>
-          {v}
-        </Text>
-      ),
-    },
-    {
-      title: "Manager",
-      dataIndex: "manager",
-      render: (v: string) => (
-        <Space>
-          <Avatar size={24} style={{ background: "#059669", fontSize: 10 }}>
-            {v[0]}
-          </Avatar>
-          <Text style={{ fontSize: 13 }}>{v}</Text>
-        </Space>
-      ),
-    },
-    {
-      title: "Headcount",
-      dataIndex: "headcount",
-      render: (v: number) => <Tag>{v} employees</Tag>,
-    },
-    {
-      title: "Status",
-      dataIndex: "status",
-      render: (v: string) => <Badge status="success" text="Active" />,
-    },
-    {
-      title: "Actions",
-      render: () => (
-        <Space>
-          <Button size="small" icon={<EditOutlined />}>
-            Edit
-          </Button>
-          <Button size="small" danger icon={<DeleteOutlined />} />
-        </Space>
-      ),
-    },
-  ];
-  return (
-    <>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          marginBottom: 12,
-        }}
-      >
-        <Text strong>Departments ({DEPARTMENTS.length})</Text>
-        <Button type="primary" icon={<PlusOutlined />} size="small">
-          Add Department
-        </Button>
-      </div>
-      <Table
-        size="small"
-        dataSource={DEPARTMENTS}
-        columns={deptCols}
-        pagination={false}
-      />
-    </>
-  );
-}
-
-function EmployeesTab() {
-  return (
-    <Alert
-      type="info"
-      showIcon
-      message="Employee profiles are managed in the HR module."
-      description="Go to HR → Employees to view and manage detailed employee profiles, contracts, and documents."
-      action={
-        <Button size="small" type="primary">
-          Go to HR
-        </Button>
-      }
-    />
-  );
-}
-
 function LoginMethodsTab() {
   const { token } = antTheme.useToken();
   const methods = [
@@ -580,6 +480,7 @@ function LoginMethodsTab() {
       label: "Email & Password",
       desc: "Standard email/password login",
       enabled: true,
+      disabled: false,
       icon: <UserOutlined />,
     },
     {
@@ -587,6 +488,7 @@ function LoginMethodsTab() {
       label: "Google SSO",
       desc: "Sign in with Google Workspace",
       enabled: false,
+      disabled: true,
       icon: <GlobalOutlined />,
     },
     {
@@ -594,6 +496,7 @@ function LoginMethodsTab() {
       label: "Microsoft SSO",
       desc: "Sign in with Microsoft / Entra ID",
       enabled: false,
+      disabled: true,
       icon: <DesktopOutlined />,
     },
     {
@@ -601,6 +504,7 @@ function LoginMethodsTab() {
       label: "SAML 2.0",
       desc: "Enterprise SAML identity provider",
       enabled: false,
+      disabled: true,
       icon: <KeyOutlined />,
     },
   ];
@@ -613,7 +517,12 @@ function LoginMethodsTab() {
             <List.Item
               style={{ padding: "12px 0" }}
               actions={[
-                <Switch key="sw" defaultChecked={m.enabled} size="small" />,
+                <Switch
+                  key="sw"
+                  defaultChecked={m.enabled}
+                  size="small"
+                  disabled={m.disabled}
+                />,
               ]}
             >
               <List.Item.Meta
@@ -626,7 +535,12 @@ function LoginMethodsTab() {
                     }}
                   />
                 }
-                title={<Text style={{ fontSize: 13 }}>{m.label}</Text>}
+                title={
+                  <Text style={{ fontSize: 13 }}>
+                    {m.label}
+                    {m.disabled && SOON}
+                  </Text>
+                }
                 description={
                   <Text type="secondary" style={{ fontSize: 12 }}>
                     {m.desc}
@@ -642,11 +556,12 @@ function LoginMethodsTab() {
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Minimum Password Length"
+                label={<>Minimum Password Length {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
                   defaultValue="8"
+                  disabled
                   options={["6", "8", "10", "12", "16"].map(v => ({
                     value: v,
                     label: `${v} characters`,
@@ -655,9 +570,13 @@ function LoginMethodsTab() {
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
-              <Form.Item label="Password Expiry" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label={<>Password Expiry {SOON}</>}
+                style={{ marginBottom: 16 }}
+              >
                 <Select
                   defaultValue="90"
+                  disabled
                   options={[
                     { value: "never", label: "Never expires" },
                     { value: "30", label: "Every 30 days" },
@@ -668,22 +587,26 @@ function LoginMethodsTab() {
               </Form.Item>
             </Col>
             <Col xs={24}>
-              <Space direction="vertical" size={8}>
-                <Checkbox defaultChecked>Require uppercase letters</Checkbox>
-                <Checkbox defaultChecked>Require numbers</Checkbox>
-                <Checkbox defaultChecked>Require special characters</Checkbox>
-                <Checkbox>Prevent reuse of last 5 passwords</Checkbox>
+              <Space orientation="vertical" size={8}>
+                <Checkbox defaultChecked disabled>
+                  Require uppercase letters {SOON}
+                </Checkbox>
+                <Checkbox defaultChecked disabled>
+                  Require numbers {SOON}
+                </Checkbox>
+                <Checkbox defaultChecked disabled>
+                  Require special characters {SOON}
+                </Checkbox>
+                <Checkbox disabled>
+                  Prevent reuse of last 5 passwords {SOON}
+                </Checkbox>
               </Space>
             </Col>
           </Row>
         </Form>
       </Section>
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button
-          type="primary"
-          icon={<SafetyOutlined />}
-          onClick={() => message.success("Login settings saved")}
-        >
+        <Button type="primary" icon={<SafetyOutlined />} disabled>
           Save Settings
         </Button>
       </div>
@@ -699,11 +622,12 @@ function SessionPolicyTab() {
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Idle Session Timeout"
+                label={<>Idle Session Timeout {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
                   defaultValue="30"
+                  disabled
                   options={[
                     { value: "15", label: "15 minutes" },
                     { value: "30", label: "30 minutes" },
@@ -717,11 +641,12 @@ function SessionPolicyTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Absolute Session Limit"
+                label={<>Absolute Session Limit {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
                   defaultValue="480"
+                  disabled
                   options={[
                     { value: "240", label: "4 hours" },
                     { value: "480", label: "8 hours" },
@@ -733,11 +658,12 @@ function SessionPolicyTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Max Concurrent Sessions per User"
+                label={<>Max Concurrent Sessions per User {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
                   defaultValue="3"
+                  disabled
                   options={[
                     { value: "1", label: "1 session only" },
                     { value: "3", label: "Up to 3 sessions" },
@@ -749,11 +675,12 @@ function SessionPolicyTab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Remember Me Duration"
+                label={<>Remember Me Duration {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
                   defaultValue="7"
+                  disabled
                   options={[
                     { value: "1", label: "1 day" },
                     { value: "7", label: "7 days" },
@@ -765,25 +692,23 @@ function SessionPolicyTab() {
             </Col>
           </Row>
           <Divider style={{ margin: "4px 0 16px" }} />
-          <Space direction="vertical" size={10}>
-            <Switch defaultChecked />{" "}
+          <Space orientation="vertical" size={10}>
+            <Switch defaultChecked disabled />{" "}
             <Text style={{ fontSize: 13, marginLeft: 8 }}>
-              Show warning dialog 5 minutes before session expires
+              Show warning dialog 5 minutes before session expires {SOON}
             </Text>
             <div>
-              <Switch />{" "}
+              <Switch disabled />{" "}
               <Text style={{ fontSize: 13, marginLeft: 8 }}>
-                Force re-authentication on sensitive actions (delete, export)
+                Force re-authentication on sensitive actions (delete, export){" "}
+                {SOON}
               </Text>
             </div>
           </Space>
         </Form>
       </Section>
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button
-          type="primary"
-          onClick={() => message.success("Session policy saved")}
-        >
+        <Button type="primary" disabled>
           Save Policy
         </Button>
       </div>
@@ -796,22 +721,24 @@ function TwoFATab() {
     <>
       <Section
         title="Two-Factor Authentication Policy"
-        extra={<Switch defaultChecked />}
+        extra={<Switch defaultChecked disabled />}
       >
         <Alert
-          type="success"
+          type="info"
           showIcon
-          icon={<CheckCircleOutlined />}
-          message="2FA is enabled for this organization"
-          description="Users will be prompted to set up 2FA on next login if not already configured."
+          message="Two-factor authentication is coming soon"
           style={{ marginBottom: 16 }}
         />
         <Form layout="vertical">
           <Row gutter={[16, 0]}>
             <Col xs={24} sm={12}>
-              <Form.Item label="2FA Enforcement" style={{ marginBottom: 16 }}>
+              <Form.Item
+                label={<>2FA Enforcement {SOON}</>}
+                style={{ marginBottom: 16 }}
+              >
                 <Select
                   defaultValue="required_admin"
+                  disabled
                   options={[
                     { value: "optional", label: "Optional (user choice)" },
                     {
@@ -825,11 +752,12 @@ function TwoFATab() {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Grace Period (days to set up)"
+                label={<>Grace Period (days to set up) {SOON}</>}
                 style={{ marginBottom: 16 }}
               >
                 <Select
                   defaultValue="7"
+                  disabled
                   options={[
                     { value: "0", label: "No grace period" },
                     { value: "3", label: "3 days" },
@@ -870,11 +798,20 @@ function TwoFATab() {
             <List.Item
               style={{ padding: "10px 0" }}
               actions={[
-                <Switch key="sw" defaultChecked={m.enabled} size="small" />,
+                <Switch
+                  key="sw"
+                  defaultChecked={m.enabled}
+                  size="small"
+                  disabled
+                />,
               ]}
             >
               <List.Item.Meta
-                title={<Text style={{ fontSize: 13 }}>{m.label}</Text>}
+                title={
+                  <Text style={{ fontSize: 13 }}>
+                    {m.label} {SOON}
+                  </Text>
+                }
                 description={
                   <Text type="secondary" style={{ fontSize: 12 }}>
                     {m.desc}
@@ -886,11 +823,7 @@ function TwoFATab() {
         />
       </Section>
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button
-          type="primary"
-          icon={<SafetyOutlined />}
-          onClick={() => message.success("2FA settings saved")}
-        >
+        <Button type="primary" icon={<SafetyOutlined />} disabled>
           Save 2FA Settings
         </Button>
       </div>
@@ -1009,8 +942,6 @@ export default function UsersPermissions() {
   const tabContent: Record<string, React.ReactNode> = {
     management: <ManagementTab />,
     roles: <RolesTab />,
-    departments: <DepartmentsTab />,
-    employees: <EmployeesTab />,
     login: <LoginMethodsTab />,
     session: <SessionPolicyTab />,
     "2fa": <TwoFATab />,
@@ -1047,7 +978,7 @@ export default function UsersPermissions() {
               Users & Permissions
             </Title>
             <Text type="secondary" style={{ fontSize: 12 }}>
-              Manage users, roles, departments, and access control
+              Manage users, roles, and access control
             </Text>
           </div>
         </div>
@@ -1107,6 +1038,7 @@ export default function UsersPermissions() {
                   {tab.icon}
                 </span>
                 <span style={{ flex: 1 }}>{tab.label}</span>
+                {tab.comingSoon && SOON}
               </button>
             ))}
           </Card>
