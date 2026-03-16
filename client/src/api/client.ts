@@ -6,8 +6,6 @@ import {
   clearTokens,
 } from "@/lib/token";
 import { getStorageItem, STORAGE_KEYS } from "@/lib/storage";
-import { useBranchStore } from "@/stores/branch.store";
-import { useLangStore } from "@/stores/lang.store";
 import type { ApiError } from "@/types/api";
 
 export const apiClient = axios.create({
@@ -16,24 +14,21 @@ export const apiClient = axios.create({
   timeout: 30_000,
 });
 
-// ─── Request interceptor: attach Bearer token + X-Request-Id + X-Branch-Id ───
+// ─── Request interceptor ────────────────────────────────────────────────────
 apiClient.interceptors.request.use(config => {
   const token = getAccessToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
-  config.headers["X-Request-Id"] = crypto.randomUUID();
-  config.headers["Accept-Language"] = useLangStore.getState().lang;
 
-  const activeBranch = useBranchStore.getState().activeBranch;
-  if (activeBranch) {
-    config.headers["X-Branch-Id"] = String(activeBranch.id);
-  }
+  config.headers["X-Request-Id"] = crypto.randomUUID();
+  config.headers["Accept-Language"] =
+    getStorageItem(STORAGE_KEYS.LANGUAGE) ?? "en";
 
   return config;
 });
 
-// ─── Response interceptor: handle 401 with silent token refresh ──────────────
+// ─── Response interceptor: silent token refresh on 401 ──────────────────────
 let isRefreshing = false;
 let pendingQueue: Array<{
   resolve: (token: string) => void;
@@ -55,18 +50,15 @@ apiClient.interceptors.response.use(
       _retry?: boolean;
     };
 
-    // Only handle 401 for non-auth endpoints
     if (
       error.response?.status !== 401 ||
       originalRequest._retry ||
       originalRequest.url === "/auth/login" ||
       originalRequest.url === "/auth/refresh"
     ) {
-      // Normalize non-401 errors
       const status = error.response?.status ?? 0;
       const data = error.response?.data as Record<string, unknown> | undefined;
 
-      // API wraps errors as { error: { message, code, statusCode } }
       const nested = data?.error as Record<string, unknown> | undefined;
       const apiError: ApiError = {
         message:
@@ -91,7 +83,6 @@ apiClient.interceptors.response.use(
     }
 
     if (isRefreshing) {
-      // Queue this request until refresh completes
       return new Promise<string>((resolve, reject) => {
         pendingQueue.push({ resolve, reject });
       }).then(token => {
@@ -128,5 +119,3 @@ apiClient.interceptors.response.use(
     }
   }
 );
-
-export default apiClient;

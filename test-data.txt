@@ -1,9 +1,0 @@
-| Name             | Email                  | Role        | Redirects to |
-| ---------------- | ---------------------- | ----------- | ------------ |
-| Ahmed Al-Rashidi | ahmed@erp.com          | Super Admin | Dashboard    |
-| Sarah Johnson    | sarah@erp.com          | Admin       | Dashboard    |
-| Mohammed Hassan  | mohammed@erp.com       | Manager     | Dashboard    |
-| Layla Al-Farsi   | layla@erp.com          | Accountant  | Dashboard    |
-| Omar Khalid      | omar@erp.com           | Viewer      | Dashboard    |
-| Sara Ahmed       | sara@erp.com           | Cashier     | /pos         |
-| Alex Johnson     | alex@erp.com           | Cashier     | —            |
