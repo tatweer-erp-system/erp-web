@@ -8,6 +8,7 @@ import { CheckOutlined, CheckCircleOutlined } from "@ant-design/icons";
 import { Sun, Moon } from "lucide-react";
 import { appearanceService } from "@/services/settings.service";
 import type { AppearanceSettings } from "@/services/settings.service";
+import { getStorageItem, setStorageItem, STORAGE_KEYS } from "@/lib/storage";
 
 const { Text } = Typography;
 
@@ -120,7 +121,7 @@ export default function AppearanceTab() {
   const [density, setDensity] = useState<"compact" | "default" | "comfortable">(
     () => {
       return (
-        (localStorage.getItem("app-density") as
+        (getStorageItem(STORAGE_KEYS.DENSITY) as
           | "compact"
           | "default"
           | "comfortable") ?? "default"
@@ -171,7 +172,7 @@ export default function AppearanceTab() {
 
   const handleThemeChange = (value: "light" | "dark") => {
     setThemeOption(value);
-    localStorage.setItem("app-theme-option", value);
+    setStorageItem(STORAGE_KEYS.THEME_OPTION, value);
     setMode(value);
     debouncedSave({ theme: value });
   };
@@ -194,7 +195,7 @@ export default function AppearanceTab() {
     value: "compact" | "default" | "comfortable"
   ) => {
     setDensity(value);
-    localStorage.setItem("app-density", value);
+    setStorageItem(STORAGE_KEYS.DENSITY, value);
     debouncedSave({ density: value });
   };
 

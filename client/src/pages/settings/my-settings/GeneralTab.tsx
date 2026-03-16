@@ -14,6 +14,7 @@ import {
 } from "antd";
 import { CheckCircleOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { QUERY_KEYS } from "@/constants/queryKeys";
 import { generalSettingsService } from "@/services/settings.service";
 import type { GeneralSettings } from "@/services/settings.service";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
@@ -86,11 +87,13 @@ export default function GeneralTab() {
   const queryClient = useQueryClient();
 
   const [savedField, setSavedField] = useState<string | null>(null);
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
 
   // ─── Data fetching ───────────────────────────────────────────────────────
   const { data: settings } = useQuery<GeneralSettings>({
-    queryKey: ["generalSettings"],
+    queryKey: [QUERY_KEYS.GENERAL_SETTINGS],
     queryFn: generalSettingsService.get,
     staleTime: 5 * 60 * 1000,
   });
@@ -100,7 +103,9 @@ export default function GeneralTab() {
     mutationFn: (dto: Partial<GeneralSettings>) =>
       generalSettingsService.update(dto),
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["generalSettings"] });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GENERAL_SETTINGS],
+      });
       const fieldName = Object.keys(variables)[0];
       setSavedField(fieldName);
       setTimeout(() => setSavedField(null), 2000);

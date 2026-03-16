@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { QUERY_KEYS } from "@/constants/queryKeys";
 import {
   Card,
   Col,
@@ -18,7 +19,10 @@ import {
   CloseCircleOutlined,
 } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
-import { getAllVouchers, type Voucher } from "../../services/voucherService";
+import {
+  getAllVouchers,
+  type Voucher,
+} from "@/modules/pos/services/voucherService";
 import { VoucherStatus } from "@/constants/enums";
 
 const { RangePicker } = DatePicker;
@@ -53,7 +57,7 @@ export default function VouchersReport() {
   const [typeFilter, setTypeFilter] = useState("all");
 
   const { data: vouchers = [], isLoading } = useQuery({
-    queryKey: ["vouchers-report"],
+    queryKey: [QUERY_KEYS.VOUCHERS_REPORT],
     queryFn: getAllVouchers,
     staleTime: 30_000,
   });

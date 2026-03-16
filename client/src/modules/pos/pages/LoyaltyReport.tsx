@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { QUERY_KEYS } from "@/constants/queryKeys";
 import {
   Card,
   Col,
@@ -19,8 +20,12 @@ import {
   TrophyOutlined,
 } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
-import { getAllCustomers } from "../services/customerService";
-import { getTier, LOYALTY_TIERS, type Customer } from "../data/mockCustomers";
+import { getAllCustomers } from "@/modules/pos/services/customerService";
+import {
+  getTier,
+  LOYALTY_TIERS,
+  type Customer,
+} from "@/modules/pos/data/mockCustomers";
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -32,7 +37,7 @@ export default function LoyaltyReport() {
   const [tierFilter, setTierFilter] = useState<string>("all");
 
   const { data: customers = [], isLoading } = useQuery({
-    queryKey: ["loyalty-report-customers"],
+    queryKey: [QUERY_KEYS.LOYALTY_REPORT_CUSTOMERS],
     queryFn: getAllCustomers,
     staleTime: 30_000,
   });

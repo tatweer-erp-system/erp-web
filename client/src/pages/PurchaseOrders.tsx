@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { PaymentStatus, PurchaseOrderStatus } from "@/constants/enums";
-import DashboardLayout from "@/components/DashboardLayout";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,10 +25,10 @@ import {
   User,
   ArrowLeftRight,
 } from "lucide-react";
-import AnimatedModal from "@/components/AnimatedModal";
-import BranchSelector from "@/components/BranchSelector";
-import BulkActions from "@/components/BulkActions";
-import AdvancedFilters from "@/components/AdvancedFilters";
+import { AnimatedModal } from "@/components/AnimatedModal";
+import { BranchSelector } from "@/components/BranchSelector";
+import { BulkActions } from "@/components/BulkActions";
+import { AdvancedFilters } from "@/components/AdvancedFilters";
 import {
   DropdownMenu,
   DropdownMenuContent,

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { QUERY_KEYS } from "@/constants/queryKeys";
 import {
   Card,
   Col,
@@ -18,7 +19,10 @@ import {
   CloseCircleOutlined,
 } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
-import { getAllGiftCards, type GiftCard } from "../../services/giftCardService";
+import {
+  getAllGiftCards,
+  type GiftCard,
+} from "@/modules/pos/services/giftCardService";
 import { GiftCardStatus } from "@/constants/enums";
 
 const { RangePicker } = DatePicker;
@@ -52,7 +56,7 @@ export default function GiftCardsReport() {
   const [statusFilter, setStatusFilter] = useState("all");
 
   const { data: cards = [], isLoading } = useQuery({
-    queryKey: ["gift-cards-report"],
+    queryKey: [QUERY_KEYS.GIFT_CARDS_REPORT],
     queryFn: getAllGiftCards,
     staleTime: 30_000,
   });

@@ -6,6 +6,7 @@ import type {
   UpdateProfileDto,
 } from "@/services/settings.service";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { QUERY_KEYS } from "@/constants/queryKeys";
 import {
   Form,
   Input,
@@ -86,7 +87,7 @@ export default function ProfileTab() {
 
   // ── Fetch profile ────────────────────────────────────────────────────────
   const { data: profile, isLoading } = useQuery<UserProfile>({
-    queryKey: ["profile"],
+    queryKey: [QUERY_KEYS.PROFILE],
     queryFn: profileService.get,
     staleTime: 5 * 60 * 1000,
   });
@@ -109,7 +110,7 @@ export default function ProfileTab() {
   const updateMutation = useMutation({
     mutationFn: (dto: UpdateProfileDto) => profileService.update(dto),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.PROFILE] });
       notification.success({
         message: t("mySettings.profile.saved", language),
       });
@@ -126,7 +127,7 @@ export default function ProfileTab() {
     mutationFn: (file: File) => profileService.uploadAvatar(file),
     onSuccess: data => {
       setAvatarPreview(data.avatarUrl);
-      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.PROFILE] });
       notification.success({
         message: t("mySettings.profile.avatarUploaded", language),
       });
@@ -149,9 +150,9 @@ export default function ProfileTab() {
       updateMutation.mutate({
         firstName,
         lastName,
-        jobTitle: values.jobTitle || undefined,
-        phone: values.phone || undefined,
-        bio: values.bio || undefined,
+        jobTitle: values.jobTitle ?? undefined,
+        phone: values.phone ?? undefined,
+        bio: values.bio ?? undefined,
       });
     } catch {
       // validation errors shown by form

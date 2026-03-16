@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from "react";
-import DashboardLayout from "@/components/DashboardLayout";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
 import { t } from "@/i18n";
 import {
@@ -17,6 +17,8 @@ import type {
   CostCenter,
 } from "@/types/modules/accounting";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { getName } from "@/lib/utils";
+import { QUERY_KEYS } from "@/constants/queryKeys";
 import {
   Table,
   Button,
@@ -175,7 +177,7 @@ export default function JournalEntries() {
     refetch,
   } = useQuery({
     queryKey: [
-      "journal-entries",
+      QUERY_KEYS.JOURNAL_ENTRIES,
       page,
       limit,
       search,
@@ -192,14 +194,14 @@ export default function JournalEntries() {
   const totalRecords = entriesData?.total ?? 0;
 
   const { data: accountsList } = useQuery({
-    queryKey: ["accounts-for-je"],
+    queryKey: [QUERY_KEYS.ACCOUNTS_FOR_JE],
     queryFn: () => accountsService.list({ limit: 100 }),
     staleTime: 60_000,
   });
   const accounts: Account[] = accountsList?.data ?? [];
 
   const { data: costCentersList } = useQuery({
-    queryKey: ["cost-centers-for-je"],
+    queryKey: [QUERY_KEYS.COST_CENTERS_FOR_JE],
     queryFn: () => costCentersService.list({ limit: 100 }),
     staleTime: 60_000,
   });
@@ -222,7 +224,7 @@ export default function JournalEntries() {
   // ── Mutations ────────────────────────────────────────────────────────────
 
   const invalidate = () =>
-    queryClient.invalidateQueries({ queryKey: ["journal-entries"] });
+    queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.JOURNAL_ENTRIES] });
 
   const createMutation = useMutation({
     mutationFn: (dto: CreateJournalEntryDto) =>
@@ -329,8 +331,8 @@ export default function JournalEntries() {
     setLines(prev => prev.filter(l => l.key !== key));
   };
 
-  const totalDebit = lines.reduce((s, l) => s + (l.debit || 0), 0);
-  const totalCredit = lines.reduce((s, l) => s + (l.credit || 0), 0);
+  const totalDebit = lines.reduce((s, l) => s + (l.debit ?? 0), 0);
+  const totalCredit = lines.reduce((s, l) => s + (l.credit ?? 0), 0);
   const isBalanced = Math.abs(totalDebit - totalCredit) < 0.001;
 
   // ── Submit handler ─────────────────────────────────────────────────────
@@ -357,8 +359,8 @@ export default function JournalEntries() {
       const linesDtos = lines.map(l => ({
         accountId: l.accountId,
         costCenterId: l.costCenterId || null,
-        debit: l.debit || 0,
-        credit: l.credit || 0,
+        debit: l.debit ?? 0,
+        credit: l.credit ?? 0,
         description: l.description || null,
       }));
 
@@ -391,12 +393,12 @@ export default function JournalEntries() {
     .filter(a => a.allowDirectPosting)
     .map(a => ({
       value: a.id,
-      label: `${a.code} - ${lang === "ar" ? a.nameAr : a.nameEn}`,
+      label: `${a.code} - ${getName(a)}`,
     }));
 
   const costCenterOptions = costCenters.map(c => ({
     value: c.id,
-    label: `${c.code} - ${lang === "ar" ? c.nameAr : c.nameEn}`,
+    label: `${c.code} - ${getName(c)}`,
   }));
 
   // ── Table columns ──────────────────────────────────────────────────────

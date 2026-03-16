@@ -1,4 +1,4 @@
-import { mockProducts, type Product } from "../data/mockProducts";
+import { mockProducts, type Product } from "@/modules/pos/data/mockProducts";
 
 // Simulates async API calls — swap with real ERP endpoints later
 

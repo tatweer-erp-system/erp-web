@@ -12,7 +12,7 @@ interface AnimatedModalProps {
   size?: "sm" | "md" | "lg";
 }
 
-export default function AnimatedModal({
+export function AnimatedModal({
   isOpen,
   onClose,
   title,

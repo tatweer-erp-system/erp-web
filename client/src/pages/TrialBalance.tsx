@@ -1,9 +1,11 @@
 import { useState, useMemo } from "react";
-import DashboardLayout from "@/components/DashboardLayout";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
 import { t } from "@/i18n";
 import { reportsService } from "@/services/accounting.service";
 import { useQuery } from "@tanstack/react-query";
+import { getName } from "@/lib/utils";
+import { QUERY_KEYS } from "@/constants/queryKeys";
 import { AccountType } from "@/constants/enums";
 import type { TrialBalanceRow } from "@/types/modules/accounting";
 import {
@@ -65,7 +67,7 @@ export default function TrialBalance() {
     refetch,
   } = useQuery({
     queryKey: [
-      "trial-balance",
+      QUERY_KEYS.TRIAL_BALANCE,
       dateFrom?.format("YYYY-MM-DD"),
       dateTo?.format("YYYY-MM-DD"),
     ],
@@ -158,14 +160,14 @@ export default function TrialBalance() {
     },
     {
       title: t("accounting.tb.accountName", lang),
-      dataIndex: lang === "ar" ? "nameAr" : "nameEn",
-      render: (v, rec) =>
+      key: "name",
+      render: (_, rec) =>
         rec.isGroupHeader ? (
           <Text strong style={{ fontSize: 14 }}>
-            {v}
+            {getName(rec)}
           </Text>
         ) : (
-          <Text>{v}</Text>
+          <Text>{getName(rec)}</Text>
         ),
     },
     {
@@ -329,7 +331,7 @@ export default function TrialBalance() {
           </Card>
         )}
 
-        {hasQueried && !isFetching && result?.data?.length > 0 && (
+        {hasQueried && !isFetching && (result?.data?.length ?? 0) > 0 && (
           <Card styles={{ body: { padding: 0 } }}>
             <Table
               rowKey="id"

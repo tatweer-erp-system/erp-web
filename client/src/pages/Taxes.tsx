@@ -1,5 +1,5 @@
 import { useState } from "react";
-import DashboardLayout from "@/components/DashboardLayout";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,7 +27,7 @@ export default function Taxes() {
 
   const [selectedTab, setSelectedTab] = useState("tax-rates");
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editValues, setEditValues] = useState<Record<string, any>>({});
+  const [editValues, setEditValues] = useState<Record<string, unknown>>({});
 
   const menuItems = [
     {
@@ -161,7 +161,7 @@ export default function Taxes() {
                           {t("accounting.taxes.name", lang)}
                         </label>
                         <Input
-                          value={editValues.name || ""}
+                          value={(editValues.name as string) ?? ""}
                           onChange={e =>
                             setEditValues({
                               ...editValues,
@@ -177,7 +177,7 @@ export default function Taxes() {
                           {t("accounting.taxes.code", lang)}
                         </label>
                         <Input
-                          value={editValues.code || ""}
+                          value={(editValues.code as string) ?? ""}
                           onChange={e =>
                             setEditValues({
                               ...editValues,
@@ -194,7 +194,7 @@ export default function Taxes() {
                         </label>
                         <Input
                           type="number"
-                          value={editValues.rate || 0}
+                          value={(editValues.rate as number) ?? 0}
                           onChange={e =>
                             setEditValues({
                               ...editValues,

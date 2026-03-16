@@ -1,5 +1,5 @@
 import { useState } from "react";
-import DashboardLayout from "@/components/DashboardLayout";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
 import { usePOSStore } from "@/modules/pos/store/posStore";
 import { OfflineSettingsTab } from "@/modules/pos/components/offline/OfflineSettingsTab";

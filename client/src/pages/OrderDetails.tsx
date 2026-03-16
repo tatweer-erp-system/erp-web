@@ -1,9 +1,9 @@
 import { useState } from "react";
-import DashboardLayout from "@/components/DashboardLayout";
-import TableControls from "@/components/TableControls";
-import AnimatedModal from "@/components/AnimatedModal";
-import BulkActions from "@/components/BulkActions";
-import AdvancedFilters from "@/components/AdvancedFilters";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
+import { TableControls } from "@/components/TableControls";
+import { AnimatedModal } from "@/components/AnimatedModal";
+import { BulkActions } from "@/components/BulkActions";
+import { AdvancedFilters } from "@/components/AdvancedFilters";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

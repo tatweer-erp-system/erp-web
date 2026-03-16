@@ -16,7 +16,7 @@ interface BreadcrumbProps {
   items: BreadcrumbItem[];
 }
 
-export default function Breadcrumb({ items }: BreadcrumbProps) {
+export function Breadcrumb({ items }: BreadcrumbProps) {
   if (!items.length) return null;
 
   const antItems = [

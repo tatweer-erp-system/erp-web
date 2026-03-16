@@ -5,6 +5,7 @@ import {
   setTokens,
   clearTokens,
 } from "@/lib/token";
+import { getStorageItem, STORAGE_KEYS } from "@/lib/storage";
 import type { ApiError } from "@/types/api";
 
 export const apiClient = axios.create({
@@ -21,7 +22,7 @@ apiClient.interceptors.request.use(config => {
   }
   config.headers["X-Request-Id"] = crypto.randomUUID();
   config.headers["Accept-Language"] =
-    localStorage.getItem("app-language") ?? "en";
+    getStorageItem(STORAGE_KEYS.LANGUAGE) ?? "en";
   return config;
 });
 

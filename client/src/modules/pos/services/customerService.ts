@@ -1,4 +1,8 @@
-import { mockCustomers, getTier, type Customer } from "../data/mockCustomers";
+import {
+  mockCustomers,
+  getTier,
+  type Customer,
+} from "@/modules/pos/data/mockCustomers";
 
 // In-memory store — replace with real ERP API calls later
 let customers = [...mockCustomers];

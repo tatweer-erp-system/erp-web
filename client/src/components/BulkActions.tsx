@@ -13,7 +13,7 @@ interface BulkActionsProps {
   isAllSelected: boolean;
 }
 
-export default function BulkActions({
+export function BulkActions({
   selectedCount,
   onSelectAll,
   onDelete,

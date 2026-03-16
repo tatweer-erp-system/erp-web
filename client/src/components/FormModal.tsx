@@ -20,7 +20,7 @@ interface FormModalProps {
   isLoading?: boolean;
 }
 
-export default function FormModal({
+export function FormModal({
   isOpen,
   onClose,
   title,

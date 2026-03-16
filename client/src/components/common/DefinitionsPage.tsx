@@ -49,6 +49,7 @@ import {
 } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { t } from "@/i18n";
 import dayjs from "dayjs";
 
 const { Text } = Typography;
@@ -60,6 +61,7 @@ export interface EntityRecord {
   nameAr: string;
   nameEn: string;
   isActive: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- generic entity record with dynamic fields from various definitions
   [key: string]: any;
 }
 
@@ -82,7 +84,7 @@ export interface FieldDef {
   required?: boolean;
   min?: number;
   max?: number;
-  defaultValue?: any;
+  defaultValue?: string | number | boolean;
   fullWidth?: boolean;
 }
 
@@ -90,17 +92,18 @@ export interface ColDef {
   key: string;
   title: string;
   width?: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- generic render callback typed by consumers
   render?: (val: any, record: EntityRecord) => React.ReactNode;
 }
 
 /** Optional API service for server-backed CRUD. When provided, data is fetched from the API. */
 export interface TabService {
   list: (
-    params?: any
-  ) => Promise<{ data: Record<string, any>[]; total: number }>;
-  create: (data: any) => Promise<any>;
-  update: (id: string, data: any) => Promise<any>;
-  remove: (id: string) => Promise<any>;
+    params?: Record<string, unknown>
+  ) => Promise<{ data: Record<string, unknown>[]; total: number }>;
+  create: (data: Record<string, unknown>) => Promise<unknown>;
+  update: (id: string, data: Record<string, unknown>) => Promise<unknown>;
+  remove: (id: string) => Promise<unknown>;
 }
 
 export interface TabDef {
@@ -1078,7 +1081,7 @@ function DefinitionsTab({
   isMobile: boolean;
 }) {
   const { token } = antTheme.useToken();
-  const { definitionsCrudStyle } = useAppSettings();
+  const { definitionsCrudStyle, language: lang } = useAppSettings();
 
   const isApi = !!tab.service;
   const [localData, setLocalData] = useState<EntityRecord[]>(tab.initialData);
@@ -1106,11 +1109,11 @@ function DefinitionsTab({
       setApiData((res.data as EntityRecord[]) ?? []);
       setApiTotal(res.total ?? 0);
     } catch {
-      message.error(isRTL ? "فشل تحميل البيانات" : "Failed to load data");
+      message.error(t("common.failed_to_load", lang));
     } finally {
       setApiLoading(false);
     }
-  }, [tab.service, page, pageSize, search, isRTL]);
+  }, [tab.service, page, pageSize, search, lang]);
 
   React.useEffect(() => {
     if (isApi) fetchApiData();
@@ -1152,12 +1155,12 @@ function DefinitionsTab({
   const openEdit = useCallback(
     (record: EntityRecord) => {
       setEditRecord(record);
-      const values: Record<string, any> = { ...record };
+      const values: Record<string, unknown> = { ...record };
       tab.fields.forEach(f => {
         if (f.type === "date" && values[f.key])
-          values[f.key] = dayjs(values[f.key]);
+          values[f.key] = dayjs(values[f.key] as string);
         if (f.type === "time" && values[f.key])
-          values[f.key] = dayjs(values[f.key], "HH:mm");
+          values[f.key] = dayjs(values[f.key] as string, "HH:mm");
       });
       form.setFieldsValue(values);
       setFormOpen(true);
@@ -1191,10 +1194,10 @@ function DefinitionsTab({
             ...values,
             version: editRecord.version ?? 0,
           });
-          message.success(isRTL ? "تم التحديث بنجاح" : "Updated successfully");
+          message.success(t("common.updated_successfully", lang));
         } else {
           await tab.service.create(values);
-          message.success(isRTL ? "تمت الإضافة بنجاح" : "Added successfully");
+          message.success(t("common.created_successfully", lang));
         }
         await fetchApiData();
       } else {
@@ -1203,22 +1206,18 @@ function DefinitionsTab({
           setLocalData(prev =>
             prev.map(r => (r.id === editRecord.id ? { ...r, ...values } : r))
           );
-          message.success(isRTL ? "تم التحديث بنجاح" : "Updated successfully");
+          message.success(t("common.updated_successfully", lang));
         } else {
           setLocalData(prev => [
             { ...values, id: `${tab.key}-${Date.now()}` },
             ...prev,
           ]);
-          message.success(isRTL ? "تمت الإضافة بنجاح" : "Added successfully");
+          message.success(t("common.created_successfully", lang));
         }
       }
       handleClose();
     } catch {
-      message.error(
-        isRTL
-          ? "يرجى ملء جميع الحقول المطلوبة"
-          : "Please fill all required fields"
-      );
+      message.error(t("common.fill_required_fields", lang));
     } finally {
       setSubmitting(false);
     }
@@ -1226,7 +1225,7 @@ function DefinitionsTab({
     editRecord,
     form,
     handleClose,
-    isRTL,
+    lang,
     tab.fields,
     tab.key,
     isApi,
@@ -1245,7 +1244,7 @@ function DefinitionsTab({
           });
           await fetchApiData();
         } catch {
-          message.error(isRTL ? "فشل تحديث الحالة" : "Failed to update status");
+          message.error(t("common.failed_to_update_status", lang));
           return;
         }
       } else {
@@ -1255,15 +1254,11 @@ function DefinitionsTab({
       }
       message.success(
         next
-          ? isRTL
-            ? "تم التفعيل"
-            : "Activated successfully"
-          : isRTL
-            ? "تم إلغاء التفعيل"
-            : "Deactivated successfully"
+          ? t("common.activated_successfully", lang)
+          : t("common.deactivated_successfully", lang)
       );
     },
-    [isRTL, isApi, tab.service, fetchApiData]
+    [lang, isApi, tab.service, fetchApiData]
   );
 
   const handleDelete = useCallback(
@@ -1273,15 +1268,15 @@ function DefinitionsTab({
           await tab.service.remove(record.id);
           await fetchApiData();
         } catch {
-          message.error(isRTL ? "فشل الحذف" : "Failed to delete");
+          message.error(t("common.failed_to_delete", lang));
           return;
         }
       } else {
         setLocalData(prev => prev.filter(r => r.id !== record.id));
       }
-      message.success(isRTL ? "تم الحذف بنجاح" : "Deleted successfully");
+      message.success(t("common.deleted_successfully", lang));
     },
-    [isRTL, isApi, tab.service, fetchApiData]
+    [lang, isApi, tab.service, fetchApiData]
   );
 
   const tableColumns: ColumnsType<EntityRecord> = [
@@ -1292,7 +1287,8 @@ function DefinitionsTab({
       width: col.width,
       ellipsis: true,
       render: col.render
-        ? (val: any, record: EntityRecord) => col.render!(val, record)
+        ? // eslint-disable-next-line @typescript-eslint/no-explicit-any -- matches ColDef.render signature
+          (val: any, record: EntityRecord) => col.render!(val, record)
         : undefined,
     })),
     {
@@ -1316,6 +1312,7 @@ function DefinitionsTab({
       title: isRTL ? "إجراءات" : "Actions",
       width: 120,
       fixed: (isRTL ? "left" : "right") as "left" | "right",
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- matches Ant Design column render signature
       render: (_: any, record: EntityRecord) => (
         <Space size={2}>
           {/* Edit */}

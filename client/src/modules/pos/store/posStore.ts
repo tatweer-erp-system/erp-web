@@ -1,19 +1,26 @@
 import { create } from "zustand";
-import type { Product } from "../data/mockProducts";
-import type { OrderResult } from "../services/posService";
-import type { Customer } from "../data/mockCustomers";
+import type { Product } from "@/modules/pos/data/mockProducts";
+import type { OrderResult } from "@/modules/pos/services/posService";
+import type { Customer } from "@/modules/pos/data/mockCustomers";
 import {
   getTier,
   DEFAULT_EARN_RATIO,
   DEFAULT_REDEEM_RATIO,
-} from "../data/mockCustomers";
-import type { CashierRole } from "../services/cashierAuthService";
-import type { RestaurantTable } from "../data/mockRestaurant";
+} from "@/modules/pos/data/mockCustomers";
+// TODO: Pre-existing error — cashierAuthService module does not exist yet. CashierRole type needs to be created.
+import type { CashierRole } from "@/modules/pos/services/cashierAuthService";
+import type { RestaurantTable } from "@/modules/pos/data/mockRestaurant";
 import {
   CashMovementType,
   DiscountType,
   POSPaymentMethod,
 } from "@/constants/enums";
+import {
+  getStorageItem,
+  setStorageItem,
+  removeStorageItem,
+  STORAGE_KEYS,
+} from "@/lib/storage";
 
 export type PaymentMethod = POSPaymentMethod;
 
@@ -693,7 +700,7 @@ export const usePOSStore = create<POSState>()((set, get) => ({
   // ── Cashier session ───────────────────────────────────────────────────────
   cashierSession: (() => {
     try {
-      const stored = localStorage.getItem("pos-cashier-session");
+      const stored = getStorageItem(STORAGE_KEYS.POS_CASHIER_SESSION);
       if (!stored) return null;
       const s = JSON.parse(stored) as CashierSession;
       return { ...s, loginTime: new Date(s.loginTime) };
@@ -704,8 +711,8 @@ export const usePOSStore = create<POSState>()((set, get) => ({
 
   setCashierSession(session) {
     if (session)
-      localStorage.setItem("pos-cashier-session", JSON.stringify(session));
-    else localStorage.removeItem("pos-cashier-session");
+      setStorageItem(STORAGE_KEYS.POS_CASHIER_SESSION, JSON.stringify(session));
+    else removeStorageItem(STORAGE_KEYS.POS_CASHIER_SESSION);
     set({ cashierSession: session });
   },
 
@@ -715,7 +722,10 @@ export const usePOSStore = create<POSState>()((set, get) => ({
         ? { ...state.cashierSession, isLocked: true }
         : null;
       if (updated)
-        localStorage.setItem("pos-cashier-session", JSON.stringify(updated));
+        setStorageItem(
+          STORAGE_KEYS.POS_CASHIER_SESSION,
+          JSON.stringify(updated)
+        );
       return { cashierSession: updated };
     });
   },
@@ -726,7 +736,10 @@ export const usePOSStore = create<POSState>()((set, get) => ({
         ? { ...state.cashierSession, isLocked: false }
         : null;
       if (updated)
-        localStorage.setItem("pos-cashier-session", JSON.stringify(updated));
+        setStorageItem(
+          STORAGE_KEYS.POS_CASHIER_SESSION,
+          JSON.stringify(updated)
+        );
       return { cashierSession: updated };
     });
   },
@@ -813,14 +826,14 @@ export const usePOSStore = create<POSState>()((set, get) => ({
   // ── Restaurant — settings ─────────────────────────────────────────────────
   restaurantMode: (() => {
     try {
-      return localStorage.getItem("pos-restaurant-mode") === "true";
+      return getStorageItem(STORAGE_KEYS.POS_RESTAURANT_MODE) === "true";
     } catch {
       return false;
     }
   })(),
   setRestaurantMode: v => {
     try {
-      localStorage.setItem("pos-restaurant-mode", String(v));
+      setStorageItem(STORAGE_KEYS.POS_RESTAURANT_MODE, String(v));
     } catch {
       /* noop */
     }
@@ -829,7 +842,7 @@ export const usePOSStore = create<POSState>()((set, get) => ({
 
   tableManagementEnabled: (() => {
     try {
-      const v = localStorage.getItem("pos-restaurant-table-management");
+      const v = getStorageItem(STORAGE_KEYS.POS_TABLE_MANAGEMENT);
       return v === null ? true : v === "true";
     } catch {
       return true;
@@ -837,7 +850,7 @@ export const usePOSStore = create<POSState>()((set, get) => ({
   })(),
   setTableManagementEnabled: v => {
     try {
-      localStorage.setItem("pos-restaurant-table-management", String(v));
+      setStorageItem(STORAGE_KEYS.POS_TABLE_MANAGEMENT, String(v));
     } catch {
       /* noop */
     }
@@ -846,16 +859,14 @@ export const usePOSStore = create<POSState>()((set, get) => ({
 
   courseManagementEnabled: (() => {
     try {
-      return (
-        localStorage.getItem("pos-restaurant-course-management") === "true"
-      );
+      return getStorageItem(STORAGE_KEYS.POS_COURSE_MANAGEMENT) === "true";
     } catch {
       return false;
     }
   })(),
   setCourseManagementEnabled: v => {
     try {
-      localStorage.setItem("pos-restaurant-course-management", String(v));
+      setStorageItem(STORAGE_KEYS.POS_COURSE_MANAGEMENT, String(v));
     } catch {
       /* noop */
     }
@@ -864,14 +875,14 @@ export const usePOSStore = create<POSState>()((set, get) => ({
 
   kitchenPrintingEnabled: (() => {
     try {
-      return localStorage.getItem("pos-restaurant-kitchen-printing") === "true";
+      return getStorageItem(STORAGE_KEYS.POS_KITCHEN_PRINTING) === "true";
     } catch {
       return false;
     }
   })(),
   setKitchenPrintingEnabled: v => {
     try {
-      localStorage.setItem("pos-restaurant-kitchen-printing", String(v));
+      setStorageItem(STORAGE_KEYS.POS_KITCHEN_PRINTING, String(v));
     } catch {
       /* noop */
     }
@@ -880,16 +891,14 @@ export const usePOSStore = create<POSState>()((set, get) => ({
 
   autoSendKitchen: (() => {
     try {
-      return (
-        localStorage.getItem("pos-restaurant-auto-send-kitchen") === "true"
-      );
+      return getStorageItem(STORAGE_KEYS.POS_AUTO_SEND_KITCHEN) === "true";
     } catch {
       return false;
     }
   })(),
   setAutoSendKitchen: v => {
     try {
-      localStorage.setItem("pos-restaurant-auto-send-kitchen", String(v));
+      setStorageItem(STORAGE_KEYS.POS_AUTO_SEND_KITCHEN, String(v));
     } catch {
       /* noop */
     }
@@ -898,7 +907,7 @@ export const usePOSStore = create<POSState>()((set, get) => ({
 
   allowTakeAway: (() => {
     try {
-      const v = localStorage.getItem("pos-restaurant-allow-takeaway");
+      const v = getStorageItem(STORAGE_KEYS.POS_ALLOW_TAKEAWAY);
       return v === null ? true : v === "true";
     } catch {
       return true;
@@ -906,7 +915,7 @@ export const usePOSStore = create<POSState>()((set, get) => ({
   })(),
   setAllowTakeAway: v => {
     try {
-      localStorage.setItem("pos-restaurant-allow-takeaway", String(v));
+      setStorageItem(STORAGE_KEYS.POS_ALLOW_TAKEAWAY, String(v));
     } catch {
       /* noop */
     }
@@ -916,7 +925,7 @@ export const usePOSStore = create<POSState>()((set, get) => ({
   defaultGuests: (() => {
     try {
       return parseInt(
-        localStorage.getItem("pos-restaurant-default-guests") ?? "2",
+        getStorageItem(STORAGE_KEYS.POS_DEFAULT_GUESTS) ?? "2",
         10
       );
     } catch {
@@ -925,7 +934,7 @@ export const usePOSStore = create<POSState>()((set, get) => ({
   })(),
   setDefaultGuests: n => {
     try {
-      localStorage.setItem("pos-restaurant-default-guests", String(n));
+      setStorageItem(STORAGE_KEYS.POS_DEFAULT_GUESTS, String(n));
     } catch {
       /* noop */
     }
@@ -952,14 +961,14 @@ export const usePOSStore = create<POSState>()((set, get) => ({
 
   offlineModeEnabled: (() => {
     try {
-      return localStorage.getItem("pos-offline-enabled") === "true";
+      return getStorageItem(STORAGE_KEYS.POS_OFFLINE_ENABLED) === "true";
     } catch {
       return false;
     }
   })(),
   setOfflineModeEnabled: v => {
     try {
-      localStorage.setItem("pos-offline-enabled", String(v));
+      setStorageItem(STORAGE_KEYS.POS_OFFLINE_ENABLED, String(v));
     } catch {
       /* noop */
     }
@@ -969,7 +978,7 @@ export const usePOSStore = create<POSState>()((set, get) => ({
   cacheRefreshInterval: (() => {
     try {
       const v = parseInt(
-        localStorage.getItem("pos-cache-interval") ?? "60",
+        getStorageItem(STORAGE_KEYS.POS_CACHE_INTERVAL) ?? "60",
         10
       );
       return ([15, 30, 60, 0] as const).includes(v as 15 | 30 | 60 | 0)
@@ -981,7 +990,7 @@ export const usePOSStore = create<POSState>()((set, get) => ({
   })(),
   setCacheRefreshInterval: v => {
     try {
-      localStorage.setItem("pos-cache-interval", String(v));
+      setStorageItem(STORAGE_KEYS.POS_CACHE_INTERVAL, String(v));
     } catch {
       /* noop */
     }
@@ -990,15 +999,15 @@ export const usePOSStore = create<POSState>()((set, get) => ({
 
   lastCacheSync: (() => {
     try {
-      return localStorage.getItem("pos-last-cache-sync");
+      return getStorageItem(STORAGE_KEYS.POS_LAST_CACHE_SYNC);
     } catch {
       return null;
     }
   })(),
   setLastCacheSync: t => {
     try {
-      if (t) localStorage.setItem("pos-last-cache-sync", t);
-      else localStorage.removeItem("pos-last-cache-sync");
+      if (t) setStorageItem(STORAGE_KEYS.POS_LAST_CACHE_SYNC, t);
+      else removeStorageItem(STORAGE_KEYS.POS_LAST_CACHE_SYNC);
     } catch {
       /* noop */
     }

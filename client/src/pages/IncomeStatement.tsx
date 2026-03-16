@@ -1,5 +1,5 @@
 import { useState } from "react";
-import DashboardLayout from "@/components/DashboardLayout";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
 import { t } from "@/i18n";
 import {
@@ -7,6 +7,8 @@ import {
   costCentersService,
 } from "@/services/accounting.service";
 import { useQuery } from "@tanstack/react-query";
+import { getName } from "@/lib/utils";
+import { QUERY_KEYS } from "@/constants/queryKeys";
 import {
   Card,
   Button,
@@ -68,7 +70,7 @@ export default function IncomeStatement() {
 
   // Cost centers for filter
   const { data: costCentersData } = useQuery({
-    queryKey: ["cost-centers-list"],
+    queryKey: [QUERY_KEYS.COST_CENTERS_LIST],
     queryFn: () => costCentersService.list({ page: 1, limit: 100 }),
   });
 
@@ -76,7 +78,7 @@ export default function IncomeStatement() {
 
   // Income statement data
   const { data, isFetching } = useQuery({
-    queryKey: ["income-statement", filters],
+    queryKey: [QUERY_KEYS.INCOME_STATEMENT, filters],
     queryFn: () =>
       reportsService.incomeStatement(
         filters!.from,
@@ -178,7 +180,7 @@ export default function IncomeStatement() {
                 style={{ width: isMobile ? "100%" : 220 }}
                 options={costCenters.map(cc => ({
                   value: cc.id,
-                  label: lang === "ar" ? cc.nameAr : cc.nameEn,
+                  label: getName(cc),
                 }))}
               />
             </div>

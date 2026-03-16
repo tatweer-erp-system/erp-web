@@ -4,6 +4,12 @@ import { useAuthContext } from "@/contexts/AuthContext";
 import { type Branch, Role } from "@/types/auth";
 import { t } from "@/i18n";
 import { AxiosError } from "axios";
+import {
+  getStorageItem,
+  setStorageItem,
+  removeStorageItem,
+  STORAGE_KEYS,
+} from "@/lib/storage";
 
 interface EyePos {
   x: number;
@@ -1692,14 +1698,14 @@ function ErrorMsg({ children }: { children: React.ReactNode }) {
 export default function Login() {
   const [, setLocation] = useLocation();
   const { login, branches, selectBranch } = useAuthContext();
-  const lang = localStorage.getItem("app-language") ?? "en";
+  const lang = getStorageItem(STORAGE_KEYS.LANGUAGE) ?? "en";
 
   const [email, setEmail] = useState(
-    () => localStorage.getItem("remembered-email") ?? ""
+    () => getStorageItem(STORAGE_KEYS.REMEMBERED_EMAIL) ?? ""
   );
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(
-    () => !!localStorage.getItem("remembered-email")
+    () => !!getStorageItem(STORAGE_KEYS.REMEMBERED_EMAIL)
   );
   const [showPassword, setShowPassword] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
@@ -1748,9 +1754,9 @@ export default function Login() {
     setIsLoading(true);
 
     if (rememberMe) {
-      localStorage.setItem("remembered-email", email.trim());
+      setStorageItem(STORAGE_KEYS.REMEMBERED_EMAIL, email.trim());
     } else {
-      localStorage.removeItem("remembered-email");
+      removeStorageItem(STORAGE_KEYS.REMEMBERED_EMAIL);
     }
 
     try {

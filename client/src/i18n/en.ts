@@ -1018,4 +1018,31 @@ export const en: Record<string, string> = {
   "accounting.fs.edit": "Edit",
   "accounting.fs.paymentGatewayComingSoon":
     "Payment Gateway configuration coming soon.",
+
+  // Invoice
+  "invoice.company_name": "Your Company",
+  "invoice.contact_email": "contact@company.com",
+  "invoice.billing_email": "billing@company.com",
+  "invoice.thank_you_message":
+    "Thank you for your business! Payment is due within 15 days. Please make checks payable to Your Company.",
+
+  // Common messages
+  "common.updated_successfully": "Updated successfully",
+  "common.created_successfully": "Created successfully",
+  "common.error_occurred": "An error occurred. Please try again.",
+  "common.failed_to_load": "Failed to load data",
+  "common.fill_required_fields": "Please fill all required fields",
+  "common.failed_to_update_status": "Failed to update status",
+  "common.activated_successfully": "Activated successfully",
+  "common.deactivated_successfully": "Deactivated successfully",
+  "common.failed_to_delete": "Failed to delete",
+  "common.deleted_successfully": "Deleted successfully",
+
+  // PIN
+  "pin.incorrect": "Incorrect PIN. Please try again.",
+  "pin.mismatch": "PINs do not match. Please try again.",
+  "pin.set_failed": "Failed to set PIN. Please try again.",
+
+  // POS
+  "pos.cache_refresh_failed": "Failed to refresh cache",
 };

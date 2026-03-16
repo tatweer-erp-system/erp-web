@@ -1,5 +1,5 @@
-import Breadcrumb from "@/components/Breadcrumb";
-import DashboardLayout from "@/components/DashboardLayout";
+import { Breadcrumb } from "@/components/Breadcrumb";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
 
 export default function PendingOrders() {
   return (

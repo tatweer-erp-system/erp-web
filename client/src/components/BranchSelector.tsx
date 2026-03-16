@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { QUERY_KEYS } from "@/constants/queryKeys";
 import { branchesService } from "@/services/branches.service";
 import { useSettings } from "@/contexts/SettingsContext";
 import { useAuthContext } from "@/contexts/AuthContext";
@@ -14,7 +15,7 @@ interface BranchSelectorProps {
   className?: string;
 }
 
-export default function BranchSelector({
+export function BranchSelector({
   value,
   onChange,
   defaultValue,
@@ -26,7 +27,7 @@ export default function BranchSelector({
 
   // Try fetching from API; fall back to auth context branches
   const { data: apiBranches } = useQuery({
-    queryKey: ["branches"],
+    queryKey: [QUERY_KEYS.BRANCHES],
     queryFn: () => branchesService.list(),
     staleTime: 5 * 60 * 1000,
   });

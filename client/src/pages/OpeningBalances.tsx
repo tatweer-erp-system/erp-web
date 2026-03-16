@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, memo, useRef } from "react";
-import DashboardLayout from "@/components/DashboardLayout";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
 import {
   Table,
@@ -27,6 +27,8 @@ import {
   accountsService,
   journalEntriesService,
 } from "@/services/accounting.service";
+import { getName } from "@/lib/utils";
+import { QUERY_KEYS } from "@/constants/queryKeys";
 import type {
   Account,
   CreateJournalEntryDto,
@@ -148,13 +150,8 @@ const BalancesTable = memo(function BalancesTable({
         title: t("accounting.ob.accountName", lang),
         key: "name",
         ellipsis: true,
-        sorter: (a, b) =>
-          (lang === "ar" ? a.nameAr : a.nameEn).localeCompare(
-            lang === "ar" ? b.nameAr : b.nameEn
-          ),
-        render: (_: unknown, rec: Account) => (
-          <Text>{lang === "ar" ? rec.nameAr : rec.nameEn}</Text>
-        ),
+        sorter: (a, b) => getName(a).localeCompare(getName(b)),
+        render: (_: unknown, rec: Account) => <Text>{getName(rec)}</Text>,
       },
       {
         title: t("accounting.ob.accountType", lang),
@@ -243,7 +240,7 @@ export default function OpeningBalances() {
 
   // ── Fetch accounts tree ───────────────────────────────────────────────────────
   const { data: accountsTree, isLoading } = useQuery({
-    queryKey: ["accounts-tree"],
+    queryKey: [QUERY_KEYS.ACCOUNTS_TREE],
     queryFn: () => accountsService.tree(),
   });
 
@@ -284,8 +281,8 @@ export default function OpeningBalances() {
       let d = 0,
         c = 0;
       for (const b of Object.values(balancesRef.current)) {
-        d += b.debit || 0;
-        c += b.credit || 0;
+        d += b.debit ?? 0;
+        c += b.credit ?? 0;
       }
       setTotals({ debit: d, credit: c });
     },
@@ -299,8 +296,8 @@ export default function OpeningBalances() {
         .filter(([, b]) => b.debit > 0 || b.credit > 0)
         .map(([accountId, b]) => ({
           accountId,
-          debit: b.debit || 0,
-          credit: b.credit || 0,
+          debit: b.debit ?? 0,
+          credit: b.credit ?? 0,
         }));
 
       const dto: CreateJournalEntryDto = {

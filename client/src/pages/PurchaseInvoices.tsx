@@ -1,5 +1,5 @@
 import { useState } from "react";
-import DashboardLayout from "@/components/DashboardLayout";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,9 +11,9 @@ import {
   Grid3x3,
   List,
 } from "lucide-react";
-import AnimatedModal from "@/components/AnimatedModal";
-import BulkActions from "@/components/BulkActions";
-import AdvancedFilters from "@/components/AdvancedFilters";
+import { AnimatedModal } from "@/components/AnimatedModal";
+import { BulkActions } from "@/components/BulkActions";
+import { AdvancedFilters } from "@/components/AdvancedFilters";
 import {
   DropdownMenu,
   DropdownMenuContent,

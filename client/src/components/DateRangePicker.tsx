@@ -12,7 +12,7 @@ interface DateRangePickerProps {
   isRTL?: boolean;
 }
 
-export default function DateRangePicker({
+export function DateRangePicker({
   onDateRangeChange,
   isRTL = false,
 }: DateRangePickerProps) {

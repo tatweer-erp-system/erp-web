@@ -997,4 +997,30 @@ export const ar: Record<string, string> = {
   "accounting.fs.add": "إضافة",
   "accounting.fs.edit": "تعديل",
   "accounting.fs.paymentGatewayComingSoon": "إعدادات بوابة الدفع قادمة قريباً.",
+
+  // Invoice
+  "invoice.company_name": "شركتك",
+  "invoice.contact_email": "contact@company.com",
+  "invoice.billing_email": "billing@company.com",
+  "invoice.thank_you_message": "شكراً لتعاملكم معنا! يرجى الدفع خلال 15 يوماً.",
+
+  // Common messages
+  "common.updated_successfully": "تم التحديث بنجاح",
+  "common.created_successfully": "تم الإنشاء بنجاح",
+  "common.error_occurred": "حدث خطأ. يرجى المحاولة مرة أخرى.",
+  "common.failed_to_load": "فشل تحميل البيانات",
+  "common.fill_required_fields": "يرجى ملء جميع الحقول المطلوبة",
+  "common.failed_to_update_status": "فشل تحديث الحالة",
+  "common.activated_successfully": "تم التفعيل",
+  "common.deactivated_successfully": "تم إلغاء التفعيل",
+  "common.failed_to_delete": "فشل الحذف",
+  "common.deleted_successfully": "تم الحذف بنجاح",
+
+  // PIN
+  "pin.incorrect": "رمز PIN غير صحيح. يرجى المحاولة مرة أخرى.",
+  "pin.mismatch": "رموز PIN غير متطابقة. يرجى المحاولة مرة أخرى.",
+  "pin.set_failed": "فشل تعيين رمز PIN. يرجى المحاولة مرة أخرى.",
+
+  // POS
+  "pos.cache_refresh_failed": "فشل تحديث ذاكرة التخزين المؤقت",
 };

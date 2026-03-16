@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import DashboardLayout from "@/components/DashboardLayout";
+import { QUERY_KEYS } from "@/constants/queryKeys";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import AnimatedModal from "@/components/AnimatedModal";
-import BulkActions from "@/components/BulkActions";
-import AdvancedFilters from "@/components/AdvancedFilters";
+import { AnimatedModal } from "@/components/AnimatedModal";
+import { BulkActions } from "@/components/BulkActions";
+import { AdvancedFilters } from "@/components/AdvancedFilters";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -59,7 +60,7 @@ export default function Users() {
 
   // Fetch users
   const { data: usersData, isLoading } = useQuery({
-    queryKey: ["users", currentPage, pageSize, searchQuery],
+    queryKey: [QUERY_KEYS.USERS, currentPage, pageSize, searchQuery],
     queryFn: () =>
       usersService.list({
         page: currentPage,
@@ -70,7 +71,7 @@ export default function Users() {
 
   // Fetch available roles
   const { data: rolesData } = useQuery({
-    queryKey: ["roles"],
+    queryKey: [QUERY_KEYS.ROLES],
     queryFn: () => rolesService.list(),
     staleTime: 10 * 60 * 1000,
   });
@@ -219,7 +220,7 @@ export default function Users() {
               variant="outline"
               className="border-border"
               onClick={() =>
-                queryClient.invalidateQueries({ queryKey: ["users"] })
+                queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.USERS] })
               }
             >
               <RotateCcw size={16} />

@@ -103,7 +103,7 @@ const bellKeyframes = `
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-export default function NotificationCenter() {
+export function NotificationCenter() {
   const { token } = antTheme.useToken();
   const [, navigate] = useLocation();
   const [open, setOpen] = useState(false);

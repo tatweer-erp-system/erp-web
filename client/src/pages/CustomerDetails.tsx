@@ -1,5 +1,5 @@
 import { useState } from "react";
-import DashboardLayout from "@/components/DashboardLayout";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -38,8 +38,8 @@ import { PageHeader } from "@/components/common/PageHeader";
 import { StatCard } from "@/components/common/StatCard";
 import { CollapsibleCard } from "@/components/common/CollapsibleCard";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
-import AnimatedModal from "@/components/AnimatedModal";
-import AttachmentsTab from "@/components/AttachmentsTab";
+import { AnimatedModal } from "@/components/AnimatedModal";
+import { AttachmentsTab } from "@/components/AttachmentsTab";
 import { useLocation } from "wouter";
 import { CustomerStatus } from "@/constants/enums";
 

@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import DashboardLayout from "@/components/DashboardLayout";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
 import {
   Table,
@@ -37,6 +37,8 @@ import {
 } from "@ant-design/icons";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { fiscalPeriodsService } from "@/services/accounting.service";
+import { getName } from "@/lib/utils";
+import { QUERY_KEYS } from "@/constants/queryKeys";
 import type {
   FiscalPeriod,
   CreateFiscalPeriodDto,
@@ -75,7 +77,7 @@ export default function PeriodClosing() {
     isLoading,
     refetch,
   } = useQuery({
-    queryKey: ["fiscal-periods"],
+    queryKey: [QUERY_KEYS.FISCAL_PERIODS],
     queryFn: () => fiscalPeriodsService.list(),
   });
 
@@ -104,7 +106,7 @@ export default function PeriodClosing() {
 
   // ── Mutations ─────────────────────────────────────────────────────────────────
   const invalidate = () =>
-    queryClient.invalidateQueries({ queryKey: ["fiscal-periods"] });
+    queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.FISCAL_PERIODS] });
 
   const createMutation = useMutation({
     mutationFn: (dto: CreateFiscalPeriodDto) =>
@@ -302,7 +304,7 @@ export default function PeriodClosing() {
       width: 200,
       render: (_: unknown, rec: FiscalPeriod) => (
         <Text strong style={{ fontSize: 13 }}>
-          {lang === "ar" ? rec.nameAr : rec.nameEn}
+          {getName(rec)}
         </Text>
       ),
     },
@@ -437,7 +439,7 @@ export default function PeriodClosing() {
         <CalendarOutlined />
         <span>
           {editRecord
-            ? `${t("accounting.je.edit", lang)} — ${lang === "ar" ? editRecord.nameAr : editRecord.nameEn}`
+            ? `${t("accounting.je.edit", lang)} — ${getName(editRecord)}`
             : t("accounting.pc.newPeriod", lang)}
         </span>
       </Space>

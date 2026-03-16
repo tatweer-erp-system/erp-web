@@ -21,12 +21,12 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import DashboardLayout from "@/components/DashboardLayout";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { PageHeader } from "@/components/common/PageHeader";
 import { StatCard } from "@/components/common/StatCard";
 import { DataTable } from "@/components/common/DataTable/DataTable";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
-import AnimatedModal from "@/components/AnimatedModal";
+import { AnimatedModal } from "@/components/AnimatedModal";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -248,17 +248,17 @@ export default function SalesInvoices() {
   };
 
   const handleCreateSubmit = () => {
-    // TODO: call API
+    // TODO(ERP-XXX): implement create sales invoice API call
     setCreateOpen(false);
   };
 
   const handleEditSubmit = () => {
-    // TODO: call API
+    // TODO(ERP-XXX): implement update sales invoice API call
     setEditItem(null);
   };
 
   const handleDelete = () => {
-    // TODO: call API
+    // TODO(ERP-XXX): implement delete sales invoice API call
     setDeleteId(null);
   };
 

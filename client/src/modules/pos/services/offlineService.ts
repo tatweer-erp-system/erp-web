@@ -1,5 +1,5 @@
 import { openDB, type IDBPDatabase } from "idb";
-import type { Product } from "../data/mockProducts";
+import type { Product } from "@/modules/pos/data/mockProducts";
 import type { OrderPayload } from "./posService";
 import { OfflineTxStatus } from "@/constants/enums";
 

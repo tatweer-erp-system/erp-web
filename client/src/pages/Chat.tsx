@@ -20,7 +20,7 @@ import {
   SmileOutlined,
   CheckOutlined,
 } from "@ant-design/icons";
-import DashboardLayout from "@/components/DashboardLayout";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
 
 const { Text } = Typography;
 

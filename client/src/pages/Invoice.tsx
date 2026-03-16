@@ -1,12 +1,13 @@
-import DashboardLayout from "@/components/DashboardLayout";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, Printer, Download, Send, Eye } from "lucide-react";
 import { useSettings } from "@/contexts/SettingsContext";
+import { t } from "@/i18n";
 
 export default function Invoice() {
-  const { language } = useSettings();
-  const isRTL = language === "ar";
+  const { language: lang } = useSettings();
+  const isRTL = lang === "ar";
 
   const breadcrumbs = [
     { label: "Dashboard", href: "/" },
@@ -99,7 +100,7 @@ export default function Invoice() {
             </div>
             <div className={`text-right ${isRTL ? "text-left" : ""}`}>
               <div className="text-2xl font-bold text-foreground mb-4">
-                Your Company
+                {t("invoice.company_name", lang)}
               </div>
               <p className="text-sm text-muted-foreground">
                 123 Business Street
@@ -108,7 +109,7 @@ export default function Invoice() {
                 New York, NY 10001
               </p>
               <p className="text-sm text-muted-foreground">
-                contact@company.com
+                {t("invoice.contact_email", lang)}
               </p>
             </div>
           </div>
@@ -241,8 +242,7 @@ export default function Invoice() {
               Notes
             </h3>
             <p className="text-sm text-muted-foreground">
-              Thank you for your business! Payment is due within 15 days. Please
-              make checks payable to Your Company.
+              {t("invoice.thank_you_message", lang)}
             </p>
           </div>
 
@@ -255,8 +255,8 @@ export default function Invoice() {
               required.
             </p>
             <p className="mt-2">
-              For questions, please contact: billing@company.com | Phone: +1
-              (555) 123-4567
+              For questions, please contact: {t("invoice.billing_email", lang)}{" "}
+              | Phone: +1 (555) 123-4567
             </p>
           </div>
         </Card>

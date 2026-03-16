@@ -1,9 +1,11 @@
 import { useState, useMemo } from "react";
-import DashboardLayout from "@/components/DashboardLayout";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
 import { t } from "@/i18n";
 import { reportsService } from "@/services/accounting.service";
 import { useQuery } from "@tanstack/react-query";
+import { getName } from "@/lib/utils";
+import { QUERY_KEYS } from "@/constants/queryKeys";
 import {
   Card,
   Button,
@@ -57,7 +59,7 @@ export default function BalanceSheet() {
   const [asOfDate, setAsOfDate] = useState<string | null>(null);
 
   const { data, isFetching } = useQuery({
-    queryKey: ["balance-sheet", asOfDate],
+    queryKey: [QUERY_KEYS.BALANCE_SHEET, asOfDate],
     queryFn: () => reportsService.balanceSheet(asOfDate!),
     enabled: asOfDate !== null,
   });
@@ -102,8 +104,9 @@ export default function BalanceSheet() {
     },
     {
       title: t("accounting.bs.accountName", lang),
-      dataIndex: lang === "ar" ? "nameAr" : "nameEn",
+      key: "name",
       ellipsis: true,
+      render: (_, rec) => getName(rec),
     },
     {
       title: t("accounting.bs.balance", lang),

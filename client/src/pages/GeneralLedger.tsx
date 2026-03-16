@@ -1,9 +1,11 @@
 import { useState, useCallback } from "react";
-import DashboardLayout from "@/components/DashboardLayout";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
 import { t } from "@/i18n";
 import { reportsService, accountsService } from "@/services/accounting.service";
 import { useQuery } from "@tanstack/react-query";
+import { getName } from "@/lib/utils";
+import { QUERY_KEYS } from "@/constants/queryKeys";
 import type { GeneralLedgerRow, Account } from "@/types/modules/accounting";
 import {
   Card,
@@ -46,7 +48,7 @@ export default function GeneralLedger() {
 
   // Load accounts list for the selector
   const { data: accountsData, isLoading: accountsLoading } = useQuery({
-    queryKey: ["accounts-list-gl"],
+    queryKey: [QUERY_KEYS.ACCOUNTS_LIST_GL],
     queryFn: () => accountsService.list({ page: 1, limit: 100 }),
   });
 
@@ -54,7 +56,7 @@ export default function GeneralLedger() {
 
   const accountOptions = accounts.map(a => ({
     value: a.id,
-    label: `${a.code} - ${lang === "ar" ? a.nameAr : a.nameEn}`,
+    label: `${a.code} - ${getName(a)}`,
   }));
 
   const {
@@ -63,7 +65,7 @@ export default function GeneralLedger() {
     refetch,
   } = useQuery({
     queryKey: [
-      "general-ledger",
+      QUERY_KEYS.GENERAL_LEDGER,
       accountId,
       dateFrom?.format("YYYY-MM-DD"),
       dateTo?.format("YYYY-MM-DD"),

@@ -50,7 +50,7 @@ import {
   Cell,
   Legend,
 } from "recharts";
-import DashboardLayout from "@/components/DashboardLayout";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
 import { Link } from "wouter";
 import { OrderStatus } from "@/constants/enums";

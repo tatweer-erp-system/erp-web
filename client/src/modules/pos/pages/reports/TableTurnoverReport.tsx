@@ -28,8 +28,8 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
-import { usePOSStore } from "../../store/posStore";
-import { mockSections } from "../../data/mockRestaurant";
+import { usePOSStore } from "@/modules/pos/store/posStore";
+import { mockSections } from "@/modules/pos/data/mockRestaurant";
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;

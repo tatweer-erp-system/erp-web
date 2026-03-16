@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { QUERY_KEYS } from "@/constants/queryKeys";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import AnimatedModal from "@/components/AnimatedModal";
+import { AnimatedModal } from "@/components/AnimatedModal";
 import { projectsService } from "@/services/projects.service";
 import { usersService } from "@/services/users.service";
 import { useSettings } from "@/contexts/SettingsContext";
@@ -44,9 +45,7 @@ function getRoleIcon(role: string) {
   }
 }
 
-export default function ProjectMembersTab({
-  projectId,
-}: ProjectMembersTabProps) {
+export function ProjectMembersTab({ projectId }: ProjectMembersTabProps) {
   const { language } = useSettings();
   const isRTL = language === "ar";
   const queryClient = useQueryClient();
@@ -62,14 +61,14 @@ export default function ProjectMembersTab({
 
   // Fetch project members
   const { data: membersData, isLoading: membersLoading } = useQuery({
-    queryKey: ["project-members", projectId],
+    queryKey: [QUERY_KEYS.PROJECT_MEMBERS, projectId],
     queryFn: () => projectsService.getMembers(projectId),
     enabled: !!projectId,
   });
 
   // Fetch available users for the add modal
   const { data: usersData } = useQuery({
-    queryKey: ["users-list", userSearch],
+    queryKey: [QUERY_KEYS.USERS_LIST, userSearch],
     queryFn: () =>
       usersService.list({ page: 1, limit: 20, search: userSearch }),
     enabled: isAddModalOpen,
@@ -84,7 +83,7 @@ export default function ProjectMembersTab({
       projectsService.addMember(projectId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["project-members", projectId],
+        queryKey: [QUERY_KEYS.PROJECT_MEMBERS, projectId],
       });
       setIsAddModalOpen(false);
       setNewMemberUserId("");
@@ -98,7 +97,7 @@ export default function ProjectMembersTab({
       projectsService.updateMemberRole(projectId, userId, { role }),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["project-members", projectId],
+        queryKey: [QUERY_KEYS.PROJECT_MEMBERS, projectId],
       });
     },
   });
@@ -109,7 +108,7 @@ export default function ProjectMembersTab({
       projectsService.removeMember(projectId, userId),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["project-members", projectId],
+        queryKey: [QUERY_KEYS.PROJECT_MEMBERS, projectId],
       });
       setIsRemoveConfirmOpen(false);
       setMemberToRemove(null);

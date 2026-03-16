@@ -1,20 +1,24 @@
-const ACCESS_TOKEN_KEY = "web_access_token";
-const REFRESH_TOKEN_KEY = "web_refresh_token";
+import {
+  getStorageItem,
+  setStorageItem,
+  removeStorageItem,
+  STORAGE_KEYS,
+} from "@/lib/storage";
 
 export function getAccessToken(): string | null {
-  return localStorage.getItem(ACCESS_TOKEN_KEY);
+  return getStorageItem(STORAGE_KEYS.ACCESS_TOKEN);
 }
 
 export function getRefreshToken(): string | null {
-  return localStorage.getItem(REFRESH_TOKEN_KEY);
+  return getStorageItem(STORAGE_KEYS.REFRESH_TOKEN);
 }
 
 export function setTokens(accessToken: string, refreshToken: string): void {
-  localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
-  localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+  setStorageItem(STORAGE_KEYS.ACCESS_TOKEN, accessToken);
+  setStorageItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
 }
 
 export function clearTokens(): void {
-  localStorage.removeItem(ACCESS_TOKEN_KEY);
-  localStorage.removeItem(REFRESH_TOKEN_KEY);
+  removeStorageItem(STORAGE_KEYS.ACCESS_TOKEN);
+  removeStorageItem(STORAGE_KEYS.REFRESH_TOKEN);
 }

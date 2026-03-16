@@ -1,9 +1,11 @@
 import { useState, useCallback } from "react";
-import DashboardLayout from "@/components/DashboardLayout";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
 import { t } from "@/i18n";
 import { reportsService, accountsService } from "@/services/accounting.service";
 import { useQuery } from "@tanstack/react-query";
+import { getName } from "@/lib/utils";
+import { QUERY_KEYS } from "@/constants/queryKeys";
 import type {
   AccountStatementResult,
   GeneralLedgerRow,
@@ -50,7 +52,7 @@ export default function AccountStatements() {
 
   // Load accounts list for the selector
   const { data: accountsData, isLoading: accountsLoading } = useQuery({
-    queryKey: ["accounts-list-as"],
+    queryKey: [QUERY_KEYS.ACCOUNTS_LIST_AS],
     queryFn: () => accountsService.list({ page: 1, limit: 100 }),
   });
 
@@ -58,7 +60,7 @@ export default function AccountStatements() {
 
   const accountOptions = accounts.map(a => ({
     value: a.id,
-    label: `${a.code} - ${lang === "ar" ? a.nameAr : a.nameEn}`,
+    label: `${a.code} - ${getName(a)}`,
   }));
 
   const {
@@ -67,7 +69,7 @@ export default function AccountStatements() {
     refetch,
   } = useQuery({
     queryKey: [
-      "account-statement",
+      QUERY_KEYS.ACCOUNT_STATEMENT,
       accountId,
       dateFrom?.format("YYYY-MM-DD"),
       dateTo?.format("YYYY-MM-DD"),

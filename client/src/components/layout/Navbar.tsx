@@ -24,7 +24,7 @@ import {
   LockOutlined,
 } from "@ant-design/icons";
 import { Moon, Sun } from "lucide-react";
-import NotificationCenter from "@/components/NotificationCenter";
+import { NotificationCenter } from "@/components/NotificationCenter";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
 import { usePinLock } from "@/contexts/PinLockContext";
 import { useAuthContext, ROLE_DISPLAY } from "@/contexts/AuthContext";

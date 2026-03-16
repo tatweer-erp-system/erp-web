@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import DateRangePicker from "@/components/DateRangePicker";
+import { DateRangePicker } from "@/components/DateRangePicker";
 import {
   Search,
   Plus,
@@ -32,7 +32,7 @@ interface TableControlsProps {
   addButtonLabel?: string;
 }
 
-export default function TableControls({
+export function TableControls({
   onSearch,
   onAddNew,
   onPrint,
@@ -52,8 +52,8 @@ export default function TableControls({
     onSearch?.(query);
   };
 
-  const handleDateRangeChange = (startDate: Date, endDate: Date) => {
-    console.log("Date range selected:", startDate, endDate);
+  const handleDateRangeChange = (_startDate: Date, _endDate: Date) => {
+    // Date range filtering handled by parent via callback
   };
 
   return (

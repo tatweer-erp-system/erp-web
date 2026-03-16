@@ -3,6 +3,7 @@ import { t } from "@/i18n";
 import { securityService } from "@/services/settings.service";
 import type { ChangePasswordDto, Session } from "@/services/settings.service";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { QUERY_KEYS } from "@/constants/queryKeys";
 import { useState } from "react";
 import {
   Form,
@@ -177,7 +178,7 @@ export default function SecurityTab() {
 
   // ── Sessions ─────────────────────────────────────────────────────────────
   const { data: sessions = [] } = useQuery<Session[]>({
-    queryKey: ["sessions"],
+    queryKey: [QUERY_KEYS.SESSIONS],
     queryFn: securityService.getSessions,
     staleTime: 30 * 1000,
   });
@@ -185,7 +186,7 @@ export default function SecurityTab() {
   const revokeSessionMutation = useMutation({
     mutationFn: (id: string) => securityService.revokeSession(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["sessions"] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.SESSIONS] });
       notification.success({
         message: t("mySettings.security.sessionRevoked", lang),
       });
@@ -200,7 +201,7 @@ export default function SecurityTab() {
   const revokeAllMutation = useMutation({
     mutationFn: () => securityService.revokeAllSessions(),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["sessions"] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.SESSIONS] });
       notification.success({
         message: t("mySettings.security.allSessionsRevoked", lang),
       });

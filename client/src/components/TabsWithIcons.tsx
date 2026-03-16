@@ -14,7 +14,7 @@ interface TabsWithIconsProps {
   isRTL?: boolean;
 }
 
-export default function TabsWithIcons({
+export function TabsWithIcons({
   tabs,
   activeTab,
   onTabChange,

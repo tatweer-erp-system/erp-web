@@ -32,7 +32,7 @@ interface AdvancedFiltersProps {
   filterOptions: Record<string, { label: string; options: string[] }>;
 }
 
-export default function AdvancedFilters({
+export function AdvancedFilters({
   onApplyFilters,
   onClearFilters,
   filterOptions,
@@ -147,7 +147,7 @@ export default function AdvancedFilters({
                   {label}
                 </label>
                 <Select
-                  value={filters[key] || ""}
+                  value={filters[key] ?? ""}
                   onValueChange={v => handleFilterChange(key, v)}
                 >
                   <SelectTrigger className="h-8 text-sm bg-secondary border-0 rounded-lg">

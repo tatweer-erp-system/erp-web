@@ -4,13 +4,14 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import ErrorBoundary from "./components/ErrorBoundary";
+import { ErrorBoundary } from "./components/ErrorBoundary";
+import { PageErrorBoundary } from "@/components/common/PageErrorBoundary";
 import { AppSettingsProvider } from "./contexts/AppSettingsContext";
 import { AuthProvider, useAuthContext } from "./contexts/AuthContext";
 import { Role } from "@/types/auth";
 import { PageSkeleton } from "./components/common/LoadingSkeleton";
 import { routes } from "./lib/routes";
-import DashboardLayout from "./components/layout/DashboardLayout";
+import { DashboardLayout } from "./components/layout/DashboardLayout";
 
 import Login from "@/pages/Login";
 const NotFound = lazy(() => import("@/pages/NotFound"));
@@ -85,7 +86,11 @@ function Router() {
       <Suspense fallback={<PageSkeleton />}>
         <Switch>
           {routes.map(({ path, component: Page }) => (
-            <Route key={path} path={path} component={Page} />
+            <Route key={path} path={path}>
+              <PageErrorBoundary>
+                <Page />
+              </PageErrorBoundary>
+            </Route>
           ))}
           <Route path="/404" component={NotFound} />
           <Route component={NotFound} />

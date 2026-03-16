@@ -1,12 +1,12 @@
 import { useState } from "react";
-import DashboardLayout from "@/components/DashboardLayout";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import TabsWithIcons from "@/components/TabsWithIcons";
-import AnimatedModal from "@/components/AnimatedModal";
-import BranchSelector from "@/components/BranchSelector";
-import AttachmentsTab from "@/components/AttachmentsTab";
+import { TabsWithIcons } from "@/components/TabsWithIcons";
+import { AnimatedModal } from "@/components/AnimatedModal";
+import { BranchSelector } from "@/components/BranchSelector";
+import { AttachmentsTab } from "@/components/AttachmentsTab";
 import {
   User,
   Phone,

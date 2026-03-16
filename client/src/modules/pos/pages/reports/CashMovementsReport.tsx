@@ -18,7 +18,7 @@ import {
   DownloadOutlined,
 } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
-import { usePOSStore, type CashMovement } from "../../store/posStore";
+import { usePOSStore, type CashMovement } from "@/modules/pos/store/posStore";
 import dayjs from "dayjs";
 import { CashMovementType } from "@/constants/enums";
 

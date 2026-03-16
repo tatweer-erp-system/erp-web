@@ -3,7 +3,9 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
 import { t } from "@/i18n";
 import { accountsService } from "@/services/accounting.service";
-import DashboardLayout from "@/components/DashboardLayout";
+import { getName } from "@/lib/utils";
+import { QUERY_KEYS } from "@/constants/queryKeys";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import {
   Tree,
   Card,
@@ -161,15 +163,15 @@ function CreateChildModal({
     mutationFn: (dto: Record<string, unknown>) =>
       accountsService.create(dto as never),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["accounts-tree"] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ACCOUNTS_TREE] });
       message.success(t("accounting.coa.childCreated", lang));
       form.resetFields();
       onClose();
     },
-    onError: (err: any) => {
+    onError: (err: Error) => {
       notification.error({
         message: t("mySettings.error.save", "en"),
-        description: err?.message,
+        description: err.message,
         direction: document.dir as "rtl" | "ltr",
       });
     },
@@ -179,15 +181,15 @@ function CreateChildModal({
     mutationFn: (dto: Record<string, unknown>) =>
       accountsService.update(editAccount!.id!, dto as never),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["accounts-tree"] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ACCOUNTS_TREE] });
       message.success(t("accounting.coa.accountUpdated", lang));
       form.resetFields();
       onClose();
     },
-    onError: (err: any) => {
+    onError: (err: Error) => {
       notification.error({
         message: t("mySettings.error.save", "en"),
-        description: err?.message,
+        description: err.message,
         direction: document.dir as "rtl" | "ltr",
       });
     },
@@ -224,8 +226,8 @@ function CreateChildModal({
         subType: editAccount.subType,
         normalBalance: editAccount.normalBalance,
         isActive: editAccount.isActive ?? true,
-        descriptionEn: editAccount.descriptionEn || "",
-        descriptionAr: editAccount.descriptionAr || "",
+        descriptionEn: editAccount.descriptionEn ?? "",
+        descriptionAr: editAccount.descriptionAr ?? "",
       });
     }
   }, [isEdit, editAccount, open, form]);
@@ -874,32 +876,31 @@ function ChartOfAccountsContent() {
   const queryClient = useQueryClient();
 
   const { data: accountsFromApi, isLoading: accountsLoading } = useQuery({
-    queryKey: ["accounts-tree"],
+    queryKey: [QUERY_KEYS.ACCOUNTS_TREE],
     queryFn: () => accountsService.tree(),
     staleTime: 5 * 60_000,
   });
   const ACCOUNTS: Account[] = (accountsFromApi ?? []) as Account[];
 
-  const acctName = (a: Account) =>
-    lang === "ar" ? a.nameAr || a.nameEn : a.nameEn;
+  const acctName = (a: Account) => getName(a);
 
   const acctDescription = (a: Account) =>
     lang === "ar"
-      ? a.descriptionAr || a.descriptionEn || ""
-      : a.descriptionEn || a.description || "";
+      ? (a.descriptionAr ?? a.descriptionEn ?? "")
+      : (a.descriptionEn ?? a.description ?? "");
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => accountsService.remove(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["accounts-tree"] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ACCOUNTS_TREE] });
       message.success(t("accounting.coa.accountDeleted", lang));
       setDrawerOpen(false);
       setSelected(null);
     },
-    onError: (err: any) => {
+    onError: (err: Error) => {
       notification.error({
         message: t("mySettings.error.save", lang),
-        description: err?.message,
+        description: err.message,
         direction: document.dir as "rtl" | "ltr",
       });
     },

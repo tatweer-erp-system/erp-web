@@ -1,4 +1,10 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import {
+  getStorageItem,
+  setStorageItem,
+  removeStorageItem,
+  STORAGE_KEYS,
+} from "@/lib/storage";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -535,34 +541,34 @@ export function AppSettingsProvider({
   children: React.ReactNode;
 }) {
   const [theme, setTheme] = useState<ThemeMode>(() => {
-    return (localStorage.getItem("app-theme") as ThemeMode) ?? "dark";
+    return (getStorageItem(STORAGE_KEYS.THEME) as ThemeMode) ?? "dark";
   });
 
   const [accentColor, setAccentColorState] = useState<string>(() => {
-    return localStorage.getItem("app-accent-color") ?? "";
+    return getStorageItem(STORAGE_KEYS.ACCENT_COLOR) ?? "";
   });
 
   const [themeRadius, setThemeRadiusState] = useState<number>(() => {
-    const stored = localStorage.getItem("app-theme-radius");
+    const stored = getStorageItem(STORAGE_KEYS.THEME_RADIUS);
     return stored ? Number(stored) : 6;
   });
 
   const [preset, setPresetState] = useState<string | null>(() => {
-    return localStorage.getItem("app-preset") ?? null;
+    return getStorageItem(STORAGE_KEYS.PRESET) ?? null;
   });
 
   const [language, setLanguageState] = useState<string>(() => {
-    return localStorage.getItem("app-language") ?? "en";
+    return getStorageItem(STORAGE_KEYS.LANGUAGE) ?? "en";
   });
 
   const [financialYear, setFinancialYearState] = useState("2025-2026");
 
   const [currentBranchId, setCurrentBranchId] = useState<string>(() => {
-    return localStorage.getItem("app-branch") ?? "hq";
+    return getStorageItem(STORAGE_KEYS.BRANCH) ?? "hq";
   });
 
   const [pinStyle, setPinStyleState] = useState<1 | 2 | 3>(() => {
-    const stored = localStorage.getItem("app-pin-style");
+    const stored = getStorageItem(STORAGE_KEYS.PIN_STYLE);
     return stored ? (Number(stored) as 1 | 2 | 3) : 3;
   });
 
@@ -570,7 +576,7 @@ export function AppSettingsProvider({
     "top" | "left"
   >(() => {
     return (
-      (localStorage.getItem("app-definitions-tab-pos") as "top" | "left") ??
+      (getStorageItem(STORAGE_KEYS.DEFINITIONS_TAB_POS) as "top" | "left") ??
       "left"
     );
   });
@@ -579,7 +585,7 @@ export function AppSettingsProvider({
     "vertical" | "horizontal"
   >(() => {
     return (
-      (localStorage.getItem("app-definitions-layout") as
+      (getStorageItem(STORAGE_KEYS.DEFINITIONS_LAYOUT) as
         | "vertical"
         | "horizontal") ?? "vertical"
     );
@@ -589,7 +595,7 @@ export function AppSettingsProvider({
     "vertical" | "horizontal"
   >(() => {
     return (
-      (localStorage.getItem("app-settings-layout") as
+      (getStorageItem(STORAGE_KEYS.SETTINGS_LAYOUT) as
         | "vertical"
         | "horizontal") ?? "vertical"
     );
@@ -599,7 +605,7 @@ export function AppSettingsProvider({
     "drawer" | "modal"
   >(() => {
     return (
-      (localStorage.getItem("app-definitions-crud-style") as
+      (getStorageItem(STORAGE_KEYS.DEFINITIONS_CRUD_STYLE) as
         | "drawer"
         | "modal") ?? "drawer"
     );
@@ -609,7 +615,7 @@ export function AppSettingsProvider({
     "card" | "compact" | "list"
   >(() => {
     return (
-      (localStorage.getItem("app-pos-card-style") as
+      (getStorageItem(STORAGE_KEYS.POS_CARD_STYLE) as
         | "card"
         | "compact"
         | "list") ?? "card"
@@ -617,14 +623,14 @@ export function AppSettingsProvider({
   });
 
   const [posGridCols, setPOSGridColsState] = useState<2 | 3 | 4 | 5>(() => {
-    const stored = localStorage.getItem("app-pos-grid-cols");
+    const stored = getStorageItem(STORAGE_KEYS.POS_GRID_COLS);
     return stored ? (Number(stored) as 2 | 3 | 4 | 5) : 4;
   });
 
   // Toggle dark/light class + apply base colors
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
-    localStorage.setItem("app-theme", theme);
+    setStorageItem(STORAGE_KEYS.THEME, theme);
     applyBaseColors(theme);
   }, [theme]);
 
@@ -636,7 +642,7 @@ export function AppSettingsProvider({
 
     if (!found) {
       applyBaseColors(theme);
-      if (!preset) localStorage.removeItem("app-preset");
+      if (!preset) removeStorageItem(STORAGE_KEYS.PRESET);
       return;
     }
 
@@ -661,7 +667,7 @@ export function AppSettingsProvider({
     root.style.setProperty("--chart-3", c.chart3);
     root.style.setProperty("--chart-4", c.chart4);
     root.style.setProperty("--chart-5", c.chart5);
-    localStorage.setItem("app-preset", preset);
+    setStorageItem(STORAGE_KEYS.PRESET, preset ?? "");
   }, [preset, theme]);
 
   // Apply radius CSS vars
@@ -689,18 +695,18 @@ export function AppSettingsProvider({
   const setAccentColor = (hex: string) => {
     setAccentColorState(hex);
     if (hex) {
-      localStorage.setItem("app-accent-color", hex);
+      setStorageItem(STORAGE_KEYS.ACCENT_COLOR, hex);
       document.documentElement.style.setProperty("--primary", hex);
       document.documentElement.style.setProperty("--ring", hex);
       document.documentElement.style.setProperty("--sidebar-primary", hex);
     } else {
-      localStorage.removeItem("app-accent-color");
+      removeStorageItem(STORAGE_KEYS.ACCENT_COLOR);
     }
   };
 
   const setThemeRadius = (r: number) => {
     setThemeRadiusState(r);
-    localStorage.setItem("app-theme-radius", String(r));
+    setStorageItem(STORAGE_KEYS.THEME_RADIUS, String(r));
     const root = document.documentElement;
     root.style.setProperty("--radius", `${r}px`);
     root.style.setProperty("--radius-sm", `${Math.max(r - 4, 0)}px`);
@@ -713,49 +719,49 @@ export function AppSettingsProvider({
 
   const setLanguage = (lang: string) => {
     setLanguageState(lang);
-    localStorage.setItem("app-language", lang);
+    setStorageItem(STORAGE_KEYS.LANGUAGE, lang);
   };
 
   const setFinancialYear = (year: string) => setFinancialYearState(year);
 
   const setBranch = (branchId: string) => {
     setCurrentBranchId(branchId);
-    localStorage.setItem("app-branch", branchId);
+    setStorageItem(STORAGE_KEYS.BRANCH, branchId);
   };
 
   const setPinStyle = (style: 1 | 2 | 3) => {
     setPinStyleState(style);
-    localStorage.setItem("app-pin-style", String(style));
+    setStorageItem(STORAGE_KEYS.PIN_STYLE, String(style));
   };
 
   const setDefinitionsTabPosition = (pos: "top" | "left") => {
     setDefinitionsTabPositionState(pos);
-    localStorage.setItem("app-definitions-tab-pos", pos);
+    setStorageItem(STORAGE_KEYS.DEFINITIONS_TAB_POS, pos);
   };
 
   const setDefinitionsLayout = (layout: "vertical" | "horizontal") => {
     setDefinitionsLayoutState(layout);
-    localStorage.setItem("app-definitions-layout", layout);
+    setStorageItem(STORAGE_KEYS.DEFINITIONS_LAYOUT, layout);
   };
 
   const setSettingsLayout = (layout: "vertical" | "horizontal") => {
     setSettingsLayoutState(layout);
-    localStorage.setItem("app-settings-layout", layout);
+    setStorageItem(STORAGE_KEYS.SETTINGS_LAYOUT, layout);
   };
 
   const setDefinitionsCrudStyle = (style: "drawer" | "modal") => {
     setDefinitionsCrudStyleState(style);
-    localStorage.setItem("app-definitions-crud-style", style);
+    setStorageItem(STORAGE_KEYS.DEFINITIONS_CRUD_STYLE, style);
   };
 
   const setPOSCardStyle = (style: "card" | "compact" | "list") => {
     setPOSCardStyleState(style);
-    localStorage.setItem("app-pos-card-style", style);
+    setStorageItem(STORAGE_KEYS.POS_CARD_STYLE, style);
   };
 
   const setPOSGridCols = (cols: 2 | 3 | 4 | 5) => {
     setPOSGridColsState(cols);
-    localStorage.setItem("app-pos-grid-cols", String(cols));
+    setStorageItem(STORAGE_KEYS.POS_GRID_COLS, String(cols));
   };
 
   const currentBranch =

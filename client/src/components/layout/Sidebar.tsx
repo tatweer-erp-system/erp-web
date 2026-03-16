@@ -78,6 +78,7 @@ import {
 import { t } from "@/i18n";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
 import { useAuthContext } from "@/contexts/AuthContext";
+import { getStorageItem, setStorageItem, STORAGE_KEYS } from "@/lib/storage";
 import type React from "react";
 
 // ─── Nav Data ─────────────────────────────────────────────────────────────────
@@ -527,7 +528,7 @@ function SidebarInner({ isOpen, isRTL, language }: SidebarProps) {
 
   const [openKeys, setOpenKeys] = useState<string[]>(() => {
     try {
-      const s = localStorage.getItem("sidebarOpenKeys");
+      const s = getStorageItem(STORAGE_KEYS.SIDEBAR_OPEN_KEYS);
       return s ? JSON.parse(s) : getDefaultOpenKeys();
     } catch {
       return getDefaultOpenKeys();
@@ -542,7 +543,7 @@ function SidebarInner({ isOpen, isRTL, language }: SidebarProps) {
       ) {
         const next = [...openKeys, item.name];
         setOpenKeys(next);
-        localStorage.setItem("sidebarOpenKeys", JSON.stringify(next));
+        setStorageItem(STORAGE_KEYS.SIDEBAR_OPEN_KEYS, JSON.stringify(next));
       }
     }
   }, [activeMenuKey]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -562,7 +563,7 @@ function SidebarInner({ isOpen, isRTL, language }: SidebarProps) {
 
   function handleOpenChange(keys: string[]) {
     setOpenKeys(keys);
-    localStorage.setItem("sidebarOpenKeys", JSON.stringify(keys));
+    setStorageItem(STORAGE_KEYS.SIDEBAR_OPEN_KEYS, JSON.stringify(keys));
   }
 
   // Derived colors

@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
 import { usePinLock } from "@/contexts/PinLockContext";
+import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { t } from "@/i18n";
 
 export type OverlayMode = "verify" | "setup" | "confirm";
 
 export function usePinOverlayLogic() {
   const { isLocked, hasPin, unlock, setupPin } = usePinLock();
+  const { language: lang } = useAppSettings();
   const [mode, setMode] = useState<OverlayMode>("verify");
   const [firstPin, setFirstPin] = useState("");
   const [pin, setPin] = useState("");
@@ -29,7 +32,7 @@ export function usePinOverlayLogic() {
       try {
         await unlock(value);
       } catch {
-        setError("Incorrect PIN. Please try again.");
+        setError(t("pin.incorrect", lang));
         setPin("");
       } finally {
         setLoading(false);
@@ -40,7 +43,7 @@ export function usePinOverlayLogic() {
       setMode("confirm");
     } else if (mode === "confirm") {
       if (value !== firstPin) {
-        setError("PINs do not match. Please try again.");
+        setError(t("pin.mismatch", lang));
         setPin("");
         return;
       }
@@ -50,7 +53,7 @@ export function usePinOverlayLogic() {
         await setupPin(firstPin);
         await unlock(firstPin);
       } catch {
-        setError("Failed to set PIN. Please try again.");
+        setError(t("pin.set_failed", lang));
         setPin("");
       } finally {
         setLoading(false);

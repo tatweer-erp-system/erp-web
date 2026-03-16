@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { useForm, type DefaultValues, type FieldValues } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import type { ZodType } from "zod";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -11,13 +12,14 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import type { ApiError } from "@/types/api";
+import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { t } from "@/i18n";
 
 interface FormModalProps<T extends FieldValues> {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  schema: any; // ZodType — typed loosely to work across zod v3/v4
+  schema: ZodType;
   defaultValues: DefaultValues<T>;
   onSubmit: (data: T) => Promise<void>;
   isLoading?: boolean;
@@ -34,23 +36,28 @@ export function FormModal<T extends FieldValues>({
   isLoading = false,
   children,
 }: FormModalProps<T>) {
+  const { language: lang } = useAppSettings();
   const isEdit = "id" in defaultValues && !!defaultValues.id;
 
   const form = useForm<T>({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    resolver: zodResolver(schema) as any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- ZodType generic variance mismatch with react-hook-form Resolver
+    resolver: zodResolver(schema as any) as any,
     defaultValues,
   });
 
   const handleSubmit = form.handleSubmit(async data => {
     try {
       await onSubmit(data);
-      toast.success(isEdit ? "Updated successfully" : "Created successfully");
+      toast.success(
+        isEdit
+          ? t("common.updated_successfully", lang)
+          : t("common.created_successfully", lang)
+      );
       onOpenChange(false);
       form.reset();
     } catch (err) {
       const apiError = err as ApiError;
-      toast.error(apiError?.message ?? "An error occurred. Please try again.");
+      toast.error(apiError?.message ?? t("common.error_occurred", lang));
     }
   });
 

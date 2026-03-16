@@ -381,7 +381,7 @@ const SEED: Attachment[] = [
   },
 ];
 
-export default function AttachmentsTab({
+export function AttachmentsTab({
   entityName,
   initialAttachments = SEED,
 }: AttachmentsTabProps) {

@@ -51,7 +51,7 @@ import {
   LoadingOutlined,
   CloseCircleOutlined,
 } from "@ant-design/icons";
-import DashboardLayout from "@/components/layout/DashboardLayout";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { DocumentStatus, UploadStatus } from "@/constants/enums";
 
 const { Title, Text } = Typography;

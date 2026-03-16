@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import DashboardLayout from "@/components/DashboardLayout";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { CreateQuotationModal } from "@/pages/CreateQuotation";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
 import {

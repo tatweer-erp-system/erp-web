@@ -13,12 +13,15 @@ import {
   CheckCircleOutlined,
   DisconnectOutlined,
 } from "@ant-design/icons";
-import { usePOSStore } from "../../store/posStore";
-import { cacheProducts } from "../../services/offlineService";
-import { getProducts } from "../../services/posService";
+import { usePOSStore } from "@/modules/pos/store/posStore";
+import { cacheProducts } from "@/modules/pos/services/offlineService";
+import { getProducts } from "@/modules/pos/services/posService";
+import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { t } from "@/i18n";
 
 export function OfflineSettingsTab({ onDirty }: { onDirty?: () => void } = {}) {
   const { token } = antTheme.useToken();
+  const { language: lang } = useAppSettings();
   const isOnline = usePOSStore(s => s.isOnline);
   const offlineModeEnabled = usePOSStore(s => s.offlineModeEnabled);
   const setOfflineModeEnabled = usePOSStore(s => s.setOfflineModeEnabled);
@@ -44,7 +47,7 @@ export function OfflineSettingsTab({ onDirty }: { onDirty?: () => void } = {}) {
         `Product cache refreshed — ${products.length} products cached`
       );
     } catch {
-      message.error("Failed to refresh cache");
+      message.error(t("pos.cache_refresh_failed", lang));
     } finally {
       setRefreshing(false);
     }

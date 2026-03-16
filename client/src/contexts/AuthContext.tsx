@@ -7,18 +7,23 @@ import {
   type ReactNode,
 } from "react";
 import { type User, type Tenant, type Branch, Role } from "@/types/auth";
-import * as authService from "@/services/auth.service";
+import {
+  login as authLogin,
+  logout as authLogout,
+  refresh as authRefresh,
+} from "@/services/auth.service";
 import {
   getAccessToken,
   getRefreshToken,
   setTokens,
   clearTokens,
 } from "@/lib/token";
-
-const USER_STORAGE_KEY = "web_user";
-const TENANT_STORAGE_KEY = "web_tenant";
-const BRANCHES_STORAGE_KEY = "web_branches";
-const SELECTED_BRANCH_KEY = "web_selected_branch";
+import {
+  getStorageJSON,
+  setStorageJSON,
+  removeStorageItem,
+  STORAGE_KEYS,
+} from "@/lib/storage";
 
 export const ROLE_DISPLAY: Record<
   Role,
@@ -47,36 +52,27 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-function loadFromStorage<T>(key: string): T | null {
-  try {
-    const stored = localStorage.getItem(key);
-    return stored ? (JSON.parse(stored) as T) : null;
-  } catch {
-    return null;
-  }
-}
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(() =>
-    loadFromStorage<User>(USER_STORAGE_KEY)
+    getStorageJSON<User>(STORAGE_KEYS.USER)
   );
   const [tenant, setTenant] = useState<Tenant | null>(() =>
-    loadFromStorage<Tenant>(TENANT_STORAGE_KEY)
+    getStorageJSON<Tenant>(STORAGE_KEYS.TENANT)
   );
   const [branches, setBranches] = useState<Branch[]>(
-    () => loadFromStorage<Branch[]>(BRANCHES_STORAGE_KEY) ?? []
+    () => getStorageJSON<Branch[]>(STORAGE_KEYS.BRANCHES) ?? []
   );
   const [selectedBranch, setSelectedBranch] = useState<Branch | null>(() =>
-    loadFromStorage<Branch>(SELECTED_BRANCH_KEY)
+    getStorageJSON<Branch>(STORAGE_KEYS.SELECTED_BRANCH)
   );
   const [isLoading, setIsLoading] = useState(() => !!getAccessToken());
 
   const clearAuth = useCallback(() => {
     clearTokens();
-    localStorage.removeItem(USER_STORAGE_KEY);
-    localStorage.removeItem(TENANT_STORAGE_KEY);
-    localStorage.removeItem(BRANCHES_STORAGE_KEY);
-    localStorage.removeItem(SELECTED_BRANCH_KEY);
+    removeStorageItem(STORAGE_KEYS.USER);
+    removeStorageItem(STORAGE_KEYS.TENANT);
+    removeStorageItem(STORAGE_KEYS.BRANCHES);
+    removeStorageItem(STORAGE_KEYS.SELECTED_BRANCH);
     setUser(null);
     setTenant(null);
     setBranches([]);
@@ -95,8 +91,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     // Try to refresh the token to validate the session
-    authService
-      .refresh(refresh)
+    authRefresh(refresh)
       .then(res => {
         setTokens(res.accessToken, res.refreshToken);
       })
@@ -109,11 +104,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [clearAuth]);
 
   const login = useCallback(async (email: string, password: string) => {
-    const res = await authService.login(email, password);
+    const res = await authLogin(email, password);
     setTokens(res.accessToken, res.refreshToken);
-    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(res.user));
-    localStorage.setItem(TENANT_STORAGE_KEY, JSON.stringify(res.tenant));
-    localStorage.setItem(BRANCHES_STORAGE_KEY, JSON.stringify(res.branches));
+    setStorageJSON(STORAGE_KEYS.USER, res.user);
+    setStorageJSON(STORAGE_KEYS.TENANT, res.tenant);
+    setStorageJSON(STORAGE_KEYS.BRANCHES, res.branches);
     setUser(res.user);
     setTenant(res.tenant);
     setBranches(res.branches);
@@ -121,14 +116,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Auto-select default branch if there's only one
     if (res.branches.length === 1) {
       const branch = res.branches[0];
-      localStorage.setItem(SELECTED_BRANCH_KEY, JSON.stringify(branch));
+      setStorageJSON(STORAGE_KEYS.SELECTED_BRANCH, branch);
       setSelectedBranch(branch);
     }
   }, []);
 
   const logout = useCallback(async () => {
     try {
-      await authService.logout();
+      await authLogout();
     } catch {
       // Proceed with local logout even if API call fails
     }
@@ -136,7 +131,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [clearAuth]);
 
   const selectBranch = useCallback((branch: Branch) => {
-    localStorage.setItem(SELECTED_BRANCH_KEY, JSON.stringify(branch));
+    setStorageJSON(STORAGE_KEYS.SELECTED_BRANCH, branch);
     setSelectedBranch(branch);
   }, []);
 

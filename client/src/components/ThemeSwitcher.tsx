@@ -1,5 +1,5 @@
 import React from "react";
-import { useAppSettings } from "../contexts/AppSettingsContext";
+import { useAppSettings } from "@/contexts/AppSettingsContext";
 import { Moon, Sun } from "lucide-react";
 
 export function ThemeSwitcher() {

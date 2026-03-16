@@ -12,7 +12,9 @@ import type {
   DropdownItem,
 } from "@/types/modules/inventory";
 import { ProductType, InvoicePolicy } from "@/constants/enums";
-import DashboardLayout from "@/components/DashboardLayout";
+import { getName } from "@/lib/utils";
+import { QUERY_KEYS } from "@/constants/queryKeys";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import {
   Table,
   Card,
@@ -106,7 +108,7 @@ function ProductFormModal({
   const createMutation = useMutation({
     mutationFn: (dto: CreateProductDto) => productsService.create(dto),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.PRODUCTS] });
       message.success(t("products.createSuccess", lang));
       form.resetFields();
       onClose();
@@ -124,7 +126,7 @@ function ProductFormModal({
     mutationFn: (dto: Record<string, unknown>) =>
       productsService.update(editProduct!.id, dto as never),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.PRODUCTS] });
       message.success(t("products.updateSuccess", lang));
       form.resetFields();
       onClose();
@@ -161,10 +163,10 @@ function ProductFormModal({
       form.setFieldsValue({
         nameEn: editProduct.nameEn,
         nameAr: editProduct.nameAr,
-        descriptionEn: editProduct.descriptionEn || "",
-        descriptionAr: editProduct.descriptionAr || "",
-        sku: editProduct.sku || "",
-        barcode: editProduct.barcode || "",
+        descriptionEn: editProduct.descriptionEn ?? "",
+        descriptionAr: editProduct.descriptionAr ?? "",
+        sku: editProduct.sku ?? "",
+        barcode: editProduct.barcode ?? "",
         categoryId: editProduct.categoryId,
         unitPrice: editProduct.unitPrice,
         costPrice: editProduct.costPrice,
@@ -344,7 +346,7 @@ function ProductFormModal({
                   optionFilterProp="label"
                   options={categories.map(c => ({
                     value: c.id,
-                    label: lang === "ar" ? c.nameAr : c.nameEn,
+                    label: getName(c),
                   }))}
                 />
               </Form.Item>
@@ -536,7 +538,7 @@ export default function ProductDetails() {
 
   // ── Fetch categories (shared by filters + modal) ──
   const { data: categoryOptions = [] } = useQuery({
-    queryKey: ["categories-dropdown"],
+    queryKey: [QUERY_KEYS.CATEGORIES_DROPDOWN],
     queryFn: () => categoriesService.dropdown({ limit: 100 }),
     staleTime: 60_000,
   });
@@ -547,7 +549,12 @@ export default function ProductDetails() {
     isLoading,
     isFetching,
   } = useQuery({
-    queryKey: ["products", pagination.page, pagination.limit, debouncedSearch],
+    queryKey: [
+      QUERY_KEYS.PRODUCTS,
+      pagination.page,
+      pagination.limit,
+      debouncedSearch,
+    ],
     queryFn: () =>
       productsService.list({
         page: pagination.page,
@@ -571,7 +578,7 @@ export default function ProductDetails() {
   const deleteMutation = useMutation({
     mutationFn: (id: string) => productsService.remove(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.PRODUCTS] });
       message.success(t("products.deleteSuccess", lang));
     },
     onError: (err: { message?: string }) => {
@@ -639,13 +646,10 @@ export default function ProductDetails() {
   const columns: ColumnsType<Product> = [
     {
       title: t("products.nameEn", lang).replace(/ \(.*\)/, ""),
-      dataIndex: lang === "ar" ? "nameAr" : "nameEn",
       key: "name",
-      render: (text: string, record: Product) => (
+      render: (_: string, record: Product) => (
         <div>
-          <div style={{ fontWeight: 600 }}>
-            {lang === "ar" ? record.nameAr : record.nameEn}
-          </div>
+          <div style={{ fontWeight: 600 }}>{getName(record)}</div>
           {record.sku && (
             <div style={{ fontSize: 12, color: "#888" }}>{record.sku}</div>
           )}
@@ -909,7 +913,7 @@ export default function ProductDetails() {
                 style={{ minWidth: 160 }}
                 options={categoryOptions.map(c => ({
                   value: c.id,
-                  label: lang === "ar" ? c.nameAr : c.nameEn,
+                  label: getName(c),
                 }))}
               />
 
@@ -935,7 +939,9 @@ export default function ProductDetails() {
                 <Button
                   icon={<ReloadOutlined spin={isFetching} />}
                   onClick={() =>
-                    queryClient.invalidateQueries({ queryKey: ["products"] })
+                    queryClient.invalidateQueries({
+                      queryKey: [QUERY_KEYS.PRODUCTS],
+                    })
                   }
                 />
               </Tooltip>
@@ -1064,7 +1070,7 @@ export default function ProductDetails() {
                         <div className="space-y-2">
                           <div className="flex items-start justify-between">
                             <h3 className="font-semibold text-foreground text-sm leading-tight">
-                              {lang === "ar" ? product.nameAr : product.nameEn}
+                              {getName(product)}
                             </h3>
                             <Tag
                               color={

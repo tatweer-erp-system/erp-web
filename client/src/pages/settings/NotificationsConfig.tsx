@@ -1,5 +1,5 @@
 import { useParams, useLocation } from "wouter";
-import DashboardLayout from "@/components/DashboardLayout";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import {
   Alert,
   Button,

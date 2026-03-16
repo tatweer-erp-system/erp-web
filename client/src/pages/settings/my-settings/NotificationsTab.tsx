@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
 import { t } from "@/i18n";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { QUERY_KEYS } from "@/constants/queryKeys";
 import {
   Switch,
   Radio,
@@ -65,7 +66,11 @@ function Section({
 }
 
 // ─── Toggle channel definitions ───────────────────────────────────────────────
-const NOTIFICATION_CHANNELS = [
+const NOTIFICATION_CHANNELS: Array<{
+  key: string;
+  i18nKey: string;
+  locked?: boolean;
+}> = [
   {
     key: "emailNotifications",
     i18nKey: "mySettings.notifications.emailNotifications",
@@ -147,7 +152,7 @@ export default function NotificationsTab() {
   const quietHoursTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { data } = useQuery<NotificationSettings>({
-    queryKey: ["notificationSettings"],
+    queryKey: [QUERY_KEYS.NOTIFICATION_SETTINGS],
     queryFn: notificationSettingsService.get,
     staleTime: 5 * 60 * 1000,
   });
@@ -162,7 +167,9 @@ export default function NotificationsTab() {
     mutationFn: (dto: Partial<NotificationSettings>) =>
       notificationSettingsService.update(dto),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notificationSettings"] });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.NOTIFICATION_SETTINGS],
+      });
       notification.success({
         message: t("mySettings.notifications.saved", lang),
         icon: <CheckCircleOutlined style={{ color: token.colorSuccess }} />,

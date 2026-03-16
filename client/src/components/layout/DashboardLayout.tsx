@@ -26,7 +26,7 @@ interface DashboardLayoutProps {
 const InsideLayoutCtx = createContext(false);
 export const useInsideLayout = () => useContext(InsideLayoutCtx);
 
-export default function DashboardLayout({
+export function DashboardLayout({
   children,
   currentPage = "Dashboard",
   breadcrumbs,
