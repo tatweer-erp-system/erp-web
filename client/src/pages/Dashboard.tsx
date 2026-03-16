@@ -168,7 +168,7 @@ const alerts = [
     id: "1",
     severity: "error",
     message: "14 products are out of stock",
-    action: "/product-details",
+    action: "/products",
   },
   {
     id: "2",

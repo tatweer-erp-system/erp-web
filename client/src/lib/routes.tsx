@@ -225,7 +225,7 @@ export const routes: RouteConfig[] = [
 
   // ── Inventory ───────────────────────────────────────────────────────────────
   {
-    path: "/product-details",
+    path: "/products",
     component: lz(() => import("@/pages/ProductDetails")),
     permissions: ["inventory:read"],
     breadcrumb: ["Inventory", "Products"],

@@ -1,5 +1,9 @@
 import { DefinitionsPage } from "@/components/common/DefinitionsPage";
 import type { TabDef } from "@/components/common/DefinitionsPage";
+import {
+  paymentTermsService,
+  rejectionReasonsService,
+} from "@/services/definitions.service";
 import { Tag } from "antd";
 
 const tabs: TabDef[] = [
@@ -48,29 +52,13 @@ const tabs: TabDef[] = [
     key: "payment-terms",
     label: "Payment Terms",
     labelAr: "شروط الدفع",
-    initialData: [
-      {
-        id: "ppt1",
-        nameAr: "فوري",
-        nameEn: "Immediate",
-        days_due: 0,
-        penalty_percentage: 0,
-        isActive: true,
-      },
-      {
-        id: "ppt2",
-        nameAr: "30 يوم",
-        nameEn: "Net 30",
-        days_due: 30,
-        penalty_percentage: 1.5,
-        isActive: true,
-      },
-    ],
+    service: paymentTermsService,
+    initialData: [],
     columns: [
       { key: "nameEn", title: "Name (EN)", width: 160 },
       { key: "nameAr", title: "Name (AR)", width: 160 },
-      { key: "days_due", title: "Days Due", width: 100 },
-      { key: "penalty_percentage", title: "Penalty %", width: 100 },
+      { key: "daysDue", title: "Days Due", width: 100 },
+      { key: "penaltyPercentage", title: "Penalty %", width: 100 },
     ],
     fields: [
       { key: "nameEn", label: "Name (English)", type: "text", required: true },
@@ -81,14 +69,26 @@ const tabs: TabDef[] = [
         required: true,
       },
       {
-        key: "days_due",
+        key: "descriptionEn",
+        label: "Description (English)",
+        type: "text",
+        required: false,
+      },
+      {
+        key: "descriptionAr",
+        label: "Description (Arabic) / الوصف بالعربي",
+        type: "text",
+        required: false,
+      },
+      {
+        key: "daysDue",
         label: "Days Due",
         type: "number",
         required: true,
         min: 0,
       },
       {
-        key: "penalty_percentage",
+        key: "penaltyPercentage",
         label: "Penalty Percentage (%)",
         type: "number",
         required: false,
@@ -102,26 +102,8 @@ const tabs: TabDef[] = [
     key: "rejection-reasons",
     label: "Rejection Reasons",
     labelAr: "أسباب الرفض",
-    initialData: [
-      {
-        id: "rj1",
-        nameAr: "جودة غير مقبولة",
-        nameEn: "Quality Not Acceptable",
-        isActive: true,
-      },
-      {
-        id: "rj2",
-        nameAr: "سعر مرتفع",
-        nameEn: "Price Too High",
-        isActive: true,
-      },
-      {
-        id: "rj3",
-        nameAr: "تأخر في التسليم",
-        nameEn: "Late Delivery",
-        isActive: true,
-      },
-    ],
+    service: rejectionReasonsService,
+    initialData: [],
     columns: [
       { key: "nameEn", title: "Name (EN)", width: 240 },
       { key: "nameAr", title: "Name (AR)", width: 240 },

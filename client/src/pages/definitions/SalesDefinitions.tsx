@@ -1,5 +1,13 @@
 import { DefinitionsPage } from "@/components/common/DefinitionsPage";
 import type { TabDef } from "@/components/common/DefinitionsPage";
+import {
+  voucherTypesService,
+  receiptTemplatesService,
+  cancellationReasonsService,
+  voidRefundReasonsService,
+  discountReasonsService,
+  holdReasonsService,
+} from "@/services/definitions.service";
 import { Tag } from "antd";
 
 const tabs: TabDef[] = [
@@ -247,27 +255,13 @@ const tabs: TabDef[] = [
     key: "cancellation-reasons",
     label: "Cancellation Reasons",
     labelAr: "أسباب الإلغاء",
-    initialData: [
-      {
-        id: "cr1",
-        nameAr: "طلب العميل",
-        nameEn: "Customer Request",
-        requires_approval: false,
-        isActive: true,
-      },
-      {
-        id: "cr2",
-        nameAr: "نفاد المخزون",
-        nameEn: "Out of Stock",
-        requires_approval: true,
-        isActive: true,
-      },
-    ],
+    service: cancellationReasonsService,
+    initialData: [],
     columns: [
       { key: "nameEn", title: "Name (EN)", width: 200 },
       { key: "nameAr", title: "Name (AR)", width: 200 },
       {
-        key: "requires_approval",
+        key: "requiresApproval",
         title: "Requires Approval",
         width: 150,
         render: (v: boolean) => (
@@ -284,7 +278,7 @@ const tabs: TabDef[] = [
         required: true,
       },
       {
-        key: "requires_approval",
+        key: "requiresApproval",
         label: "Requires Approval",
         type: "switch",
         required: false,
@@ -712,67 +706,19 @@ const discountReasonsTab: TabDef = {
   key: "discount-reasons",
   label: "Discount Reasons",
   labelAr: "أسباب الخصم",
-  initialData: [
-    {
-      id: "dr1",
-      nameEn: "Loyalty Reward",
-      nameAr: "مكافأة ولاء",
-      requires_approval: false,
-      max_percent: 100,
-      isActive: true,
-    },
-    {
-      id: "dr2",
-      nameEn: "Employee Discount",
-      nameAr: "خصم موظف",
-      requires_approval: false,
-      max_percent: 30,
-      isActive: true,
-    },
-    {
-      id: "dr3",
-      nameEn: "Damaged Item",
-      nameAr: "منتج تالف",
-      requires_approval: true,
-      max_percent: 50,
-      isActive: true,
-    },
-    {
-      id: "dr4",
-      nameEn: "Promotional Event",
-      nameAr: "حدث ترويجي",
-      requires_approval: false,
-      max_percent: 25,
-      isActive: true,
-    },
-    {
-      id: "dr5",
-      nameEn: "Manager Discretion",
-      nameAr: "تقدير المدير",
-      requires_approval: true,
-      max_percent: 100,
-      isActive: true,
-    },
-    {
-      id: "dr6",
-      nameEn: "Clearance Sale",
-      nameAr: "تصفية المخزون",
-      requires_approval: true,
-      max_percent: 70,
-      isActive: false,
-    },
-  ],
+  service: discountReasonsService,
+  initialData: [],
   columns: [
     { key: "nameEn", title: "Reason (EN)", width: 180 },
     { key: "nameAr", title: "Reason (AR)", width: 180 },
     {
-      key: "max_percent",
+      key: "maxPercent",
       title: "Max %",
       width: 80,
       render: (v: number) => `${v}%`,
     },
     {
-      key: "requires_approval",
+      key: "requiresApproval",
       title: "Manager Approval",
       width: 140,
       render: (v: boolean) => (
@@ -791,7 +737,7 @@ const discountReasonsTab: TabDef = {
       required: true,
     },
     {
-      key: "max_percent",
+      key: "maxPercent",
       label: "Max Discount %",
       type: "number",
       required: false,
@@ -799,7 +745,7 @@ const discountReasonsTab: TabDef = {
       max: 100,
     },
     {
-      key: "requires_approval",
+      key: "requiresApproval",
       label: "Requires Manager Approval",
       type: "switch",
       required: false,
@@ -809,59 +755,11 @@ const discountReasonsTab: TabDef = {
 
 // ── POS Void / Refund Reasons ──────────────────────────────────────────────────
 const voidReasonsTab: TabDef = {
-  key: "void-reasons",
+  key: "void-refund-reasons",
   label: "Void / Refund Reasons",
   labelAr: "أسباب الإلغاء والاسترداد",
-  initialData: [
-    {
-      id: "vr1",
-      nameEn: "Customer Changed Mind",
-      nameAr: "تغيير رأي العميل",
-      type: "both",
-      requires_manager: false,
-      isActive: true,
-    },
-    {
-      id: "vr2",
-      nameEn: "Incorrect Item Scanned",
-      nameAr: "خطأ في المسح",
-      type: "void",
-      requires_manager: false,
-      isActive: true,
-    },
-    {
-      id: "vr3",
-      nameEn: "Defective Product",
-      nameAr: "منتج معيب",
-      type: "refund",
-      requires_manager: true,
-      isActive: true,
-    },
-    {
-      id: "vr4",
-      nameEn: "Duplicate Transaction",
-      nameAr: "معاملة مكررة",
-      type: "void",
-      requires_manager: true,
-      isActive: true,
-    },
-    {
-      id: "vr5",
-      nameEn: "Wrong Price Charged",
-      nameAr: "خطأ في السعر",
-      type: "refund",
-      requires_manager: true,
-      isActive: true,
-    },
-    {
-      id: "vr6",
-      nameEn: "Payment Issue",
-      nameAr: "مشكلة في الدفع",
-      type: "void",
-      requires_manager: false,
-      isActive: false,
-    },
-  ],
+  service: voidRefundReasonsService,
+  initialData: [],
   columns: [
     { key: "nameEn", title: "Reason (EN)", width: 200 },
     { key: "nameAr", title: "Reason (AR)", width: 200 },
@@ -888,7 +786,7 @@ const voidReasonsTab: TabDef = {
       },
     },
     {
-      key: "requires_manager",
+      key: "requiresManager",
       title: "Manager Req.",
       width: 120,
       render: (v: boolean) => (
@@ -916,7 +814,7 @@ const voidReasonsTab: TabDef = {
       ],
     },
     {
-      key: "requires_manager",
+      key: "requiresManager",
       label: "Requires Manager Approval",
       type: "switch",
       required: false,
@@ -929,48 +827,13 @@ const holdReasonsTab: TabDef = {
   key: "hold-reasons",
   label: "Hold Reasons",
   labelAr: "أسباب التعليق",
-  initialData: [
-    {
-      id: "hr1",
-      nameEn: "Customer Undecided",
-      nameAr: "العميل غير متأكد",
-      max_hold_minutes: 30,
-      isActive: true,
-    },
-    {
-      id: "hr2",
-      nameEn: "Price Check Required",
-      nameAr: "التحقق من السعر",
-      max_hold_minutes: 15,
-      isActive: true,
-    },
-    {
-      id: "hr3",
-      nameEn: "Manager Approval",
-      nameAr: "موافقة المدير",
-      max_hold_minutes: 60,
-      isActive: true,
-    },
-    {
-      id: "hr4",
-      nameEn: "Stock Verification",
-      nameAr: "التحقق من المخزون",
-      max_hold_minutes: 20,
-      isActive: true,
-    },
-    {
-      id: "hr5",
-      nameEn: "Customer Will Return",
-      nameAr: "العميل سيعود",
-      max_hold_minutes: 120,
-      isActive: false,
-    },
-  ],
+  service: holdReasonsService,
+  initialData: [],
   columns: [
     { key: "nameEn", title: "Reason (EN)", width: 200 },
     { key: "nameAr", title: "Reason (AR)", width: 200 },
     {
-      key: "max_hold_minutes",
+      key: "maxHoldMinutes",
       title: "Max Hold (min)",
       width: 120,
       render: (v: number) => (v ? `${v} min` : "Unlimited"),
@@ -985,7 +848,7 @@ const holdReasonsTab: TabDef = {
       required: true,
     },
     {
-      key: "max_hold_minutes",
+      key: "maxHoldMinutes",
       label: "Max Hold Duration (minutes)",
       type: "number",
       required: false,
@@ -997,54 +860,17 @@ const holdReasonsTab: TabDef = {
 
 // ── POS Receipt Settings ───────────────────────────────────────────────────────
 const receiptSettingsTab: TabDef = {
-  key: "receipt-settings",
+  key: "receipt-templates",
   label: "Receipt Templates",
   labelAr: "قوالب الإيصالات",
-  initialData: [
-    {
-      id: "rs1",
-      nameEn: "Standard Receipt",
-      nameAr: "إيصال قياسي",
-      header_text: "Thank you for shopping with us!\nWelcome back anytime.",
-      footer_text: "Returns accepted within 30 days with receipt.",
-      show_logo: true,
-      show_tax: true,
-      show_barcode: true,
-      copies: 1,
-      isActive: true,
-    },
-    {
-      id: "rs2",
-      nameEn: "Gift Receipt",
-      nameAr: "إيصال هدية",
-      header_text: "Gift Receipt — No prices shown",
-      footer_text:
-        "This item was purchased as a gift. Exchange within 14 days.",
-      show_logo: true,
-      show_tax: false,
-      show_barcode: false,
-      copies: 1,
-      isActive: true,
-    },
-    {
-      id: "rs3",
-      nameEn: "Kitchen Ticket",
-      nameAr: "تذكرة المطبخ",
-      header_text: "",
-      footer_text: "",
-      show_logo: false,
-      show_tax: false,
-      show_barcode: false,
-      copies: 2,
-      isActive: false,
-    },
-  ],
+  service: receiptTemplatesService,
+  initialData: [],
   columns: [
     { key: "nameEn", title: "Template (EN)", width: 160 },
     { key: "nameAr", title: "Template (AR)", width: 160 },
     { key: "copies", title: "Copies", width: 70 },
     {
-      key: "show_logo",
+      key: "showLogo",
       title: "Logo",
       width: 70,
       render: (v: boolean) => (
@@ -1052,7 +878,7 @@ const receiptSettingsTab: TabDef = {
       ),
     },
     {
-      key: "show_tax",
+      key: "showTaxDetails",
       title: "Tax Line",
       width: 80,
       render: (v: boolean) => (
@@ -1060,7 +886,7 @@ const receiptSettingsTab: TabDef = {
       ),
     },
     {
-      key: "show_barcode",
+      key: "showBarcode",
       title: "Barcode",
       width: 80,
       render: (v: boolean) => (
@@ -1082,33 +908,45 @@ const receiptSettingsTab: TabDef = {
       required: true,
     },
     {
-      key: "header_text",
-      label: "Header Text",
+      key: "headerTextEn",
+      label: "Header Text (English)",
       type: "text",
       required: false,
       hint: "Printed at the top of the receipt",
     },
     {
-      key: "footer_text",
-      label: "Footer Text",
+      key: "headerTextAr",
+      label: "Header Text (Arabic) / نص الرأس بالعربي",
+      type: "text",
+      required: false,
+    },
+    {
+      key: "footerTextEn",
+      label: "Footer Text (English)",
       type: "text",
       required: false,
       hint: "Printed at the bottom of the receipt",
     },
     {
-      key: "show_logo",
+      key: "footerTextAr",
+      label: "Footer Text (Arabic) / نص التذييل بالعربي",
+      type: "text",
+      required: false,
+    },
+    {
+      key: "showLogo",
       label: "Show Company Logo",
       type: "switch",
       required: false,
     },
     {
-      key: "show_tax",
+      key: "showTaxDetails",
       label: "Show Tax Breakdown",
       type: "switch",
       required: false,
     },
     {
-      key: "show_barcode",
+      key: "showBarcode",
       label: "Show Barcode",
       type: "switch",
       required: false,
@@ -1120,6 +958,12 @@ const receiptSettingsTab: TabDef = {
       required: false,
       min: 1,
       max: 5,
+    },
+    {
+      key: "isDefault",
+      label: "Set as Default Template",
+      type: "switch",
+      required: false,
     },
   ],
 };
@@ -1281,133 +1125,97 @@ const voucherTypesTab: TabDef = {
   key: "voucher-types",
   label: "Voucher Types",
   labelAr: "أنواع القسائم",
+  service: voucherTypesService,
+  initialData: [],
   columns: [
     {
       key: "nameEn",
-      label: "Type Name",
+      title: "Type Name",
       render: (v: string) => <strong>{v}</strong>,
     },
     {
-      key: "discount_type",
-      label: "Discount Type",
+      key: "discountType",
+      title: "Discount Type",
       render: (v: string) => (
         <Tag
-          color={v === "percent" ? "blue" : "green"}
+          color={v === "percentage" ? "blue" : "green"}
           style={{ borderRadius: 6, fontWeight: 600 }}
         >
-          {v === "percent" ? "Percentage" : "Fixed Amount"}
+          {v === "percentage" ? "Percentage" : "Fixed Amount"}
         </Tag>
       ),
     },
     {
-      key: "discount_value",
-      label: "Value",
+      key: "discountValue",
+      title: "Value",
       render: (v: number, row: Record<string, unknown>) =>
-        row.discount_type === "percent" ? `${v}%` : `$${Number(v).toFixed(2)}`,
+        row.discountType === "percentage"
+          ? `${v}%`
+          : `$${Number(v).toFixed(2)}`,
     },
     {
-      key: "min_order",
-      label: "Min Order",
+      key: "minOrderAmount",
+      title: "Min Order",
       render: (v: number) => `$${Number(v).toFixed(2)}`,
     },
     {
-      key: "valid_days",
-      label: "Valid Days",
-      render: (v: number) => (v ? `${v} days` : "—"),
+      key: "validDays",
+      title: "Valid Days",
+      render: (v: number) => (v ? `${v} days` : "---"),
     },
     {
-      key: "max_uses",
-      label: "Max Uses",
+      key: "maxUses",
+      title: "Max Uses",
       render: (v: number) => (v === 0 ? "Unlimited" : v),
     },
   ],
-  initialData: [
-    {
-      id: "VT001",
-      nameEn: "Welcome Discount",
-      nameAr: "خصم الترحيب",
-      discount_type: "fixed",
-      discount_value: 5,
-      min_order: 0,
-      valid_days: 30,
-      max_uses: 0,
-      isActive: true,
-    },
-    {
-      id: "VT002",
-      nameEn: "Summer Sale 10%",
-      nameAr: "تخفيضات الصيف",
-      discount_type: "percent",
-      discount_value: 10,
-      min_order: 0,
-      valid_days: 60,
-      max_uses: 500,
-      isActive: true,
-    },
-    {
-      id: "VT003",
-      nameEn: "Flat $20 Off",
-      nameAr: "خصم ثابت 20$",
-      discount_type: "fixed",
-      discount_value: 20,
-      min_order: 50,
-      valid_days: 90,
-      max_uses: 200,
-      isActive: true,
-    },
-    {
-      id: "VT004",
-      nameEn: "Summer 15%",
-      nameAr: "خصم 15%",
-      discount_type: "percent",
-      discount_value: 15,
-      min_order: 100,
-      valid_days: 45,
-      max_uses: 100,
-      isActive: true,
-    },
-    {
-      id: "VT005",
-      nameEn: "Clearance Fixed",
-      nameAr: "خصم التصفية",
-      discount_type: "fixed",
-      discount_value: 50,
-      min_order: 200,
-      valid_days: 14,
-      max_uses: 50,
-      isActive: false,
-    },
-  ],
   fields: [
-    { key: "nameEn", label: "Type Name (EN)", required: true },
-    { key: "nameAr", label: "Type Name (AR)", required: true },
+    { key: "nameEn", label: "Type Name (EN)", type: "text", required: true },
+    { key: "nameAr", label: "Type Name (AR)", type: "text", required: true },
     {
-      key: "discount_type",
+      key: "descriptionEn",
+      label: "Description (English)",
+      type: "text",
+      required: false,
+    },
+    {
+      key: "descriptionAr",
+      label: "Description (Arabic) / الوصف بالعربي",
+      type: "text",
+      required: false,
+    },
+    {
+      key: "discountType",
       label: "Discount Type",
       type: "select",
       required: true,
       options: [
-        { value: "percent", label: "Percentage (%)" },
+        { value: "percentage", label: "Percentage (%)" },
         { value: "fixed", label: "Fixed Amount ($)" },
       ],
     },
     {
-      key: "discount_value",
+      key: "discountValue",
       label: "Discount Value",
       type: "number",
       required: true,
       min: 0,
     },
-    { key: "min_order", label: "Min Order Amount ($)", type: "number", min: 0 },
     {
-      key: "valid_days",
+      key: "minOrderAmount",
+      label: "Min Order Amount ($)",
+      type: "number",
+      min: 0,
+    },
+    {
+      key: "validDays",
       label: "Valid for Days",
       type: "number",
       min: 0,
       hint: "0 = no expiry",
     },
     {
-      key: "max_uses",
+      key: "maxUses",
       label: "Max Uses",
       type: "number",
       min: 0,
@@ -1424,14 +1232,14 @@ const giftCardDenominationsTab: TabDef = {
   columns: [
     {
       key: "amount",
-      label: "Amount",
+      title: "Amount",
       render: (v: number) => (
         <strong style={{ fontSize: 14, color: "#A855F7" }}>
           ${Number(v).toFixed(2)}
         </strong>
       ),
     },
-    { key: "nameEn", label: "Label" },
+    { key: "nameEn", title: "Label" },
   ],
   initialData: [
     {
@@ -1478,8 +1286,8 @@ const giftCardDenominationsTab: TabDef = {
     },
   ],
   fields: [
-    { key: "nameEn", label: "Label (EN)", required: true },
-    { key: "nameAr", label: "Label (AR)", required: true },
+    { key: "nameEn", label: "Label (EN)", type: "text", required: true },
+    { key: "nameAr", label: "Label (AR)", type: "text", required: true },
     {
       key: "amount",
       label: "Amount ($)",

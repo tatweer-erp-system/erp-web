@@ -1,5 +1,9 @@
 import { DefinitionsPage } from "@/components/common/DefinitionsPage";
 import type { TabDef } from "@/components/common/DefinitionsPage";
+import {
+  unitsOfMeasureService,
+  adjustmentReasonsService,
+} from "@/services/definitions.service";
 import { Tag } from "antd";
 
 const tabs: TabDef[] = [
@@ -8,46 +12,14 @@ const tabs: TabDef[] = [
     key: "uom",
     label: "Units of Measure",
     labelAr: "وحدات القياس",
-    initialData: [
-      {
-        id: "uom1",
-        nameAr: "كيلوجرام",
-        nameEn: "Kilogram",
-        symbol: "kg",
-        type: "weight",
-        isActive: true,
-      },
-      {
-        id: "uom2",
-        nameAr: "متر",
-        nameEn: "Meter",
-        symbol: "m",
-        type: "length",
-        isActive: true,
-      },
-      {
-        id: "uom3",
-        nameAr: "لتر",
-        nameEn: "Liter",
-        symbol: "L",
-        type: "volume",
-        isActive: true,
-      },
-      {
-        id: "uom4",
-        nameAr: "قطعة",
-        nameEn: "Piece",
-        symbol: "pcs",
-        type: "unit",
-        isActive: true,
-      },
-    ],
+    service: unitsOfMeasureService,
+    initialData: [],
     columns: [
       { key: "nameEn", title: "Name (EN)", width: 160 },
       { key: "nameAr", title: "Name (AR)", width: 160 },
       { key: "symbol", title: "Symbol", width: 80 },
       {
-        key: "type",
+        key: "uomType",
         title: "Type",
         width: 100,
         render: (val: string) => {
@@ -56,6 +28,7 @@ const tabs: TabDef[] = [
             length: "green",
             volume: "cyan",
             unit: "purple",
+            time: "orange",
           };
           return <Tag color={colors[val] ?? "default"}>{val}</Tag>;
         },
@@ -71,15 +44,16 @@ const tabs: TabDef[] = [
       },
       { key: "symbol", label: "Symbol", type: "text", required: true },
       {
-        key: "type",
+        key: "uomType",
         label: "Type",
         type: "select",
         required: true,
         options: [
-          { value: "length", label: "Length" },
+          { value: "unit", label: "Unit" },
           { value: "weight", label: "Weight" },
           { value: "volume", label: "Volume" },
-          { value: "unit", label: "Unit" },
+          { value: "length", label: "Length" },
+          { value: "time", label: "Time" },
         ],
       },
     ],
@@ -291,29 +265,8 @@ const tabs: TabDef[] = [
     key: "adjustment-reasons",
     label: "Adjustment Reasons",
     labelAr: "أسباب التسوية",
-    initialData: [
-      {
-        id: "ar1",
-        nameAr: "تلف",
-        nameEn: "Damage",
-        type: "decrease",
-        isActive: true,
-      },
-      {
-        id: "ar2",
-        nameAr: "عد مادي",
-        nameEn: "Physical Count",
-        type: "increase",
-        isActive: true,
-      },
-      {
-        id: "ar3",
-        nameAr: "سرقة",
-        nameEn: "Theft",
-        type: "decrease",
-        isActive: true,
-      },
-    ],
+    service: adjustmentReasonsService,
+    initialData: [],
     columns: [
       { key: "nameEn", title: "Name (EN)", width: 160 },
       { key: "nameAr", title: "Name (AR)", width: 160 },

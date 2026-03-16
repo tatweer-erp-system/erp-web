@@ -45,7 +45,7 @@ const INITIAL: Notification[] = [
       "Wireless Headphones (SKU-001) has only 3 units remaining (reorder point: 15).",
     timestamp: new Date(now - 18 * 60000),
     read: false,
-    href: "/product-details?id=2",
+    href: "/products?id=2",
     meta: {
       notifKind: "inventory.low_stock",
       productName: "Wireless Headphones",

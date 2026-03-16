@@ -170,7 +170,7 @@ const NAV_ITEMS: NavItem[] = [
 
   // ── Inventory (Odoo: Inventory > Products, Operations, Reporting) ───────
   { name: "INVENTORY", isHeader: true },
-  { name: "Products", icon: <AppstoreOutlined />, href: "/product-details" },
+  { name: "Products", icon: <AppstoreOutlined />, href: "/products" },
   { name: "Warehouses", icon: <HomeOutlined />, href: "/warehouses" },
   { name: "Opening Stock", icon: <InboxOutlined />, href: "/opening-stock" },
   {

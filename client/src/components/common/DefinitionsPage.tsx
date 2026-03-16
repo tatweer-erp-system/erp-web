@@ -93,6 +93,16 @@ export interface ColDef {
   render?: (val: any, record: EntityRecord) => React.ReactNode;
 }
 
+/** Optional API service for server-backed CRUD. When provided, data is fetched from the API. */
+export interface TabService {
+  list: (
+    params?: any
+  ) => Promise<{ data: Record<string, any>[]; total: number }>;
+  create: (data: any) => Promise<any>;
+  update: (id: string, data: any) => Promise<any>;
+  remove: (id: string) => Promise<any>;
+}
+
 export interface TabDef {
   key: string;
   label: string;
@@ -102,6 +112,8 @@ export interface TabDef {
   initialData: EntityRecord[];
   /** When set, renders this node instead of the default DefinitionsTab table */
   customContent?: React.ReactNode;
+  /** API service — when provided, CRUD goes to the server instead of local state */
+  service?: TabService;
 }
 
 export interface DefinitionsPageProps {
@@ -1068,7 +1080,11 @@ function DefinitionsTab({
   const { token } = antTheme.useToken();
   const { definitionsCrudStyle } = useAppSettings();
 
-  const [data, setData] = useState<EntityRecord[]>(tab.initialData);
+  const isApi = !!tab.service;
+  const [localData, setLocalData] = useState<EntityRecord[]>(tab.initialData);
+  const [apiData, setApiData] = useState<EntityRecord[]>([]);
+  const [apiTotal, setApiTotal] = useState(0);
+  const [apiLoading, setApiLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -1077,7 +1093,33 @@ function DefinitionsTab({
   const [submitting, setSubmitting] = useState(false);
   const [form] = Form.useForm();
 
+  // API fetch
+  const fetchApiData = useCallback(async () => {
+    if (!tab.service) return;
+    setApiLoading(true);
+    try {
+      const res = await tab.service.list({
+        page,
+        limit: pageSize,
+        search: search || undefined,
+      });
+      setApiData((res.data as EntityRecord[]) ?? []);
+      setApiTotal(res.total ?? 0);
+    } catch {
+      message.error(isRTL ? "فشل تحميل البيانات" : "Failed to load data");
+    } finally {
+      setApiLoading(false);
+    }
+  }, [tab.service, page, pageSize, search, isRTL]);
+
+  React.useEffect(() => {
+    if (isApi) fetchApiData();
+  }, [isApi, fetchApiData]);
+
+  const data = isApi ? apiData : localData;
+
   const filtered = useMemo(() => {
+    if (isApi) return data; // already filtered server-side
     const q = search.toLowerCase().trim();
     if (!q) return data;
     return data.filter(
@@ -1088,11 +1130,12 @@ function DefinitionsTab({
           v => typeof v === "string" && v.toLowerCase().includes(q)
         )
     );
-  }, [data, search]);
+  }, [data, search, isApi]);
 
   const paginated = useMemo(
-    () => filtered.slice((page - 1) * pageSize, page * pageSize),
-    [filtered, page, pageSize]
+    () =>
+      isApi ? filtered : filtered.slice((page - 1) * pageSize, page * pageSize),
+    [filtered, page, pageSize, isApi]
   );
 
   const openAdd = useCallback(() => {
@@ -1132,7 +1175,6 @@ function DefinitionsTab({
     try {
       const values = await form.validateFields();
       setSubmitting(true);
-      await new Promise(r => setTimeout(r, 350));
 
       tab.fields.forEach(f => {
         if ((f.type === "date" || f.type === "time") && values[f.key]?.format) {
@@ -1143,17 +1185,32 @@ function DefinitionsTab({
         }
       });
 
-      if (editRecord) {
-        setData(prev =>
-          prev.map(r => (r.id === editRecord.id ? { ...r, ...values } : r))
-        );
-        message.success(isRTL ? "تم التحديث بنجاح" : "Updated successfully");
+      if (isApi && tab.service) {
+        if (editRecord) {
+          await tab.service.update(editRecord.id, {
+            ...values,
+            version: editRecord.version ?? 0,
+          });
+          message.success(isRTL ? "تم التحديث بنجاح" : "Updated successfully");
+        } else {
+          await tab.service.create(values);
+          message.success(isRTL ? "تمت الإضافة بنجاح" : "Added successfully");
+        }
+        await fetchApiData();
       } else {
-        setData(prev => [
-          { ...values, id: `${tab.key}-${Date.now()}` },
-          ...prev,
-        ]);
-        message.success(isRTL ? "تمت الإضافة بنجاح" : "Added successfully");
+        await new Promise(r => setTimeout(r, 350));
+        if (editRecord) {
+          setLocalData(prev =>
+            prev.map(r => (r.id === editRecord.id ? { ...r, ...values } : r))
+          );
+          message.success(isRTL ? "تم التحديث بنجاح" : "Updated successfully");
+        } else {
+          setLocalData(prev => [
+            { ...values, id: `${tab.key}-${Date.now()}` },
+            ...prev,
+          ]);
+          message.success(isRTL ? "تمت الإضافة بنجاح" : "Added successfully");
+        }
       }
       handleClose();
     } catch {
@@ -1165,14 +1222,37 @@ function DefinitionsTab({
     } finally {
       setSubmitting(false);
     }
-  }, [editRecord, form, handleClose, isRTL, tab.fields, tab.key]);
+  }, [
+    editRecord,
+    form,
+    handleClose,
+    isRTL,
+    tab.fields,
+    tab.key,
+    isApi,
+    tab.service,
+    fetchApiData,
+  ]);
 
   const handleToggleActive = useCallback(
-    (record: EntityRecord) => {
+    async (record: EntityRecord) => {
       const next = !record.isActive;
-      setData(prev =>
-        prev.map(r => (r.id === record.id ? { ...r, isActive: next } : r))
-      );
+      if (isApi && tab.service) {
+        try {
+          await tab.service.update(record.id, {
+            isActive: next,
+            version: record.version ?? 0,
+          });
+          await fetchApiData();
+        } catch {
+          message.error(isRTL ? "فشل تحديث الحالة" : "Failed to update status");
+          return;
+        }
+      } else {
+        setLocalData(prev =>
+          prev.map(r => (r.id === record.id ? { ...r, isActive: next } : r))
+        );
+      }
       message.success(
         next
           ? isRTL
@@ -1183,15 +1263,25 @@ function DefinitionsTab({
             : "Deactivated successfully"
       );
     },
-    [isRTL]
+    [isRTL, isApi, tab.service, fetchApiData]
   );
 
   const handleDelete = useCallback(
-    (record: EntityRecord) => {
-      setData(prev => prev.filter(r => r.id !== record.id));
+    async (record: EntityRecord) => {
+      if (isApi && tab.service) {
+        try {
+          await tab.service.remove(record.id);
+          await fetchApiData();
+        } catch {
+          message.error(isRTL ? "فشل الحذف" : "Failed to delete");
+          return;
+        }
+      } else {
+        setLocalData(prev => prev.filter(r => r.id !== record.id));
+      }
       message.success(isRTL ? "تم الحذف بنجاح" : "Deleted successfully");
     },
-    [isRTL]
+    [isRTL, isApi, tab.service, fetchApiData]
   );
 
   const tableColumns: ColumnsType<EntityRecord> = [
@@ -1356,6 +1446,7 @@ function DefinitionsTab({
         columns={tableColumns}
         rowKey="id"
         size="small"
+        loading={isApi && apiLoading}
         pagination={false}
         rowClassName={record => (!record.isActive ? "opacity-50" : "")}
       />
@@ -1415,7 +1506,7 @@ function DefinitionsTab({
           <Pagination
             current={page}
             pageSize={pageSize}
-            total={filtered.length}
+            total={isApi ? apiTotal : filtered.length}
             showSizeChanger
             onChange={(p, ps) => {
               setPage(p);

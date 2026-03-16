@@ -1,5 +1,12 @@
 import { DefinitionsPage } from "@/components/common/DefinitionsPage";
 import type { TabDef } from "@/components/common/DefinitionsPage";
+import {
+  jobTitlesService,
+  employmentTypesService,
+  leaveTypesService,
+  publicHolidaysService,
+  terminationReasonsService,
+} from "@/services/definitions.service";
 import { Tag } from "antd";
 
 const tabs: TabDef[] = [
@@ -71,36 +78,12 @@ const tabs: TabDef[] = [
     key: "job-titles",
     label: "Job Titles",
     labelAr: "المسميات الوظيفية",
-    initialData: [
-      {
-        id: "jt1",
-        nameAr: "مدير مبيعات",
-        nameEn: "Sales Manager",
-        department: "Sales Department",
-        grade: "G5",
-        isActive: true,
-      },
-      {
-        id: "jt2",
-        nameAr: "محاسب",
-        nameEn: "Accountant",
-        department: "Finance Department",
-        grade: "G3",
-        isActive: true,
-      },
-      {
-        id: "jt3",
-        nameAr: "مطور برمجيات",
-        nameEn: "Software Developer",
-        department: "IT Department",
-        grade: "G4",
-        isActive: true,
-      },
-    ],
+    service: jobTitlesService,
+    initialData: [],
     columns: [
       { key: "nameEn", title: "Name (EN)", width: 180 },
       { key: "nameAr", title: "Name (AR)", width: 180 },
-      { key: "department", title: "Department", width: 160 },
+      { key: "departmentId", title: "Department", width: 160 },
       { key: "grade", title: "Grade", width: 80 },
     ],
     fields: [
@@ -111,7 +94,12 @@ const tabs: TabDef[] = [
         type: "text",
         required: true,
       },
-      { key: "department", label: "Department", type: "text", required: false },
+      {
+        key: "departmentId",
+        label: "Department",
+        type: "text",
+        required: false,
+      },
       { key: "grade", label: "Grade / Level", type: "text", required: false },
     ],
   },
@@ -121,25 +109,12 @@ const tabs: TabDef[] = [
     key: "employment-types",
     label: "Employment Types",
     labelAr: "أنواع التوظيف",
-    initialData: [
-      {
-        id: "et1",
-        nameAr: "دوام كامل",
-        nameEn: "Full-Time",
-        isActive: true,
-      },
-      {
-        id: "et2",
-        nameAr: "دوام جزئي",
-        nameEn: "Part-Time",
-        isActive: true,
-      },
-      { id: "et3", nameAr: "عقد مؤقت", nameEn: "Contract", isActive: true },
-      { id: "et4", nameAr: "متدرب", nameEn: "Intern", isActive: true },
-    ],
+    service: employmentTypesService,
+    initialData: [],
     columns: [
-      { key: "nameEn", title: "Name (EN)", width: 220 },
-      { key: "nameAr", title: "Name (AR)", width: 220 },
+      { key: "nameEn", title: "Name (EN)", width: 180 },
+      { key: "nameAr", title: "Name (AR)", width: 180 },
+      { key: "descriptionEn", title: "Description (EN)", width: 200 },
     ],
     fields: [
       { key: "nameEn", label: "Name (English)", type: "text", required: true },
@@ -149,6 +124,18 @@ const tabs: TabDef[] = [
         type: "text",
         required: true,
       },
+      {
+        key: "descriptionEn",
+        label: "Description (English)",
+        type: "text",
+        required: false,
+      },
+      {
+        key: "descriptionAr",
+        label: "Description (Arabic) / الوصف بالعربي",
+        type: "text",
+        required: false,
+      },
     ],
   },
 
@@ -157,41 +144,14 @@ const tabs: TabDef[] = [
     key: "leave-types",
     label: "Leave Types",
     labelAr: "أنواع الإجازات",
-    initialData: [
-      {
-        id: "lt1",
-        nameAr: "إجازة سنوية",
-        nameEn: "Annual Leave",
-        days_per_year: 21,
-        is_paid: true,
-        requires_approval: true,
-        isActive: true,
-      },
-      {
-        id: "lt2",
-        nameAr: "إجازة مرضية",
-        nameEn: "Sick Leave",
-        days_per_year: 15,
-        is_paid: true,
-        requires_approval: false,
-        isActive: true,
-      },
-      {
-        id: "lt3",
-        nameAr: "إجازة غير مدفوعة",
-        nameEn: "Unpaid Leave",
-        days_per_year: 30,
-        is_paid: false,
-        requires_approval: true,
-        isActive: true,
-      },
-    ],
+    service: leaveTypesService,
+    initialData: [],
     columns: [
       { key: "nameEn", title: "Name (EN)", width: 160 },
       { key: "nameAr", title: "Name (AR)", width: 160 },
-      { key: "days_per_year", title: "Days/Year", width: 100 },
+      { key: "daysPerYear", title: "Days/Year", width: 100 },
       {
-        key: "is_paid",
+        key: "isPaid",
         title: "Paid",
         width: 80,
         render: (v: boolean) => (
@@ -199,7 +159,7 @@ const tabs: TabDef[] = [
         ),
       },
       {
-        key: "requires_approval",
+        key: "requiresApproval",
         title: "Approval",
         width: 90,
         render: (v: boolean) => (
@@ -216,20 +176,32 @@ const tabs: TabDef[] = [
         required: true,
       },
       {
-        key: "days_per_year",
+        key: "descriptionEn",
+        label: "Description (English)",
+        type: "text",
+        required: false,
+      },
+      {
+        key: "descriptionAr",
+        label: "Description (Arabic) / الوصف بالعربي",
+        type: "text",
+        required: false,
+      },
+      {
+        key: "daysPerYear",
         label: "Days Per Year",
         type: "number",
         required: true,
         min: 0,
       },
       {
-        key: "is_paid",
+        key: "isPaid",
         label: "Is Paid Leave",
         type: "switch",
         required: false,
       },
       {
-        key: "requires_approval",
+        key: "requiresApproval",
         label: "Requires Approval",
         type: "switch",
         required: false,
@@ -467,29 +439,8 @@ const tabs: TabDef[] = [
     key: "termination-reasons",
     label: "Termination Reasons",
     labelAr: "أسباب إنهاء الخدمة",
-    initialData: [
-      {
-        id: "tr1",
-        nameAr: "استقالة",
-        nameEn: "Resignation",
-        type: "resignation",
-        isActive: true,
-      },
-      {
-        id: "tr2",
-        nameAr: "فصل تأديبي",
-        nameEn: "Disciplinary Termination",
-        type: "termination",
-        isActive: true,
-      },
-      {
-        id: "tr3",
-        nameAr: "تقاعد",
-        nameEn: "Retirement",
-        type: "retirement",
-        isActive: true,
-      },
-    ],
+    service: terminationReasonsService,
+    initialData: [],
     columns: [
       { key: "nameEn", title: "Name (EN)", width: 200 },
       { key: "nameAr", title: "Name (AR)", width: 200 },
@@ -497,7 +448,15 @@ const tabs: TabDef[] = [
         key: "type",
         title: "Type",
         width: 130,
-        render: (v: string) => <Tag color="blue">{v}</Tag>,
+        render: (v: string) => {
+          const colors: Record<string, string> = {
+            voluntary: "blue",
+            involuntary: "red",
+            end_of_contract: "orange",
+            retirement: "green",
+          };
+          return <Tag color={colors[v] ?? "default"}>{v}</Tag>;
+        },
       },
     ],
     fields: [
@@ -514,8 +473,9 @@ const tabs: TabDef[] = [
         type: "select",
         required: true,
         options: [
-          { value: "resignation", label: "Resignation" },
-          { value: "termination", label: "Termination" },
+          { value: "voluntary", label: "Voluntary" },
+          { value: "involuntary", label: "Involuntary" },
+          { value: "end_of_contract", label: "End of Contract" },
           { value: "retirement", label: "Retirement" },
         ],
       },
@@ -601,38 +561,14 @@ const tabs: TabDef[] = [
     key: "public-holidays",
     label: "Public Holidays",
     labelAr: "الإجازات الرسمية",
-    initialData: [
-      {
-        id: "ph1",
-        nameAr: "رأس السنة الميلادية",
-        nameEn: "New Year's Day",
-        date: "2025-01-01",
-        is_recurring: true,
-        isActive: true,
-      },
-      {
-        id: "ph2",
-        nameAr: "يوم العمال",
-        nameEn: "Labor Day",
-        date: "2025-05-01",
-        is_recurring: true,
-        isActive: true,
-      },
-      {
-        id: "ph3",
-        nameAr: "اليوم الوطني",
-        nameEn: "National Day",
-        date: "2025-09-23",
-        is_recurring: true,
-        isActive: true,
-      },
-    ],
+    service: publicHolidaysService,
+    initialData: [],
     columns: [
       { key: "nameEn", title: "Name (EN)", width: 180 },
       { key: "nameAr", title: "Name (AR)", width: 180 },
       { key: "date", title: "Date", width: 110 },
       {
-        key: "is_recurring",
+        key: "isRecurring",
         title: "Recurring",
         width: 100,
         render: (v: boolean) => (
@@ -650,7 +586,7 @@ const tabs: TabDef[] = [
       },
       { key: "date", label: "Date", type: "date", required: true },
       {
-        key: "is_recurring",
+        key: "isRecurring",
         label: "Recurring Annually",
         type: "switch",
         required: false,

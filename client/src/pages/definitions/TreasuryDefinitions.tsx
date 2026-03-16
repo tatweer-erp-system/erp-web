@@ -1,5 +1,6 @@
 import { DefinitionsPage } from "@/components/common/DefinitionsPage";
 import type { TabDef } from "@/components/common/DefinitionsPage";
+import { transferReasonsService } from "@/services/definitions.service";
 import { Tag } from "antd";
 
 const tabs: TabDef[] = [
@@ -214,26 +215,8 @@ const tabs: TabDef[] = [
     key: "transfer-reasons",
     label: "Transfer Reasons",
     labelAr: "أسباب التحويل",
-    initialData: [
-      {
-        id: "tr1",
-        nameAr: "دفع فواتير",
-        nameEn: "Bill Payment",
-        isActive: true,
-      },
-      {
-        id: "tr2",
-        nameAr: "رواتب موظفين",
-        nameEn: "Employee Salaries",
-        isActive: true,
-      },
-      {
-        id: "tr3",
-        nameAr: "تحويل داخلي",
-        nameEn: "Internal Transfer",
-        isActive: true,
-      },
-    ],
+    service: transferReasonsService,
+    initialData: [],
     columns: [
       { key: "nameEn", title: "Name (EN)", width: 240 },
       { key: "nameAr", title: "Name (AR)", width: 240 },

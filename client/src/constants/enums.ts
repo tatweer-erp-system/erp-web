@@ -77,6 +77,29 @@ export const StockStatus = {
 } as const;
 export type StockStatus = (typeof StockStatus)[keyof typeof StockStatus];
 
+/** Product type (storable, consumable, service) */
+export const ProductType = {
+  STORABLE: "storable",
+  CONSUMABLE: "consumable",
+  SERVICE: "service",
+} as const;
+export type ProductType = (typeof ProductType)[keyof typeof ProductType];
+
+/** Product invoice policy */
+export const InvoicePolicy = {
+  ORDERED: "ordered",
+  DELIVERED: "delivered",
+} as const;
+export type InvoicePolicy = (typeof InvoicePolicy)[keyof typeof InvoicePolicy];
+
+/** Product status */
+export const ProductStatus = {
+  ACTIVE: "active",
+  INACTIVE: "inactive",
+  DISCONTINUED: "discontinued",
+} as const;
+export type ProductStatus = (typeof ProductStatus)[keyof typeof ProductStatus];
+
 /** Extended stock status used in inventory reports */
 export const StockReportStatus = {
   IN_STOCK: "in-stock",
@@ -422,3 +445,50 @@ export const FiscalPeriodType = {
 } as const;
 export type FiscalPeriodType =
   (typeof FiscalPeriodType)[keyof typeof FiscalPeriodType];
+
+// ─── Definitions ──────────────────────────────────────────────────────────────
+
+/** Termination reason type */
+export const TerminationType = {
+  VOLUNTARY: "voluntary",
+  INVOLUNTARY: "involuntary",
+  END_OF_CONTRACT: "end_of_contract",
+  RETIREMENT: "retirement",
+} as const;
+export type TerminationType =
+  (typeof TerminationType)[keyof typeof TerminationType];
+
+/** Unit of measure type */
+export const UomType = {
+  UNIT: "unit",
+  WEIGHT: "weight",
+  VOLUME: "volume",
+  LENGTH: "length",
+  TIME: "time",
+} as const;
+export type UomType = (typeof UomType)[keyof typeof UomType];
+
+/** Inventory adjustment reason type */
+export const AdjustmentReasonType = {
+  INCREASE: "increase",
+  DECREASE: "decrease",
+} as const;
+export type AdjustmentReasonType =
+  (typeof AdjustmentReasonType)[keyof typeof AdjustmentReasonType];
+
+/** Voucher discount type */
+export const VoucherDiscountType = {
+  PERCENTAGE: "percentage",
+  FIXED: "fixed",
+} as const;
+export type VoucherDiscountType =
+  (typeof VoucherDiscountType)[keyof typeof VoucherDiscountType];
+
+/** Void/refund reason type */
+export const VoidRefundReasonType = {
+  VOID: "void",
+  REFUND: "refund",
+  BOTH: "both",
+} as const;
+export type VoidRefundReasonType =
+  (typeof VoidRefundReasonType)[keyof typeof VoidRefundReasonType];
