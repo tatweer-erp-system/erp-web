@@ -1,11 +1,10 @@
-import { Suspense, lazy, useEffect } from "react";
+import { Suspense, lazy } from "react";
 import {
   BrowserRouter,
   Routes,
   Route,
   Navigate,
   useLocation,
-  useParams,
   Outlet,
 } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -15,7 +14,7 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 import { PageErrorBoundary } from "@/components/common/PageErrorBoundary";
 import { AppSettingsProvider } from "./contexts/AppSettingsContext";
 import { AuthProvider, useAuthContext } from "./contexts/AuthContext";
-import { Role } from "@/types/auth";
+import { Role, deriveRole } from "@/types/auth";
 import { PageSkeleton } from "./components/common/LoadingSkeleton";
 import { routes } from "./lib/routes";
 import { DashboardLayout } from "./components/layout/DashboardLayout";
@@ -33,10 +32,10 @@ const queryClient = new QueryClient({
 });
 
 function AuthGuard() {
-  const location = useLocation();
-  const { user, isAuthenticated, isLoading } = useAuthContext();
+  const { user, isAuthenticated, isReady } = useAuthContext();
 
-  if (isLoading) {
+  // Wait for hydration to finish before making any decision
+  if (!isReady) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="flex flex-col items-center gap-3">
@@ -64,7 +63,7 @@ function AuthGuard() {
     );
   }
 
-  if (!isAuthenticated || user?.role === Role.Cashier) {
+  if (!isAuthenticated || deriveRole(user) === Role.Cashier) {
     return <Navigate to="/login" replace />;
   }
 
@@ -72,12 +71,8 @@ function AuthGuard() {
 }
 
 function LoginGuard() {
-  const { user } = useAuthContext();
-
-  if (user && user.role !== Role.Cashier) {
-    return <Navigate to="/" replace />;
-  }
-
+  // Login page never auto-redirects.
+  // Redirection happens inside <Login /> via navigate("/") after successful branch selection.
   return <Login />;
 }
 

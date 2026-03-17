@@ -123,6 +123,8 @@ export const en: Record<string, string> = {
   "login.selectBranch": "Select Branch",
   "login.selectBranchHint": "Choose the branch you want to access",
   "login.back": "Back",
+  "login.noBranches":
+    "No branches assigned to your account. Please contact your administrator.",
   "login.footerNote": "Tatweer ERP Enterprise Suite",
   "login.vision2030": "Kingdom of Saudi Arabia  -  Vision 2030",
   "login.cashierNotAllowed":

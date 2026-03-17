@@ -5,6 +5,8 @@ import {
   removeStorageItem,
   STORAGE_KEYS,
 } from "@/lib/storage";
+import { useAuthContext } from "./AuthContext";
+import type { Branch } from "@/types/auth";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -481,7 +483,7 @@ interface AppSettingsContextType {
 
   // Branch
   branches: Branch[];
-  currentBranch: Branch;
+  currentBranch: Branch | null;
   setBranch: (branchId: string) => void;
 
   // PIN lock screen style
@@ -513,25 +515,9 @@ interface AppSettingsContextType {
   setPOSGridCols: (cols: 2 | 3 | 4 | 5) => void;
 }
 
-export interface Branch {
-  id: string;
-  name: string;
-  location: string;
-  initials: string;
-}
-
 const AppSettingsContext = createContext<AppSettingsContextType | undefined>(
   undefined
 );
-
-// ─── Branches ─────────────────────────────────────────────────────────────────
-
-const BRANCHES: Branch[] = [
-  { id: "hq", name: "Main Branch", location: "New York, USA", initials: "HQ" },
-  { id: "cai", name: "Cairo Branch", location: "Cairo, Egypt", initials: "CA" },
-  { id: "dxb", name: "Dubai Branch", location: "Dubai, UAE", initials: "DB" },
-  { id: "lon", name: "London Branch", location: "London, UK", initials: "LN" },
-];
 
 // ─── Provider ─────────────────────────────────────────────────────────────────
 
@@ -540,6 +526,11 @@ export function AppSettingsProvider({
 }: {
   children: React.ReactNode;
 }) {
+  const {
+    branches: authBranches,
+    selectedBranch,
+    selectBranch,
+  } = useAuthContext();
   const [theme, setTheme] = useState<ThemeMode>(() => {
     return (getStorageItem(STORAGE_KEYS.THEME) as ThemeMode) ?? "dark";
   });
@@ -563,9 +554,7 @@ export function AppSettingsProvider({
 
   const [financialYear, setFinancialYearState] = useState("2025-2026");
 
-  const [currentBranchId, setCurrentBranchId] = useState<string>(() => {
-    return getStorageItem(STORAGE_KEYS.BRANCH) ?? "hq";
-  });
+  const currentBranch = selectedBranch ?? authBranches[0] ?? null;
 
   const [pinStyle, setPinStyleState] = useState<1 | 2 | 3>(() => {
     const stored = getStorageItem(STORAGE_KEYS.PIN_STYLE);
@@ -725,8 +714,8 @@ export function AppSettingsProvider({
   const setFinancialYear = (year: string) => setFinancialYearState(year);
 
   const setBranch = (branchId: string) => {
-    setCurrentBranchId(branchId);
-    setStorageItem(STORAGE_KEYS.BRANCH, branchId);
+    const branch = authBranches.find(b => b.id === branchId);
+    if (branch) selectBranch(branch);
   };
 
   const setPinStyle = (style: 1 | 2 | 3) => {
@@ -764,8 +753,6 @@ export function AppSettingsProvider({
     setStorageItem(STORAGE_KEYS.POS_GRID_COLS, String(cols));
   };
 
-  const currentBranch =
-    BRANCHES.find(b => b.id === currentBranchId) ?? BRANCHES[0];
   const currentPreset = preset
     ? (THEME_PRESETS.find(p => p.id === preset) ?? null)
     : null;
@@ -788,7 +775,7 @@ export function AppSettingsProvider({
         setLanguage,
         financialYear,
         setFinancialYear,
-        branches: BRANCHES,
+        branches: authBranches,
         currentBranch,
         setBranch,
         pinStyle,

@@ -139,6 +139,7 @@ export const ar: Record<string, string> = {
   "login.selectBranch": "اختر الفرع",
   "login.selectBranchHint": "حدد الفرع الذي تريد الدخول إليه",
   "login.back": "رجوع",
+  "login.noBranches": "لا توجد فروع مخصصة لحسابك. يرجى التواصل مع المسؤول.",
   "login.footerNote": "تطوير ERP — نظام آمن للمؤسسات",
   "login.vision2030": "المملكة العربية السعودية  ·  رؤية ٢٠٣٠",
   "login.cashierNotAllowed":

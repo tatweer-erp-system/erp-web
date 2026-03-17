@@ -1,7 +1,5 @@
 import { useMemo } from "react";
-
-import { useAuthStore } from "@/stores/auth.store";
-import type { Permission } from "@/types/auth";
+import { useAuthContext } from "@/contexts/AuthContext";
 
 type PermissionResult = {
   hasPermission: boolean;
@@ -15,10 +13,7 @@ type PermissionsResult = {
   isLoading: boolean;
 };
 
-function checkPermission(
-  userPermissions: Permission[],
-  required: Permission
-): boolean {
+function checkPermission(userPermissions: string[], required: string): boolean {
   for (const p of userPermissions) {
     if (p === "*") return true;
     if (p === required) return true;
@@ -29,13 +24,10 @@ function checkPermission(
 
 /**
  * Checks whether the current user holds a single permission.
- *
- * @param required - The permission string to check (e.g. `'sales:write'`).
- * @returns `{ hasPermission, isLoading }` derived from the auth store.
  */
-export function usePermission(required: Permission): PermissionResult {
-  const permissions = useAuthStore(s => s.permissions);
-  const isLoading = useAuthStore(s => s.isLoading);
+export function usePermission(required: string): PermissionResult {
+  const { user, isLoading } = useAuthContext();
+  const permissions = user?.permissions ?? [];
 
   const hasPermission = useMemo(
     () => checkPermission(permissions, required),
@@ -47,13 +39,10 @@ export function usePermission(required: Permission): PermissionResult {
 
 /**
  * Checks whether the current user holds multiple permissions.
- *
- * @param required - Array of permission strings to check.
- * @returns `{ hasAll, hasAny, results, isLoading }` where `results` maps each permission to its check.
  */
-export function usePermissions(required: Permission[]): PermissionsResult {
-  const permissions = useAuthStore(s => s.permissions);
-  const isLoading = useAuthStore(s => s.isLoading);
+export function usePermissions(required: string[]): PermissionsResult {
+  const { user, isLoading } = useAuthContext();
+  const permissions = user?.permissions ?? [];
 
   const results = useMemo(() => {
     const map: Record<string, boolean> = {};

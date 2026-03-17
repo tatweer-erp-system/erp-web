@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuthStore } from "@/stores/auth.store";
-import { type Branch, Role } from "@/types/auth";
+import { useAuthContext } from "@/contexts/AuthContext";
+import { type Branch } from "@/types/auth";
+import { getName } from "@/shared/utils/getName.util";
 import { useTranslation } from "@/hooks/ui/useTranslation";
 import { AxiosError } from "axios";
 import {
@@ -1697,9 +1698,7 @@ function ErrorMsg({ children }: { children: React.ReactNode }) {
 // ─── Main Login Page ──────────────────────────────────────────────────────────
 export default function Login() {
   const navigate = useNavigate();
-  const login = useAuthStore(s => s.login);
-  const branches = useAuthStore(s => s.branches);
-  const selectBranch = useAuthStore(s => s.selectBranch);
+  const { login, branches, selectBranch } = useAuthContext();
   const { t, lang } = useTranslation();
 
   const [email, setEmail] = useState(
@@ -1762,14 +1761,21 @@ export default function Login() {
     }
 
     try {
-      await login(email.trim(), password);
+      const loginBranches = await login(email.trim(), password);
 
-      // After login, branches are set in context
-      // We need to check from the response — branches are stored in context
-      // If single branch, auto-select and go. If multiple, show branch picker.
-      // Since login() stores branches in context, we read from there after state update.
-      // We use a small trick: login sets branches, but React batches state updates.
-      // So we check branches length after login completes.
+      if (loginBranches.length === 0) {
+        setError(t("login.noBranches", lang));
+        setIsLoading(false);
+        return;
+      } else if (loginBranches.length === 1) {
+        await selectBranch(loginBranches[0]);
+        setSuccess(true);
+      } else {
+        setPendingBranches(loginBranches);
+        setStep("branch");
+        setIsLoading(false);
+        return;
+      }
     } catch (err) {
       if (err instanceof AxiosError) {
         const status = err.response?.status;
@@ -1803,23 +1809,17 @@ export default function Login() {
     setIsLoading(false);
   }
 
-  // After login succeeds and branches are updated in context, handle branch selection
-  useEffect(() => {
-    if (!branches?.length || isLoading) return;
-
-    if (branches.length === 1) {
-      selectBranch(branches[0]);
+  async function handleBranchSelect(branch: Branch) {
+    setIsLoading(true);
+    try {
+      await selectBranch(branch);
       setSuccess(true);
-    } else if (branches.length > 1 && step === "form" && email.trim()) {
-      setPendingBranches(branches);
-      setStep("branch");
+    } catch {
+      setError(t("login.networkError", lang));
+      setStep("form");
+    } finally {
+      setIsLoading(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [branches]);
-
-  function handleBranchSelect(branch: Branch) {
-    selectBranch(branch);
-    setSuccess(true);
   }
 
   // Shared input class builder
@@ -1969,7 +1969,7 @@ export default function Login() {
                       </div>
                       <div className="flex-1 min-w-0 text-right">
                         <div className="font-semibold text-sm text-slate-800">
-                          {branch.name}
+                          {getName(branch)}
                         </div>
                         <div className="text-xs text-slate-400">
                           {branch.code}

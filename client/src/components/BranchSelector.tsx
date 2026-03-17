@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { QUERY_KEYS } from "@/constants/queryKeys";
 import { branchesService } from "@/services/branches.service";
 import { useLangStore } from "@/stores/lang.store";
-import { useAuthStore } from "@/stores/auth.store";
+import { useAuthContext } from "@/contexts/AuthContext";
 import { t } from "@/i18n";
-import type { Branch } from "@/types/auth";
+import { getName } from "@/shared/utils/getName.util";
 
 interface BranchSelectorProps {
   value?: string;
@@ -23,8 +23,7 @@ export function BranchSelector({
   className = "",
 }: BranchSelectorProps) {
   const language = useLangStore(s => s.lang);
-  const selectedBranch = useAuthStore(s => s.selectedBranch);
-  const authBranches = useAuthStore(s => s.branches);
+  const { selectedBranch, branches: authBranches } = useAuthContext();
 
   // Try fetching from API; fall back to auth context branches
   const { data: apiBranches } = useQuery({
@@ -58,7 +57,7 @@ export function BranchSelector({
         <option value="">{t("selectBranch", language)}</option>
         {branches.map(branch => (
           <option key={branch.id} value={branch.id}>
-            {branch.name} ({branch.code})
+            {getName(branch)} ({branch.code})
           </option>
         ))}
       </select>

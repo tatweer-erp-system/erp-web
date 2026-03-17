@@ -1,32 +1,23 @@
-import { useAuthStore } from "@/stores/auth.store";
-import { Role, type Permission, ROLE_PERMISSIONS } from "@/types/auth";
+import { useAuthContext } from "@/contexts/AuthContext";
+import { Role, deriveRole } from "@/types/auth";
 
 export function usePermissions() {
-  const user = useAuthStore(s => s.user);
-  const role = user?.role ?? Role.Admin;
-  const rolePermissions = ROLE_PERMISSIONS[role];
-  const isSuperAdmin = rolePermissions[0] === "*";
+  const { user } = useAuthContext();
+  const role = deriveRole(user);
 
-  // Use API-provided permissions if available, otherwise fall back to role-based
+  const isSuperAdmin = role === Role.SuperAdmin;
   const userPermissions = user?.permissions ?? [];
 
-  const can = (permission: Permission): boolean => {
+  const can = (permission: string): boolean => {
     if (isSuperAdmin) return true;
 
-    // Check user's computed permissions from API (supports wildcard matching)
     for (const p of userPermissions) {
       if (p === "*") return true;
       if (p === permission) return true;
-      // Wildcard: "sales:*" matches "sales:read", "sales:write", etc.
       if (p.endsWith(":*")) {
-        const prefix = p.slice(0, -1); // "sales:"
+        const prefix = p.slice(0, -1);
         if (permission.startsWith(prefix)) return true;
       }
-    }
-
-    // Fallback to static role permissions if no API permissions
-    if (userPermissions.length === 0) {
-      return (rolePermissions as Permission[]).includes(permission);
     }
 
     return false;

@@ -1,6 +1,10 @@
 import apiClient from "@/lib/api";
 import type { ApiResponse } from "@/types/api";
-import type { LoginResponse, RefreshResponse } from "@/types/auth";
+import type {
+  LoginResponse,
+  RefreshResponse,
+  SelectBranchResponse,
+} from "@/types/auth";
 
 export async function login(
   email: string,
@@ -9,6 +13,16 @@ export async function login(
   const { data } = await apiClient.post<ApiResponse<LoginResponse>>(
     "/auth/login",
     { email, password }
+  );
+  return data.data;
+}
+
+export async function selectBranch(
+  branchId: string
+): Promise<SelectBranchResponse> {
+  const { data } = await apiClient.post<ApiResponse<SelectBranchResponse>>(
+    "/auth/select-branch",
+    { branchId }
   );
   return data.data;
 }

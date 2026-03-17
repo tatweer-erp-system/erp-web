@@ -7,76 +7,23 @@ export enum Role {
   Cashier = "cashier",
 }
 
-export type Permission =
-  | "inventory:read"
-  | "inventory:write"
-  | "inventory:delete"
-  | "sales:read"
-  | "sales:write"
-  | "purchases:read"
-  | "purchases:write"
-  | "accounting:read"
-  | "accounting:write"
-  | "treasury:read"
-  | "treasury:write"
-  | "reports:read"
-  | "users:read"
-  | "users:write"
-  | "users:delete"
-  | "settings:read"
-  | "settings:write";
-
-export const ROLE_PERMISSIONS: Record<Role, Permission[] | ["*"]> = {
-  [Role.SuperAdmin]: ["*"],
-  [Role.Admin]: [
-    "inventory:read",
-    "inventory:write",
-    "sales:read",
-    "sales:write",
-    "purchases:read",
-    "purchases:write",
-    "accounting:read",
-    "treasury:read",
-    "reports:read",
-    "users:read",
-    "users:write",
-    "settings:read",
-    "settings:write",
-  ],
-  [Role.Manager]: [
-    "inventory:read",
-    "sales:read",
-    "sales:write",
-    "purchases:read",
-    "reports:read",
-  ],
-  [Role.Accountant]: [
-    "accounting:read",
-    "accounting:write",
-    "treasury:read",
-    "treasury:write",
-    "reports:read",
-  ],
-  [Role.Viewer]: [
-    "inventory:read",
-    "sales:read",
-    "purchases:read",
-    "reports:read",
-  ],
-  [Role.Cashier]: [], // No ERP permissions — POS terminal only
-};
+export type Permission = string;
 
 export interface Tenant {
   slug: string;
-  name: string;
-  logo?: string;
+  nameEn: string;
+  nameAr: string;
+  logo?: string | null;
 }
 
 export interface Branch {
   id: string;
-  name: string;
+  nameEn: string;
+  nameAr: string;
   code: string;
-  isDefault: boolean;
+  address?: string;
+  isMain: boolean;
+  isActive: boolean;
 }
 
 export interface UserRole {
@@ -89,11 +36,21 @@ export interface User {
   firstName: string;
   lastName: string;
   email: string;
-  role: Role;
   roles: UserRole[];
   permissions: string[];
   preferredLang: string;
-  avatarUrl?: string;
+  avatarUrl?: string | null;
+}
+
+/** Derive the display role from the roles array. */
+export function deriveRole(user: User | null): Role {
+  if (!user || !user.roles.length) return Role.Viewer;
+  const name = user.roles[0].name.toLowerCase();
+  if (name === "super admin" || name === "superadmin") return Role.SuperAdmin;
+  if (name in Role) return Role[name as keyof typeof Role];
+  // Match by lowercase value
+  const match = Object.values(Role).find(v => v === name);
+  return match ?? Role.Viewer;
 }
 
 export interface LoginResponse {
@@ -105,6 +62,11 @@ export interface LoginResponse {
 }
 
 export interface RefreshResponse {
+  accessToken: string;
+  refreshToken: string;
+}
+
+export interface SelectBranchResponse {
   accessToken: string;
   refreshToken: string;
 }

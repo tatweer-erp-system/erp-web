@@ -4,7 +4,7 @@ import { persist } from "zustand/middleware";
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 type Branch = {
-  id: number;
+  id: string;
   nameEn: string;
   nameAr: string;
   code: string;

@@ -29,8 +29,8 @@ import { useLangStore } from "@/stores/lang.store";
 import { useThemeStore } from "@/stores/theme.store";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
 import { usePinLock } from "@/contexts/PinLockContext";
-import { useAuthStore } from "@/stores/auth.store";
-import { ROLE_DISPLAY } from "@/contexts/AuthContext";
+import { useAuthContext , ROLE_DISPLAY } from "@/contexts/AuthContext";
+import { deriveRole } from "@/types/auth";
 
 interface NavbarProps {
   sidebarOpen: boolean;
@@ -46,8 +46,7 @@ function NavbarInner({ sidebarOpen, setSidebarOpen, isRTL }: NavbarProps) {
   const setMode = useThemeStore(s => s.setMode);
   const { financialYear, setFinancialYear } = useAppSettings();
   const { lock } = usePinLock();
-  const user = useAuthStore(s => s.user);
-  const logout = useAuthStore(s => s.logout);
+  const { user, logout } = useAuthContext();
   const screens = Grid.useBreakpoint();
   const isMobile = !screens.md;
 
@@ -87,7 +86,7 @@ function NavbarInner({ sidebarOpen, setSidebarOpen, isRTL }: NavbarProps) {
           <div style={{ fontSize: 12, color: token.colorTextSecondary }}>
             {user?.email ?? ""}
           </div>
-          {user && ROLE_DISPLAY[user.role] && (
+          {user && ROLE_DISPLAY[deriveRole(user)] && (
             <div
               style={{
                 display: "inline-block",
@@ -96,11 +95,11 @@ function NavbarInner({ sidebarOpen, setSidebarOpen, isRTL }: NavbarProps) {
                 fontWeight: 600,
                 padding: "1px 6px",
                 borderRadius: 20,
-                color: ROLE_DISPLAY[user.role].color,
-                background: ROLE_DISPLAY[user.role].bg,
+                color: ROLE_DISPLAY[deriveRole(user)].color,
+                background: ROLE_DISPLAY[deriveRole(user)].bg,
               }}
             >
-              {ROLE_DISPLAY[user.role].label}
+              {ROLE_DISPLAY[deriveRole(user)].label}
             </div>
           )}
         </div>
@@ -299,7 +298,7 @@ function NavbarInner({ sidebarOpen, setSidebarOpen, isRTL }: NavbarProps) {
           <Avatar
             style={{
               background: user
-                ? (ROLE_DISPLAY[user.role]?.color ?? token.colorPrimary)
+                ? (ROLE_DISPLAY[deriveRole(user)]?.color ?? token.colorPrimary)
                 : token.colorPrimary,
               cursor: "pointer",
               fontWeight: 700,

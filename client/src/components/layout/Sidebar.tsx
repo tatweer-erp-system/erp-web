@@ -77,8 +77,9 @@ import {
 } from "@ant-design/icons";
 import { t } from "@/i18n";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
-import { useAuthStore } from "@/stores/auth.store";
+import { useAuthContext } from "@/contexts/AuthContext";
 import { getStorageItem, setStorageItem, STORAGE_KEYS } from "@/lib/storage";
+import { getName } from "@/shared/utils/getName.util";
 import type React from "react";
 
 // ─── Nav Data ─────────────────────────────────────────────────────────────────
@@ -499,7 +500,7 @@ function SidebarInner({ isOpen, isRTL, language }: SidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const { branches, currentBranch, setBranch } = useAppSettings();
-  const logout = useAuthStore(s => s.logout);
+  const { logout } = useAuthContext();
 
   // Resolve which menu key to highlight — exact match first, then longest prefix
   // (handles /:tab sub-routes like /settings/company/profile)
@@ -577,7 +578,7 @@ function SidebarInner({ isOpen, isRTL, language }: SidebarProps) {
   const [cardHovered, setCardHovered] = useState(false);
 
   const branchMenuItems: MenuProps["items"] = branches.map(branch => {
-    const isActive = branch.id === currentBranch.id;
+    const isActive = branch.id === currentBranch?.id;
     return {
       key: branch.id,
       label: (
@@ -611,7 +612,7 @@ function SidebarInner({ isOpen, isRTL, language }: SidebarProps) {
               transition: "all 0.2s",
             }}
           >
-            {branch.initials}
+            {branch.code}
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div
@@ -621,7 +622,7 @@ function SidebarInner({ isOpen, isRTL, language }: SidebarProps) {
                 color: isActive ? primaryColor : token.colorText,
               }}
             >
-              {branch.name}
+              {getName(branch)}
             </div>
             <div
               style={{
@@ -634,7 +635,7 @@ function SidebarInner({ isOpen, isRTL, language }: SidebarProps) {
               }}
             >
               <EnvironmentOutlined style={{ fontSize: 9 }} />
-              {branch.location}
+              {branch.address ?? branch.code}
             </div>
           </div>
           {isActive && (
@@ -943,7 +944,7 @@ function SidebarInner({ isOpen, isRTL, language }: SidebarProps) {
                       lineHeight: 1.3,
                     }}
                   >
-                    {currentBranch.name}
+                    {currentBranch ? getName(currentBranch) : "—"}
                   </div>
                   <div
                     style={{
@@ -963,7 +964,7 @@ function SidebarInner({ isOpen, isRTL, language }: SidebarProps) {
                         whiteSpace: "nowrap",
                       }}
                     >
-                      {currentBranch.location}
+                      {currentBranch?.address ?? currentBranch?.code ?? ""}
                     </span>
                   </div>
                 </div>
@@ -988,7 +989,7 @@ function SidebarInner({ isOpen, isRTL, language }: SidebarProps) {
                     transition: "all 0.22s ease",
                   }}
                 >
-                  {currentBranch.initials}
+                  {currentBranch?.code ?? ""}
                 </div>
               </div>
             </div>
@@ -1055,7 +1056,7 @@ function SidebarInner({ isOpen, isRTL, language }: SidebarProps) {
                     />
                     <div>
                       <div style={{ fontSize: 12, fontWeight: 700 }}>
-                        {currentBranch.name}
+                        {currentBranch ? getName(currentBranch) : "—"}
                       </div>
                       <div
                         style={{
@@ -1068,7 +1069,7 @@ function SidebarInner({ isOpen, isRTL, language }: SidebarProps) {
                         }}
                       >
                         <EnvironmentOutlined style={{ fontSize: 8 }} />
-                        {currentBranch.location}
+                        {currentBranch?.address ?? currentBranch?.code ?? ""}
                       </div>
                     </div>
                   </div>
@@ -1124,7 +1125,7 @@ function SidebarInner({ isOpen, isRTL, language }: SidebarProps) {
                       boxShadow: "0 0 0 2px #10B98130",
                     }}
                   >
-                    {currentBranch.initials.charAt(0)}
+                    {(currentBranch?.code ?? "").charAt(0)}
                   </div>
                 </div>
               </Dropdown>
