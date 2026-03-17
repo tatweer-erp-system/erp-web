@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { useLangStore } from "@/stores/lang.store";
 import { t } from "@/i18n";
 import {
   journalEntriesService,
@@ -129,7 +130,8 @@ function emptyLine(): LineRow {
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export default function JournalEntries() {
-  const { theme, language: lang } = useAppSettings();
+  const { theme } = useAppSettings();
+  const lang = useLangStore(s => s.lang);
   const screens = Grid.useBreakpoint();
   const isMobile = !screens.md;
   const queryClient = useQueryClient();

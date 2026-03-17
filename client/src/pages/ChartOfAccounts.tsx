@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { useLangStore } from "@/stores/lang.store";
 import { t } from "@/i18n";
 import { accountsService } from "@/services/accounting.service";
 import { getName } from "@/lib/utils";
@@ -870,8 +870,7 @@ function ChartOfAccountsContent() {
   const { token } = antTheme.useToken();
   const screens = Grid.useBreakpoint();
   const isMobile = !screens.md;
-  const { language } = useAppSettings();
-  const lang = language;
+  const lang = useLangStore(s => s.lang);
   const isRTL = lang === "ar";
   const queryClient = useQueryClient();
 
@@ -1719,8 +1718,7 @@ function ChartOfAccountsContent() {
 }
 
 export default function ChartOfAccounts() {
-  const { language } = useAppSettings();
-  const lang = language;
+  const lang = useLangStore(s => s.lang);
   const isRTL = lang === "ar";
 
   return (

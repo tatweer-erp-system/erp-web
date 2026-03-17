@@ -1,4 +1,4 @@
-import { useParams, useLocation } from "wouter";
+import { useParams, useNavigate } from "react-router-dom";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import {
   Alert,
@@ -685,8 +685,8 @@ function QuietHoursTab() {
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function NotificationsConfig() {
-  const params = useParams<{ tab?: string }>();
-  const [, setLocation] = useLocation();
+  const params = useParams<"tab">();
+  const navigate = useNavigate();
   const { token } = antTheme.useToken();
   const activeTab = params.tab ?? "preferences";
 
@@ -747,9 +747,7 @@ export default function NotificationsConfig() {
             {TABS.map(tab => (
               <button
                 key={tab.key}
-                onClick={() =>
-                  setLocation(`/settings/notifications/${tab.key}`)
-                }
+                onClick={() => navigate(`/settings/notifications/${tab.key}`)}
                 style={{
                   width: "100%",
                   display: "flex",

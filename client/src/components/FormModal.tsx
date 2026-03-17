@@ -1,15 +1,7 @@
-import { ReactNode } from "react";
-import { X } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { type ReactNode } from "react";
+import { Modal, Button } from "antd";
 
-interface FormModalProps {
+type FormModalProps = {
   isOpen: boolean;
   onClose: () => void;
   title: string;
@@ -18,7 +10,7 @@ interface FormModalProps {
   onSubmit?: () => void;
   submitLabel?: string;
   isLoading?: boolean;
-}
+};
 
 export function FormModal({
   isOpen,
@@ -31,22 +23,30 @@ export function FormModal({
   isLoading = false,
 }: FormModalProps) {
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          {description && <DialogDescription>{description}</DialogDescription>}
-        </DialogHeader>
-        <div className="space-y-4 py-4">{children}</div>
+    <Modal
+      open={isOpen}
+      onCancel={onClose}
+      title={
+        <div>
+          <div className="text-lg font-semibold">{title}</div>
+          {description && (
+            <div className="text-sm text-gray-500">{description}</div>
+          )}
+        </div>
+      }
+      width={448}
+      destroyOnClose
+      centered
+      footer={
         <div className="flex gap-3 justify-end">
-          <Button variant="outline" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button onClick={onSubmit} disabled={isLoading}>
-            {isLoading ? "Loading..." : submitLabel}
+          <Button onClick={onClose}>Cancel</Button>
+          <Button type="primary" onClick={onSubmit} loading={isLoading}>
+            {submitLabel}
           </Button>
         </div>
-      </DialogContent>
-    </Dialog>
+      }
+    >
+      <div className="space-y-4 py-2">{children}</div>
+    </Modal>
   );
 }

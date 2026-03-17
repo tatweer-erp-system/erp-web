@@ -1,6 +1,6 @@
 import { useState, ReactNode } from "react";
 import { ChevronDown } from "lucide-react";
-import { Card } from "@/components/ui/card";
+import { Card } from "antd";
 import { cn } from "@/lib/utils";
 
 interface CollapsibleCardProps {
@@ -26,26 +26,20 @@ export function CollapsibleCard({
 
   return (
     <Card
-      className={cn(
-        "overflow-hidden border border-border shadow-sm bg-card",
-        className
-      )}
+      className={cn("overflow-hidden shadow-sm", className)}
+      styles={{ body: { padding: 0 } }}
     >
       <button
         type="button"
-        className="w-full flex items-center justify-between px-4 py-2 hover:bg-muted/40 transition-colors"
+        className="w-full flex items-center justify-between px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors"
         onClick={() => setOpen(v => !v)}
       >
         <div className="flex items-center gap-2">
-          {icon && <span className="text-primary flex-shrink-0">{icon}</span>}
-          <div className="text-left">
-            <p className="text-sm font-semibold text-foreground leading-tight">
-              {title}
-            </p>
+          {icon && <span className="text-blue-500 flex-shrink-0">{icon}</span>}
+          <div className="text-start">
+            <p className="text-sm font-semibold leading-tight">{title}</p>
             {subtitle && (
-              <p className="text-xs text-muted-foreground leading-tight">
-                {subtitle}
-              </p>
+              <p className="text-xs text-gray-400 leading-tight">{subtitle}</p>
             )}
           </div>
         </div>
@@ -54,7 +48,7 @@ export function CollapsibleCard({
           <ChevronDown
             size={14}
             className={cn(
-              "text-muted-foreground transition-transform duration-300 flex-shrink-0",
+              "text-gray-400 transition-transform duration-300 flex-shrink-0",
               open && "rotate-180"
             )}
           />
@@ -69,7 +63,7 @@ export function CollapsibleCard({
         )}
       >
         <div className="overflow-hidden">
-          <div className="border-t border-border">{children}</div>
+          <div className="border-t">{children}</div>
         </div>
       </div>
     </Card>

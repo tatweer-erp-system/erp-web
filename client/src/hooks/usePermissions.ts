@@ -1,8 +1,8 @@
-import { useAuthContext } from "@/contexts/AuthContext";
+import { useAuthStore } from "@/stores/auth.store";
 import { Role, type Permission, ROLE_PERMISSIONS } from "@/types/auth";
 
 export function usePermissions() {
-  const { user } = useAuthContext();
+  const user = useAuthStore(s => s.user);
   const role = user?.role ?? Role.Admin;
   const rolePermissions = ROLE_PERMISSIONS[role];
   const isSuperAdmin = rolePermissions[0] === "*";

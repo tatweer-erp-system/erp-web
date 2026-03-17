@@ -18,7 +18,7 @@ import {
   CloseOutlined,
   AlertOutlined,
 } from "@ant-design/icons";
-import { useLocation } from "wouter";
+import { useNavigate } from "react-router-dom";
 import {
   useNotificationsStore,
   type NotifType,
@@ -105,7 +105,7 @@ const bellKeyframes = `
 
 export function NotificationCenter() {
   const { token } = antTheme.useToken();
-  const [, navigate] = useLocation();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"all" | "unread" | "read">("all");
   const [bellAnimating, setBellAnimating] = useState(false);

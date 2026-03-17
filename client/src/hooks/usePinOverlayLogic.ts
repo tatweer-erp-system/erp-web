@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { usePinLock } from "@/contexts/PinLockContext";
-import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { useLangStore } from "@/stores/lang.store";
 import { t } from "@/i18n";
 
 export type OverlayMode = "verify" | "setup" | "confirm";
 
 export function usePinOverlayLogic() {
   const { isLocked, hasPin, unlock, setupPin } = usePinLock();
-  const { language: lang } = useAppSettings();
+  const lang = useLangStore(s => s.lang);
   const [mode, setMode] = useState<OverlayMode>("verify");
   const [firstPin, setFirstPin] = useState("");
   const [pin, setPin] = useState("");

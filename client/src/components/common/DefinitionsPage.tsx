@@ -2,7 +2,7 @@
  * Generic Definitions Page
  * Reusable CRUD tab-page for all module "Definitions / التعريفات" pages.
  *
- * Layout is controlled globally via AppSettingsContext:
+ * Layout is controlled globally via Zustand stores (ui.store / lang.store):
  *   definitionsLayout:   "leftnav" (Settings-style left-nav card) | "tabs" (Antd Tabs)
  *   definitionsCrudStyle: "drawer" (slide-in drawer) | "modal" (compact 2-col modal)
  *
@@ -48,7 +48,8 @@ import {
   StopOutlined,
 } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
-import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { useLangStore } from "@/stores/lang.store";
+import { useUiStore } from "@/stores/ui.store";
 import { t } from "@/i18n";
 import dayjs from "dayjs";
 
@@ -1081,7 +1082,8 @@ function DefinitionsTab({
   isMobile: boolean;
 }) {
   const { token } = antTheme.useToken();
-  const { definitionsCrudStyle, language: lang } = useAppSettings();
+  const definitionsCrudStyle = useUiStore(s => s.definitionsCrudStyle);
+  const lang = useLangStore(s => s.lang);
 
   const isApi = !!tab.service;
   const [localData, setLocalData] = useState<EntityRecord[]>(tab.initialData);
@@ -1533,7 +1535,8 @@ export function DefinitionsPage({
   tabs,
   formDesign = 1,
 }: DefinitionsPageProps) {
-  const { language, definitionsLayout } = useAppSettings();
+  const language = useLangStore(s => s.lang);
+  const definitionsLayout = useUiStore(s => s.definitionsLayout);
   const isRTL = language === "ar";
   const { token } = antTheme.useToken();
   const screens = Grid.useBreakpoint();

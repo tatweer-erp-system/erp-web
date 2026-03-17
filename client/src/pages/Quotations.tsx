@@ -1,7 +1,8 @@
 import { useState, useMemo } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { CreateQuotationModal } from "@/pages/CreateQuotation";
-import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { useLangStore } from "@/stores/lang.store";
+import { useThemeStore } from "@/stores/theme.store";
 import {
   Table,
   Button,
@@ -148,7 +149,8 @@ const STATUS_TAG: Record<QuotationStatus, { color: string; label: string }> = {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function Quotations() {
-  const { theme } = useAppSettings();
+  const lang = useLangStore(s => s.lang);
+  const theme = useThemeStore(s => s.mode);
   const screens = Grid.useBreakpoint();
   const isMobile = !screens.md;
   const primary = theme === "dark" ? "#37D399" : "#3B82F6";

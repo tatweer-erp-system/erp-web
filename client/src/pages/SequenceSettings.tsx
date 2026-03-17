@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { useLangStore } from "@/stores/lang.store";
 import { t } from "@/i18n";
 import {
   Table,
@@ -236,7 +236,7 @@ const RESET_CYCLE_COLORS: Record<string, string> = {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function SequenceSettings() {
-  const { language } = useAppSettings();
+  const language = useLangStore(s => s.lang);
   const lang = language;
   const { token } = antTheme.useToken();
   const screens = Grid.useBreakpoint();

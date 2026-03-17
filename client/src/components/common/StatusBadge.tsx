@@ -1,5 +1,5 @@
 import { Tag } from "antd";
-import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { useLangStore } from "@/stores/lang.store";
 import { t } from "@/i18n";
 
 /**
@@ -70,7 +70,7 @@ type StatusBadgeProps = {
  * Translates the status label via t().
  */
 export function StatusBadge({ status }: StatusBadgeProps) {
-  const { language: lang } = useAppSettings();
+  const lang = useLangStore(s => s.lang);
   const color = STATUS_COLORS[status] ?? "default";
   const label = t(`status.${status}`, lang);
 

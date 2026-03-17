@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { useLangStore } from "@/stores/lang.store";
 import { t } from "@/i18n";
 import { reportsService, accountsService } from "@/services/accounting.service";
 import { useQuery } from "@tanstack/react-query";
@@ -35,8 +35,7 @@ function fmtNum(value: number): string {
 }
 
 export default function GeneralLedger() {
-  const { language } = useAppSettings();
-  const lang = language;
+  const lang = useLangStore(s => s.lang);
   const isRTL = lang === "ar";
 
   const [accountId, setAccountId] = useState<string | undefined>(undefined);

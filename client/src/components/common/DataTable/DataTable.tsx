@@ -8,7 +8,7 @@ import {
   type SortingState,
   type RowSelectionState,
 } from "@tanstack/react-table";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Checkbox } from "antd";
 import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { EmptyState } from "@/components/common/EmptyState";
@@ -55,13 +55,13 @@ export function DataTable<T extends object>({
     header: ({ table }) => (
       <Checkbox
         checked={table.getIsAllPageRowsSelected()}
-        onCheckedChange={v => table.toggleAllPageRowsSelected(!!v)}
+        onChange={e => table.toggleAllPageRowsSelected(e.target.checked)}
       />
     ),
     cell: ({ row }) => (
       <Checkbox
         checked={row.getIsSelected()}
-        onCheckedChange={v => row.toggleSelected(!!v)}
+        onChange={e => row.toggleSelected(e.target.checked)}
         onClick={e => e.stopPropagation()}
       />
     ),

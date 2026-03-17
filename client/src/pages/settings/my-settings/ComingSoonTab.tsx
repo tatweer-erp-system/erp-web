@@ -11,7 +11,7 @@ import {
   Typography,
   theme as antTheme,
 } from "antd";
-import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { useLangStore } from "@/stores/lang.store";
 import { t } from "@/i18n";
 
 const { Text } = Typography;
@@ -96,7 +96,7 @@ const INTEGRATIONS = [
 // ─── IntegrationsTab ─────────────────────────────────────────────────────────
 export function IntegrationsTab() {
   const { token } = antTheme.useToken();
-  const { language } = useAppSettings();
+  const { lang: language } = useLangStore();
   const lang = language;
 
   return (
@@ -145,7 +145,7 @@ export function IntegrationsTab() {
 
 // ─── LoyaltyTab ──────────────────────────────────────────────────────────────
 export function LoyaltyTab() {
-  const { language } = useAppSettings();
+  const { lang: language } = useLangStore();
   const lang = language;
 
   return (
@@ -231,7 +231,7 @@ export function LoyaltyTab() {
 
 // ─── VouchersTab ─────────────────────────────────────────────────────────────
 export function VouchersTab() {
-  const { language } = useAppSettings();
+  const { lang: language } = useLangStore();
   const lang = language;
 
   return (

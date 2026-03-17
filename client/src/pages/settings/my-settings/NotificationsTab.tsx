@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { useLangStore } from "@/stores/lang.store";
 import { t } from "@/i18n";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { QUERY_KEYS } from "@/constants/queryKeys";
@@ -142,7 +142,7 @@ function mapApiToLocal(data: NotificationSettings): LocalNotificationSettings {
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function NotificationsTab() {
   const { token } = antTheme.useToken();
-  const { language: lang } = useAppSettings();
+  const lang = useLangStore(s => s.lang);
   const queryClient = useQueryClient();
 
   const [settings, setSettings] = useState<LocalNotificationSettings | null>(

@@ -18,10 +18,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useSettings } from "@/contexts/SettingsContext";
+import { useLangStore } from "@/stores/lang.store";
 
 export default function ReportsGenerator() {
-  const { language } = useSettings();
+  const language = useLangStore(s => s.lang);
   const isRTL = language === "ar";
   const [activeTab, setActiveTab] = useState("saved");
 

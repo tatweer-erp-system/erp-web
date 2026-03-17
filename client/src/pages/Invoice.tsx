@@ -2,11 +2,11 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, Printer, Download, Send, Eye } from "lucide-react";
-import { useSettings } from "@/contexts/SettingsContext";
+import { useLangStore } from "@/stores/lang.store";
 import { t } from "@/i18n";
 
 export default function Invoice() {
-  const { language: lang } = useSettings();
+  const lang = useLangStore(s => s.lang);
   const isRTL = lang === "ar";
 
   const breadcrumbs = [

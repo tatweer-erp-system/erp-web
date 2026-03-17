@@ -16,12 +16,12 @@ import {
 import { usePOSStore } from "@/modules/pos/store/posStore";
 import { cacheProducts } from "@/modules/pos/services/offlineService";
 import { getProducts } from "@/modules/pos/services/posService";
-import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { useLangStore } from "@/stores/lang.store";
 import { t } from "@/i18n";
 
 export function OfflineSettingsTab({ onDirty }: { onDirty?: () => void } = {}) {
   const { token } = antTheme.useToken();
-  const { language: lang } = useAppSettings();
+  const lang = useLangStore(s => s.lang);
   const isOnline = usePOSStore(s => s.isOnline);
   const offlineModeEnabled = usePOSStore(s => s.offlineModeEnabled);
   const setOfflineModeEnabled = usePOSStore(s => s.setOfflineModeEnabled);

@@ -1,7 +1,7 @@
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useSettings } from "@/contexts/SettingsContext";
+import { useLangStore } from "@/stores/lang.store";
 import {
   LineChart,
   Line,
@@ -49,8 +49,8 @@ const customerData = [
 ];
 
 export default function Analytics() {
-  const { language } = useSettings();
-  const isRTL = language === "ar";
+  const lang = useLangStore(s => s.lang);
+  const isRTL = lang === "ar";
 
   const breadcrumbs = [
     { label: "Dashboard", href: "/" },

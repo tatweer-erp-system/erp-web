@@ -1,6 +1,6 @@
 import { type ReactNode } from "react";
 import { Modal } from "antd";
-import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { useLangStore } from "@/stores/lang.store";
 import { useModalWidth } from "@/hooks/ui/useModalWidth";
 import { cn } from "@/lib/utils";
 
@@ -28,8 +28,8 @@ export function AppModal({
   children,
   footer,
 }: AppModalProps) {
-  const { language } = useAppSettings();
-  const isRTL = language === "ar";
+  const lang = useLangStore(s => s.lang);
+  const isRTL = lang === "ar";
   const responsiveWidth = useModalWidth(width);
   const isFullScreen =
     typeof responsiveWidth === "string" && responsiveWidth === "100%";

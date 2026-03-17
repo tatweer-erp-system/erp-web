@@ -3,16 +3,9 @@ import { useForm, type DefaultValues, type FieldValues } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ZodType } from "zod";
 import { toast } from "sonner";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { Modal, Button } from "antd";
 import type { ApiError } from "@/types/api";
-import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { useLangStore } from "@/stores/lang.store";
 import { t } from "@/i18n";
 
 interface FormModalProps<T extends FieldValues> {
@@ -36,7 +29,7 @@ export function FormModal<T extends FieldValues>({
   isLoading = false,
   children,
 }: FormModalProps<T>) {
-  const { language: lang } = useAppSettings();
+  const lang = useLangStore(s => s.lang);
   const isEdit = "id" in defaultValues && !!defaultValues.id;
 
   const form = useForm<T>({
@@ -62,45 +55,30 @@ export function FormModal<T extends FieldValues>({
   });
 
   return (
-    <Dialog
+    <Modal
       open={open}
-      onOpenChange={v => {
-        onOpenChange(v);
-        if (!v) form.reset();
+      onCancel={() => {
+        onOpenChange(false);
+        form.reset();
       }}
+      title={title}
+      width={448}
+      destroyOnClose
+      centered
+      footer={null}
     >
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-        </DialogHeader>
+      <form onSubmit={handleSubmit} className="space-y-4 py-2" noValidate>
+        {children(form)}
 
-        <form onSubmit={handleSubmit} className="space-y-4 py-2">
-          {children(form)}
-
-          <DialogFooter className="pt-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={isLoading}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? (
-                <span className="flex items-center gap-2">
-                  <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  {isEdit ? "Saving..." : "Creating..."}
-                </span>
-              ) : isEdit ? (
-                "Save Changes"
-              ) : (
-                "Create"
-              )}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end pt-2">
+          <Button onClick={() => onOpenChange(false)} disabled={isLoading}>
+            Cancel
+          </Button>
+          <Button type="primary" htmlType="submit" loading={isLoading}>
+            {isEdit ? "Save Changes" : "Create"}
+          </Button>
+        </div>
+      </form>
+    </Modal>
   );
 }

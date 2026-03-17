@@ -1,4 +1,4 @@
-import { useParams, useLocation } from "wouter";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   Alert,
   Button,
@@ -661,8 +661,8 @@ function ReconciliationTab() {
 }
 
 export default function TreasurySettings() {
-  const params = useParams<{ tab?: string }>();
-  const [, setLocation] = useLocation();
+  const params = useParams<"tab">();
+  const navigate = useNavigate();
   const { token } = antTheme.useToken();
   const activeTab = params.tab ?? "general";
 
@@ -716,7 +716,7 @@ export default function TreasurySettings() {
           {TABS.map(tab => (
             <button
               key={tab.key}
-              onClick={() => setLocation(`/settings/treasury/${tab.key}`)}
+              onClick={() => navigate(`/settings/treasury/${tab.key}`)}
               style={{
                 width: "100%",
                 display: "flex",

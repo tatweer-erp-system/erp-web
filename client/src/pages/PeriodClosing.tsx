@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { useLangStore } from "@/stores/lang.store";
 import {
   Table,
   Button,
@@ -60,7 +61,8 @@ const STATUS_TAG: Record<FiscalPeriodStatus, { color: string; key: string }> = {
 // ─── Component ──────────────────────────────────────────────────────────────────
 
 export default function PeriodClosing() {
-  const { theme, language: lang } = useAppSettings();
+  const { theme } = useAppSettings();
+  const lang = useLangStore(s => s.lang);
   const screens = Grid.useBreakpoint();
   const isMobile = !screens.md;
   const primary = theme === "dark" ? "#37D399" : "#3B82F6";

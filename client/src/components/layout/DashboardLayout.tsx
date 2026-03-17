@@ -6,14 +6,14 @@ import {
   createContext,
   useContext,
 } from "react";
-import { Link, useLocation } from "wouter";
+import { Link, useLocation } from "react-router-dom";
 import { Sidebar } from "./Sidebar";
 import { Navbar } from "./Navbar";
 import { ThemeCustomizer } from "@/components/ThemeCustomizer";
 import { AntProvider } from "@/lib/antd-provider";
 import { Breadcrumb, Grid, theme as antTheme } from "antd";
 import { HomeOutlined } from "@ant-design/icons";
-import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { useLangStore } from "@/stores/lang.store";
 import { PinLockProvider } from "@/contexts/PinLockContext";
 import { PinLockOverlay } from "./PinLockOverlay";
 
@@ -56,10 +56,7 @@ function BreadcrumbBar({
   const items = [
     {
       title: (
-        <Link
-          href="/"
-          style={{ color: token.colorTextSecondary, fontSize: 13 }}
-        >
+        <Link to="/" style={{ color: token.colorTextSecondary, fontSize: 13 }}>
           <HomeOutlined />
         </Link>
       ),
@@ -69,7 +66,7 @@ function BreadcrumbBar({
           title:
             i < breadcrumbs.length - 1 && b.href ? (
               <Link
-                href={b.href}
+                to={b.href}
                 style={{ color: token.colorTextSecondary, fontSize: 13 }}
               >
                 {b.label}
@@ -124,7 +121,7 @@ function LayoutShell({
   currentPage = "Dashboard",
   breadcrumbs,
 }: DashboardLayoutProps) {
-  const { language } = useAppSettings();
+  const language = useLangStore(s => s.lang);
   const screens = useBreakpoint();
   const isMobile = !screens.md;
   const [sidebarOpen, setSidebarOpen] = useState(() =>
@@ -133,7 +130,7 @@ function LayoutShell({
   const [animating, setAnimating] = useState(false);
   const prevLang = useRef(language);
   const isRTL = language === "ar";
-  const [location] = useLocation();
+  const location = useLocation();
 
   // Auto-close/open sidebar on breakpoint change
   useEffect(() => {
@@ -144,7 +141,7 @@ function LayoutShell({
   // Close mobile sidebar on navigation
   useEffect(() => {
     if (isMobile) setSidebarOpen(false);
-  }, [location]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [location.pathname]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (prevLang.current === language) return;

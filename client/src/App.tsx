@@ -1,9 +1,16 @@
-import { Suspense, lazy } from "react";
-import { Route, Switch, useLocation, Redirect } from "wouter";
+import { Suspense, lazy, useEffect } from "react";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+  useParams,
+  Outlet,
+} from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { PageErrorBoundary } from "@/components/common/PageErrorBoundary";
 import { AppSettingsProvider } from "./contexts/AppSettingsContext";
@@ -25,11 +32,10 @@ const queryClient = new QueryClient({
   },
 });
 
-function Router() {
-  const [location] = useLocation();
+function AuthGuard() {
+  const location = useLocation();
   const { user, isAuthenticated, isLoading } = useAuthContext();
 
-  // ── Show loading spinner while checking auth state on app load ──────────
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
@@ -58,22 +64,34 @@ function Router() {
     );
   }
 
-  // ── Unauthenticated or cashier (POS-only role) ────────────────────────────
-  if (
-    (!isAuthenticated || user?.role === Role.Cashier) &&
-    location !== "/login"
-  ) {
-    return <Redirect to="/login" />;
+  if (!isAuthenticated || user?.role === Role.Cashier) {
+    return <Navigate to="/login" replace />;
   }
 
-  // ── Login page ────────────────────────────────────────────────────────────
-  if (location === "/login") {
-    if (user && user.role !== Role.Cashier) return <Redirect to="/" />;
-    return <Login />;
+  return <Outlet />;
+}
+
+function LoginGuard() {
+  const { user } = useAuthContext();
+
+  if (user && user.role !== Role.Cashier) {
+    return <Navigate to="/" replace />;
   }
 
-  // ── ERP Dashboard layout ──────────────────────────────────────────────────
-  const currentRoute = routes.find(r => r.path === location);
+  return <Login />;
+}
+
+function LayoutWrapper() {
+  const location = useLocation();
+
+  const currentRoute = routes.find(r => {
+    if (r.path.includes(":")) {
+      const pattern = r.path.replace(/:[^/]+/g, "[^/]+");
+      return new RegExp(`^${pattern}$`).test(location.pathname);
+    }
+    return r.path === location.pathname;
+  });
+
   const breadcrumbs = currentRoute
     ? [
         { label: "Dashboard", href: "/" },
@@ -84,17 +102,7 @@ function Router() {
   return (
     <DashboardLayout breadcrumbs={breadcrumbs}>
       <Suspense fallback={<PageSkeleton />}>
-        <Switch>
-          {routes.map(({ path, component: Page }) => (
-            <Route key={path} path={path}>
-              <PageErrorBoundary>
-                <Page />
-              </PageErrorBoundary>
-            </Route>
-          ))}
-          <Route path="/404" component={NotFound} />
-          <Route component={NotFound} />
-        </Switch>
+        <Outlet />
       </Suspense>
     </DashboardLayout>
   );
@@ -106,10 +114,43 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <AppSettingsProvider>
-            <TooltipProvider>
-              <Toaster />
-              <Router />
-            </TooltipProvider>
+            <Toaster />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/login" element={<LoginGuard />} />
+                <Route element={<AuthGuard />}>
+                  <Route element={<LayoutWrapper />}>
+                    {routes.map(({ path, component: Page }) => (
+                      <Route
+                        key={path}
+                        path={path}
+                        element={
+                          <PageErrorBoundary>
+                            <Page />
+                          </PageErrorBoundary>
+                        }
+                      />
+                    ))}
+                    <Route
+                      path="/404"
+                      element={
+                        <Suspense fallback={<PageSkeleton />}>
+                          <NotFound />
+                        </Suspense>
+                      }
+                    />
+                    <Route
+                      path="*"
+                      element={
+                        <Suspense fallback={<PageSkeleton />}>
+                          <NotFound />
+                        </Suspense>
+                      }
+                    />
+                  </Route>
+                </Route>
+              </Routes>
+            </BrowserRouter>
           </AppSettingsProvider>
           {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
         </AuthProvider>

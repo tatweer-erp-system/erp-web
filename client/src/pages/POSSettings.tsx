@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { useUiStore } from "@/stores/ui.store";
 import { usePOSStore } from "@/modules/pos/store/posStore";
 import { OfflineSettingsTab } from "@/modules/pos/components/offline/OfflineSettingsTab";
 import {
@@ -140,7 +140,7 @@ const NAV_ITEMS = [
 
 export default function POSSettings() {
   const { token } = antTheme.useToken();
-  const { settingsLayout } = useAppSettings();
+  const settingsLayout = useUiStore(s => s.settingsLayout);
   const [activeTab, setActiveTab] = useState("general");
 
   // ── Dirty / unsaved changes tracking ──────────────────────────────────────

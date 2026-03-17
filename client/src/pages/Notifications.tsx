@@ -33,7 +33,7 @@ import {
   RightOutlined,
 } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
-import { useLocation } from "wouter";
+import { useNavigate } from "react-router-dom";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import {
   useNotificationsStore,
@@ -101,7 +101,7 @@ function formatTime(date: Date): string {
 
 export default function Notifications() {
   const { token } = antTheme.useToken();
-  const [, navigate] = useLocation();
+  const navigate = useNavigate();
 
   const { items, markRead, markAllRead, remove, clearAll } =
     useNotificationsStore();

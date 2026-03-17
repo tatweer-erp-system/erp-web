@@ -5,7 +5,8 @@ import {
   setTokens,
   clearTokens,
 } from "@/lib/token";
-import { getStorageItem, STORAGE_KEYS } from "@/lib/storage";
+import { useLangStore } from "@/stores/lang.store";
+import { useBranchStore } from "@/stores/branch.store";
 import type { ApiError } from "@/types/api";
 
 export const apiClient = axios.create({
@@ -22,8 +23,12 @@ apiClient.interceptors.request.use(config => {
   }
 
   config.headers["X-Request-Id"] = crypto.randomUUID();
-  config.headers["Accept-Language"] =
-    getStorageItem(STORAGE_KEYS.LANGUAGE) ?? "en";
+  config.headers["Accept-Language"] = useLangStore.getState().lang ?? "en";
+
+  const branchId = useBranchStore.getState().activeBranch?.id;
+  if (branchId) {
+    config.headers["X-Branch-Id"] = String(branchId);
+  }
 
   return config;
 });

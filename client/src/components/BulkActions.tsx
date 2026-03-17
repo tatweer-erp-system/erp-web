@@ -1,17 +1,14 @@
-import { useState } from "react";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Button } from "@/components/ui/button";
-import { Trash2, Download, Edit2, Eye } from "lucide-react";
-import { toast } from "sonner";
+import { Checkbox, Button } from "antd";
+import { Trash2, Download, Edit2 } from "lucide-react";
 
-interface BulkActionsProps {
+type BulkActionsProps = {
   selectedCount: number;
   onSelectAll: (checked: boolean) => void;
   onDelete: () => void;
   onExport: () => void;
   onStatusUpdate: () => void;
   isAllSelected: boolean;
-}
+};
 
 export function BulkActions({
   selectedCount,
@@ -22,43 +19,31 @@ export function BulkActions({
   isAllSelected,
 }: BulkActionsProps) {
   return (
-    <div className="flex items-center gap-4 p-4 dark:bg-card bg-card rounded-lg border border-E9EDF4 shadow-sm">
+    <div className="flex items-center gap-4 p-4 bg-white dark:bg-gray-800 rounded-lg border shadow-sm">
       <Checkbox
         checked={isAllSelected}
-        onCheckedChange={checked => onSelectAll(checked as boolean)}
-        className="h-5 w-5"
+        onChange={e => onSelectAll(e.target.checked)}
       />
-      <span className="text-sm font-medium text-foreground">
-        {selectedCount} selected
-      </span>
+      <span className="text-sm font-medium">{selectedCount} selected</span>
 
       {selectedCount > 0 && (
-        <div className="flex items-center gap-2 ml-auto">
+        <div className="flex items-center gap-2 ms-auto">
           <Button
-            size="sm"
-            variant="outline"
-            className="flex items-center gap-2"
+            size="small"
+            icon={<Edit2 size={16} />}
             onClick={onStatusUpdate}
           >
-            <Edit2 size={16} />
             Update Status
           </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            className="flex items-center gap-2"
-            onClick={onExport}
-          >
-            <Download size={16} />
+          <Button size="small" icon={<Download size={16} />} onClick={onExport}>
             Export
           </Button>
           <Button
-            size="sm"
-            variant="destructive"
-            className="flex items-center gap-2"
+            size="small"
+            danger
+            icon={<Trash2 size={16} />}
             onClick={onDelete}
           >
-            <Trash2 size={16} />
             Delete
           </Button>
         </div>

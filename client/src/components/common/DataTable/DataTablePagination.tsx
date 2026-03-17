@@ -4,7 +4,7 @@ import {
   ChevronsLeft,
   ChevronsRight,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "antd";
 import { PAGE_SIZE_OPTIONS } from "@/lib/constants";
 import type { PaginationState } from "./types";
 
@@ -55,44 +55,36 @@ export function DataTablePagination({
 
       <div className="flex items-center gap-1">
         <Button
-          variant="ghost"
-          size="sm"
+          type="text"
+          size="small"
           onClick={() => go(0)}
           disabled={pageIndex === 0}
-          className="h-7 w-7 p-0"
-        >
-          <ChevronsLeft size={14} />
-        </Button>
+          icon={<ChevronsLeft size={14} />}
+        />
         <Button
-          variant="ghost"
-          size="sm"
+          type="text"
+          size="small"
           onClick={() => go(pageIndex - 1)}
           disabled={pageIndex === 0}
-          className="h-7 w-7 p-0"
-        >
-          <ChevronLeft size={14} />
-        </Button>
+          icon={<ChevronLeft size={14} />}
+        />
         <span className="text-xs text-muted-foreground px-2">
           {pageIndex + 1} / {totalPages}
         </span>
         <Button
-          variant="ghost"
-          size="sm"
+          type="text"
+          size="small"
           onClick={() => go(pageIndex + 1)}
           disabled={pageIndex >= totalPages - 1}
-          className="h-7 w-7 p-0"
-        >
-          <ChevronRight size={14} />
-        </Button>
+          icon={<ChevronRight size={14} />}
+        />
         <Button
-          variant="ghost"
-          size="sm"
+          type="text"
+          size="small"
           onClick={() => go(totalPages - 1)}
           disabled={pageIndex >= totalPages - 1}
-          className="h-7 w-7 p-0"
-        >
-          <ChevronsRight size={14} />
-        </Button>
+          icon={<ChevronsRight size={14} />}
+        />
       </div>
     </div>
   );

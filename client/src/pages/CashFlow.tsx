@@ -1,5 +1,5 @@
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { useLangStore } from "@/stores/lang.store";
 import { t } from "@/i18n";
 import { Card, Table, DatePicker, Tag, Space, Typography } from "antd";
 import type { TableColumnsType } from "antd";
@@ -13,8 +13,7 @@ interface CashFlowPlaceholderRow {
 }
 
 export default function CashFlow() {
-  const { language } = useAppSettings();
-  const lang = language;
+  const lang = useLangStore(s => s.lang);
   const isRTL = lang === "ar";
 
   const placeholderColumns: TableColumnsType<CashFlowPlaceholderRow> = [

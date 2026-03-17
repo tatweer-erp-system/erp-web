@@ -1,38 +1,33 @@
-import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { useThemeStore } from "@/stores/theme.store";
+import { getPresetById } from "@/theme/theme.presets";
 
 /**
- * Convenience wrapper around the app settings context for theme-related state.
+ * Convenience wrapper around the theme store for theme-related state.
  *
  * Returns the current theme mode, accent color, radius, preset, and their setters.
- * Once `theme.store.ts` replaces `AppSettingsContext`, this hook's internals change
- * but the public API stays the same.
  */
 export function useTheme() {
-  const {
-    theme,
-    toggleTheme,
-    setMode,
-    accentColor,
-    setAccentColor,
-    themeRadius,
-    setThemeRadius,
-    preset,
-    setPreset,
-    presets,
-    currentPreset,
-  } = useAppSettings();
+  const mode = useThemeStore(s => s.mode);
+  const setMode = useThemeStore(s => s.setMode);
+  const accentColor = useThemeStore(s => s.accentColor);
+  const setAccentColor = useThemeStore(s => s.setAccentColor);
+  const borderRadius = useThemeStore(s => s.borderRadius);
+  const setBorderRadius = useThemeStore(s => s.setBorderRadius);
+  const presetId = useThemeStore(s => s.presetId);
+  const setPreset = useThemeStore(s => s.setPreset);
+
+  const currentPreset = presetId ? (getPresetById(presetId) ?? null) : null;
 
   return {
-    mode: theme,
-    toggleMode: toggleTheme,
+    mode,
+    toggleMode: () => setMode(mode === "dark" ? "light" : "dark"),
     setMode,
     accentColor,
     setAccentColor,
-    borderRadius: themeRadius,
-    setBorderRadius: setThemeRadius,
-    preset,
+    borderRadius,
+    setBorderRadius,
+    preset: presetId,
     setPreset,
-    presets,
     currentPreset,
   };
 }

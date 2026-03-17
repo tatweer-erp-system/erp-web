@@ -1,7 +1,7 @@
 import { type ReactNode } from "react";
 import { Button } from "antd";
 import { Inbox } from "lucide-react";
-import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { useLangStore } from "@/stores/lang.store";
 import { t } from "@/i18n";
 
 type EmptyStateProps = {
@@ -26,7 +26,7 @@ export function EmptyState({
   actionLabel,
   onAction,
 }: EmptyStateProps) {
-  const { language: lang } = useAppSettings();
+  const lang = useLangStore(s => s.lang);
 
   const resolvedTitle = title ?? t("common.no_data_title", lang);
   const resolvedDescription =

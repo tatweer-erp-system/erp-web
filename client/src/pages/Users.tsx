@@ -14,7 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useSettings } from "@/contexts/SettingsContext";
+import { useLangStore } from "@/stores/lang.store";
 import { usersService } from "@/services/users.service";
 import { rolesService } from "@/services/roles.service";
 import { t } from "@/i18n";
@@ -34,7 +34,7 @@ import {
 import type { User, UserRole } from "@/types/auth";
 
 export default function Users() {
-  const { language } = useSettings();
+  const language = useLangStore(s => s.lang);
   const isRTL = language === "ar";
   const queryClient = useQueryClient();
 

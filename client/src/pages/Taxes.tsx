@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Pencil, Trash2, Plus, RefreshCw } from "lucide-react";
-import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { useLangStore } from "@/stores/lang.store";
 import { t } from "@/i18n";
 
 interface Tax {
@@ -15,8 +15,7 @@ interface Tax {
 }
 
 export default function Taxes() {
-  const { language } = useAppSettings();
-  const lang = language;
+  const lang = useLangStore(s => s.lang);
   const isRTL = lang === "ar";
 
   const [taxes, setTaxes] = useState<Tax[]>([

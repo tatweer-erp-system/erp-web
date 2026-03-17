@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Input } from "antd";
 import { useDebounce } from "@/hooks/useDebounce";
-import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { useLangStore } from "@/stores/lang.store";
 import { t } from "@/i18n";
 
 type SearchInputProps = {
@@ -20,7 +20,7 @@ export function SearchInput({
   onChange,
   placeholder,
 }: SearchInputProps) {
-  const { language: lang } = useAppSettings();
+  const lang = useLangStore(s => s.lang);
   const [localValue, setLocalValue] = useState(value);
   const debouncedValue = useDebounce(localValue, 300);
   const isFirstMount = useRef(true);

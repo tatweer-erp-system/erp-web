@@ -17,7 +17,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { QUERY_KEYS } from "@/constants/queryKeys";
 import { generalSettingsService } from "@/services/settings.service";
 import type { GeneralSettings } from "@/services/settings.service";
-import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { useLangStore } from "@/stores/lang.store";
 import { t } from "@/i18n";
 
 const { Text } = Typography;
@@ -82,8 +82,7 @@ function Section({
 // ─── Main component ──────────────────────────────────────────────────────────
 export default function GeneralTab() {
   const { token } = antTheme.useToken();
-  const { language } = useAppSettings();
-  const lang = language;
+  const lang = useLangStore(s => s.lang);
   const queryClient = useQueryClient();
 
   const [savedField, setSavedField] = useState<string | null>(null);

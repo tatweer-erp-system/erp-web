@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback, memo, useRef } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { useLangStore } from "@/stores/lang.store";
 import {
   Table,
   Button,
@@ -230,7 +231,8 @@ const BalancesTable = memo(function BalancesTable({
 // ─── Main Component ─────────────────────────────────────────────────────────────
 
 export default function OpeningBalances() {
-  const { theme, language: lang } = useAppSettings();
+  const { theme } = useAppSettings();
+  const lang = useLangStore(s => s.lang);
   const primary = theme === "dark" ? "#37D399" : "#3B82F6";
 
   const [balanceDate, setBalanceDate] = useState<dayjs.Dayjs | null>(null);

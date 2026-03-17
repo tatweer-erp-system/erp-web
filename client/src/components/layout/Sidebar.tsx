@@ -1,5 +1,5 @@
 import { memo, useState, useEffect, useRef } from "react";
-import { useLocation, Link } from "wouter";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Menu, Dropdown, Tooltip, theme as antTheme } from "antd";
 import type { MenuProps } from "antd";
 import {
@@ -77,7 +77,7 @@ import {
 } from "@ant-design/icons";
 import { t } from "@/i18n";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
-import { useAuthContext } from "@/contexts/AuthContext";
+import { useAuthStore } from "@/stores/auth.store";
 import { getStorageItem, setStorageItem, STORAGE_KEYS } from "@/lib/storage";
 import type React from "react";
 
@@ -496,9 +496,10 @@ function SidebarInner({ isOpen, isRTL, language }: SidebarProps) {
   const [hovered, setHovered] = useState(false);
   const visible = isOpen || hovered;
   const collapsed = !visible;
-  const [location, setLocation] = useLocation();
+  const location = useLocation();
+  const navigate = useNavigate();
   const { branches, currentBranch, setBranch } = useAppSettings();
-  const { logout } = useAuthContext();
+  const logout = useAuthStore(s => s.logout);
 
   // Resolve which menu key to highlight — exact match first, then longest prefix
   // (handles /:tab sub-routes like /settings/company/profile)
@@ -509,19 +510,21 @@ function SidebarInner({ isOpen, isRTL, language }: SidebarProps) {
       if (item.submenu)
         item.submenu.forEach(s => s.href && allLeaves.push(s.href));
     }
-    const exact = allLeaves.find(href => href === location);
+    const pathname = location.pathname;
+    const exact = allLeaves.find(href => href === pathname);
     if (exact) return exact;
     const prefix = allLeaves
-      .filter(href => location.startsWith(href + "/"))
+      .filter(href => pathname.startsWith(href + "/"))
       .sort((a, b) => b.length - a.length)[0];
-    return prefix ?? location;
+    return prefix ?? pathname;
   })();
 
   // Auto-expand parent group of active route
   const getDefaultOpenKeys = () => {
     const keys: string[] = [];
     for (const item of NAV_ITEMS) {
-      if (item.submenu?.some(s => s.href === location)) keys.push(item.name);
+      if (item.submenu?.some(s => s.href === location.pathname))
+        keys.push(item.name);
     }
     return keys;
   };
@@ -1152,7 +1155,7 @@ function SidebarInner({ isOpen, isRTL, language }: SidebarProps) {
           openKeys={collapsed ? [] : openKeys}
           onOpenChange={handleOpenChange}
           onSelect={({ key }) => {
-            if (key.startsWith("/")) setLocation(key);
+            if (key.startsWith("/")) navigate(key);
           }}
           items={menuItems}
           style={{

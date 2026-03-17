@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { QUERY_KEYS } from "@/constants/queryKeys";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
+import { Button, Input, Card } from "antd";
 import { AnimatedModal } from "@/components/AnimatedModal";
 import { projectsService } from "@/services/projects.service";
 import { usersService } from "@/services/users.service";
@@ -13,9 +11,9 @@ import { Plus, Trash2, UserPlus, Shield, Eye, User } from "lucide-react";
 import type { ProjectMember } from "@/types/modules/sales";
 import { MemberRole } from "@/constants/enums";
 
-interface ProjectMembersTabProps {
+type ProjectMembersTabProps = {
   projectId: string;
-}
+};
 
 const MEMBER_ROLES = ["owner", "member", "viewer"] as const;
 
@@ -28,7 +26,7 @@ function getRoleBadgeStyle(role: string) {
     case MemberRole.VIEWER:
       return "bg-gray-100 text-gray-600";
     default:
-      return "bg-secondary text-muted-foreground";
+      return "bg-gray-50 text-gray-400";
   }
 }
 
@@ -131,41 +129,41 @@ export function ProjectMembersTab({ projectId }: ProjectMembersTabProps) {
       <div
         className={`flex items-center justify-between ${isRTL ? "flex-row-reverse" : ""}`}
       >
-        <h3 className="text-sm font-semibold text-foreground">
+        <h3 className="text-sm font-semibold">
           {t("projectMembers", language)}
         </h3>
         <Button
-          className="bg-primary hover:bg-primary/90 text-white flex items-center gap-2"
+          type="primary"
+          icon={<UserPlus size={16} />}
           onClick={() => setIsAddModalOpen(true)}
         >
-          <UserPlus size={16} />
           {t("addMember", language)}
         </Button>
       </div>
 
       {/* Members List */}
       {membersLoading ? (
-        <div className="text-center py-8 text-muted-foreground">Loading...</div>
+        <div className="text-center py-8 text-gray-400">Loading...</div>
       ) : members.length === 0 ? (
-        <Card className="p-8 text-center border border-border bg-secondary/20 shadow-none">
-          <p className="text-muted-foreground">{t("noData", language)}</p>
+        <Card className="text-center border shadow-none">
+          <p className="text-gray-400 py-4">{t("noData", language)}</p>
         </Card>
       ) : (
         <div className="space-y-3">
           {members.map(memberItem => (
             <div
               key={memberItem.id}
-              className="flex items-center justify-between p-4 rounded-xl bg-secondary/50 border border-border"
+              className="flex items-center justify-between p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50 border"
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                  <User size={18} className="text-primary" />
+                <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center">
+                  <User size={18} className="text-blue-500" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-foreground">
+                  <p className="text-sm font-semibold">
                     {memberItem.user.name}
                   </p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-gray-400">
                     {memberItem.user.email}
                   </p>
                 </div>
@@ -181,7 +179,7 @@ export function ProjectMembersTab({ projectId }: ProjectMembersTabProps) {
                       role: e.target.value,
                     })
                   }
-                  className="px-2 py-1 text-xs border border-border rounded-lg bg-card text-foreground"
+                  className="px-2 py-1 text-xs border rounded-lg bg-white dark:bg-gray-800"
                 >
                   {MEMBER_ROLES.map(r => (
                     <option key={r} value={r}>
@@ -198,16 +196,15 @@ export function ProjectMembersTab({ projectId }: ProjectMembersTabProps) {
                 </span>
 
                 <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-destructive hover:text-destructive"
+                  type="text"
+                  size="small"
+                  danger
                   onClick={() => {
                     setMemberToRemove(memberItem);
                     setIsRemoveConfirmOpen(true);
                   }}
-                >
-                  <Trash2 size={16} />
-                </Button>
+                  icon={<Trash2 size={16} />}
+                />
               </div>
             </div>
           ))}
@@ -230,20 +227,19 @@ export function ProjectMembersTab({ projectId }: ProjectMembersTabProps) {
         <div className="space-y-4">
           {/* User search/select */}
           <div>
-            <label className="block text-sm font-medium text-foreground mb-2">
+            <label className="block text-sm font-medium mb-2">
               {t("selectUser", language)}
             </label>
             <Input
-              type="text"
               placeholder={t("Search", language)}
               value={userSearch}
               onChange={e => setUserSearch(e.target.value)}
-              className="mb-2 bg-secondary border-0"
+              className="mb-2"
             />
             <select
               value={newMemberUserId}
               onChange={e => setNewMemberUserId(e.target.value)}
-              className="w-full px-3 py-2 border border-border rounded-lg text-sm dark:bg-card bg-card text-foreground"
+              className="w-full px-3 py-2 border rounded-lg text-sm bg-white dark:bg-gray-800"
             >
               <option value="">{t("selectUser", language)}</option>
               {availableUsers.map(u => (
@@ -256,13 +252,13 @@ export function ProjectMembersTab({ projectId }: ProjectMembersTabProps) {
 
           {/* Role selector */}
           <div>
-            <label className="block text-sm font-medium text-foreground mb-2">
+            <label className="block text-sm font-medium mb-2">
               {t("memberRole", language)}
             </label>
             <select
               value={newMemberRole}
               onChange={e => setNewMemberRole(e.target.value)}
-              className="w-full px-3 py-2 border border-border rounded-lg text-sm dark:bg-card bg-card text-foreground"
+              className="w-full px-3 py-2 border rounded-lg text-sm bg-white dark:bg-gray-800"
             >
               {MEMBER_ROLES.map(r => (
                 <option key={r} value={r}>
@@ -286,17 +282,13 @@ export function ProjectMembersTab({ projectId }: ProjectMembersTabProps) {
         submitLabel={t("confirm", language)}
         size="sm"
       >
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-gray-400">
           {t("removeMemberConfirm", language)}
         </p>
         {memberToRemove && (
-          <div className="mt-3 p-3 rounded-lg bg-secondary/50 border border-border">
-            <p className="text-sm font-medium text-foreground">
-              {memberToRemove.user.name}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              {memberToRemove.user.email}
-            </p>
+          <div className="mt-3 p-3 rounded-lg bg-gray-50 border">
+            <p className="text-sm font-medium">{memberToRemove.user.name}</p>
+            <p className="text-xs text-gray-400">{memberToRemove.user.email}</p>
           </div>
         )}
       </AnimatedModal>

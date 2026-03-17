@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { useLangStore } from "@/stores/lang.store";
 import { t } from "@/i18n";
 import {
   reportsService,
@@ -50,7 +51,8 @@ function fmt(value: number): string {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function IncomeStatement() {
-  const { theme, language: lang } = useAppSettings();
+  const { theme } = useAppSettings();
+  const lang = useLangStore(s => s.lang);
   const screens = Grid.useBreakpoint();
   const isRTL = lang === "ar";
   const isMobile = !screens.md;

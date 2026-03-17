@@ -1,4 +1,4 @@
-import { useParams, useLocation } from "wouter";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   Alert,
   Button,
@@ -839,8 +839,8 @@ function POSTab() {
 }
 
 export default function SalesSettings() {
-  const params = useParams<{ tab?: string }>();
-  const [, setLocation] = useLocation();
+  const params = useParams<"tab">();
+  const navigate = useNavigate();
   const { token } = antTheme.useToken();
   const activeTab = params.tab ?? "general";
 
@@ -895,7 +895,7 @@ export default function SalesSettings() {
           {TABS.map(tab => (
             <button
               key={tab.key}
-              onClick={() => setLocation(`/settings/sales/${tab.key}`)}
+              onClick={() => navigate(`/settings/sales/${tab.key}`)}
               style={{
                 width: "100%",
                 display: "flex",

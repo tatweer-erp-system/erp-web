@@ -1,4 +1,4 @@
-import { useParams, useLocation } from "wouter";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   Alert,
   Button,
@@ -660,8 +660,8 @@ function AccessTab() {
 }
 
 export default function ReportsSettings() {
-  const params = useParams<{ tab?: string }>();
-  const [, setLocation] = useLocation();
+  const params = useParams<"tab">();
+  const navigate = useNavigate();
   const { token } = antTheme.useToken();
   const activeTab = params.tab ?? "general";
 
@@ -716,7 +716,7 @@ export default function ReportsSettings() {
           {TABS.map(tab => (
             <button
               key={tab.key}
-              onClick={() => setLocation(`/settings/reports/${tab.key}`)}
+              onClick={() => navigate(`/settings/reports/${tab.key}`)}
               style={{
                 width: "100%",
                 display: "flex",

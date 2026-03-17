@@ -6,7 +6,6 @@ import {
   type FieldPath,
   type RegisterOptions,
 } from "react-hook-form";
-import { Label } from "@/components/ui/label";
 
 interface FormFieldProps<T extends FieldValues> {
   control: Control<T>;
@@ -39,19 +38,20 @@ export function FormField<T extends FieldValues>({
       rules={rules}
       render={({ field, fieldState }) => (
         <div className="space-y-1.5">
-          <Label htmlFor={name} className="text-sm font-medium text-foreground">
+          <label
+            htmlFor={name}
+            className="flex items-center gap-2 text-sm font-medium select-none"
+          >
             {label}
-            {required && <span className="text-destructive ml-1">*</span>}
-          </Label>
+            {required && <span className="text-red-500 ms-1">*</span>}
+          </label>
 
           {typeof children === "function"
             ? children(field as Parameters<typeof children>[0])
             : children}
 
           {fieldState.error && (
-            <p className="text-xs text-destructive">
-              {fieldState.error.message}
-            </p>
+            <p className="text-xs text-red-500">{fieldState.error.message}</p>
           )}
         </div>
       )}

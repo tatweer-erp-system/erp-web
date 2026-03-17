@@ -1,4 +1,4 @@
-import { useParams, useLocation } from "wouter";
+import { useParams, useNavigate } from "react-router-dom";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import {
   Alert,
@@ -776,8 +776,8 @@ function BranchesTab() {
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function CompanyProfile() {
-  const params = useParams<{ tab?: string }>();
-  const [, setLocation] = useLocation();
+  const params = useParams<"tab">();
+  const navigate = useNavigate();
   const { token } = antTheme.useToken();
   const activeTab = params.tab ?? "profile";
 
@@ -847,10 +847,10 @@ export default function CompanyProfile() {
                 key={tab.key}
                 onClick={() => {
                   if (tab.key === "billing") {
-                    setLocation("/settings/billing");
+                    navigate("/settings/billing");
                     return;
                   }
-                  setLocation(`/settings/company/${tab.key}`);
+                  navigate(`/settings/company/${tab.key}`);
                 }}
                 style={{
                   width: "100%",

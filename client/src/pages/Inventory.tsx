@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { useLangStore } from "@/stores/lang.store";
 import {
   Table,
   Button,
@@ -24,6 +24,7 @@ import {
   Dropdown,
   Segmented,
   Switch,
+  theme as antTheme,
 } from "antd";
 import type { TableColumnsType, TableProps } from "antd";
 import {
@@ -216,17 +217,10 @@ const STATUS_CFG = {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function Inventory() {
-  const { theme } = useAppSettings();
+  const lang = useLangStore(s => s.lang);
+  const { token } = antTheme.useToken();
   const screens = Grid.useBreakpoint();
   const isMobile = !screens.md;
-  const primary = theme === "dark" ? "#37D399" : "#3B82F6";
-  const borderSub = theme === "dark" ? "#232923" : "#EFF3F7";
-  const textMuted = theme === "dark" ? "#8a9a8a" : "#94a3b8";
-  const token = {
-    colorPrimary: primary,
-    colorBorderSecondary: borderSub,
-    colorTextQuaternary: textMuted,
-  };
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");

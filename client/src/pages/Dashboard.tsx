@@ -51,8 +51,8 @@ import {
   Legend,
 } from "recharts";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { useAppSettings } from "@/contexts/AppSettingsContext";
-import { Link } from "wouter";
+import { useLangStore } from "@/stores/lang.store";
+import { Link } from "react-router-dom";
 import { OrderStatus } from "@/constants/enums";
 
 const { Title, Text } = Typography;
@@ -353,7 +353,7 @@ function KPICard({
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function Dashboard() {
-  const { language } = useAppSettings();
+  const language = useLangStore(s => s.lang);
   const { token } = antTheme.useToken();
   const [period, setPeriod] = useState("9m");
 
@@ -869,7 +869,7 @@ export default function Dashboard() {
                 <Text strong style={{ fontSize: 15 }}>
                   Recent Orders
                 </Text>
-                <Link href="/all-orders">
+                <Link to="/all-orders">
                   <Button
                     type="link"
                     size="small"
@@ -1010,7 +1010,7 @@ export default function Dashboard() {
                 <Text strong style={{ fontSize: 15 }}>
                   Team Activity
                 </Text>
-                <Link href="/chat">
+                <Link to="/chat">
                   <Button
                     type="link"
                     size="small"

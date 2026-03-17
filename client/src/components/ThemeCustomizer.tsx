@@ -21,7 +21,13 @@ import {
   SunOutlined,
   MoonOutlined,
 } from "@ant-design/icons";
-import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { useThemeStore } from "@/stores/theme.store";
+import { useUiStore } from "@/stores/ui.store";
+import { THEME_PRESETS } from "@/theme/theme.presets";
+import {
+  BORDER_RADIUS_MAP,
+  type BorderRadiusPreset,
+} from "@/theme/theme.types";
 
 const { Text } = Typography;
 
@@ -48,11 +54,15 @@ const PALETTE: { hex: string; label: string }[] = [
   { hex: "#09122C", label: "Navy" },
 ];
 
-const RADIUS_PRESETS = [
-  { label: "Sharp", value: 2, preview: 2 },
-  { label: "Default", value: 6, preview: 6 },
-  { label: "Rounded", value: 10, preview: 10 },
-  { label: "Pill", value: 16, preview: 16 },
+const RADIUS_PRESETS: {
+  label: string;
+  value: BorderRadiusPreset;
+  preview: number;
+}[] = [
+  { label: "None", value: "none", preview: 0 },
+  { label: "Small", value: "small", preview: 4 },
+  { label: "Medium", value: "medium", preview: 6 },
+  { label: "Large", value: "large", preview: 10 },
 ];
 
 function SectionLabel({ children }: { children: string }) {
@@ -111,35 +121,28 @@ function OptionButton({
 
 export function ThemeCustomizer() {
   const { token } = antTheme.useToken();
-  const {
-    theme,
-    setMode,
-    accentColor,
-    setAccentColor,
-    themeRadius,
-    setThemeRadius,
-    preset,
-    setPreset,
-    presets,
-    pinStyle,
-    setPinStyle,
-    definitionsLayout,
-    setDefinitionsLayout,
-    settingsLayout,
-    setSettingsLayout,
-    definitionsCrudStyle,
-    setDefinitionsCrudStyle,
-  } = useAppSettings();
+  const mode = useThemeStore(s => s.mode);
+  const setMode = useThemeStore(s => s.setMode);
+  const accentColor = useThemeStore(s => s.accentColor);
+  const setAccentColor = useThemeStore(s => s.setAccentColor);
+  const borderRadius = useThemeStore(s => s.borderRadius);
+  const setBorderRadius = useThemeStore(s => s.setBorderRadius);
+  const presetId = useThemeStore(s => s.presetId);
+  const setPreset = useThemeStore(s => s.setPreset);
+  const resetToDefault = useThemeStore(s => s.resetToDefault);
+
+  const pinStyle = useUiStore(s => s.pinStyle);
+  const setPinStyle = useUiStore(s => s.setPinStyle);
+  const definitionsLayout = useUiStore(s => s.definitionsLayout);
+  const setDefinitionsLayout = useUiStore(s => s.setDefinitionsLayout);
+  const settingsLayout = useUiStore(s => s.settingsLayout);
+  const setSettingsLayout = useUiStore(s => s.setSettingsLayout);
+  const definitionsCrudStyle = useUiStore(s => s.definitionsCrudStyle);
+  const setDefinitionsCrudStyle = useUiStore(s => s.setDefinitionsCrudStyle);
 
   const [open, setOpen] = useState(false);
-  const isDark = theme === "dark";
+  const isDark = mode === "dark";
   const activeColor = accentColor || token.colorPrimary;
-
-  function reset() {
-    setPreset(null);
-    setAccentColor("");
-    setThemeRadius(6);
-  }
 
   return (
     <>
@@ -190,7 +193,11 @@ export function ThemeCustomizer() {
         }
         extra={
           <Tooltip title="Reset to default theme">
-            <Button size="small" icon={<ReloadOutlined />} onClick={reset}>
+            <Button
+              size="small"
+              icon={<ReloadOutlined />}
+              onClick={resetToDefault}
+            >
               Reset
             </Button>
           </Tooltip>
@@ -242,59 +249,9 @@ export function ThemeCustomizer() {
           <div
             style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}
           >
-            <div
-              onClick={() => {
-                setPreset(null);
-                setAccentColor("");
-              }}
-              style={{
-                padding: "10px 12px",
-                borderRadius: 10,
-                cursor: "pointer",
-                border: `2px solid ${!preset ? token.colorPrimary : token.colorBorderSecondary}`,
-                background: !preset
-                  ? `${token.colorPrimary}12`
-                  : token.colorFillAlter,
-                transition: "all 0.15s",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <div>
-                <div style={{ display: "flex", gap: 3, marginBottom: 5 }}>
-                  {["#3B82F6", "#10B981", "#F59E0B", "#EF4444"].map((c, i) => (
-                    <div
-                      key={i}
-                      style={{
-                        width: 12,
-                        height: 12,
-                        borderRadius: "50%",
-                        background: c,
-                      }}
-                    />
-                  ))}
-                </div>
-                <div
-                  style={{
-                    fontSize: 12,
-                    fontWeight: 600,
-                    color: !preset ? token.colorPrimary : token.colorText,
-                  }}
-                >
-                  Default
-                </div>
-              </div>
-              {!preset && (
-                <CheckOutlined
-                  style={{ color: token.colorPrimary, fontSize: 12 }}
-                />
-              )}
-            </div>
-
-            {presets.map(p => {
-              const colors = p[theme];
-              const isActive = preset === p.id;
+            {THEME_PRESETS.map(p => {
+              const colors = p[isDark ? "dark" : "light"];
+              const isActive = presetId === p.id;
               return (
                 <div
                   key={p.id}
@@ -467,13 +424,16 @@ export function ThemeCustomizer() {
             style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}
           >
             {RADIUS_PRESETS.map(p => {
-              const isActive = themeRadius === p.value;
+              const isActive = borderRadius === p.value;
               return (
                 <OptionButton
                   key={p.value}
                   isActive={isActive}
-                  onClick={() => setThemeRadius(p.value)}
-                  style={{ padding: "10px 8px", borderRadius: p.preview }}
+                  onClick={() => setBorderRadius(p.value)}
+                  style={{
+                    padding: "10px 8px",
+                    borderRadius: p.preview,
+                  }}
                 >
                   <div
                     style={{

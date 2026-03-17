@@ -1,4 +1,4 @@
-import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { useLangStore } from "@/stores/lang.store";
 import { t } from "@/i18n";
 import { profileService } from "@/services/settings.service";
 import type {
@@ -79,7 +79,7 @@ function Section({
 // ─── ProfileTab ──────────────────────────────────────────────────────────────
 export default function ProfileTab() {
   const { token } = antTheme.useToken();
-  const { language } = useAppSettings();
+  const language = useLangStore(s => s.lang);
   const isRTL = language === "ar";
   const queryClient = useQueryClient();
   const [form] = Form.useForm();

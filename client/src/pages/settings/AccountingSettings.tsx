@@ -1,4 +1,4 @@
-import { useParams, useLocation } from "wouter";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   Alert,
   Button,
@@ -653,8 +653,8 @@ function ClosingTab() {
 }
 
 export default function AccountingSettings() {
-  const params = useParams<{ tab?: string }>();
-  const [, setLocation] = useLocation();
+  const params = useParams<"tab">();
+  const navigate = useNavigate();
   const { token } = antTheme.useToken();
   const activeTab = params.tab ?? "general";
 
@@ -708,7 +708,7 @@ export default function AccountingSettings() {
           {TABS.map(tab => (
             <button
               key={tab.key}
-              onClick={() => setLocation(`/settings/accounting/${tab.key}`)}
+              onClick={() => navigate(`/settings/accounting/${tab.key}`)}
               style={{
                 width: "100%",
                 display: "flex",

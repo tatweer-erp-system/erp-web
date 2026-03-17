@@ -1,63 +1,142 @@
 import * as React from "react";
-import * as TabsPrimitive from "@radix-ui/react-tabs";
-
+import { Tabs as AntTabs } from "antd";
 import { cn } from "@/lib/utils";
+
+/**
+ * Tabs — Ant Design Tabs wrapper preserving the shadcn/ui compound API:
+ *
+ *   <Tabs defaultValue="tab1">
+ *     <TabsList>
+ *       <TabsTrigger value="tab1">Tab 1</TabsTrigger>
+ *       <TabsTrigger value="tab2">Tab 2</TabsTrigger>
+ *     </TabsList>
+ *     <TabsContent value="tab1">Content 1</TabsContent>
+ *     <TabsContent value="tab2">Content 2</TabsContent>
+ *   </Tabs>
+ *
+ * Implementation: Tabs reads all children to build Ant Design tab items,
+ * then renders a single <AntTabs>.
+ */
+
+type TabItem = {
+  key: string;
+  label: React.ReactNode;
+  children: React.ReactNode;
+  disabled?: boolean;
+};
 
 function Tabs({
   className,
+  defaultValue,
+  value,
+  onValueChange,
+  children,
   ...props
-}: React.ComponentProps<typeof TabsPrimitive.Root>) {
+}: {
+  className?: string;
+  defaultValue?: string;
+  value?: string;
+  onValueChange?: (value: string) => void;
+  children?: React.ReactNode;
+  dir?: string;
+} & Omit<React.ComponentProps<"div">, "children">) {
+  // Collect TabsTrigger items from TabsList, and TabsContent items
+  const triggers: {
+    value: string;
+    label: React.ReactNode;
+    disabled?: boolean;
+  }[] = [];
+  const contents: Record<string, React.ReactNode> = {};
+
+  React.Children.forEach(children, child => {
+    if (!React.isValidElement(child)) return;
+    const p = child.props as Record<string, unknown>;
+    const slot = p["data-slot"] as string | undefined;
+
+    if (slot === "tabs-list") {
+      // Extract triggers from list children
+      React.Children.forEach(p.children as React.ReactNode, trigger => {
+        if (!React.isValidElement(trigger)) return;
+        const tp = trigger.props as Record<string, unknown>;
+        if (tp["data-slot"] === "tabs-trigger") {
+          triggers.push({
+            value: tp["data-value"] as string,
+            label: tp.children as React.ReactNode,
+            disabled: !!tp.disabled,
+          });
+        }
+      });
+    } else if (slot === "tabs-content") {
+      const tabValue = p["data-value"] as string;
+      contents[tabValue] = p.children as React.ReactNode;
+    }
+  });
+
+  const tabItems: TabItem[] = triggers.map(t => ({
+    key: t.value,
+    label: t.label,
+    children: contents[t.value] ?? null,
+    disabled: t.disabled,
+  }));
+
   return (
-    <TabsPrimitive.Root
-      data-slot="tabs"
-      className={cn("flex flex-col gap-2", className)}
-      {...props}
+    <AntTabs
+      activeKey={value}
+      defaultActiveKey={defaultValue}
+      onChange={onValueChange}
+      items={tabItems}
+      className={cn(className)}
     />
   );
 }
 
 function TabsList({
   className,
+  children,
   ...props
-}: React.ComponentProps<typeof TabsPrimitive.List>) {
+}: React.ComponentProps<"div">) {
   return (
-    <TabsPrimitive.List
-      data-slot="tabs-list"
-      className={cn(
-        "bg-muted text-muted-foreground inline-flex h-9 w-fit items-center justify-center rounded-lg p-[3px]",
-        className
-      )}
-      {...props}
-    />
+    <div data-slot="tabs-list" className={className} {...props}>
+      {children}
+    </div>
   );
 }
 
 function TabsTrigger({
   className,
+  value,
+  children,
+  disabled,
   ...props
-}: React.ComponentProps<typeof TabsPrimitive.Trigger>) {
+}: React.ComponentProps<"button"> & { value: string }) {
   return (
-    <TabsPrimitive.Trigger
+    <button
       data-slot="tabs-trigger"
-      className={cn(
-        "data-[state=active]:bg-background dark:data-[state=active]:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:outline-ring dark:data-[state=active]:border-input dark:data-[state=active]:bg-input/30 text-foreground dark:text-muted-foreground inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:shadow-sm [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-        className
-      )}
+      data-value={value}
+      disabled={disabled}
+      className={className}
       {...props}
-    />
+    >
+      {children}
+    </button>
   );
 }
 
 function TabsContent({
   className,
+  value,
+  children,
   ...props
-}: React.ComponentProps<typeof TabsPrimitive.Content>) {
+}: React.ComponentProps<"div"> & { value: string }) {
   return (
-    <TabsPrimitive.Content
+    <div
       data-slot="tabs-content"
-      className={cn("flex-1 outline-none", className)}
+      data-value={value}
+      className={className}
       {...props}
-    />
+    >
+      {children}
+    </div>
   );
 }
 

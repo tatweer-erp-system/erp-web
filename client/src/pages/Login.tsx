@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { useLocation } from "wouter";
-import { useAuthContext } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "@/stores/auth.store";
 import { type Branch, Role } from "@/types/auth";
-import { t } from "@/i18n";
+import { useTranslation } from "@/hooks/ui/useTranslation";
 import { AxiosError } from "axios";
 import {
   getStorageItem,
@@ -1696,9 +1696,11 @@ function ErrorMsg({ children }: { children: React.ReactNode }) {
 
 // ─── Main Login Page ──────────────────────────────────────────────────────────
 export default function Login() {
-  const [, setLocation] = useLocation();
-  const { login, branches, selectBranch } = useAuthContext();
-  const lang = getStorageItem(STORAGE_KEYS.LANGUAGE) ?? "en";
+  const navigate = useNavigate();
+  const login = useAuthStore(s => s.login);
+  const branches = useAuthStore(s => s.branches);
+  const selectBranch = useAuthStore(s => s.selectBranch);
+  const { t, lang } = useTranslation();
 
   const [email, setEmail] = useState(
     () => getStorageItem(STORAGE_KEYS.REMEMBERED_EMAIL) ?? ""
@@ -1721,9 +1723,9 @@ export default function Login() {
   // Redirect to dashboard after successful login
   useEffect(() => {
     if (!success) return;
-    const timer = setTimeout(() => setLocation("/"), 1200);
+    const timer = setTimeout(() => navigate("/"), 1200);
     return () => clearTimeout(timer);
-  }, [success, setLocation]);
+  }, [success, navigate]);
 
   const characterRef = useRef<HTMLDivElement>(null);
 

@@ -1,32 +1,65 @@
 import * as React from "react";
-import * as AvatarPrimitive from "@radix-ui/react-avatar";
-
+import { Avatar as AntAvatar } from "antd";
 import { cn } from "@/lib/utils";
+
+/**
+ * Avatar — Ant Design Avatar wrapper preserving the shadcn/ui API:
+ *
+ *   <Avatar>
+ *     <AvatarImage src="..." alt="..." />
+ *     <AvatarFallback>AB</AvatarFallback>
+ *   </Avatar>
+ *
+ * Implementation: Avatar reads its children to find image src and
+ * fallback text, then renders a single Ant <Avatar>.
+ */
 
 function Avatar({
   className,
+  children,
   ...props
-}: React.ComponentProps<typeof AvatarPrimitive.Root>) {
+}: React.ComponentProps<"span">) {
+  let src: string | undefined;
+  let alt: string | undefined;
+  let fallbackContent: React.ReactNode = null;
+
+  React.Children.forEach(children, child => {
+    if (!React.isValidElement(child)) return;
+    const p = child.props as Record<string, unknown>;
+    const slot = p["data-slot"] as string | undefined;
+
+    if (slot === "avatar-image") {
+      src = p.src as string | undefined;
+      alt = p.alt as string | undefined;
+    } else if (slot === "avatar-fallback") {
+      fallbackContent = p.children as React.ReactNode;
+    }
+  });
+
   return (
-    <AvatarPrimitive.Root
-      data-slot="avatar"
-      className={cn(
-        "relative flex size-8 shrink-0 overflow-hidden rounded-full",
-        className
-      )}
-      {...props}
-    />
+    <AntAvatar
+      src={src}
+      alt={alt}
+      className={cn("flex items-center justify-center", className)}
+      {...(props as Record<string, unknown>)}
+    >
+      {fallbackContent}
+    </AntAvatar>
   );
 }
 
 function AvatarImage({
   className,
+  src,
+  alt,
   ...props
-}: React.ComponentProps<typeof AvatarPrimitive.Image>) {
+}: React.ComponentProps<"img">) {
   return (
-    <AvatarPrimitive.Image
+    <img
       data-slot="avatar-image"
-      className={cn("aspect-square size-full", className)}
+      src={src}
+      alt={alt}
+      className={className}
       {...props}
     />
   );
@@ -34,17 +67,13 @@ function AvatarImage({
 
 function AvatarFallback({
   className,
+  children,
   ...props
-}: React.ComponentProps<typeof AvatarPrimitive.Fallback>) {
+}: React.ComponentProps<"span">) {
   return (
-    <AvatarPrimitive.Fallback
-      data-slot="avatar-fallback"
-      className={cn(
-        "bg-muted flex size-full items-center justify-center rounded-full",
-        className
-      )}
-      {...props}
-    />
+    <span data-slot="avatar-fallback" className={className} {...props}>
+      {children}
+    </span>
   );
 }
 

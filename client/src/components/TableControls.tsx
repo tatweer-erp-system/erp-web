@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button, Input, Dropdown } from "antd";
+import type { MenuProps } from "antd";
 import { DateRangePicker } from "@/components/DateRangePicker";
 import {
   Search,
@@ -12,14 +12,8 @@ import {
   Grid3x3,
   List,
 } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
-interface TableControlsProps {
+type TableControlsProps = {
   onSearch?: (query: string) => void;
   onAddNew?: () => void;
   onPrint?: () => void;
@@ -30,7 +24,7 @@ interface TableControlsProps {
   isRTL?: boolean;
   showAddButton?: boolean;
   addButtonLabel?: string;
-}
+};
 
 export function TableControls({
   onSearch,
@@ -45,7 +39,6 @@ export function TableControls({
   addButtonLabel = "Add New",
 }: TableControlsProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState("name");
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -56,22 +49,36 @@ export function TableControls({
     // Date range filtering handled by parent via callback
   };
 
+  const sortMenuItems: MenuProps["items"] = [
+    "Name A-Z",
+    "Name Z-A",
+    "Date (New)",
+    "Date (Old)",
+    "Status",
+  ].map(option => ({
+    key: option,
+    label: option,
+    onClick: () => {},
+  }));
+
+  const exportMenuItems: MenuProps["items"] = [
+    { key: "csv", label: "CSV", onClick: () => onExport?.() },
+    { key: "excel", label: "Excel", onClick: () => onExport?.() },
+    { key: "pdf", label: "PDF", onClick: () => onExport?.() },
+  ];
+
   return (
     <div className="space-y-4">
       {/* Search and Quick Actions */}
       <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
         {/* Search Input */}
         <div className="relative flex-1 w-full sm:w-auto">
-          <Search
-            size={18}
-            className="absolute top-1/2 transform -translate-y-1/2 text-muted-foreground start-3"
-          />
           <Input
-            type="text"
             placeholder="Search..."
             value={searchQuery}
             onChange={e => handleSearch(e.target.value)}
-            className="ps-12 bg-secondary border-0 rounded-lg focus:ring-2 focus:ring-primary w-full"
+            prefix={<Search size={18} className="text-gray-400" />}
+            className="w-full"
           />
         </div>
 
@@ -84,110 +91,68 @@ export function TableControls({
           />
 
           {/* Sort */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                className="border-border gap-2 flex-1 sm:flex-none"
-              >
-                <span className="text-xs">Sort</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align={isRTL ? "start" : "end"}>
-              {[
-                "Name A-Z",
-                "Name Z-A",
-                "Date (New)",
-                "Date (Old)",
-                "Status",
-              ].map(option => (
-                <DropdownMenuItem
-                  key={option}
-                  onClick={() => setSortBy(option)}
-                >
-                  {option}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Dropdown
+            menu={{ items: sortMenuItems }}
+            trigger={["click"]}
+            placement={isRTL ? "bottomLeft" : "bottomRight"}
+          >
+            <Button className="flex-1 sm:flex-none">
+              <span className="text-xs">Sort</span>
+            </Button>
+          </Dropdown>
 
           {/* Filter */}
-          <Button
-            variant="outline"
-            className="border-border gap-2 flex-1 sm:flex-none"
-          >
+          <Button className="flex-1 sm:flex-none">
             <Filter size={16} />
             <span className="hidden sm:inline text-xs">Filter</span>
           </Button>
 
           {/* Reload */}
-          <Button
-            variant="outline"
-            className="border-border gap-2 flex-1 sm:flex-none"
-            onClick={onReload}
-          >
+          <Button className="flex-1 sm:flex-none" onClick={onReload}>
             <RotateCcw size={16} />
             <span className="hidden sm:inline text-xs">Reload</span>
           </Button>
 
           {/* Print */}
-          <Button
-            variant="outline"
-            className="border-border gap-2 flex-1 sm:flex-none"
-            onClick={onPrint}
-          >
+          <Button className="flex-1 sm:flex-none" onClick={onPrint}>
             <Printer size={16} />
             <span className="hidden sm:inline text-xs">Print</span>
           </Button>
 
           {/* Export */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                className="border-border gap-2 flex-1 sm:flex-none"
-              >
-                <Download size={16} />
-                <span className="hidden sm:inline text-xs">Export</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align={isRTL ? "start" : "end"}>
-              <DropdownMenuItem onClick={onExport}>CSV</DropdownMenuItem>
-              <DropdownMenuItem onClick={onExport}>Excel</DropdownMenuItem>
-              <DropdownMenuItem onClick={onExport}>PDF</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Dropdown
+            menu={{ items: exportMenuItems }}
+            trigger={["click"]}
+            placement={isRTL ? "bottomLeft" : "bottomRight"}
+          >
+            <Button className="flex-1 sm:flex-none">
+              <Download size={16} />
+              <span className="hidden sm:inline text-xs">Export</span>
+            </Button>
+          </Dropdown>
 
           {/* View Toggle */}
-          <div className="flex border border-border rounded-lg">
+          <Button.Group>
             <Button
-              variant={viewMode === "table" ? "default" : "ghost"}
-              size="sm"
-              className="rounded-none border-0"
+              type={viewMode === "table" ? "primary" : "default"}
               onClick={() => onViewChange?.("table")}
             >
               <List size={16} />
             </Button>
             <Button
-              variant={viewMode === "grid" ? "default" : "ghost"}
-              size="sm"
-              className="rounded-none border-0"
+              type={viewMode === "grid" ? "primary" : "default"}
               onClick={() => onViewChange?.("grid")}
             >
               <Grid3x3 size={16} />
             </Button>
-          </div>
+          </Button.Group>
         </div>
       </div>
 
       {/* Add New Button */}
       {showAddButton && (
         <div>
-          <Button
-            onClick={onAddNew}
-            className="bg-primary hover:bg-blue-700 text-white gap-2"
-          >
-            <Plus size={18} />
+          <Button type="primary" onClick={onAddNew} icon={<Plus size={18} />}>
             {addButtonLabel}
           </Button>
         </div>

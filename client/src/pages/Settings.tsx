@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { useLangStore } from "@/stores/lang.store";
+import { useThemeStore } from "@/stores/theme.store";
 import { usePOSStore } from "@/modules/pos/store/posStore";
 import {
   Alert,
@@ -268,17 +269,16 @@ export default function Settings() {
   const { token } = antTheme.useToken();
   const screens = Grid.useBreakpoint();
   const isMobile = !screens.md;
-  const {
-    theme,
-    language,
-    toggleTheme,
-    setLanguage,
-    financialYear,
-    setFinancialYear,
-    accentColor,
-    setAccentColor,
-    settingsLayout,
-  } = useAppSettings();
+  const themeMode = useThemeStore(s => s.mode);
+  const setMode = useThemeStore(s => s.setMode);
+  const accentColor = useThemeStore(s => s.accentColor);
+  const setAccentColor = useThemeStore(s => s.setAccentColor);
+  const language = useLangStore(s => s.lang);
+  const setLanguage = useLangStore(s => s.setLang);
+  const [financialYear, setFinancialYear] = useState("2025-2026");
+  const settingsLayout = "vertical" as const;
+  const theme = themeMode === "dark" ? "dark" : "light";
+  const toggleTheme = () => setMode(themeMode === "dark" ? "light" : "dark");
   const isDark = theme === "dark";
 
   const [profileForm] = Form.useForm();

@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { Link } from "wouter";
+import { Link } from "react-router-dom";
 import {
   Avatar,
   Button,
@@ -25,9 +25,12 @@ import {
 } from "@ant-design/icons";
 import { Moon, Sun } from "lucide-react";
 import { NotificationCenter } from "@/components/NotificationCenter";
+import { useLangStore } from "@/stores/lang.store";
+import { useThemeStore } from "@/stores/theme.store";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
 import { usePinLock } from "@/contexts/PinLockContext";
-import { useAuthContext, ROLE_DISPLAY } from "@/contexts/AuthContext";
+import { useAuthStore } from "@/stores/auth.store";
+import { ROLE_DISPLAY } from "@/contexts/AuthContext";
 
 interface NavbarProps {
   sidebarOpen: boolean;
@@ -37,20 +40,18 @@ interface NavbarProps {
 
 function NavbarInner({ sidebarOpen, setSidebarOpen, isRTL }: NavbarProps) {
   const { token } = antTheme.useToken();
-  const {
-    theme,
-    language,
-    financialYear,
-    toggleTheme,
-    setLanguage,
-    setFinancialYear,
-  } = useAppSettings();
+  const language = useLangStore(s => s.lang);
+  const setLanguage = useLangStore(s => s.setLang);
+  const themeMode = useThemeStore(s => s.mode);
+  const setMode = useThemeStore(s => s.setMode);
+  const { financialYear, setFinancialYear } = useAppSettings();
   const { lock } = usePinLock();
-  const { user, logout } = useAuthContext();
+  const user = useAuthStore(s => s.user);
+  const logout = useAuthStore(s => s.logout);
   const screens = Grid.useBreakpoint();
   const isMobile = !screens.md;
 
-  const isDark = theme === "dark";
+  const isDark = themeMode === "dark";
 
   function toggleFullscreen() {
     if (!document.fullscreenElement)
@@ -109,12 +110,12 @@ function NavbarInner({ sidebarOpen, setSidebarOpen, isRTL }: NavbarProps) {
     { type: "divider" },
     {
       key: "profile",
-      label: <Link href="/settings">My Profile</Link>,
+      label: <Link to="/settings">My Profile</Link>,
       icon: <UserOutlined />,
     },
     {
       key: "settings",
-      label: <Link href="/settings">Settings</Link>,
+      label: <Link to="/settings">Settings</Link>,
       icon: <SettingOutlined />,
     },
     { type: "divider" },
@@ -228,7 +229,7 @@ function NavbarInner({ sidebarOpen, setSidebarOpen, isRTL }: NavbarProps) {
           <Button
             type="text"
             icon={isDark ? <Sun size={16} /> : <Moon size={16} />}
-            onClick={toggleTheme}
+            onClick={() => setMode(isDark ? "light" : "dark")}
             style={iconBtnStyle}
           />
         </Tooltip>

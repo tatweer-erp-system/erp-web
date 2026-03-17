@@ -4,7 +4,7 @@
  * the DashboardLayout breadcrumb bar already shows the page name.
  */
 import { Breadcrumb as AntBreadcrumb } from "antd";
-import { Link } from "wouter";
+import { Link } from "react-router-dom";
 import { HomeOutlined } from "@ant-design/icons";
 
 interface BreadcrumbItem {
@@ -22,7 +22,7 @@ export function Breadcrumb({ items }: BreadcrumbProps) {
   const antItems = [
     {
       title: (
-        <Link href="/">
+        <Link to="/">
           <HomeOutlined />
         </Link>
       ),
@@ -30,7 +30,7 @@ export function Breadcrumb({ items }: BreadcrumbProps) {
     ...items.map((item, i) => ({
       title:
         item.href && i < items.length - 1 ? (
-          <Link href={item.href}>{item.label}</Link>
+          <Link to={item.href}>{item.label}</Link>
         ) : (
           item.label
         ),

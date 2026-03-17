@@ -20,7 +20,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useSettings } from "@/contexts/SettingsContext";
+import { useLangStore } from "@/stores/lang.store";
 import { InvoiceStatus } from "@/constants/enums";
 
 const purchaseInvoicesData = [
@@ -87,7 +87,7 @@ function getStatusColor(status: string) {
 }
 
 export default function PurchaseInvoices() {
-  const { language } = useSettings();
+  const language = useLangStore(s => s.lang);
   const isRTL = language === "ar";
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
   const [currentPage, setCurrentPage] = useState(1);

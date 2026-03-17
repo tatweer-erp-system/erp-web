@@ -1,4 +1,4 @@
-import { useParams, useLocation } from "wouter";
+import { useParams, useNavigate } from "react-router-dom";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, Space, Tag, Typography, theme as antTheme } from "antd";
 import {
@@ -9,7 +9,7 @@ import {
   BgColorsOutlined,
   ApiOutlined,
 } from "@ant-design/icons";
-import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { useLangStore } from "@/stores/lang.store";
 import { t } from "@/i18n";
 import ProfileTab from "./ProfileTab";
 import GeneralTab from "./GeneralTab";
@@ -57,11 +57,10 @@ const TABS = [
 
 // ─── Main page ───────────────────────────────────────────────────────────────
 export default function MySettings() {
-  const params = useParams<{ tab?: string }>();
-  const [, setLocation] = useLocation();
+  const params = useParams<"tab">();
+  const navigate = useNavigate();
   const { token } = antTheme.useToken();
-  const { language } = useAppSettings();
-  const lang = language;
+  const lang = useLangStore(s => s.lang);
   const activeTab = params.tab ?? "general";
 
   const activeLabel =
@@ -127,7 +126,7 @@ export default function MySettings() {
             {TABS.map(tab => (
               <button
                 key={tab.key}
-                onClick={() => setLocation(`/my-settings/${tab.key}`)}
+                onClick={() => navigate(`/my-settings/${tab.key}`)}
                 style={{
                   width: "100%",
                   display: "flex",

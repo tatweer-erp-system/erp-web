@@ -40,7 +40,7 @@ import { CollapsibleCard } from "@/components/common/CollapsibleCard";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { AnimatedModal } from "@/components/AnimatedModal";
 import { AttachmentsTab } from "@/components/AttachmentsTab";
-import { useLocation } from "wouter";
+import { useNavigate } from "react-router-dom";
 import { CustomerStatus } from "@/constants/enums";
 
 // ── Mock customer data ────────────────────────────────────────────────────────
@@ -143,7 +143,7 @@ const ORDER_STATUS_STYLES: Record<string, string> = {
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function CustomerDetails() {
-  const [, navigate] = useLocation();
+  const navigate = useNavigate();
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [editForm, setEditForm] = useState({

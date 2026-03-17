@@ -24,7 +24,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useSettings } from "@/contexts/SettingsContext";
+import { useLangStore } from "@/stores/lang.store";
 import { t } from "@/i18n";
 import { OrderStatus } from "@/constants/enums";
 
@@ -97,7 +97,7 @@ function getStatusColor(status: string) {
 }
 
 export default function AllOrders() {
-  const { language } = useSettings();
+  const language = useLangStore(s => s.lang);
   const isRTL = language === "ar";
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
   const [currentPage, setCurrentPage] = useState(1);

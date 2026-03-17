@@ -1,4 +1,4 @@
-import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { useLangStore } from "@/stores/lang.store";
 import { t } from "@/i18n";
 import { securityService } from "@/services/settings.service";
 import type { ChangePasswordDto, Session } from "@/services/settings.service";
@@ -87,7 +87,7 @@ function Section({
 // ─── SecurityTab ──────────────────────────────────────────────────────────────
 export default function SecurityTab() {
   const { token } = antTheme.useToken();
-  const { language: lang } = useAppSettings();
+  const lang = useLangStore(s => s.lang);
   const queryClient = useQueryClient();
   const [passwordForm] = Form.useForm();
 

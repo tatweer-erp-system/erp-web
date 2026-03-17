@@ -1,4 +1,4 @@
-import { useParams, useLocation } from "wouter";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   Alert,
   Button,
@@ -782,8 +782,8 @@ function AlertsTab() {
 }
 
 export default function InventorySettings() {
-  const params = useParams<{ tab?: string }>();
-  const [, setLocation] = useLocation();
+  const params = useParams<"tab">();
+  const navigate = useNavigate();
   const { token } = antTheme.useToken();
   const activeTab = params.tab ?? "general";
 
@@ -837,7 +837,7 @@ export default function InventorySettings() {
           {TABS.map(tab => (
             <button
               key={tab.key}
-              onClick={() => setLocation(`/settings/inventory/${tab.key}`)}
+              onClick={() => navigate(`/settings/inventory/${tab.key}`)}
               style={{
                 width: "100%",
                 display: "flex",

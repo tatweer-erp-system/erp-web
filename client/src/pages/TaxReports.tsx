@@ -44,7 +44,7 @@ import {
 } from "recharts";
 import { FilingStatus } from "@/constants/enums";
 import { t } from "@/i18n";
-import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { useLangStore } from "@/stores/lang.store";
 
 const { Text, Title } = Typography;
 
@@ -223,8 +223,7 @@ function fmtFull(n: number) {
 
 export default function TaxReports() {
   const { token } = antTheme.useToken();
-  const { language } = useAppSettings();
-  const lang = language;
+  const lang = useLangStore(s => s.lang);
   const isRTL = lang === "ar";
   const [year, setYear] = useState("2024");
 

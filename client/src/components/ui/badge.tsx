@@ -1,46 +1,44 @@
 import * as React from "react";
-import { Slot } from "@radix-ui/react-slot";
-import { cva, type VariantProps } from "class-variance-authority";
-
+import { Tag } from "antd";
 import { cn } from "@/lib/utils";
 
-const badgeVariants = cva(
-  "inline-flex items-center justify-center rounded-md border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden",
-  {
-    variants: {
-      variant: {
-        default:
-          "border-transparent bg-primary text-primary-foreground [a&]:hover:bg-primary/90",
-        secondary:
-          "border-transparent bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90",
-        destructive:
-          "border-transparent bg-destructive text-white [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
-        outline:
-          "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-    },
-  }
-);
+type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
 
+type BadgeProps = React.ComponentProps<"span"> & {
+  variant?: BadgeVariant;
+  asChild?: boolean;
+};
+
+const variantColorMap: Record<BadgeVariant, string> = {
+  default: "blue",
+  secondary: "default",
+  destructive: "red",
+  outline: "default",
+};
+
+/**
+ * Badge — Ant Design Tag wrapper preserving the shadcn/ui Badge API.
+ */
 function Badge({
   className,
-  variant,
-  asChild = false,
+  variant = "default",
+  asChild: _asChild,
+  children,
   ...props
-}: React.ComponentProps<"span"> &
-  VariantProps<typeof badgeVariants> & { asChild?: boolean }) {
-  const Comp = asChild ? Slot : "span";
-
+}: BadgeProps) {
   return (
-    <Comp
-      data-slot="badge"
-      className={cn(badgeVariants({ variant }), className)}
-      {...props}
-    />
+    <Tag
+      color={variantColorMap[variant]}
+      bordered={variant === "outline"}
+      className={cn("inline-flex items-center gap-1", className)}
+      {...(props as Record<string, unknown>)}
+    >
+      {children}
+    </Tag>
   );
 }
+
+// Keep for backward compat
+const badgeVariants = (_opts?: { variant?: BadgeVariant }) => "";
 
 export { Badge, badgeVariants };

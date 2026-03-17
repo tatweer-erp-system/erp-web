@@ -30,8 +30,8 @@ import {
   ClipboardList,
   UserCog,
 } from "lucide-react";
-import { useSettings } from "@/contexts/SettingsContext";
-import { useLocation } from "wouter";
+import { useLangStore } from "@/stores/lang.store";
+import { useNavigate } from "react-router-dom";
 import { t } from "@/i18n";
 import {
   AttendanceStatus,
@@ -215,9 +215,9 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 }
 
 export default function EmployeeDetails() {
-  const { language } = useSettings();
+  const language = useLangStore(s => s.lang);
   const isRTL = language === "ar";
-  const [, navigate] = useLocation();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("personal");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editForm, setEditForm] = useState({

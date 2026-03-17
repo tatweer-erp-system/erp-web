@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { useLangStore } from "@/stores/lang.store";
 import { t } from "@/i18n";
 import {
   productsService,
@@ -64,7 +64,7 @@ import {
   AlertTriangle,
   ExternalLink,
 } from "lucide-react";
-import { useLocation } from "wouter";
+import { useNavigate } from "react-router-dom";
 import { usePagination } from "@/hooks/usePagination";
 import { useDebounce } from "@/hooks/useDebounce";
 
@@ -522,9 +522,9 @@ function ProductFormModal({
 // ─── Main Page ───────────────────────────────────────────────────────────────
 
 export default function ProductDetails() {
-  const { language: lang } = useAppSettings();
+  const lang = useLangStore(s => s.lang);
   const isRTL = lang === "ar";
-  const [, navigate] = useLocation();
+  const navigate = useNavigate();
   const { pagination, goToPage, setLimit } = usePagination();
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 400);

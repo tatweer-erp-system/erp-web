@@ -4,7 +4,7 @@ import { z } from "zod";
 import { Input, Button, Form } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import { AppModal } from "@/components/common/AppModal";
-import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { useLangStore } from "@/stores/lang.store";
 import { t } from "@/i18n";
 
 const fastCreateSchema = z.object({
@@ -33,7 +33,7 @@ export function FastCreateModal({
   onSubmit,
   isLoading,
 }: FastCreateModalProps) {
-  const { language: lang } = useAppSettings();
+  const lang = useLangStore(s => s.lang);
 
   const {
     register,

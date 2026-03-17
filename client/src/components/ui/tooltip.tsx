@@ -1,58 +1,92 @@
 import * as React from "react";
-import * as TooltipPrimitive from "@radix-ui/react-tooltip";
-
+import { Tooltip as AntTooltip } from "antd";
 import { cn } from "@/lib/utils";
 
+/**
+ * Tooltip — Ant Design Tooltip wrapper preserving the shadcn/ui compound API.
+ *
+ *   <Tooltip>
+ *     <TooltipTrigger>Hover me</TooltipTrigger>
+ *     <TooltipContent>Tip text</TooltipContent>
+ *   </Tooltip>
+ *
+ * TooltipProvider wraps at the app level (no-op with Ant Design since
+ * Ant Design handles tooltip provider internally).
+ */
+
+/* ─── Provider (no-op) ────────────────────────────────────────────── */
+
 function TooltipProvider({
-  delayDuration = 0,
+  children,
+  delayDuration: _delayDuration,
   ...props
-}: React.ComponentProps<typeof TooltipPrimitive.Provider>) {
-  return (
-    <TooltipPrimitive.Provider
-      data-slot="tooltip-provider"
-      delayDuration={delayDuration}
-      {...props}
-    />
-  );
+}: {
+  children?: React.ReactNode;
+  delayDuration?: number;
+}) {
+  return <>{children}</>;
 }
+
+/* ─── Root ────────────────────────────────────────────────────────── */
 
 function Tooltip({
-  ...props
-}: React.ComponentProps<typeof TooltipPrimitive.Root>) {
+  children,
+}: {
+  children?: React.ReactNode;
+  open?: boolean;
+  defaultOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  delayDuration?: number;
+}) {
+  let triggerContent: React.ReactNode = null;
+  let tooltipContent: React.ReactNode = null;
+
+  React.Children.forEach(children, child => {
+    if (!React.isValidElement(child)) return;
+    const p = child.props as Record<string, unknown>;
+    const slot = p["data-slot"] as string | undefined;
+
+    if (slot === "tooltip-trigger") {
+      triggerContent = p.children as React.ReactNode;
+    } else if (slot === "tooltip-content") {
+      tooltipContent = p.children as React.ReactNode;
+    }
+  });
+
   return (
-    <TooltipProvider>
-      <TooltipPrimitive.Root data-slot="tooltip" {...props} />
-    </TooltipProvider>
+    <AntTooltip title={tooltipContent}>
+      <span className="inline-flex">{triggerContent}</span>
+    </AntTooltip>
   );
 }
 
+/* ─── Trigger ─────────────────────────────────────────────────────── */
+
 function TooltipTrigger({
+  children,
+  className,
+  asChild: _asChild,
   ...props
-}: React.ComponentProps<typeof TooltipPrimitive.Trigger>) {
-  return <TooltipPrimitive.Trigger data-slot="tooltip-trigger" {...props} />;
+}: React.ComponentProps<"span"> & { asChild?: boolean }) {
+  return (
+    <span data-slot="tooltip-trigger" className={cn(className)} {...props}>
+      {children}
+    </span>
+  );
 }
 
+/* ─── Content ─────────────────────────────────────────────────────── */
+
 function TooltipContent({
-  className,
-  sideOffset = 0,
   children,
+  className,
+  sideOffset: _sideOffset,
   ...props
-}: React.ComponentProps<typeof TooltipPrimitive.Content>) {
+}: React.ComponentProps<"div"> & { sideOffset?: number }) {
   return (
-    <TooltipPrimitive.Portal>
-      <TooltipPrimitive.Content
-        data-slot="tooltip-content"
-        sideOffset={sideOffset}
-        className={cn(
-          "bg-foreground text-background animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 w-fit origin-(--radix-tooltip-content-transform-origin) rounded-md px-3 py-1.5 text-xs text-balance",
-          className
-        )}
-        {...props}
-      >
-        {children}
-        <TooltipPrimitive.Arrow className="bg-foreground fill-foreground z-50 size-2.5 translate-y-[calc(-50%_-_2px)] rotate-45 rounded-[2px]" />
-      </TooltipPrimitive.Content>
-    </TooltipPrimitive.Portal>
+    <div data-slot="tooltip-content" className={cn(className)} {...props}>
+      {children}
+    </div>
   );
 }
 

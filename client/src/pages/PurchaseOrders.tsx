@@ -35,8 +35,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useSettings } from "@/contexts/SettingsContext";
-import { useLocation } from "wouter";
+import { useLangStore } from "@/stores/lang.store";
+import { useNavigate } from "react-router-dom";
 import { t } from "@/i18n";
 
 const purchaseOrdersData = [
@@ -126,9 +126,9 @@ function getPaymentStatusColor(status: string) {
 }
 
 export default function PurchaseOrders() {
-  const { language } = useSettings();
+  const language = useLangStore(s => s.lang);
   const isRTL = language === "ar";
-  const [, navigate] = useLocation();
+  const navigate = useNavigate();
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);

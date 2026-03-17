@@ -1,4 +1,4 @@
-import { useParams, useLocation } from "wouter";
+import { useParams, useNavigate } from "react-router-dom";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import {
   Alert,
@@ -750,8 +750,8 @@ function InvoiceHistoryTab() {
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function BillingSubscription() {
-  const params = useParams<{ tab?: string }>();
-  const [, setLocation] = useLocation();
+  const params = useParams<"tab">();
+  const navigate = useNavigate();
   const { token } = antTheme.useToken();
   const activeTab = params.tab ?? "plan";
 
@@ -813,7 +813,7 @@ export default function BillingSubscription() {
             {TABS.map(tab => (
               <button
                 key={tab.key}
-                onClick={() => setLocation(`/settings/billing/${tab.key}`)}
+                onClick={() => navigate(`/settings/billing/${tab.key}`)}
                 style={{
                   width: "100%",
                   display: "flex",

@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect, useCallback } from "react";
-import { useAppSettings } from "@/contexts/AppSettingsContext";
-import type { ThemeMode } from "@/contexts/AppSettingsContext";
+import { useLangStore } from "@/stores/lang.store";
+import { useThemeStore } from "@/stores/theme.store";
 import { t } from "@/i18n";
 import { useMutation } from "@tanstack/react-query";
 import { Radio, Typography, theme as antTheme } from "antd";
@@ -113,10 +113,16 @@ function ColorSwatch({
 
 export default function AppearanceTab() {
   const { token } = antTheme.useToken();
-  const { theme, setMode, accentColor, setAccentColor, language, setLanguage } =
-    useAppSettings();
+  const mode = useThemeStore(s => s.mode);
+  const setMode = useThemeStore(s => s.setMode);
+  const accentColor = useThemeStore(s => s.accentColor);
+  const setAccentColor = useThemeStore(s => s.setAccentColor);
+  const language = useLangStore(s => s.lang);
+  const setLanguage = useLangStore(s => s.setLang);
 
-  const [themeOption, setThemeOption] = useState<"light" | "dark">(() => theme);
+  const [themeOption, setThemeOption] = useState<"light" | "dark">(() =>
+    mode === "dark" ? "dark" : "light"
+  );
 
   const [density, setDensity] = useState<"compact" | "default" | "comfortable">(
     () => {
@@ -132,7 +138,7 @@ export default function AppearanceTab() {
   const [showSaved, setShowSaved] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const lang = language;
+  const lang = useLangStore(s => s.lang);
 
   // ── API mutation (silently fails — backend not built yet) ──────────────────
 
@@ -184,10 +190,6 @@ export default function AppearanceTab() {
 
   const handleLanguageChange = (value: "en" | "ar") => {
     setLanguage(value);
-    document.documentElement.setAttribute(
-      "dir",
-      value === "ar" ? "rtl" : "ltr"
-    );
     debouncedSave({ language: value });
   };
 

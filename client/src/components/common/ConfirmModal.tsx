@@ -1,7 +1,7 @@
 import { Button } from "antd";
 import { AlertTriangle, Trash2 } from "lucide-react";
 import { AppModal } from "@/components/common/AppModal";
-import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { useLangStore } from "@/stores/lang.store";
 import { t } from "@/i18n";
 import { cn } from "@/lib/utils";
 
@@ -33,7 +33,7 @@ export function ConfirmModal({
   variant = "danger",
   isLoading = false,
 }: ConfirmModalProps) {
-  const { language: lang } = useAppSettings();
+  const lang = useLangStore(s => s.lang);
   const isDanger = variant === "danger";
 
   const Icon = isDanger ? Trash2 : AlertTriangle;

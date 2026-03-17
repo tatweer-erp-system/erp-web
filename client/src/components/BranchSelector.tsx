@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { QUERY_KEYS } from "@/constants/queryKeys";
 import { branchesService } from "@/services/branches.service";
-import { useSettings } from "@/contexts/SettingsContext";
-import { useAuthContext } from "@/contexts/AuthContext";
+import { useLangStore } from "@/stores/lang.store";
+import { useAuthStore } from "@/stores/auth.store";
 import { t } from "@/i18n";
 import type { Branch } from "@/types/auth";
 
@@ -22,8 +22,9 @@ export function BranchSelector({
   disabled = false,
   className = "",
 }: BranchSelectorProps) {
-  const { language } = useSettings();
-  const { selectedBranch, branches: authBranches } = useAuthContext();
+  const language = useLangStore(s => s.lang);
+  const selectedBranch = useAuthStore(s => s.selectedBranch);
+  const authBranches = useAuthStore(s => s.branches);
 
   // Try fetching from API; fall back to auth context branches
   const { data: apiBranches } = useQuery({
