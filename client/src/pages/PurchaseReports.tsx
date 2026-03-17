@@ -533,7 +533,7 @@ export default function PurchaseReports() {
                         percent={c.pct}
                         showInfo={false}
                         strokeColor={colors[i]}
-                        trailColor="var(--border,#e2e8f0)"
+                        railColor="var(--border,#e2e8f0)"
                         size="small"
                       />
                     </div>

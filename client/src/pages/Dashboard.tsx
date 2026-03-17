@@ -1156,7 +1156,7 @@ export default function Dashboard() {
                       percent={m.pct}
                       showInfo={false}
                       strokeColor={m.color}
-                      trailColor={token.colorFillSecondary}
+                      railColor={token.colorFillSecondary}
                       size="small"
                       strokeLinecap="round"
                     />

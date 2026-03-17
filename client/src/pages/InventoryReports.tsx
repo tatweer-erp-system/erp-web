@@ -330,7 +330,7 @@ function StockGauge({ row }: { row: StockRow }) {
           size="small"
           showInfo={false}
           strokeColor={color}
-          trailColor={pct > 100 ? `${color}30` : undefined}
+          railColor={pct > 100 ? `${color}30` : undefined}
         />
         <Text style={{ fontSize: 10, color }} type="secondary">
           {row.quantity} units
