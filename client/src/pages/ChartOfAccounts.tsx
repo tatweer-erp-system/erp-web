@@ -172,7 +172,7 @@ function CreateChildModal({
       notification.error({
         message: t("mySettings.error.save", "en"),
         description: err.message,
-        direction: document.dir as "rtl" | "ltr",
+        style: { direction: document.dir as "rtl" | "ltr" },
       });
     },
   });
@@ -190,7 +190,7 @@ function CreateChildModal({
       notification.error({
         message: t("mySettings.error.save", "en"),
         description: err.message,
-        direction: document.dir as "rtl" | "ltr",
+        style: { direction: document.dir as "rtl" | "ltr" },
       });
     },
   });
@@ -900,7 +900,7 @@ function ChartOfAccountsContent() {
       notification.error({
         message: t("mySettings.error.save", lang),
         description: err.message,
-        direction: document.dir as "rtl" | "ltr",
+        style: { direction: document.dir as "rtl" | "ltr" },
       });
     },
   });

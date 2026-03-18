@@ -809,7 +809,7 @@ export default function Dashboard() {
                 style={{ display: "flex", flexDirection: "column", gap: 10 }}
               >
                 {alerts.map(a => (
-                  <Link key={a.id} href={a.action}>
+                  <Link key={a.id} to={a.action}>
                     <div
                       style={{
                         display: "flex",

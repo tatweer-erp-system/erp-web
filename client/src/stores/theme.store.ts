@@ -185,9 +185,9 @@ export const useThemeStore = create<ThemeStore>()(
         direction: state.direction,
         presetId: state.presetId,
       }),
-      onRehydrate: (_state, _error) => {
+      onRehydrateStorage: () => {
         // Called after rehydration completes; apply stored theme to DOM
-        return rehydratedState => {
+        return (rehydratedState?: ThemeStore, _error?: unknown) => {
           if (rehydratedState) {
             applyAllEffects(rehydratedState);
           }

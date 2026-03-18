@@ -7,8 +7,8 @@ import {
   DEFAULT_EARN_RATIO,
   DEFAULT_REDEEM_RATIO,
 } from "@/modules/pos/data/mockCustomers";
-// TODO: Pre-existing error — cashierAuthService module does not exist yet. CashierRole type needs to be created.
-import type { CashierRole } from "@/modules/pos/services/cashierAuthService";
+// TODO: cashierAuthService module does not exist yet — using inline type until it's created
+export type CashierRole = "cashier" | "manager" | "admin";
 import type { RestaurantTable } from "@/modules/pos/data/mockRestaurant";
 import {
   CashMovementType,

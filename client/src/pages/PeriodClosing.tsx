@@ -85,7 +85,7 @@ export default function PeriodClosing() {
 
   // ── Derived data ──────────────────────────────────────────────────────────────
   const uniqueYears = useMemo(() => {
-    const years = [...new Set(periods.map(p => p.fiscalYear))].sort(
+    const years = Array.from(new Set(periods.map(p => p.fiscalYear))).sort(
       (a, b) => b - a
     );
     return years;

@@ -276,7 +276,7 @@ export default function Settings() {
   const language = useLangStore(s => s.lang);
   const setLanguage = useLangStore(s => s.setLang);
   const [financialYear, setFinancialYear] = useState("2025-2026");
-  const settingsLayout = "vertical" as const;
+  const settingsLayout = "vertical" as "vertical" | "horizontal";
   const theme = themeMode === "dark" ? "dark" : "light";
   const toggleTheme = () => setMode(themeMode === "dark" ? "light" : "dark");
   const isDark = theme === "dark";

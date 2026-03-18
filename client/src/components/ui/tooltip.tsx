@@ -81,8 +81,14 @@ function TooltipContent({
   children,
   className,
   sideOffset: _sideOffset,
+  side: _side,
+  align: _align,
   ...props
-}: React.ComponentProps<"div"> & { sideOffset?: number }) {
+}: React.ComponentProps<"div"> & {
+  sideOffset?: number;
+  side?: "top" | "right" | "bottom" | "left";
+  align?: "start" | "center" | "end";
+}) {
   return (
     <div data-slot="tooltip-content" className={cn(className)} {...props}>
       {children}

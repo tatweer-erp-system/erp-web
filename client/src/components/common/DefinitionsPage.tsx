@@ -714,7 +714,7 @@ function ModalForm({
       width={isMobile ? "95vw" : sectioned ? 700 : 640}
       destroyOnHidden
       styles={{
-        content: {
+        container: {
           padding: 0,
           overflow: "hidden",
           borderRadius: token.borderRadiusLG,

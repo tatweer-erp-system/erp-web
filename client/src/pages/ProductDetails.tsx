@@ -117,7 +117,7 @@ function ProductFormModal({
       notification.error({
         message: t("products.addProduct", lang),
         description: err?.message,
-        direction: document.dir as "rtl" | "ltr",
+        style: { direction: document.dir as "rtl" | "ltr" },
       });
     },
   });
@@ -135,7 +135,7 @@ function ProductFormModal({
       notification.error({
         message: t("products.editProduct", lang),
         description: err?.message,
-        direction: document.dir as "rtl" | "ltr",
+        style: { direction: document.dir as "rtl" | "ltr" },
       });
     },
   });
@@ -585,7 +585,7 @@ export default function ProductDetails() {
       notification.error({
         message: t("products.deleteProduct", lang),
         description: err?.message,
-        direction: document.dir as "rtl" | "ltr",
+        style: { direction: document.dir as "rtl" | "ltr" },
       });
     },
   });
