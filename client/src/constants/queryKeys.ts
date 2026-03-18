@@ -89,4 +89,57 @@ export const QUERY_KEYS = {
   PURCHASE_ORDERS_LIST: "purchase-orders-list",
   PURCHASE_ORDERS_SUMMARY: "purchase-orders-summary",
   PURCHASE_ORDER_DETAIL: "purchase-order-detail",
+
+  // HR — Employees
+  EMPLOYEES: "employees",
+  EMPLOYEES_DROPDOWN: "employees-dropdown",
+  DEPARTMENTS: "departments",
+  DEPARTMENTS_DROPDOWN: "departments-dropdown",
+
+  // HR — Leaves
+  LEAVES: "leaves",
+  EMPLOYEE_LEAVES: "employee-leaves",
+  LEAVE_BALANCE: "leave-balance",
+
+  // HR — Attendance
+  ATTENDANCE: "attendance",
+  ATTENDANCE_REPORT: "attendance-report",
+
+  // HR — Contracts
+  CONTRACTS: "contracts",
+
+  // HR — Payroll
+  PAYROLL_RUNS: "payroll-runs",
+  PAYROLL_REPORT: "payroll-report",
+
+  // HR — Training
+  TRAINING: "training",
+
+  // HR — Shifts
+  SHIFTS: "shifts",
+
+  // HR — Salary Structures
+  SALARY_STRUCTURES: "salary-structures",
+
+  // HR — Payslips
+  PAYSLIPS: "payslips",
+
+  // HR — Definitions
+  JOB_TITLES: "job-titles",
+  EMPLOYMENT_TYPES: "employment-types",
+  LEAVE_TYPES: "leave-types",
+  PUBLIC_HOLIDAYS: "public-holidays",
+  TERMINATION_REASONS: "termination-reasons",
+
+  // Inventory — extended
+  WAREHOUSES: "warehouses",
+  WAREHOUSES_DROPDOWN: "warehouses-dropdown",
+  STOCK_LEVELS: "stock-levels",
+  LOW_STOCK_ALERTS: "low-stock-alerts",
+  STOCK_MOVEMENTS: "stock-movements",
+  STOCK_ADJUSTMENTS: "stock-adjustments",
+  STOCK_TRANSFERS: "stock-transfers",
+  INVENTORY_VALUATION: "inventory-valuation",
+  UNITS_OF_MEASURE: "units-of-measure",
+  ADJUSTMENT_REASONS: "adjustment-reasons",
 } as const;

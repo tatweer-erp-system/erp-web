@@ -279,12 +279,6 @@ export const routes: RouteConfig[] = [
     breadcrumb: ["Inventory", "Categories"],
   },
   {
-    path: "/units-of-measure",
-    component: lz(() => import("@/pages/UnitsOfMeasure")),
-    permissions: ["inventory:read"],
-    breadcrumb: ["Inventory", "Units"],
-  },
-  {
     path: "/warehouses",
     component: lz(() => import("@/pages/Warehouses")),
     permissions: ["inventory:read"],
@@ -307,12 +301,6 @@ export const routes: RouteConfig[] = [
     component: lz(() => import("@/pages/StockTransfers")),
     permissions: ["inventory:write"],
     breadcrumb: ["Inventory", "Transfers"],
-  },
-  {
-    path: "/stock-count",
-    component: lz(() => import("@/pages/StockCount")),
-    permissions: ["inventory:write"],
-    breadcrumb: ["Inventory", "Stock Count"],
   },
   {
     path: "/inventory-valuation",
@@ -546,9 +534,9 @@ export const routes: RouteConfig[] = [
     breadcrumb: ["HR", "All Employees"],
   },
   {
-    path: "/employee-details",
+    path: "/employees/:id",
     component: lz(() => import("@/pages/EmployeeDetails")),
-    breadcrumb: ["HR", "Employee Details"],
+    breadcrumb: ["HR", "Employees", "Detail"],
   },
   {
     path: "/departments",
@@ -561,23 +549,28 @@ export const routes: RouteConfig[] = [
     breadcrumb: ["HR", "Job Positions"],
   },
   {
-    path: "/attendance",
-    component: lz(() => import("@/pages/EmployeeManagement")),
-    breadcrumb: ["HR", "Attendance"],
-  },
-  {
     path: "/leave-management",
-    component: lz(() => import("@/pages/EmployeeManagement")),
+    component: lz(() => import("@/pages/LeaveManagement")),
     breadcrumb: ["HR", "Leave Management"],
   },
   {
+    path: "/attendance",
+    component: lz(() => import("@/pages/Attendance")),
+    breadcrumb: ["HR", "Attendance"],
+  },
+  {
     path: "/payroll",
-    component: lz(() => import("@/pages/EmployeeManagement")),
+    component: lz(() => import("@/pages/PayrollRuns")),
     breadcrumb: ["HR", "Payroll"],
   },
   {
+    path: "/contracts",
+    component: lz(() => import("@/pages/Contracts")),
+    breadcrumb: ["HR", "Contracts"],
+  },
+  {
     path: "/training",
-    component: lz(() => import("@/pages/EmployeeManagement")),
+    component: lz(() => import("@/pages/Training")),
     breadcrumb: ["HR", "Training"],
   },
 
@@ -664,18 +657,6 @@ export const routes: RouteConfig[] = [
   },
 
   // ── Module Settings ──────────────────────────────────────────────────────────
-  {
-    path: "/settings/inventory/:tab",
-    component: lz(() => import("@/pages/settings/InventorySettings")),
-    permissions: ["settings:read"],
-    breadcrumb: ["Settings", "Inventory Settings"],
-  },
-  {
-    path: "/settings/inventory",
-    component: lz(() => import("@/pages/settings/InventorySettings")),
-    permissions: ["settings:read"],
-    breadcrumb: ["Settings", "Inventory Settings"],
-  },
 
   {
     path: "/settings/sales/:tab",
@@ -730,19 +711,6 @@ export const routes: RouteConfig[] = [
   },
 
   {
-    path: "/settings/hr/:tab",
-    component: lz(() => import("@/pages/settings/HRSettings")),
-    permissions: ["settings:read"],
-    breadcrumb: ["Settings", "HR Settings"],
-  },
-  {
-    path: "/settings/hr",
-    component: lz(() => import("@/pages/settings/HRSettings")),
-    permissions: ["settings:read"],
-    breadcrumb: ["Settings", "HR Settings"],
-  },
-
-  {
     path: "/settings/reports/:tab",
     component: lz(() => import("@/pages/settings/ReportsSettings")),
     permissions: ["settings:read"],
@@ -756,12 +724,6 @@ export const routes: RouteConfig[] = [
   },
 
   // ── Definitions ─────────────────────────────────────────────────────────────
-  {
-    path: "/inventory-definitions",
-    component: lz(() => import("@/pages/definitions/InventoryDefinitions")),
-    permissions: ["inventory:read"],
-    breadcrumb: ["Inventory", "Definitions"],
-  },
   {
     path: "/sales-definitions",
     component: lz(() => import("@/pages/definitions/SalesDefinitions")),
@@ -779,11 +741,6 @@ export const routes: RouteConfig[] = [
     component: lz(() => import("@/pages/definitions/TreasuryDefinitions")),
     permissions: ["treasury:read"],
     breadcrumb: ["Treasury", "Definitions"],
-  },
-  {
-    path: "/hr-definitions",
-    component: lz(() => import("@/pages/definitions/HRDefinitions")),
-    breadcrumb: ["HR", "Definitions"],
   },
   {
     path: "/reports-definitions",

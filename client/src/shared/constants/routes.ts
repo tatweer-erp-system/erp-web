@@ -96,12 +96,14 @@ export const ROUTES = {
 
   // ── HR ──────────────────────────────────────────────────────────────────────
   EMPLOYEES: "/employees",
-  EMPLOYEE_DETAILS: "/employee-details",
+  EMPLOYEE_DETAILS: "/employees",
+  employeeDetail: (id: string) => `/employees/${id}` as const,
   DEPARTMENTS: "/departments",
   JOB_POSITIONS: "/job-positions",
   ATTENDANCE: "/attendance",
   LEAVE_MANAGEMENT: "/leave-management",
   PAYROLL: "/payroll",
+  CONTRACTS: "/contracts",
   TRAINING: "/training",
 
   // ── System Settings ─────────────────────────────────────────────────────────

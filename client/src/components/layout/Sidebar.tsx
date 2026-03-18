@@ -148,17 +148,6 @@ const NAV_ITEMS: NavItem[] = [
     href: "/stock-adjustments",
   },
   { name: "Stock Transfers", icon: <SwapOutlined />, href: "/stock-transfers" },
-  { name: "Stock Count", icon: <AuditOutlined />, href: "/stock-count" },
-  {
-    name: "Definitions",
-    icon: <DatabaseOutlined />,
-    href: "/inventory-definitions",
-  },
-  {
-    name: "Inventory Settings",
-    icon: <SettingOutlined />,
-    href: "/settings/inventory",
-  },
 
   // ── Accounting (Odoo: Accounting > Journal, Reports, Config) ────────────
   { name: "ACCOUNTING", isHeader: true },
@@ -292,8 +281,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   { name: "Payroll", icon: <DollarOutlined />, href: "/payroll" },
   { name: "Training", icon: <IdcardOutlined />, href: "/training" },
-  { name: "Definitions", icon: <DatabaseOutlined />, href: "/hr-definitions" },
-  { name: "HR Settings", icon: <SettingOutlined />, href: "/settings/hr" },
+  { name: "Contracts", icon: <FileTextOutlined />, href: "/contracts" },
 
   // ── Reports ─────────────────────────────────────────────────────────────
   { name: "REPORTS", isHeader: true },

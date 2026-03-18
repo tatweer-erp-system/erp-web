@@ -169,11 +169,12 @@ export const StockStatus = {
 } as const;
 export type StockStatus = (typeof StockStatus)[keyof typeof StockStatus];
 
-/** Product type (storable, consumable, service) */
+/** Product type (storable, consumable, service, combo) */
 export const ProductType = {
   STORABLE: "storable",
   CONSUMABLE: "consumable",
   SERVICE: "service",
+  COMBO: "combo",
 } as const;
 export type ProductType = (typeof ProductType)[keyof typeof ProductType];
 
@@ -207,8 +208,9 @@ export type StockReportStatus =
 /** Employee status */
 export const EmployeeStatus = {
   ACTIVE: "active",
-  ON_LEAVE: "on-leave",
-  INACTIVE: "inactive",
+  PROBATION: "probation",
+  SUSPENDED: "suspended",
+  TERMINATED: "terminated",
 } as const;
 export type EmployeeStatus =
   (typeof EmployeeStatus)[keyof typeof EmployeeStatus];
@@ -484,7 +486,8 @@ export type LoginResult = (typeof LoginResult)[keyof typeof LoginResult];
 export const AttendanceStatus = {
   PRESENT: "present",
   ABSENT: "absent",
-  HALF_DAY: "half-day",
+  LATE: "late",
+  HALF_DAY: "half_day",
 } as const;
 export type AttendanceStatus =
   (typeof AttendanceStatus)[keyof typeof AttendanceStatus];
@@ -497,6 +500,144 @@ export const PerformanceStatus = {
 } as const;
 export type PerformanceStatus =
   (typeof PerformanceStatus)[keyof typeof PerformanceStatus];
+
+// ─── HR — Employment & Contracts ────────────────────────────────────────────
+
+export const EmploymentType = {
+  FULL_TIME: "full-time",
+  PART_TIME: "part-time",
+  CONTRACT: "contract",
+  INTERN: "intern",
+} as const;
+export type EmploymentType =
+  (typeof EmploymentType)[keyof typeof EmploymentType];
+
+export const ContractType = {
+  FULL_TIME: "full_time",
+  PART_TIME: "part_time",
+  TEMPORARY: "temporary",
+  SEASONAL: "seasonal",
+} as const;
+export type ContractType = (typeof ContractType)[keyof typeof ContractType];
+
+export const ContractStatus = {
+  DRAFT: "draft",
+  ACTIVE: "active",
+  EXPIRED: "expired",
+  CANCELLED: "cancelled",
+} as const;
+export type ContractStatus =
+  (typeof ContractStatus)[keyof typeof ContractStatus];
+
+export const WageType = {
+  MONTHLY: "monthly",
+  DAILY: "daily",
+  HOURLY: "hourly",
+} as const;
+export type WageType = (typeof WageType)[keyof typeof WageType];
+
+export const Gender = {
+  MALE: "male",
+  FEMALE: "female",
+} as const;
+export type Gender = (typeof Gender)[keyof typeof Gender];
+
+export const MaritalStatus = {
+  SINGLE: "single",
+  MARRIED: "married",
+  DIVORCED: "divorced",
+  WIDOWED: "widowed",
+} as const;
+export type MaritalStatus = (typeof MaritalStatus)[keyof typeof MaritalStatus];
+
+// ─── HR — Leave ─────────────────────────────────────────────────────────────
+
+export const LeaveStatus = {
+  PENDING: "pending",
+  APPROVED: "approved",
+  REJECTED: "rejected",
+  CANCELLED: "cancelled",
+} as const;
+export type LeaveStatus = (typeof LeaveStatus)[keyof typeof LeaveStatus];
+
+export const AttendanceSource = {
+  MANUAL: "manual",
+  DEVICE: "device",
+  IMPORT: "import",
+} as const;
+export type AttendanceSource =
+  (typeof AttendanceSource)[keyof typeof AttendanceSource];
+
+// ─── HR — Payroll ───────────────────────────────────────────────────────────
+
+export const PayrollStatus = {
+  DRAFT: "draft",
+  CONFIRMED: "confirmed",
+  APPROVED: "approved",
+  PAID: "paid",
+} as const;
+export type PayrollStatus = (typeof PayrollStatus)[keyof typeof PayrollStatus];
+
+export const PayslipStatus = {
+  DRAFT: "draft",
+  CONFIRMED: "confirmed",
+  CANCELLED: "cancelled",
+} as const;
+export type PayslipStatus = (typeof PayslipStatus)[keyof typeof PayslipStatus];
+
+// ─── HR — Training ──────────────────────────────────────────────────────────
+
+export const TrainingStatus = {
+  PLANNED: "planned",
+  IN_PROGRESS: "in_progress",
+  COMPLETED: "completed",
+  CANCELLED: "cancelled",
+} as const;
+export type TrainingStatus =
+  (typeof TrainingStatus)[keyof typeof TrainingStatus];
+
+export const TrainingType = {
+  INTERNAL: "internal",
+  EXTERNAL: "external",
+  ONLINE: "online",
+} as const;
+export type TrainingType = (typeof TrainingType)[keyof typeof TrainingType];
+
+// ─── Inventory — Stock Movements ────────────────────────────────────────────
+
+export const StockMovementType = {
+  PURCHASE_RECEIPT: "purchase_receipt",
+  SALE_DELIVERY: "sale_delivery",
+  POS_SALE: "pos_sale",
+  INTERNAL: "internal",
+  ADJUSTMENT: "adjustment",
+  OPENING: "opening",
+  RETURN: "return",
+  SCRAP: "scrap",
+} as const;
+export type StockMovementType =
+  (typeof StockMovementType)[keyof typeof StockMovementType];
+
+export const StockReferenceType = {
+  PURCHASE_ORDER: "purchase_order",
+  SALES_ORDER: "sales_order",
+  MANUAL: "manual",
+  TRANSFER: "transfer",
+  POS_ORDER: "pos_order",
+  ADJUSTMENT: "adjustment",
+} as const;
+export type StockReferenceType =
+  (typeof StockReferenceType)[keyof typeof StockReferenceType];
+
+export const LocationType = {
+  INTERNAL: "internal",
+  CUSTOMER: "customer",
+  SUPPLIER: "supplier",
+  TRANSIT: "transit",
+  VIRTUAL: "virtual",
+  SCRAP: "scrap",
+} as const;
+export type LocationType = (typeof LocationType)[keyof typeof LocationType];
 
 // ─── Accounting ───────────────────────────────────────────────────────────────
 

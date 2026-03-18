@@ -1,781 +1,958 @@
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Plus,
-  Search,
-  Edit,
-  Trash2,
-  Shield,
-  Clock,
-  CheckCircle,
-  AlertCircle,
-  Mail,
-  Phone,
-  MapPin,
-  Download,
-  Printer,
-  RotateCcw,
-  Grid3x3,
-  List,
-  MoreVertical,
-} from "lucide-react";
-import { AnimatedModal } from "@/components/AnimatedModal";
-import { BranchSelector } from "@/components/BranchSelector";
-import { BulkActions } from "@/components/BulkActions";
-import { AdvancedFilters } from "@/components/AdvancedFilters";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { useAppSettings } from "@/contexts/AppSettingsContext";
 import { useLangStore } from "@/stores/lang.store";
+import { useBranchStore } from "@/stores/branch.store";
 import { t } from "@/i18n";
-import { EmployeeStatus } from "@/constants/enums";
+import { employeesService, departmentsService } from "@/services/hr.service";
+import type {
+  Employee,
+  CreateEmployeeDto,
+  UpdateEmployeeDto,
+  HrDropdownItem,
+} from "@/types/modules/hr";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { getName } from "@/lib/utils";
+import { QUERY_KEYS } from "@/constants/queryKeys";
+import {
+  EmployeeStatus,
+  EmploymentType,
+  Gender,
+  MaritalStatus,
+} from "@/constants/enums";
+import {
+  Table,
+  Button,
+  Tag,
+  Space,
+  Card,
+  Row,
+  Col,
+  Grid,
+  Statistic,
+  Modal,
+  Form,
+  Select,
+  Tooltip,
+  Typography,
+  Dropdown,
+  Drawer,
+  Input,
+  Switch,
+  DatePicker,
+  notification,
+} from "antd";
+import type { TableColumnsType } from "antd";
+import {
+  PlusOutlined,
+  ReloadOutlined,
+  EditOutlined,
+  MoreOutlined,
+  EyeOutlined,
+  DeleteOutlined,
+  TeamOutlined,
+  UserOutlined,
+  ClockCircleOutlined,
+  StopOutlined,
+} from "@ant-design/icons";
+import dayjs from "dayjs";
 
-const employeesData = [
-  {
-    id: 1,
-    employeeNumber: "EMP-RYD-00001",
-    name: "Sarah Johnson",
-    role: "Sales Manager",
-    department: "Sales",
-    email: "sarah@company.com",
-    phone: "+1 (555) 123-4567",
-    status: EmployeeStatus.ACTIVE,
-    joinDate: "Jan 15, 2023",
-    branch: "Riyadh HQ",
-  },
-  {
-    id: 2,
-    employeeNumber: "EMP-JED-00002",
-    name: "Michael Chen",
-    role: "Software Developer",
-    department: "IT",
-    email: "michael@company.com",
-    phone: "+1 (555) 234-5678",
-    status: EmployeeStatus.ACTIVE,
-    joinDate: "Mar 20, 2023",
-    branch: "Jeddah",
-  },
-  {
-    id: 3,
-    employeeNumber: "EMP-RYD-00003",
-    name: "Emily Rodriguez",
-    role: "HR Specialist",
-    department: "Human Resources",
-    email: "emily@company.com",
-    phone: "+1 (555) 345-6789",
-    status: EmployeeStatus.ACTIVE,
-    joinDate: "Feb 10, 2023",
-    branch: "Riyadh HQ",
-  },
-  {
-    id: 4,
-    employeeNumber: "EMP-DMM-00004",
-    name: "David Williams",
-    role: "Accountant",
-    department: "Finance",
-    email: "david@company.com",
-    phone: "+1 (555) 456-7890",
-    status: EmployeeStatus.ON_LEAVE,
-    joinDate: "May 5, 2022",
-    branch: "Dammam",
-  },
-  {
-    id: 5,
-    employeeNumber: "EMP-RYD-00005",
-    name: "Jessica Lee",
-    role: "Marketing Manager",
-    department: "Marketing",
-    email: "jessica@company.com",
-    phone: "+1 (555) 567-8901",
-    status: EmployeeStatus.ACTIVE,
-    joinDate: "Jul 12, 2023",
-    branch: "Riyadh HQ",
-  },
-];
+const { Text } = Typography;
 
-function getStatusColor(status: string) {
+// ─── Helpers ────────────────────────────────────────────────────────────────
+
+function getEmployeeStatus(emp: Employee): EmployeeStatus {
+  if (!emp.isActive) return EmployeeStatus.TERMINATED;
+  return EmployeeStatus.ACTIVE;
+}
+
+function getStatusColor(status: EmployeeStatus): string {
   switch (status) {
     case EmployeeStatus.ACTIVE:
-      return "bg-green-50 text-green-600";
-    case EmployeeStatus.ON_LEAVE:
-      return "bg-orange-50 text-orange-600";
-    case EmployeeStatus.INACTIVE:
-      return "dark:bg-secondary bg-secondary text-gray-600";
+      return "green";
+    case EmployeeStatus.PROBATION:
+      return "gold";
+    case EmployeeStatus.SUSPENDED:
+      return "red";
+    case EmployeeStatus.TERMINATED:
+      return "default";
     default:
-      return "dark:bg-secondary bg-secondary text-gray-600";
+      return "default";
   }
 }
 
+function getStatusLabel(status: EmployeeStatus, lang: string): string {
+  switch (status) {
+    case EmployeeStatus.ACTIVE:
+      return t("Active", lang);
+    case EmployeeStatus.PROBATION:
+      return t("Probation", lang);
+    case EmployeeStatus.SUSPENDED:
+      return t("Suspended", lang);
+    case EmployeeStatus.TERMINATED:
+      return t("Terminated", lang);
+    default:
+      return status;
+  }
+}
+
+function getEmploymentTypeLabel(
+  type: string | undefined,
+  lang: string
+): string {
+  switch (type) {
+    case EmploymentType.FULL_TIME:
+      return t("Full Time", lang);
+    case EmploymentType.PART_TIME:
+      return t("Part Time", lang);
+    case EmploymentType.CONTRACT:
+      return t("Contract", lang);
+    case EmploymentType.INTERN:
+      return t("Intern", lang);
+    default:
+      return type ?? "—";
+  }
+}
+
+function getEmploymentTypeColor(type: string | undefined): string {
+  switch (type) {
+    case EmploymentType.FULL_TIME:
+      return "blue";
+    case EmploymentType.PART_TIME:
+      return "cyan";
+    case EmploymentType.CONTRACT:
+      return "purple";
+    case EmploymentType.INTERN:
+      return "orange";
+    default:
+      return "default";
+  }
+}
+
+// ─── Component ──────────────────────────────────────────────────────────────
+
 export default function EmployeeManagement() {
-  const language = useLangStore(s => s.lang);
-  const isRTL = language === "ar";
-  const [viewMode, setViewMode] = useState<"table" | "grid">("table");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [selectedItems, setSelectedItems] = useState<number[]>([]);
-  const [appliedFilters, setAppliedFilters] = useState<Record<string, string>>(
-    {}
-  );
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editFormData, setEditFormData] = useState({
-    employeeNumber: "",
-    name: "",
-    email: "",
-    phone: "",
-    role: "",
-    department: "",
-    branchId: "",
-  });
-  const [createFormData, setCreateFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    role: "",
-    department: "",
-    branchId: "",
-  });
+  const { theme } = useAppSettings();
+  const lang = useLangStore(s => s.lang);
+  const screens = Grid.useBreakpoint();
+  const isMobile = !screens.md;
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const branchId = useBranchStore(s => s.activeBranch?.id ?? null);
 
-  const totalPages = Math.ceil(employeesData.length / pageSize);
-  const startIndex = (currentPage - 1) * pageSize;
-  const paginatedData = employeesData.slice(startIndex, startIndex + pageSize);
-
-  const handlePrint = () => window.print();
-
-  const handleExport = () => {
-    const csv = [
-      [
-        t("employeeNumber", language),
-        t("name", language),
-        "Role",
-        "Department",
-        t("email", language),
-        "Phone",
-        t("status", language),
-        "Join Date",
-        t("branch", language),
-      ],
-      ...employeesData.map(item => [
-        item.employeeNumber,
-        item.name,
-        item.role,
-        item.department,
-        item.email,
-        item.phone,
-        item.status,
-        item.joinDate,
-        item.branch,
-      ]),
-    ]
-      .map(row => row.join(","))
-      .join("\n");
-
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "employees-export.csv";
-    a.click();
+  const primary = theme === "dark" ? "#37D399" : "#3B82F6";
+  const token = {
+    colorPrimary: primary,
   };
 
-  const breadcrumbs = [
-    { label: t("Dashboard", language), href: "/" },
-    { label: t("Settings", language), href: "#" },
-    { label: t("Users", language) },
+  // ── State ──────────────────────────────────────────────────────────────────
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [departmentFilter, setDepartmentFilter] = useState<string | undefined>(
+    undefined
+  );
+  const [searchText, setSearchText] = useState<string>("");
+  const [debouncedSearch, setDebouncedSearch] = useState<string>("");
+  const [searchTimer, setSearchTimer] = useState<ReturnType<
+    typeof setTimeout
+  > | null>(null);
+
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
+
+  const [form] = Form.useForm();
+
+  // ── Search debounce ────────────────────────────────────────────────────────
+  const handleSearchChange = useCallback(
+    (value: string) => {
+      setSearchText(value);
+      if (searchTimer) clearTimeout(searchTimer);
+      const timer = setTimeout(() => {
+        setDebouncedSearch(value);
+      }, 400);
+      setSearchTimer(timer);
+    },
+    [searchTimer]
+  );
+
+  // ── Queries ────────────────────────────────────────────────────────────────
+
+  const {
+    data: employeesRaw,
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: [QUERY_KEYS.EMPLOYEES, branchId, debouncedSearch],
+    queryFn: () =>
+      employeesService.list({
+        limit: 200,
+        search: debouncedSearch || undefined,
+      }),
+    staleTime: 30_000,
+    enabled: !!branchId,
+  });
+
+  const allEmployees: Employee[] = useMemo(() => {
+    const raw = employeesRaw as Record<string, unknown> | undefined;
+    return (raw?.data as Employee[]) ?? [];
+  }, [employeesRaw]);
+
+  const { data: departmentsDropdown } = useQuery({
+    queryKey: [QUERY_KEYS.DEPARTMENTS_DROPDOWN],
+    queryFn: () => departmentsService.dropdown(),
+    staleTime: 60_000,
+  });
+
+  const departmentOptions = useMemo(() => {
+    const list = (departmentsDropdown as HrDropdownItem[]) ?? [];
+    return list.map(d => ({
+      value: d.id,
+      label: getName(d),
+    }));
+  }, [departmentsDropdown]);
+
+  // ── Filtered data ─────────────────────────────────────────────────────────
+  const employees = useMemo(() => {
+    let filtered = [...allEmployees];
+
+    if (statusFilter !== "all") {
+      filtered = filtered.filter(emp => {
+        const empStatus = getEmployeeStatus(emp);
+        return empStatus === statusFilter;
+      });
+    }
+
+    if (departmentFilter) {
+      filtered = filtered.filter(emp => emp.departmentId === departmentFilter);
+    }
+
+    return filtered;
+  }, [allEmployees, statusFilter, departmentFilter]);
+
+  // ── KPI values (computed from ALL data, not filtered) ─────────────────────
+  const kpiTotal = allEmployees.length;
+  const kpiActive = allEmployees.filter(
+    emp => getEmployeeStatus(emp) === EmployeeStatus.ACTIVE
+  ).length;
+  const kpiProbation = allEmployees.filter(
+    emp => getEmployeeStatus(emp) === EmployeeStatus.PROBATION
+  ).length;
+  const kpiTerminated = allEmployees.filter(
+    emp => getEmployeeStatus(emp) === EmployeeStatus.TERMINATED
+  ).length;
+
+  // ── Mutations ─────────────────────────────────────────────────────────────
+
+  const invalidate = () =>
+    queryClient.invalidateQueries({
+      queryKey: [QUERY_KEYS.EMPLOYEES],
+    });
+
+  const createMutation = useMutation({
+    mutationFn: (dto: CreateEmployeeDto) => employeesService.create(dto),
+    onSuccess: () => {
+      notification.success({
+        message: t("Employee created successfully", lang),
+      });
+      invalidate();
+      closeDrawer();
+    },
+    onError: () => {
+      notification.error({ message: t("Failed to create employee", lang) });
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, dto }: { id: string; dto: UpdateEmployeeDto }) =>
+      employeesService.update(id, dto),
+    onSuccess: () => {
+      notification.success({
+        message: t("Employee updated successfully", lang),
+      });
+      invalidate();
+      closeDrawer();
+    },
+    onError: () => {
+      notification.error({ message: t("Failed to update employee", lang) });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => employeesService.remove(id),
+    onSuccess: () => {
+      notification.success({
+        message: t("Employee deleted successfully", lang),
+      });
+      invalidate();
+    },
+    onError: () => {
+      notification.error({ message: t("Failed to delete employee", lang) });
+    },
+  });
+
+  // ── Drawer helpers ────────────────────────────────────────────────────────
+
+  const openCreate = useCallback(() => {
+    setEditingEmployee(null);
+    form.resetFields();
+    form.setFieldsValue({
+      isSaudi: false,
+      hireDate: dayjs(),
+    });
+    setDrawerOpen(true);
+  }, [form]);
+
+  const openEdit = useCallback(
+    (employee: Employee) => {
+      setEditingEmployee(employee);
+      form.setFieldsValue({
+        nameEn: employee.nameEn,
+        nameAr: employee.nameAr,
+        departmentId: employee.departmentId ?? undefined,
+        hireDate: employee.hireDate ? dayjs(employee.hireDate) : undefined,
+        employmentType: employee.employmentType ?? undefined,
+        nationality: employee.nationality ?? undefined,
+        nationalId: employee.nationalId ?? undefined,
+        gender: employee.gender ?? undefined,
+        maritalStatus: employee.maritalStatus ?? undefined,
+        isSaudi: employee.isSaudi ?? false,
+        bankAccount: employee.bankAccount ?? undefined,
+        bankName: employee.bankName ?? undefined,
+        emergencyContact: employee.emergencyContact ?? undefined,
+        emergencyPhone: employee.emergencyPhone ?? undefined,
+      });
+      setDrawerOpen(true);
+    },
+    [form]
+  );
+
+  const closeDrawer = useCallback(() => {
+    setDrawerOpen(false);
+    setEditingEmployee(null);
+    form.resetFields();
+  }, [form]);
+
+  // ── Submit handler ────────────────────────────────────────────────────────
+
+  const handleSubmit = async () => {
+    try {
+      const values = await form.validateFields();
+
+      const hireDateStr = values.hireDate
+        ? dayjs(values.hireDate).format("YYYY-MM-DD")
+        : undefined;
+
+      if (editingEmployee) {
+        updateMutation.mutate({
+          id: editingEmployee.id,
+          dto: {
+            nameEn: values.nameEn,
+            nameAr: values.nameAr,
+            departmentId: values.departmentId,
+            hireDate: hireDateStr,
+            employmentType: values.employmentType,
+            nationality: values.nationality,
+            nationalId: values.nationalId,
+            gender: values.gender,
+            maritalStatus: values.maritalStatus,
+            isSaudi: values.isSaudi,
+            bankAccount: values.bankAccount,
+            bankName: values.bankName,
+            emergencyContact: values.emergencyContact,
+            emergencyPhone: values.emergencyPhone,
+            version: editingEmployee.version ?? 0,
+          },
+        });
+      } else {
+        createMutation.mutate({
+          nameEn: values.nameEn,
+          nameAr: values.nameAr,
+          departmentId: values.departmentId,
+          hireDate: hireDateStr ?? dayjs().format("YYYY-MM-DD"),
+          employmentType: values.employmentType,
+          nationality: values.nationality,
+          nationalId: values.nationalId,
+          gender: values.gender,
+          maritalStatus: values.maritalStatus,
+          isSaudi: values.isSaudi ?? false,
+          bankAccount: values.bankAccount,
+          bankName: values.bankName,
+          emergencyContact: values.emergencyContact,
+          emergencyPhone: values.emergencyPhone,
+        });
+      }
+    } catch {
+      // form validation failed
+    }
+  };
+
+  // ── Table columns ─────────────────────────────────────────────────────────
+
+  const columns: TableColumnsType<Employee> = [
+    {
+      title: t("employeeNumber", lang),
+      dataIndex: "employeeNumber",
+      width: 160,
+      sorter: (a, b) =>
+        (a.employeeNumber ?? "").localeCompare(b.employeeNumber ?? ""),
+      render: (v: string | undefined) => (
+        <Text style={{ fontFamily: "monospace", color: token.colorPrimary }}>
+          {v ?? "—"}
+        </Text>
+      ),
+    },
+    {
+      title: t("Name", lang),
+      key: "name",
+      sorter: (a, b) => getName(a).localeCompare(getName(b)),
+      render: (_, rec) => <Text strong>{getName(rec)}</Text>,
+    },
+    {
+      title: t("Department", lang),
+      key: "department",
+      render: (_, rec) => {
+        const deptName =
+          lang === "ar" ? rec.departmentNameAr : rec.departmentNameEn;
+        return <Text>{deptName ?? "—"}</Text>;
+      },
+    },
+    {
+      title: t("Employment Type", lang),
+      dataIndex: "employmentType",
+      width: 140,
+      render: (v: string | undefined) => (
+        <Tag
+          color={getEmploymentTypeColor(v)}
+          style={{ borderRadius: 20, padding: "2px 10px" }}
+        >
+          {getEmploymentTypeLabel(v, lang)}
+        </Tag>
+      ),
+    },
+    {
+      title: t("Hire Date", lang),
+      dataIndex: "hireDate",
+      width: 130,
+      sorter: (a, b) =>
+        new Date(a.hireDate).getTime() - new Date(b.hireDate).getTime(),
+      render: (v: string) => (
+        <Text>{v ? dayjs(v).format("YYYY-MM-DD") : "—"}</Text>
+      ),
+    },
+    {
+      title: t("Status", lang),
+      key: "status",
+      width: 120,
+      render: (_, rec) => {
+        const status = getEmployeeStatus(rec);
+        return (
+          <Tag
+            color={getStatusColor(status)}
+            style={{ borderRadius: 20, padding: "2px 10px" }}
+          >
+            {getStatusLabel(status, lang)}
+          </Tag>
+        );
+      },
+    },
+    {
+      title: "",
+      align: "center",
+      width: 60,
+      render: (_, rec) => {
+        const items = [
+          {
+            key: "view",
+            label: t("View", lang),
+            icon: <EyeOutlined />,
+            onClick: () => navigate(`/employees/${rec.id}`),
+          },
+          {
+            key: "edit",
+            label: t("Edit", lang),
+            icon: <EditOutlined />,
+            onClick: () => openEdit(rec),
+          },
+          { type: "divider" as const, key: "d1" },
+          {
+            key: "delete",
+            label: t("Delete", lang),
+            danger: true,
+            icon: <DeleteOutlined />,
+            onClick: () => {
+              Modal.confirm({
+                title: t("Delete Employee", lang),
+                content: t(
+                  "Are you sure you want to delete this employee?",
+                  lang
+                ),
+                okButtonProps: { danger: true },
+                okText: t("Delete", lang),
+                cancelText: t("Cancel", lang),
+                onOk: () => deleteMutation.mutate(rec.id),
+              });
+            },
+          },
+        ];
+
+        return (
+          <Dropdown menu={{ items }} trigger={["click"]}>
+            <Button type="text" icon={<MoreOutlined />} />
+          </Dropdown>
+        );
+      },
+    },
   ];
 
+  // ── Status filter tabs ────────────────────────────────────────────────────
+
+  const statusTabs = [
+    { key: "all", label: t("All", lang) },
+    { key: EmployeeStatus.ACTIVE, label: t("Active", lang) },
+    { key: EmployeeStatus.PROBATION, label: t("Probation", lang) },
+    { key: EmployeeStatus.SUSPENDED, label: t("Suspended", lang) },
+    { key: EmployeeStatus.TERMINATED, label: t("Terminated", lang) },
+  ];
+
+  // ── Gradient header style for drawer ──────────────────────────────────────
+
+  const gradientHeader = {
+    background: `linear-gradient(135deg, ${primary}, ${theme === "dark" ? "#2dd4bf" : "#6366f1"})`,
+    padding: "16px 24px",
+    margin: "-20px -24px 16px -24px",
+    borderRadius: "8px 8px 0 0",
+    color: "#fff",
+  };
+
   return (
-    <DashboardLayout currentPage="Users" breadcrumbs={breadcrumbs}>
-      <div className="space-y-6">
-        {/* Header Section */}
-        <div
-          className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 ${isRTL ? "text-right" : ""}`}
-        >
-          <Button
-            className="bg-primary hover:bg-blue-700 text-white flex items-center gap-2 w-full sm:w-auto"
-            onClick={() => setIsCreateModalOpen(true)}
-          >
-            <Plus size={18} />
-            Add Employee
-          </Button>
-        </div>
-
-        {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className="p-4 dark:bg-card bg-card shadow-sm border-0">
-            <p className="text-sm font-medium text-muted-foreground">
-              Total Employees
-            </p>
-            <h3 className="text-2xl font-bold text-foreground mt-2">245</h3>
-            <p className="text-xs text-muted-foreground mt-2">Active staff</p>
-          </Card>
-          <Card className="p-4 dark:bg-card bg-card shadow-sm border-0">
-            <p className="text-sm font-medium text-muted-foreground">
-              On Leave
-            </p>
-            <h3 className="text-2xl font-bold text-orange-600 mt-2">12</h3>
-            <p className="text-xs text-muted-foreground mt-2">Currently away</p>
-          </Card>
-          <Card className="p-4 dark:bg-card bg-card shadow-sm border-0">
-            <p className="text-sm font-medium text-muted-foreground">
-              New This Month
-            </p>
-            <h3 className="text-2xl font-bold text-green-600 mt-2">8</h3>
-            <p className="text-xs text-muted-foreground mt-2">Recent hires</p>
-          </Card>
-          <Card className="p-4 dark:bg-card bg-card shadow-sm border-0">
-            <p className="text-sm font-medium text-muted-foreground">
-              Departments
-            </p>
-            <h3 className="text-2xl font-bold text-primary mt-2">12</h3>
-            <p className="text-xs text-muted-foreground mt-2">Across company</p>
-          </Card>
-        </div>
-
-        {/* Bulk Actions */}
-        {selectedItems.length > 0 && (
-          <BulkActions
-            selectedCount={selectedItems.length}
-            isAllSelected={selectedItems.length === paginatedData.length}
-            onSelectAll={checked =>
-              setSelectedItems(
-                checked ? paginatedData.map(item => item.id) : []
-              )
-            }
-            onDelete={() => setSelectedItems([])}
-            onExport={() => {
-              handleExport();
-              setSelectedItems([]);
-            }}
-            onStatusUpdate={() => setSelectedItems([])}
-          />
-        )}
-
-        {/* Search and Advanced Controls */}
-        <Card className="p-4 dark:bg-card bg-card shadow-sm border-0">
-          <div className="flex flex-wrap gap-2 items-center">
-            <div className="flex-1 min-w-xs">
-              <Input
-                type="text"
-                placeholder={`${t("Search", language)}...`}
-                className={`${isRTL ? "pr-12 text-right" : "pl-12"} bg-secondary border-0`}
-              />
-            </div>
-            <AdvancedFilters
-              onApplyFilters={filters => setAppliedFilters(filters)}
-              onClearFilters={() => setAppliedFilters({})}
-              filterOptions={{
-                status: {
-                  label: t("status", language),
-                  options: ["Active", "On Leave", "Inactive"],
-                },
-                department: {
-                  label: "Department",
-                  options: ["Sales", "IT", "HR", "Finance", "Marketing"],
-                },
-              }}
-            />
-            <Button
-              variant="outline"
-              className="border-border"
-              onClick={() => window.location.reload()}
-            >
-              <RotateCcw size={16} />
-            </Button>
-            <Button
-              variant="outline"
-              className="border-border"
-              onClick={handlePrint}
-            >
-              <Printer size={16} />
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="border-border flex items-center gap-2"
+    <DashboardLayout
+      currentPage="Employees"
+      breadcrumbs={[
+        { label: t("Dashboard", lang), href: "/" },
+        { label: t("HR", lang), href: "#" },
+        { label: t("Employees", lang) },
+      ]}
+    >
+      <Space direction="vertical" size={20} style={{ width: "100%" }}>
+        {/* ── KPI Cards ──────────────────────────────────────────────────── */}
+        <Row gutter={[16, 16]}>
+          {[
+            {
+              title: t("Total Employees", lang),
+              value: kpiTotal,
+              suffix: t("Employees", lang),
+              icon: <TeamOutlined />,
+              iconColor: token.colorPrimary,
+              iconBg: `${token.colorPrimary}15`,
+              color: undefined,
+            },
+            {
+              title: t("Active", lang),
+              value: kpiActive,
+              suffix: t("Employees", lang),
+              icon: <UserOutlined />,
+              iconColor: "#10b981",
+              iconBg: "#10b98115",
+              color: "#10b981",
+            },
+            {
+              title: t("On Probation", lang),
+              value: kpiProbation,
+              suffix: t("Employees", lang),
+              icon: <ClockCircleOutlined />,
+              iconColor: "#f59e0b",
+              iconBg: "#f59e0b15",
+              color: "#f59e0b",
+            },
+            {
+              title: t("Terminated", lang),
+              value: kpiTerminated,
+              suffix: t("Employees", lang),
+              icon: <StopOutlined />,
+              iconColor: "#ef4444",
+              iconBg: "#ef444415",
+              color: "#ef4444",
+            },
+          ].map(s => (
+            <Col key={s.title} xs={24} sm={12} lg={6}>
+              <Card size="small" styles={{ body: { padding: "16px 20px" } }}>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "flex-start",
+                  }}
                 >
-                  <Download size={16} />
-                  <span className="hidden sm:inline">Export</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align={isRTL ? "start" : "end"}
-                className="w-48"
+                  <div>
+                    <Text
+                      type="secondary"
+                      style={{
+                        fontSize: 12,
+                        display: "block",
+                        marginBottom: 4,
+                      }}
+                    >
+                      {s.title}
+                    </Text>
+                    <Statistic
+                      value={s.value}
+                      precision={0}
+                      valueStyle={{
+                        fontSize: 24,
+                        lineHeight: 1,
+                        color: s.color ?? "inherit",
+                      }}
+                    />
+                    <Text type="secondary" style={{ fontSize: 12 }}>
+                      {s.suffix}
+                    </Text>
+                  </div>
+                  <div
+                    style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 10,
+                      background: s.iconBg,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: 18,
+                      color: s.iconColor,
+                    }}
+                  >
+                    {s.icon}
+                  </div>
+                </div>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+
+        {/* ── Toolbar Card ───────────────────────────────────────────────── */}
+        <Card size="small" styles={{ body: { padding: "12px 16px" } }}>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 8,
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Space wrap>
+              <Input.Search
+                placeholder={t("Search employees...", lang)}
+                value={searchText}
+                onChange={e => handleSearchChange(e.target.value)}
+                allowClear
+                style={{ width: 220 }}
+              />
+              <Select
+                value={departmentFilter}
+                onChange={v => setDepartmentFilter(v)}
+                allowClear
+                placeholder={t("Department", lang)}
+                style={{ width: 180 }}
+                options={departmentOptions}
+              />
+              <div style={{ display: "flex", gap: 4 }}>
+                {statusTabs.map(tab => (
+                  <Button
+                    key={tab.key}
+                    type={statusFilter === tab.key ? "primary" : "default"}
+                    size="small"
+                    onClick={() => setStatusFilter(tab.key)}
+                    style={{
+                      borderRadius: 16,
+                      fontSize: 12,
+                      padding: "0 12px",
+                    }}
+                  >
+                    {tab.label}
+                  </Button>
+                ))}
+              </div>
+            </Space>
+
+            <Space>
+              <Tooltip title={t("Reload", lang)}>
+                <Button icon={<ReloadOutlined />} onClick={() => refetch()} />
+              </Tooltip>
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={openCreate}
               >
-                <DropdownMenuItem onClick={handleExport}>
-                  Export as CSV
-                </DropdownMenuItem>
-                <DropdownMenuItem>Export as Excel</DropdownMenuItem>
-                <DropdownMenuItem>Export as PDF</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <div className="flex gap-1 border border-border rounded-lg p-1">
-              <button
-                onClick={() => setViewMode("table")}
-                className={`p-2 rounded transition-colors ${viewMode === "table" ? "bg-primary text-white" : "text-foreground hover:bg-secondary"}`}
-              >
-                <List size={16} />
-              </button>
-              <button
-                onClick={() => setViewMode("grid")}
-                className={`p-2 rounded transition-colors ${viewMode === "grid" ? "bg-primary text-white" : "text-foreground hover:bg-secondary"}`}
-              >
-                <Grid3x3 size={16} />
-              </button>
-            </div>
+                {t("Add Employee", lang)}
+              </Button>
+            </Space>
           </div>
         </Card>
 
-        {/* Table View */}
-        {viewMode === "table" && (
-          <Card className="dark:bg-card bg-card shadow-sm border-0 overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-border">
-                    <th className="px-6 py-4 text-sm font-semibold text-foreground text-center">
-                      <input
-                        type="checkbox"
-                        checked={
-                          selectedItems.length === paginatedData.length &&
-                          paginatedData.length > 0
-                        }
-                        onChange={e =>
-                          setSelectedItems(
-                            e.target.checked
-                              ? paginatedData.map(item => item.id)
-                              : []
-                          )
-                        }
-                        className="w-4 h-4 rounded border-border"
-                      />
-                    </th>
-                    <th
-                      className={`px-6 py-4 text-sm font-semibold text-foreground ${isRTL ? "text-right" : "text-left"}`}
-                    >
-                      {t("employeeNumber", language)}
-                    </th>
-                    <th
-                      className={`px-6 py-4 text-sm font-semibold text-foreground ${isRTL ? "text-right" : "text-left"}`}
-                    >
-                      {t("name", language)}
-                    </th>
-                    <th
-                      className={`px-6 py-4 text-sm font-semibold text-foreground ${isRTL ? "text-right" : "text-left"}`}
-                    >
-                      Role
-                    </th>
-                    <th
-                      className={`px-6 py-4 text-sm font-semibold text-foreground ${isRTL ? "text-right" : "text-left"}`}
-                    >
-                      Department
-                    </th>
-                    <th
-                      className={`px-6 py-4 text-sm font-semibold text-foreground ${isRTL ? "text-right" : "text-left"}`}
-                    >
-                      {t("branch", language)}
-                    </th>
-                    <th
-                      className={`px-6 py-4 text-sm font-semibold text-foreground ${isRTL ? "text-right" : "text-left"}`}
-                    >
-                      {t("email", language)}
-                    </th>
-                    <th
-                      className={`px-6 py-4 text-sm font-semibold text-foreground ${isRTL ? "text-right" : "text-left"}`}
-                    >
-                      {t("status", language)}
-                    </th>
-                    <th className="px-6 py-4 text-sm font-semibold text-foreground text-center">
-                      {t("actions", language)}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {paginatedData.map(item => (
-                    <tr
-                      key={item.id}
-                      className="border-b border-border hover:bg-secondary/50 transition-colors"
-                    >
-                      <td className="px-6 py-4 text-center">
-                        <input
-                          type="checkbox"
-                          checked={selectedItems.includes(item.id)}
-                          onChange={e => {
-                            setSelectedItems(
-                              e.target.checked
-                                ? [...selectedItems, item.id]
-                                : selectedItems.filter(id => id !== item.id)
-                            );
-                          }}
-                          className="w-4 h-4 rounded border-border"
-                        />
-                      </td>
-                      <td className="px-6 py-4 text-sm text-primary font-medium">
-                        {item.employeeNumber}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-foreground font-medium">
-                        {item.name}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-muted-foreground">
-                        {item.role}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-muted-foreground">
-                        {item.department}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-muted-foreground">
-                        {item.branch}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-muted-foreground">
-                        {item.email}
-                      </td>
-                      <td className="px-6 py-4 text-sm">
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(item.status)}`}
-                        >
-                          {item.status === EmployeeStatus.ON_LEAVE
-                            ? "On Leave"
-                            : item.status.charAt(0).toUpperCase() +
-                              item.status.slice(1)}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm">
-                              <MoreVertical size={16} />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align={isRTL ? "start" : "end"}>
-                            <DropdownMenuItem
-                              onClick={() => {
-                                setEditFormData({
-                                  employeeNumber: item.employeeNumber,
-                                  name: item.name,
-                                  email: item.email,
-                                  phone: item.phone,
-                                  role: item.role,
-                                  department: item.department,
-                                  branchId: "",
-                                });
-                                setIsEditModalOpen(true);
-                              }}
-                            >
-                              Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>View Details</DropdownMenuItem>
-                            <DropdownMenuItem>Send Email</DropdownMenuItem>
-                            <DropdownMenuItem className="text-destructive">
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+        {/* ── Table ──────────────────────────────────────────────────────── */}
+        <Card styles={{ body: { padding: 0 } }}>
+          <Table
+            rowKey="id"
+            columns={columns}
+            dataSource={employees}
+            loading={isLoading}
+            size="middle"
+            scroll={{ x: "max-content" }}
+            pagination={{
+              showSizeChanger: true,
+              showTotal: (total, range) =>
+                `${range[0]}–${range[1]} ${t("of", lang)} ${total}`,
+              pageSizeOptions: ["10", "25", "50", "100"],
+              defaultPageSize: 10,
+            }}
+            onRow={record => ({
+              onClick: () => navigate(`/employees/${record.id}`),
+              style: { cursor: "pointer" },
+            })}
+            locale={{
+              emptyText: t("No employees found", lang),
+            }}
+          />
+        </Card>
+      </Space>
 
-            {/* Pagination */}
-            <div className="flex items-center justify-between px-6 py-4 border-t border-border">
-              <div className="text-sm text-muted-foreground">
-                Showing {startIndex + 1} to{" "}
-                {Math.min(startIndex + pageSize, employeesData.length)} of{" "}
-                {employeesData.length}
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                  disabled={currentPage === 1}
-                >
-                  Previous
-                </Button>
-                <div className="flex items-center gap-1">
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                    page => (
-                      <Button
-                        key={page}
-                        variant={currentPage === page ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setCurrentPage(page)}
-                      >
-                        {page}
-                      </Button>
-                    )
-                  )}
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() =>
-                    setCurrentPage(Math.min(totalPages, currentPage + 1))
-                  }
-                  disabled={currentPage === totalPages}
-                >
-                  Next
-                </Button>
-              </div>
-              <select
-                value={pageSize}
-                onChange={e => {
-                  setPageSize(Number(e.target.value));
-                  setCurrentPage(1);
-                }}
-                className="px-3 py-2 border border-border rounded-lg text-sm dark:bg-card bg-card text-foreground"
-              >
-                <option value={5}>5 per page</option>
-                <option value={10}>10 per page</option>
-                <option value={25}>25 per page</option>
-                <option value={50}>50 per page</option>
-              </select>
-            </div>
-          </Card>
-        )}
-
-        {/* Grid View */}
-        {viewMode === "grid" && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {paginatedData.map(item => (
-              <Card
-                key={item.id}
-                className="p-4 dark:bg-card bg-card shadow-sm border-0"
-              >
-                <div className="flex items-start justify-between">
-                  <div className={isRTL ? "text-right" : ""}>
-                    <h3 className="font-semibold text-foreground">
-                      {item.name}
-                    </h3>
-                    <p className="text-xs text-primary mt-0.5">
-                      {item.employeeNumber}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {item.role}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {item.department}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {item.branch}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      {item.email}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Joined: {item.joinDate}
-                    </p>
-                  </div>
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(item.status)}`}
-                  >
-                    {item.status === EmployeeStatus.ON_LEAVE
-                      ? "On Leave"
-                      : item.status.charAt(0).toUpperCase() +
-                        item.status.slice(1)}
-                  </span>
-                </div>
-              </Card>
-            ))}
-          </div>
-        )}
-
-        {/* Create Modal - NO employee number input, has branch selector */}
-        <AnimatedModal
-          isOpen={isCreateModalOpen}
-          onClose={() => setIsCreateModalOpen(false)}
-          title="Add Employee"
-        >
-          <div className="space-y-4">
-            <BranchSelector
-              value={createFormData.branchId}
-              onChange={branchId =>
-                setCreateFormData({ ...createFormData, branchId })
-              }
-            />
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                {t("name", language)}
-              </label>
-              <Input
-                type="text"
-                value={createFormData.name}
-                onChange={e =>
-                  setCreateFormData({ ...createFormData, name: e.target.value })
-                }
-                placeholder="Employee name"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                {t("email", language)}
-              </label>
-              <Input
-                type="email"
-                value={createFormData.email}
-                onChange={e =>
-                  setCreateFormData({
-                    ...createFormData,
-                    email: e.target.value,
-                  })
-                }
-                placeholder="Email address"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                Phone
-              </label>
-              <Input
-                type="tel"
-                value={createFormData.phone}
-                onChange={e =>
-                  setCreateFormData({
-                    ...createFormData,
-                    phone: e.target.value,
-                  })
-                }
-                placeholder="Phone number"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                Role
-              </label>
-              <Input
-                type="text"
-                value={createFormData.role}
-                onChange={e =>
-                  setCreateFormData({ ...createFormData, role: e.target.value })
-                }
-                placeholder="Job role"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                Department
-              </label>
-              <Input
-                type="text"
-                value={createFormData.department}
-                onChange={e =>
-                  setCreateFormData({
-                    ...createFormData,
-                    department: e.target.value,
-                  })
-                }
-                placeholder="Department"
-              />
-            </div>
-            <Button className="w-full bg-primary hover:bg-blue-700 text-white">
-              {t("save", language)}
+      {/* ── Create / Edit Drawer ──────────────────────────────────────── */}
+      <Drawer
+        open={drawerOpen}
+        onClose={closeDrawer}
+        width={isMobile ? "100%" : 640}
+        title={null}
+        footer={
+          <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
+            <Button onClick={closeDrawer}>{t("Cancel", lang)}</Button>
+            <Button
+              type="primary"
+              onClick={handleSubmit}
+              loading={createMutation.isPending || updateMutation.isPending}
+            >
+              {editingEmployee ? t("Update", lang) : t("Create", lang)}
             </Button>
           </div>
-        </AnimatedModal>
+        }
+        destroyOnClose
+      >
+        {/* Gradient header */}
+        <div style={gradientHeader}>
+          <Space>
+            {editingEmployee ? <EditOutlined /> : <PlusOutlined />}
+            <span style={{ fontSize: 16, fontWeight: 600 }}>
+              {editingEmployee
+                ? `${t("Edit Employee", lang)} — ${getName(editingEmployee)}`
+                : t("Add Employee", lang)}
+            </span>
+          </Space>
+        </div>
 
-        {/* Edit Modal - employee number shown as read-only badge, has branch selector */}
-        <AnimatedModal
-          isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          title="Edit Employee"
-        >
-          <div className="space-y-4">
-            {/* Employee Number - read-only badge */}
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                {t("employeeNumber", language)}
-              </label>
-              <div className="px-3 py-2 bg-secondary/50 border border-border rounded-lg text-sm text-primary font-medium">
-                {editFormData.employeeNumber}
-              </div>
-            </div>
-            <BranchSelector
-              value={editFormData.branchId}
-              onChange={branchId =>
-                setEditFormData({ ...editFormData, branchId })
-              }
-            />
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                {t("name", language)}
-              </label>
-              <Input
-                type="text"
-                value={editFormData.name}
-                onChange={e =>
-                  setEditFormData({ ...editFormData, name: e.target.value })
-                }
-                placeholder="Employee name"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                {t("email", language)}
-              </label>
-              <Input
-                type="email"
-                value={editFormData.email}
-                onChange={e =>
-                  setEditFormData({ ...editFormData, email: e.target.value })
-                }
-                placeholder="Email address"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                Phone
-              </label>
-              <Input
-                type="tel"
-                value={editFormData.phone}
-                onChange={e =>
-                  setEditFormData({ ...editFormData, phone: e.target.value })
-                }
-                placeholder="Phone number"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                Role
-              </label>
-              <Input
-                type="text"
-                value={editFormData.role}
-                onChange={e =>
-                  setEditFormData({ ...editFormData, role: e.target.value })
-                }
-                placeholder="Job role"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                Department
-              </label>
-              <Input
-                type="text"
-                value={editFormData.department}
-                onChange={e =>
-                  setEditFormData({
-                    ...editFormData,
-                    department: e.target.value,
-                  })
-                }
-                placeholder="Department"
-              />
-            </div>
-            <Button className="w-full bg-primary hover:bg-blue-700 text-white">
-              {t("save", language)}
-            </Button>
-          </div>
-        </AnimatedModal>
-      </div>
+        <Form form={form} layout="vertical">
+          {/* ── Name fields ────────────────────────────────────────────── */}
+          <Row gutter={16}>
+            <Col xs={24} sm={12}>
+              <Form.Item
+                label={t("Name (English)", lang)}
+                name="nameEn"
+                rules={[
+                  {
+                    required: true,
+                    message: t("Name (English) is required", lang),
+                  },
+                ]}
+              >
+                <Input placeholder={t("Name (English)", lang)} />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12}>
+              <Form.Item
+                label={t("Name (Arabic)", lang)}
+                name="nameAr"
+                rules={[
+                  {
+                    required: true,
+                    message: t("Name (Arabic) is required", lang),
+                  },
+                ]}
+              >
+                <Input dir="rtl" placeholder={t("Name (Arabic)", lang)} />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          {/* ── Department & Hire Date ─────────────────────────────────── */}
+          <Row gutter={16}>
+            <Col xs={24} sm={12}>
+              <Form.Item
+                label={t("Department", lang)}
+                name="departmentId"
+                rules={[
+                  {
+                    required: true,
+                    message: t("Department is required", lang),
+                  },
+                ]}
+              >
+                <Select
+                  showSearch
+                  optionFilterProp="label"
+                  placeholder={t("Select Department", lang)}
+                  options={departmentOptions}
+                  allowClear
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12}>
+              <Form.Item
+                label={t("Hire Date", lang)}
+                name="hireDate"
+                rules={[
+                  {
+                    required: true,
+                    message: t("Hire Date is required", lang),
+                  },
+                ]}
+              >
+                <DatePicker
+                  style={{ width: "100%" }}
+                  format="YYYY-MM-DD"
+                  placeholder={t("Select date", lang)}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          {/* ── Employment Type & Nationality ─────────────────────────── */}
+          <Row gutter={16}>
+            <Col xs={24} sm={12}>
+              <Form.Item
+                label={t("Employment Type", lang)}
+                name="employmentType"
+              >
+                <Select
+                  placeholder={t("Select type", lang)}
+                  allowClear
+                  options={[
+                    {
+                      value: EmploymentType.FULL_TIME,
+                      label: t("Full Time", lang),
+                    },
+                    {
+                      value: EmploymentType.PART_TIME,
+                      label: t("Part Time", lang),
+                    },
+                    {
+                      value: EmploymentType.CONTRACT,
+                      label: t("Contract", lang),
+                    },
+                    {
+                      value: EmploymentType.INTERN,
+                      label: t("Intern", lang),
+                    },
+                  ]}
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12}>
+              <Form.Item label={t("Nationality", lang)} name="nationality">
+                <Input placeholder={t("Nationality", lang)} />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          {/* ── National ID & Is Saudi ────────────────────────────────── */}
+          <Row gutter={16}>
+            <Col xs={24} sm={12}>
+              <Form.Item label={t("National ID", lang)} name="nationalId">
+                <Input placeholder={t("National ID", lang)} />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12}>
+              <Form.Item
+                label={t("Saudi National", lang)}
+                name="isSaudi"
+                valuePropName="checked"
+              >
+                <Switch />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          {/* ── Gender & Marital Status ───────────────────────────────── */}
+          <Row gutter={16}>
+            <Col xs={24} sm={12}>
+              <Form.Item label={t("Gender", lang)} name="gender">
+                <Select
+                  placeholder={t("Select gender", lang)}
+                  allowClear
+                  options={[
+                    { value: Gender.MALE, label: t("Male", lang) },
+                    { value: Gender.FEMALE, label: t("Female", lang) },
+                  ]}
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12}>
+              <Form.Item label={t("Marital Status", lang)} name="maritalStatus">
+                <Select
+                  placeholder={t("Select status", lang)}
+                  allowClear
+                  options={[
+                    { value: MaritalStatus.SINGLE, label: t("Single", lang) },
+                    {
+                      value: MaritalStatus.MARRIED,
+                      label: t("Married", lang),
+                    },
+                    {
+                      value: MaritalStatus.DIVORCED,
+                      label: t("Divorced", lang),
+                    },
+                    {
+                      value: MaritalStatus.WIDOWED,
+                      label: t("Widowed", lang),
+                    },
+                  ]}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          {/* ── Bank Details ──────────────────────────────────────────── */}
+          <Row gutter={16}>
+            <Col xs={24} sm={12}>
+              <Form.Item label={t("Bank Name", lang)} name="bankName">
+                <Input placeholder={t("Bank Name", lang)} />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12}>
+              <Form.Item label={t("Bank Account", lang)} name="bankAccount">
+                <Input placeholder={t("IBAN / Account Number", lang)} />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          {/* ── Emergency Contact ─────────────────────────────────────── */}
+          <Row gutter={16}>
+            <Col xs={24} sm={12}>
+              <Form.Item
+                label={t("Emergency Contact", lang)}
+                name="emergencyContact"
+              >
+                <Input placeholder={t("Contact name", lang)} />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12}>
+              <Form.Item
+                label={t("Emergency Phone", lang)}
+                name="emergencyPhone"
+              >
+                <Input placeholder={t("Phone number", lang)} />
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form>
+      </Drawer>
     </DashboardLayout>
   );
 }
