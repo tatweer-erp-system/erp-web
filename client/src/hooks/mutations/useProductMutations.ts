@@ -38,7 +38,11 @@ export function useDeleteProduct() {
 
   return useMutation({
     mutationFn: (id: string) => productsService.remove(id),
-    onSuccess: () => {
+    onSuccess: (_data, id) => {
+      // Remove detail query so it doesn't refetch the now-deleted product
+      queryClient.removeQueries({
+        queryKey: [QUERY_KEYS.PRODUCTS, "detail", id],
+      });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.PRODUCTS] });
     },
   });

@@ -61,7 +61,14 @@ export function useDeleteSalesOrder() {
 
   return useMutation({
     mutationFn: (id: string) => deleteSalesOrder(id),
-    onSuccess: () => {
+    onSuccess: (_data, id) => {
+      // Remove detail query so it doesn't refetch the now-deleted order
+      queryClient.removeQueries({
+        queryKey: queryKeys.saleOrders.detail(id),
+      });
+      queryClient.removeQueries({
+        queryKey: queryKeys.saleOrders.quotationDetail(id),
+      });
       queryClient.invalidateQueries({ queryKey: queryKeys.saleOrders.all });
       queryClient.invalidateQueries({
         queryKey: queryKeys.saleOrders.quotations,

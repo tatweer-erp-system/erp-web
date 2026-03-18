@@ -10,6 +10,8 @@ import {
   EllipsisOutlined,
   PrinterOutlined,
   CopyOutlined,
+  SaveOutlined,
+  CloseOutlined,
 } from "@ant-design/icons";
 import { Truck } from "lucide-react";
 
@@ -20,9 +22,14 @@ type SalesOrderDetailActionsProps = {
   isCancelled: boolean;
   canInvoice: boolean;
   hasRemainingDelivery: boolean;
+  isEditing: boolean;
+  isSaving: boolean;
   onConfirm: () => void;
   onCancel: () => void;
   onDelete: () => void;
+  onEdit: () => void;
+  onCancelEdit: () => void;
+  onSave: () => void;
   onCreateInvoice: () => void;
   onCreateDelivery: () => void;
   isDeliveryLoading: boolean;
@@ -41,9 +48,14 @@ export function SalesOrderDetailActions({
   isCancelled,
   canInvoice,
   hasRemainingDelivery,
+  isEditing,
+  isSaving,
   onConfirm,
   onCancel,
   onDelete,
+  onEdit,
+  onCancelEdit,
+  onSave,
   onCreateInvoice,
   onCreateDelivery,
   isDeliveryLoading,
@@ -71,6 +83,24 @@ export function SalesOrderDetailActions({
     [t, lang]
   );
 
+  if (isEditing) {
+    return (
+      <Space wrap>
+        <Button icon={<CloseOutlined />} onClick={onCancelEdit}>
+          {t("common.cancel", lang)}
+        </Button>
+        <Button
+          type="primary"
+          icon={<SaveOutlined />}
+          loading={isSaving}
+          onClick={onSave}
+        >
+          {t("common.save", lang)}
+        </Button>
+      </Space>
+    );
+  }
+
   return (
     <Space wrap>
       {isDraft && (
@@ -82,7 +112,7 @@ export function SalesOrderDetailActions({
           >
             {t("sales.action.confirm", lang)}
           </Button>
-          <Button icon={<EditOutlined />}>
+          <Button icon={<EditOutlined />} onClick={onEdit}>
             {t("sales.action.edit", lang)}
           </Button>
           <Button danger icon={<DeleteOutlined />} onClick={onDelete}>

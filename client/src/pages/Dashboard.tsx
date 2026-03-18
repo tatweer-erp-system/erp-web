@@ -174,7 +174,7 @@ const alerts = [
     id: "2",
     severity: "warning",
     message: "Invoice INV-2024-031 is 7 days overdue",
-    action: "/sales-invoices",
+    action: "/sales/invoices",
   },
   {
     id: "3",
@@ -869,7 +869,7 @@ export default function Dashboard() {
                 <Text strong style={{ fontSize: 15 }}>
                   Recent Orders
                 </Text>
-                <Link to="/all-orders">
+                <Link to="/sales/orders">
                   <Button
                     type="link"
                     size="small"

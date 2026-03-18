@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 
 import { Button, Tabs, Skeleton, Result, Card, Space } from "antd";
 import { ArrowLeftOutlined, ArrowRightOutlined } from "@ant-design/icons";
@@ -8,10 +8,12 @@ import { useParams, useNavigate } from "react-router-dom";
 
 import { useTranslation } from "@/hooks/ui/useTranslation";
 import { useSalesOrder } from "@/hooks/queries/useSalesOrders";
+import { useCustomersDropdown } from "@/hooks/queries/usePartners";
 import {
   useConfirmSalesOrder,
   useCancelSalesOrder,
   useDeleteSalesOrder,
+  useUpdateSalesOrder,
   useCreateInvoiceFromSO,
   useCreateDeliveryFromSO,
 } from "@/hooks/mutations/useSalesOrderMutations";
@@ -28,14 +30,25 @@ import {
   DownPaymentsTabContent,
   HistoryTabContent,
 } from "@/components/sales/SalesOrderDetailTabs";
+import type { SalesOrderEditFormState } from "@/components/sales/SalesOrderDetailTabs";
 import { CreateInvoiceModal } from "@/components/sales/CreateInvoiceModal";
 import { SalesOrderStatus, SalesOrderInvoiceStatus } from "@/constants/enums";
 import { ROUTES } from "@/shared/constants/routes";
+import { getName } from "@/shared/utils/getName.util";
+import type { SalesOrder, UpdateSalesOrderInput } from "@/types/modules/sales";
+
+function buildFormState(order: SalesOrder): SalesOrderEditFormState {
+  return {
+    partnerId: order.partnerId ?? "",
+    salespersonId: order.salespersonId ?? "",
+    notes: order.notes ?? "",
+  };
+}
 
 /**
  * Sales Order detail page displaying order info, lines, invoices,
  * deliveries, down payments, and activity history.
- * Actions are conditionally rendered based on the order status.
+ * Supports inline edit mode for draft order header fields.
  */
 export default function SalesOrderDetailPage() {
   const { t, lang, direction } = useTranslation();
@@ -43,10 +56,12 @@ export default function SalesOrderDetailPage() {
   const navigate = useNavigate();
 
   const { data: order, isLoading, isError } = useSalesOrder(id);
+  const { data: customersDropdown } = useCustomersDropdown();
 
   const confirmMutation = useConfirmSalesOrder();
   const cancelMutation = useCancelSalesOrder();
   const deleteMutation = useDeleteSalesOrder();
+  const updateMutation = useUpdateSalesOrder();
   const invoiceMutation = useCreateInvoiceFromSO();
   const deliveryMutation = useCreateDeliveryFromSO();
 
@@ -54,8 +69,30 @@ export default function SalesOrderDetailPage() {
   const [isCancelOpen, setIsCancelOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [form, setForm] = useState<SalesOrderEditFormState>(() =>
+    order ? buildFormState(order) : ({} as SalesOrderEditFormState)
+  );
+
+  // Reset form when order data loads or changes
+  useEffect(() => {
+    if (order && !isEditing) {
+      setForm(buildFormState(order));
+    }
+  }, [order, isEditing]);
 
   const BackIcon = direction === "rtl" ? ArrowRightOutlined : ArrowLeftOutlined;
+
+  const customerOptions = useMemo(
+    () =>
+      (customersDropdown ?? []).map(
+        (c: { id: string; nameEn: string; nameAr: string }) => ({
+          label: getName(c),
+          value: c.id,
+        })
+      ),
+    [customersDropdown]
+  );
 
   const handleConfirm = useCallback(() => {
     if (!id) return;
@@ -86,6 +123,50 @@ export default function SalesOrderDetailPage() {
         toast.error(err?.message ?? t("sales.message.loadFailed", lang)),
     });
   }, [id, deleteMutation, t, lang, navigate]);
+
+  const handleEdit = useCallback(() => {
+    if (!order) return;
+    setForm(buildFormState(order));
+    setIsEditing(true);
+  }, [order]);
+
+  const handleCancelEdit = useCallback(() => {
+    if (order) setForm(buildFormState(order));
+    setIsEditing(false);
+  }, [order]);
+
+  const handleSave = useCallback(() => {
+    if (!id || !order) return;
+
+    const dto: UpdateSalesOrderInput = {
+      version: order.version,
+      partnerId: form.partnerId || undefined,
+      salespersonId: form.salespersonId || undefined,
+      notes: form.notes || undefined,
+    };
+
+    updateMutation.mutate(
+      { id, dto },
+      {
+        onSuccess: () => {
+          toast.success(t("sales.message.updated", lang));
+          setIsEditing(false);
+        },
+        onError: (err: { message?: string }) =>
+          toast.error(err?.message ?? t("sales.message.loadFailed", lang)),
+      }
+    );
+  }, [id, order, form, updateMutation, t, lang]);
+
+  const updateField = useCallback(
+    <K extends keyof SalesOrderEditFormState>(
+      key: K,
+      value: SalesOrderEditFormState[K]
+    ) => {
+      setForm(prev => ({ ...prev, [key]: value }));
+    },
+    []
+  );
 
   const handleCreateInvoice = useCallback(
     (type: string, value?: number) => {
@@ -189,9 +270,14 @@ export default function SalesOrderDetailPage() {
                 isCancelled={isCancelled}
                 canInvoice={canInvoice}
                 hasRemainingDelivery={hasRemainingDelivery}
+                isEditing={isEditing}
+                isSaving={updateMutation.isPending}
                 onConfirm={() => setIsConfirmOpen(true)}
                 onCancel={() => setIsCancelOpen(true)}
                 onDelete={() => setIsDeleteOpen(true)}
+                onEdit={handleEdit}
+                onCancelEdit={handleCancelEdit}
+                onSave={handleSave}
                 onCreateInvoice={() => setIsInvoiceModalOpen(true)}
                 onCreateDelivery={handleCreateDelivery}
                 isDeliveryLoading={deliveryMutation.isPending}
@@ -208,7 +294,13 @@ export default function SalesOrderDetailPage() {
             cancelledAt={order.confirmedAt}
           />
         </div>
-        <SalesOrderInfoCard order={order} />
+        <SalesOrderInfoCard
+          order={order}
+          isEditing={isEditing}
+          form={form}
+          updateField={updateField}
+          customerOptions={customerOptions}
+        />
 
         <Tabs
           type="line"

@@ -1,10 +1,10 @@
 /**
  * Customer detail page displaying partner info with tabs.
- * Follows the SalesOrderDetailPage pattern.
+ * Supports inline edit mode — toggle between read-only and form inputs.
  * Default export for lazy loading via React.lazy().
  */
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 
 import {
   Button,
@@ -19,7 +19,9 @@ import {
   Modal,
   Form,
   Input,
+  InputNumber,
   Switch,
+  Select,
 } from "antd";
 import type { TableColumnsType } from "antd";
 import {
@@ -32,6 +34,8 @@ import {
   MailOutlined,
   PhoneOutlined,
   EnvironmentOutlined,
+  SaveOutlined,
+  CloseOutlined,
 } from "@ant-design/icons";
 import { toast } from "sonner";
 import dayjs from "dayjs";
@@ -41,6 +45,7 @@ import { useTranslation } from "@/hooks/ui/useTranslation";
 import { useCustomer } from "@/hooks/queries/usePartners";
 import {
   useDeletePartner,
+  useUpdatePartner,
   useCreatePartnerContact,
   useUpdatePartnerContact,
   useDeletePartnerContact,
@@ -55,9 +60,58 @@ import { PartnerType } from "@/constants/enums";
 import type {
   Partner,
   PartnerContact,
+  UpdatePartnerInput,
   CreatePartnerContactInput,
   UpdatePartnerContactInput,
 } from "@/types/modules/partners";
+
+// ── Edit form state ──────────────────────────────────────────────────────
+
+type EditFormState = {
+  nameEn: string;
+  nameAr: string;
+  type: string;
+  email: string;
+  phone: string;
+  mobile: string;
+  website: string;
+  isActive: boolean;
+  street: string;
+  city: string;
+  state: string;
+  country: string;
+  zip: string;
+  creditLimit: number;
+  taxNumber: string;
+  vatNumber: string;
+  bankIban: string;
+  bankName: string;
+  notes: string;
+};
+
+function buildFormState(customer: Partner): EditFormState {
+  return {
+    nameEn: customer.nameEn ?? "",
+    nameAr: customer.nameAr ?? "",
+    type: customer.type,
+    email: customer.email ?? "",
+    phone: customer.phone ?? "",
+    mobile: customer.mobile ?? "",
+    website: customer.website ?? "",
+    isActive: customer.isActive,
+    street: customer.street ?? "",
+    city: customer.city ?? "",
+    state: customer.state ?? "",
+    country: customer.country ?? "",
+    zip: customer.zip ?? "",
+    creditLimit: Number(customer.creditLimit) || 0,
+    taxNumber: customer.taxNumber ?? "",
+    vatNumber: customer.vatNumber ?? "",
+    bankIban: customer.bankIban ?? "",
+    bankName: customer.bankName ?? "",
+    notes: customer.notes ?? "",
+  };
+}
 
 export default function CustomerDetails() {
   const { t, lang, direction } = useTranslation();
@@ -66,8 +120,20 @@ export default function CustomerDetails() {
 
   const { data: customer, isLoading, isError } = useCustomer(id);
   const deleteMutation = useDeletePartner();
+  const updateMutation = useUpdatePartner();
 
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [form, setForm] = useState<EditFormState>(() =>
+    customer ? buildFormState(customer) : ({} as EditFormState)
+  );
+
+  // Reset form when customer data loads or changes (e.g. after save)
+  useEffect(() => {
+    if (customer && !isEditing) {
+      setForm(buildFormState(customer));
+    }
+  }, [customer, isEditing]);
 
   const BackIcon = direction === "rtl" ? ArrowRightOutlined : ArrowLeftOutlined;
 
@@ -82,6 +148,68 @@ export default function CustomerDetails() {
         toast.error(err?.message ?? t("common.error_occurred", lang)),
     });
   }, [id, deleteMutation, t, lang, navigate]);
+
+  const handleEdit = useCallback(() => {
+    if (!customer) return;
+    setForm(buildFormState(customer));
+    setIsEditing(true);
+  }, [customer]);
+
+  const handleCancelEdit = useCallback(() => {
+    if (customer) setForm(buildFormState(customer));
+    setIsEditing(false);
+  }, [customer]);
+
+  const handleSave = useCallback(() => {
+    if (!id || !customer) return;
+
+    if (!form.nameEn.trim() && !form.nameAr.trim()) {
+      toast.error(t("customers.field.nameEn", lang));
+      return;
+    }
+
+    const dto: UpdatePartnerInput = {
+      version: customer.version,
+      nameEn: form.nameEn.trim() || form.nameAr.trim(),
+      nameAr: form.nameAr.trim() || form.nameEn.trim(),
+      type: form.type as PartnerType,
+      email: form.email || undefined,
+      phone: form.phone || undefined,
+      mobile: form.mobile || undefined,
+      website: form.website || undefined,
+      isActive: form.isActive,
+      street: form.street || undefined,
+      city: form.city || undefined,
+      state: form.state || undefined,
+      country: form.country || undefined,
+      zip: form.zip || undefined,
+      creditLimit: form.creditLimit || undefined,
+      taxNumber: form.taxNumber || undefined,
+      vatNumber: form.vatNumber || undefined,
+      bankIban: form.bankIban || undefined,
+      bankName: form.bankName || undefined,
+      notes: form.notes || undefined,
+    };
+
+    updateMutation.mutate(
+      { id, dto },
+      {
+        onSuccess: () => {
+          toast.success(t("customers.updateSuccess", lang));
+          setIsEditing(false);
+        },
+        onError: (err: { message?: string }) =>
+          toast.error(err?.message ?? t("common.error_occurred", lang)),
+      }
+    );
+  }, [id, customer, form, updateMutation, t, lang]);
+
+  const updateField = useCallback(
+    <K extends keyof EditFormState>(key: K, value: EditFormState[K]) => {
+      setForm(prev => ({ ...prev, [key]: value }));
+    },
+    []
+  );
 
   const breadcrumbs = useMemo(
     () => [
@@ -150,20 +278,38 @@ export default function CustomerDetails() {
               >
                 {t("customers.backToList", lang)}
               </Button>
-              <Button
-                type="primary"
-                icon={<EditOutlined />}
-                onClick={() => navigate(ROUTES.customerDetail(customer.id))}
-              >
-                {t("customers.editCustomer", lang)}
-              </Button>
-              <Button
-                danger
-                icon={<DeleteOutlined />}
-                onClick={() => setIsDeleteOpen(true)}
-              >
-                {t("customers.deleteCustomer", lang)}
-              </Button>
+              {isEditing ? (
+                <>
+                  <Button icon={<CloseOutlined />} onClick={handleCancelEdit}>
+                    {t("common.cancel", lang)}
+                  </Button>
+                  <Button
+                    type="primary"
+                    icon={<SaveOutlined />}
+                    loading={updateMutation.isPending}
+                    onClick={handleSave}
+                  >
+                    {t("common.save", lang)}
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    type="primary"
+                    icon={<EditOutlined />}
+                    onClick={handleEdit}
+                  >
+                    {t("customers.editCustomer", lang)}
+                  </Button>
+                  <Button
+                    danger
+                    icon={<DeleteOutlined />}
+                    onClick={() => setIsDeleteOpen(true)}
+                  >
+                    {t("customers.deleteCustomer", lang)}
+                  </Button>
+                </>
+              )}
             </Space>
           }
         />
@@ -179,17 +325,44 @@ export default function CustomerDetails() {
             {
               key: "general",
               label: t("customers.tab.general", lang),
-              children: <GeneralTab customer={customer} t={t} lang={lang} />,
+              children: (
+                <GeneralTab
+                  customer={customer}
+                  t={t}
+                  lang={lang}
+                  isEditing={isEditing}
+                  form={form}
+                  updateField={updateField}
+                />
+              ),
             },
             {
               key: "address",
               label: t("customers.tab.address", lang),
-              children: <AddressTab customer={customer} t={t} lang={lang} />,
+              children: (
+                <AddressTab
+                  customer={customer}
+                  t={t}
+                  lang={lang}
+                  isEditing={isEditing}
+                  form={form}
+                  updateField={updateField}
+                />
+              ),
             },
             {
               key: "accounting",
               label: t("customers.tab.accounting", lang),
-              children: <AccountingTab customer={customer} t={t} lang={lang} />,
+              children: (
+                <AccountingTab
+                  customer={customer}
+                  t={t}
+                  lang={lang}
+                  isEditing={isEditing}
+                  form={form}
+                  updateField={updateField}
+                />
+              ),
             },
             {
               key: "contacts",
@@ -199,7 +372,16 @@ export default function CustomerDetails() {
             {
               key: "notes",
               label: t("customers.tab.notes", lang),
-              children: <NotesTab customer={customer} t={t} lang={lang} />,
+              children: (
+                <NotesTab
+                  customer={customer}
+                  t={t}
+                  lang={lang}
+                  isEditing={isEditing}
+                  form={form}
+                  updateField={updateField}
+                />
+              ),
             },
           ]}
         />
@@ -218,12 +400,21 @@ export default function CustomerDetails() {
   );
 }
 
-// ── Tab type ──────────────────────────────────────────────────────────────
+// ── Shared types ─────────────────────────────────────────────────────────
 
 type TabProps = {
   customer: Partner;
   t: (k: string, l: string) => string;
   lang: "ar" | "en";
+};
+
+type EditableTabProps = TabProps & {
+  isEditing: boolean;
+  form: EditFormState;
+  updateField: <K extends keyof EditFormState>(
+    key: K,
+    value: EditFormState[K]
+  ) => void;
 };
 
 // ── Info Card ─────────────────────────────────────────────────────────────
@@ -274,7 +465,14 @@ function CustomerInfoCard({ customer, t, lang }: TabProps) {
 
 // ── General Tab ───────────────────────────────────────────────────────────
 
-function GeneralTab({ customer, t, lang }: TabProps) {
+function GeneralTab({
+  customer,
+  t,
+  lang,
+  isEditing,
+  form,
+  updateField,
+}: EditableTabProps) {
   const typeLabel: Record<string, string> = {
     [PartnerType.CUSTOMER]: t("customers.type.customer", lang),
     [PartnerType.SUPPLIER]: t("customers.type.supplier", lang),
@@ -282,140 +480,395 @@ function GeneralTab({ customer, t, lang }: TabProps) {
     [PartnerType.INDIVIDUAL]: t("customers.type.individual", lang),
   };
 
+  const typeOptions = [
+    { label: t("customers.type.customer", lang), value: PartnerType.CUSTOMER },
+    { label: t("customers.type.supplier", lang), value: PartnerType.SUPPLIER },
+    { label: t("customers.type.both", lang), value: PartnerType.BOTH },
+    {
+      label: t("customers.type.individual", lang),
+      value: PartnerType.INDIVIDUAL,
+    },
+  ];
+
+  if (!isEditing) {
+    return (
+      <Card size="small">
+        <Descriptions column={{ xs: 1, sm: 2, lg: 3 }} size="small" bordered>
+          <Descriptions.Item label={t("customers.field.nameEn", lang)}>
+            {customer.nameEn || "--"}
+          </Descriptions.Item>
+          <Descriptions.Item label={t("customers.field.nameAr", lang)}>
+            {customer.nameAr || "--"}
+          </Descriptions.Item>
+          <Descriptions.Item label={t("customers.field.type", lang)}>
+            {typeLabel[customer.type] ?? customer.type}
+          </Descriptions.Item>
+          <Descriptions.Item label={t("customers.field.email", lang)}>
+            {customer.email ? (
+              <CopyableCode value={customer.email} variant="plain" />
+            ) : (
+              "--"
+            )}
+          </Descriptions.Item>
+          <Descriptions.Item label={t("customers.field.phone", lang)}>
+            {customer.phone ? (
+              <CopyableCode value={customer.phone} variant="plain" />
+            ) : (
+              "--"
+            )}
+          </Descriptions.Item>
+          <Descriptions.Item label={t("customers.field.mobile", lang)}>
+            {customer.mobile ? (
+              <CopyableCode value={customer.mobile} variant="plain" />
+            ) : (
+              "--"
+            )}
+          </Descriptions.Item>
+          <Descriptions.Item label={t("customers.field.website", lang)}>
+            {customer.website ? (
+              <CopyableCode value={customer.website} variant="plain" />
+            ) : (
+              "--"
+            )}
+          </Descriptions.Item>
+          <Descriptions.Item label={t("customers.field.isActive", lang)}>
+            <Tag color={customer.isActive ? "green" : "default"}>
+              {customer.isActive
+                ? t("customers.status.active", lang)
+                : t("customers.status.inactive", lang)}
+            </Tag>
+          </Descriptions.Item>
+          <Descriptions.Item label={t("customers.column.createdAt", lang)}>
+            {dayjs(customer.createdAt).format("DD MMM YYYY HH:mm")}
+          </Descriptions.Item>
+        </Descriptions>
+      </Card>
+    );
+  }
+
   return (
     <Card size="small">
-      <Descriptions column={{ xs: 1, sm: 2, lg: 3 }} size="small" bordered>
-        <Descriptions.Item label={t("customers.field.nameEn", lang)}>
-          {customer.nameEn || "--"}
-        </Descriptions.Item>
-        <Descriptions.Item label={t("customers.field.nameAr", lang)}>
-          {customer.nameAr || "--"}
-        </Descriptions.Item>
-        <Descriptions.Item label={t("customers.field.type", lang)}>
-          {typeLabel[customer.type] ?? customer.type}
-        </Descriptions.Item>
-        <Descriptions.Item label={t("customers.field.email", lang)}>
-          {customer.email ? (
-            <CopyableCode value={customer.email} variant="plain" />
-          ) : (
-            "--"
-          )}
-        </Descriptions.Item>
-        <Descriptions.Item label={t("customers.field.phone", lang)}>
-          {customer.phone ? (
-            <CopyableCode value={customer.phone} variant="plain" />
-          ) : (
-            "--"
-          )}
-        </Descriptions.Item>
-        <Descriptions.Item label={t("customers.field.mobile", lang)}>
-          {customer.mobile ? (
-            <CopyableCode value={customer.mobile} variant="plain" />
-          ) : (
-            "--"
-          )}
-        </Descriptions.Item>
-        <Descriptions.Item label={t("customers.field.website", lang)}>
-          {customer.website ? (
-            <CopyableCode value={customer.website} variant="plain" />
-          ) : (
-            "--"
-          )}
-        </Descriptions.Item>
-        <Descriptions.Item label={t("customers.field.isActive", lang)}>
-          <Tag color={customer.isActive ? "green" : "default"}>
-            {customer.isActive
-              ? t("customers.status.active", lang)
-              : t("customers.status.inactive", lang)}
-          </Tag>
-        </Descriptions.Item>
-        <Descriptions.Item label={t("customers.column.createdAt", lang)}>
-          {dayjs(customer.createdAt).format("DD MMM YYYY HH:mm")}
-        </Descriptions.Item>
-      </Descriptions>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <Form.Item
+          label={t("customers.field.nameEn", lang)}
+          layout="vertical"
+          required
+          className="mb-0"
+        >
+          <Input
+            value={form.nameEn}
+            onChange={e => updateField("nameEn", e.target.value)}
+            placeholder={t("customers.field.nameEn", lang)}
+          />
+        </Form.Item>
+        <Form.Item
+          label={t("customers.field.nameAr", lang)}
+          layout="vertical"
+          required
+          className="mb-0"
+        >
+          <Input
+            value={form.nameAr}
+            onChange={e => updateField("nameAr", e.target.value)}
+            placeholder={t("customers.field.nameAr", lang)}
+            dir="rtl"
+          />
+        </Form.Item>
+        <Form.Item
+          label={t("customers.field.type", lang)}
+          layout="vertical"
+          className="mb-0"
+        >
+          <Select
+            value={form.type}
+            onChange={v => updateField("type", v)}
+            options={typeOptions}
+          />
+        </Form.Item>
+        <Form.Item
+          label={t("customers.field.email", lang)}
+          layout="vertical"
+          className="mb-0"
+        >
+          <Input
+            value={form.email}
+            onChange={e => updateField("email", e.target.value)}
+            placeholder={t("customers.field.email", lang)}
+            type="email"
+          />
+        </Form.Item>
+        <Form.Item
+          label={t("customers.field.phone", lang)}
+          layout="vertical"
+          className="mb-0"
+        >
+          <Input
+            value={form.phone}
+            onChange={e => updateField("phone", e.target.value)}
+            placeholder={t("customers.field.phone", lang)}
+          />
+        </Form.Item>
+        <Form.Item
+          label={t("customers.field.mobile", lang)}
+          layout="vertical"
+          className="mb-0"
+        >
+          <Input
+            value={form.mobile}
+            onChange={e => updateField("mobile", e.target.value)}
+            placeholder={t("customers.field.mobile", lang)}
+          />
+        </Form.Item>
+        <Form.Item
+          label={t("customers.field.website", lang)}
+          layout="vertical"
+          className="mb-0"
+        >
+          <Input
+            value={form.website}
+            onChange={e => updateField("website", e.target.value)}
+            placeholder={t("customers.field.website", lang)}
+          />
+        </Form.Item>
+        <Form.Item
+          label={t("customers.field.isActive", lang)}
+          layout="vertical"
+          className="mb-0"
+        >
+          <Switch
+            checked={form.isActive}
+            onChange={v => updateField("isActive", v)}
+          />
+        </Form.Item>
+      </div>
     </Card>
   );
 }
 
 // ── Address Tab ───────────────────────────────────────────────────────────
 
-function AddressTab({ customer, t, lang }: TabProps) {
+function AddressTab({
+  customer,
+  t,
+  lang,
+  isEditing,
+  form,
+  updateField,
+}: EditableTabProps) {
+  if (!isEditing) {
+    return (
+      <Card size="small">
+        <Descriptions column={{ xs: 1, sm: 2, lg: 3 }} size="small" bordered>
+          <Descriptions.Item label={t("customers.field.street", lang)}>
+            {customer.street || "--"}
+          </Descriptions.Item>
+          <Descriptions.Item label={t("customers.field.city", lang)}>
+            {customer.city || "--"}
+          </Descriptions.Item>
+          <Descriptions.Item label={t("customers.field.state", lang)}>
+            {customer.state || "--"}
+          </Descriptions.Item>
+          <Descriptions.Item label={t("customers.field.country", lang)}>
+            {customer.country || "--"}
+          </Descriptions.Item>
+          <Descriptions.Item label={t("customers.field.zip", lang)}>
+            {customer.zip || "--"}
+          </Descriptions.Item>
+        </Descriptions>
+      </Card>
+    );
+  }
+
   return (
     <Card size="small">
-      <Descriptions column={{ xs: 1, sm: 2, lg: 3 }} size="small" bordered>
-        <Descriptions.Item label={t("customers.field.street", lang)}>
-          {customer.street || "--"}
-        </Descriptions.Item>
-        <Descriptions.Item label={t("customers.field.city", lang)}>
-          {customer.city || "--"}
-        </Descriptions.Item>
-        <Descriptions.Item label={t("customers.field.state", lang)}>
-          {customer.state || "--"}
-        </Descriptions.Item>
-        <Descriptions.Item label={t("customers.field.country", lang)}>
-          {customer.country || "--"}
-        </Descriptions.Item>
-        <Descriptions.Item label={t("customers.field.zip", lang)}>
-          {customer.zip || "--"}
-        </Descriptions.Item>
-      </Descriptions>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <Form.Item
+          label={t("customers.field.street", lang)}
+          layout="vertical"
+          className="mb-0"
+        >
+          <Input
+            value={form.street}
+            onChange={e => updateField("street", e.target.value)}
+            placeholder={t("customers.field.street", lang)}
+          />
+        </Form.Item>
+        <Form.Item
+          label={t("customers.field.city", lang)}
+          layout="vertical"
+          className="mb-0"
+        >
+          <Input
+            value={form.city}
+            onChange={e => updateField("city", e.target.value)}
+            placeholder={t("customers.field.city", lang)}
+          />
+        </Form.Item>
+        <Form.Item
+          label={t("customers.field.state", lang)}
+          layout="vertical"
+          className="mb-0"
+        >
+          <Input
+            value={form.state}
+            onChange={e => updateField("state", e.target.value)}
+            placeholder={t("customers.field.state", lang)}
+          />
+        </Form.Item>
+        <Form.Item
+          label={t("customers.field.country", lang)}
+          layout="vertical"
+          className="mb-0"
+        >
+          <Input
+            value={form.country}
+            onChange={e => updateField("country", e.target.value)}
+            placeholder={t("customers.field.country", lang)}
+          />
+        </Form.Item>
+        <Form.Item
+          label={t("customers.field.zip", lang)}
+          layout="vertical"
+          className="mb-0"
+        >
+          <Input
+            value={form.zip}
+            onChange={e => updateField("zip", e.target.value)}
+            placeholder={t("customers.field.zip", lang)}
+          />
+        </Form.Item>
+      </div>
     </Card>
   );
 }
 
 // ── Accounting Tab ────────────────────────────────────────────────────────
 
-function AccountingTab({ customer, t, lang }: TabProps) {
+function AccountingTab({
+  customer,
+  t,
+  lang,
+  isEditing,
+  form,
+  updateField,
+}: EditableTabProps) {
+  if (!isEditing) {
+    return (
+      <Card size="small">
+        <Descriptions column={{ xs: 1, sm: 2, lg: 3 }} size="small" bordered>
+          <Descriptions.Item label={t("customers.field.creditLimit", lang)}>
+            <span className="font-mono">
+              {Number(customer.creditLimit).toLocaleString("en-SA", {
+                minimumFractionDigits: 2,
+              })}
+            </span>
+          </Descriptions.Item>
+          <Descriptions.Item label={t("customers.field.taxNumber", lang)}>
+            {customer.taxNumber ? (
+              <CopyableCode value={customer.taxNumber} variant="plain" />
+            ) : (
+              "--"
+            )}
+          </Descriptions.Item>
+          <Descriptions.Item label={t("customers.field.vatNumber", lang)}>
+            {customer.vatNumber ? (
+              <CopyableCode value={customer.vatNumber} variant="plain" />
+            ) : (
+              "--"
+            )}
+          </Descriptions.Item>
+          <Descriptions.Item label={t("customers.field.paymentTerm", lang)}>
+            {customer.paymentTermId || "--"}
+          </Descriptions.Item>
+          <Descriptions.Item label={t("customers.field.pricelist", lang)}>
+            {customer.pricelistId || "--"}
+          </Descriptions.Item>
+          <Descriptions.Item label={t("customers.field.fiscalPosition", lang)}>
+            {customer.fiscalPositionId || "--"}
+          </Descriptions.Item>
+          <Descriptions.Item label={t("customers.field.arAccount", lang)}>
+            {customer.arAccountId || "--"}
+          </Descriptions.Item>
+          <Descriptions.Item label={t("customers.field.apAccount", lang)}>
+            {customer.apAccountId || "--"}
+          </Descriptions.Item>
+          <Descriptions.Item label={t("customers.field.bankIban", lang)}>
+            {customer.bankIban ? (
+              <CopyableCode value={customer.bankIban} variant="plain" />
+            ) : (
+              "--"
+            )}
+          </Descriptions.Item>
+          <Descriptions.Item label={t("customers.field.bankName", lang)}>
+            {customer.bankName || "--"}
+          </Descriptions.Item>
+        </Descriptions>
+      </Card>
+    );
+  }
+
   return (
     <Card size="small">
-      <Descriptions column={{ xs: 1, sm: 2, lg: 3 }} size="small" bordered>
-        <Descriptions.Item label={t("customers.field.creditLimit", lang)}>
-          <span className="font-mono">
-            {Number(customer.creditLimit).toLocaleString("en-SA", {
-              minimumFractionDigits: 2,
-            })}
-          </span>
-        </Descriptions.Item>
-        <Descriptions.Item label={t("customers.field.taxNumber", lang)}>
-          {customer.taxNumber ? (
-            <CopyableCode value={customer.taxNumber} variant="plain" />
-          ) : (
-            "--"
-          )}
-        </Descriptions.Item>
-        <Descriptions.Item label={t("customers.field.vatNumber", lang)}>
-          {customer.vatNumber ? (
-            <CopyableCode value={customer.vatNumber} variant="plain" />
-          ) : (
-            "--"
-          )}
-        </Descriptions.Item>
-        <Descriptions.Item label={t("customers.field.paymentTerm", lang)}>
-          {customer.paymentTermId || "--"}
-        </Descriptions.Item>
-        <Descriptions.Item label={t("customers.field.pricelist", lang)}>
-          {customer.pricelistId || "--"}
-        </Descriptions.Item>
-        <Descriptions.Item label={t("customers.field.fiscalPosition", lang)}>
-          {customer.fiscalPositionId || "--"}
-        </Descriptions.Item>
-        <Descriptions.Item label={t("customers.field.arAccount", lang)}>
-          {customer.arAccountId || "--"}
-        </Descriptions.Item>
-        <Descriptions.Item label={t("customers.field.apAccount", lang)}>
-          {customer.apAccountId || "--"}
-        </Descriptions.Item>
-        <Descriptions.Item label={t("customers.field.bankIban", lang)}>
-          {customer.bankIban ? (
-            <CopyableCode value={customer.bankIban} variant="plain" />
-          ) : (
-            "--"
-          )}
-        </Descriptions.Item>
-        <Descriptions.Item label={t("customers.field.bankName", lang)}>
-          {customer.bankName || "--"}
-        </Descriptions.Item>
-      </Descriptions>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <Form.Item
+          label={t("customers.field.creditLimit", lang)}
+          layout="vertical"
+          className="mb-0"
+        >
+          <InputNumber
+            value={form.creditLimit}
+            min={0}
+            precision={2}
+            onChange={v => updateField("creditLimit", v ?? 0)}
+            style={{ width: "100%" }}
+            placeholder={t("customers.field.creditLimit", lang)}
+          />
+        </Form.Item>
+        <Form.Item
+          label={t("customers.field.taxNumber", lang)}
+          layout="vertical"
+          className="mb-0"
+        >
+          <Input
+            value={form.taxNumber}
+            onChange={e => updateField("taxNumber", e.target.value)}
+            placeholder={t("customers.field.taxNumber", lang)}
+          />
+        </Form.Item>
+        <Form.Item
+          label={t("customers.field.vatNumber", lang)}
+          layout="vertical"
+          className="mb-0"
+        >
+          <Input
+            value={form.vatNumber}
+            onChange={e => updateField("vatNumber", e.target.value)}
+            placeholder={t("customers.field.vatNumber", lang)}
+          />
+        </Form.Item>
+        <Form.Item
+          label={t("customers.field.bankIban", lang)}
+          layout="vertical"
+          className="mb-0"
+        >
+          <Input
+            value={form.bankIban}
+            onChange={e => updateField("bankIban", e.target.value)}
+            placeholder={t("customers.field.bankIban", lang)}
+          />
+        </Form.Item>
+        <Form.Item
+          label={t("customers.field.bankName", lang)}
+          layout="vertical"
+          className="mb-0"
+        >
+          <Input
+            value={form.bankName}
+            onChange={e => updateField("bankName", e.target.value)}
+            placeholder={t("customers.field.bankName", lang)}
+          />
+        </Form.Item>
+      </div>
     </Card>
   );
 }
@@ -432,18 +885,18 @@ function ContactsTab({ customer, t, lang }: TabProps) {
     null
   );
   const [deleteContactId, setDeleteContactId] = useState<string | null>(null);
-  const [form] = Form.useForm();
+  const [contactForm] = Form.useForm();
 
   const handleOpenCreate = useCallback(() => {
     setEditingContact(null);
-    form.resetFields();
+    contactForm.resetFields();
     setIsModalOpen(true);
-  }, [form]);
+  }, [contactForm]);
 
   const handleOpenEdit = useCallback(
     (contact: PartnerContact) => {
       setEditingContact(contact);
-      form.setFieldsValue({
+      contactForm.setFieldsValue({
         firstName: contact.firstName,
         lastName: contact.lastName,
         email: contact.email,
@@ -454,11 +907,11 @@ function ContactsTab({ customer, t, lang }: TabProps) {
       });
       setIsModalOpen(true);
     },
-    [form]
+    [contactForm]
   );
 
   const handleSubmit = useCallback(() => {
-    form.validateFields().then(values => {
+    contactForm.validateFields().then(values => {
       if (editingContact) {
         const dto: UpdatePartnerContactInput = {
           version: editingContact.version,
@@ -489,7 +942,7 @@ function ContactsTab({ customer, t, lang }: TabProps) {
       }
     });
   }, [
-    form,
+    contactForm,
     editingContact,
     customer.id,
     createContact,
@@ -635,7 +1088,7 @@ function ContactsTab({ customer, t, lang }: TabProps) {
         okText={t("common.save", lang)}
         cancelText={t("common.cancel", lang)}
       >
-        <Form form={form} layout="vertical" className="mt-4">
+        <Form form={contactForm} layout="vertical" className="mt-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4">
             <Form.Item
               name="firstName"
@@ -698,14 +1151,40 @@ function ContactsTab({ customer, t, lang }: TabProps) {
 
 // ── Notes Tab ─────────────────────────────────────────────────────────────
 
-function NotesTab({ customer, t, lang }: TabProps) {
+function NotesTab({
+  customer,
+  t,
+  lang,
+  isEditing,
+  form,
+  updateField,
+}: EditableTabProps) {
+  if (!isEditing) {
+    return (
+      <Card size="small">
+        <Descriptions column={1} size="small" bordered>
+          <Descriptions.Item label={t("customers.field.notes", lang)}>
+            {customer.notes || "--"}
+          </Descriptions.Item>
+        </Descriptions>
+      </Card>
+    );
+  }
+
   return (
     <Card size="small">
-      <Descriptions column={1} size="small" bordered>
-        <Descriptions.Item label={t("customers.field.notes", lang)}>
-          {customer.notes || "--"}
-        </Descriptions.Item>
-      </Descriptions>
+      <Form.Item
+        label={t("customers.field.notes", lang)}
+        layout="vertical"
+        className="mb-0"
+      >
+        <Input.TextArea
+          value={form.notes}
+          onChange={e => updateField("notes", e.target.value)}
+          placeholder={t("customers.field.notes", lang)}
+          rows={4}
+        />
+      </Form.Item>
     </Card>
   );
 }

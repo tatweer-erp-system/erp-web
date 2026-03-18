@@ -623,7 +623,7 @@ export default function OrderDetails() {
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <button
-              onClick={() => navigate("/customer-details")}
+              onClick={() => navigate("/sales/customers")}
               className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-secondary/50 transition-colors text-left group"
             >
               <div className="w-9 h-9 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0">

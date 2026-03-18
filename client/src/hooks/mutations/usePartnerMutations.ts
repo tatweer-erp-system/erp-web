@@ -61,7 +61,14 @@ export function useDeletePartner() {
 
   return useMutation({
     mutationFn: (id: string) => deletePartner(id),
-    onSuccess: () => {
+    onSuccess: (_data, id) => {
+      // Remove the detail query so it doesn't refetch the now-deleted partner
+      queryClient.removeQueries({
+        queryKey: queryKeys.partners.customerDetail(id),
+      });
+      queryClient.removeQueries({
+        queryKey: queryKeys.partners.vendorDetail(id),
+      });
       queryClient.invalidateQueries({
         queryKey: queryKeys.partners.customers,
       });

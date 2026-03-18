@@ -99,20 +99,14 @@ const NAV_ITEMS: NavItem[] = [
 
   // ── Sales (Odoo: Sales > Orders, Customers, Invoicing) ──────────────────
   { name: "SALES", isHeader: true },
-  { name: "Quotations", icon: <FileTextOutlined />, href: "/quotations" },
-  { name: "Sales Orders", icon: <ShoppingCartOutlined />, href: "/all-orders" },
-  { name: "Customers", icon: <TeamOutlined />, href: "/all-customers" },
-  { name: "Pricelists", icon: <TagsOutlined />, href: "/price-lists" },
+  { name: "Quotations", icon: <FileTextOutlined />, href: "/sales/quotations" },
   {
-    name: "Definitions",
-    icon: <DatabaseOutlined />,
-    href: "/sales-definitions",
+    name: "Sales Orders",
+    icon: <ShoppingCartOutlined />,
+    href: "/sales/orders",
   },
-  {
-    name: "Sales Settings",
-    icon: <SettingOutlined />,
-    href: "/settings/sales",
-  },
+  { name: "Customers", icon: <TeamOutlined />, href: "/sales/customers" },
+  { name: "Pricelists", icon: <TagsOutlined />, href: "/sales/pricelists" },
 
   // ── Purchases (Odoo: Purchase > Orders, Vendors, Bills) ─────────────────
   { name: "PURCHASES", isHeader: true },
@@ -125,8 +119,8 @@ const NAV_ITEMS: NavItem[] = [
     name: "Vendors",
     icon: <CarOutlined />,
     submenu: [
-      { name: "All Vendors", href: "/all-vendors" },
-      { name: "Vendor Groups", href: "/vendor-groups" },
+      { name: "All Vendors", href: "/sales/vendors" },
+      { name: "Vendor Groups", href: "/sales/vendor-groups" },
     ],
   },
   {
@@ -195,7 +189,7 @@ const NAV_ITEMS: NavItem[] = [
   {
     name: "Customer Statements",
     icon: <LineChartOutlined />,
-    href: "/customer-statements",
+    href: "/sales/customer-statements",
   },
   {
     name: "Vendor Statements",
@@ -245,7 +239,7 @@ const NAV_ITEMS: NavItem[] = [
   {
     name: "Customer Receipts",
     icon: <MoneyCollectOutlined />,
-    href: "/customer-receipts",
+    href: "/sales/customer-receipts",
   },
   {
     name: "Vendor Payments",

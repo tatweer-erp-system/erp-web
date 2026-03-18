@@ -52,7 +52,14 @@ export function useDeletePricelist() {
 
   return useMutation({
     mutationFn: (id: string) => deletePricelist(id),
-    onSuccess: () => {
+    onSuccess: (_data, id) => {
+      // Remove detail query so it doesn't refetch the now-deleted pricelist
+      queryClient.removeQueries({
+        queryKey: queryKeys.pricelists.detail(id),
+      });
+      queryClient.removeQueries({
+        queryKey: queryKeys.pricelists.items(id),
+      });
       queryClient.invalidateQueries({ queryKey: queryKeys.pricelists.all });
     },
   });

@@ -1,10 +1,10 @@
 /**
  * Pricelist detail page displaying pricelist info and items.
- * Actions are conditionally rendered based on the pricelist state.
+ * Supports inline edit mode — toggle between read-only and form inputs.
  * Default export for lazy loading via React.lazy().
  */
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 
 import {
   Button,
@@ -17,6 +17,11 @@ import {
   Table,
   Descriptions,
   Typography,
+  Form,
+  Input,
+  Select,
+  DatePicker,
+  Switch,
 } from "antd";
 import type { TableColumnsType } from "antd";
 import {
@@ -25,6 +30,8 @@ import {
   EditOutlined,
   DeleteOutlined,
   PlusOutlined,
+  SaveOutlined,
+  CloseOutlined,
 } from "@ant-design/icons";
 import { toast } from "sonner";
 import dayjs from "dayjs";
@@ -34,6 +41,7 @@ import { useTranslation } from "@/hooks/ui/useTranslation";
 import { usePricelist, usePricelistItems } from "@/hooks/queries/usePricelists";
 import {
   useDeletePricelist,
+  useUpdatePricelist,
   useDeletePricelistItem,
   useCreatePricelistItem,
 } from "@/hooks/mutations/usePricelistMutations";
@@ -48,9 +56,35 @@ import {
 } from "@/constants/enums";
 import { ROUTES } from "@/shared/constants/routes";
 import { getName } from "@/shared/utils/getName.util";
-import type { Pricelist, PricelistItem } from "@/types/modules/pricelists";
+import type {
+  Pricelist,
+  PricelistItem,
+  UpdatePricelistInput,
+} from "@/types/modules/pricelists";
 
 const { Text } = Typography;
+
+// ── Edit form state ──────────────────────────────────────────────────────
+
+type EditFormState = {
+  nameEn: string;
+  nameAr: string;
+  discountPolicy: string;
+  startDate: string;
+  endDate: string;
+  isActive: boolean;
+};
+
+function buildFormState(pricelist: Pricelist): EditFormState {
+  return {
+    nameEn: pricelist.nameEn ?? "",
+    nameAr: pricelist.nameAr ?? "",
+    discountPolicy: pricelist.discountPolicy,
+    startDate: pricelist.startDate ?? "",
+    endDate: pricelist.endDate ?? "",
+    isActive: pricelist.isActive,
+  };
+}
 
 export default function PricelistDetailPage() {
   const { t, lang, direction } = useTranslation();
@@ -60,11 +94,23 @@ export default function PricelistDetailPage() {
   const { data: pricelist, isLoading, isError } = usePricelist(id);
   const { data: items, isLoading: itemsLoading } = usePricelistItems(id);
   const deleteMutation = useDeletePricelist();
+  const updateMutation = useUpdatePricelist();
   const deleteItemMutation = useDeletePricelistItem();
   const createItemMutation = useCreatePricelistItem();
 
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [form, setForm] = useState<EditFormState>(() =>
+    pricelist ? buildFormState(pricelist) : ({} as EditFormState)
+  );
+
+  // Reset form when pricelist data loads or changes
+  useEffect(() => {
+    if (pricelist && !isEditing) {
+      setForm(buildFormState(pricelist));
+    }
+  }, [pricelist, isEditing]);
 
   const BackIcon = direction === "rtl" ? ArrowRightOutlined : ArrowLeftOutlined;
 
@@ -117,6 +163,56 @@ export default function PricelistDetailPage() {
       }
     );
   }, [id, createItemMutation, t, lang]);
+
+  const handleEdit = useCallback(() => {
+    if (!pricelist) return;
+    setForm(buildFormState(pricelist));
+    setIsEditing(true);
+  }, [pricelist]);
+
+  const handleCancelEdit = useCallback(() => {
+    if (pricelist) setForm(buildFormState(pricelist));
+    setIsEditing(false);
+  }, [pricelist]);
+
+  const handleSave = useCallback(() => {
+    if (!id || !pricelist) return;
+
+    if (!form.nameEn.trim() && !form.nameAr.trim()) {
+      toast.error(t("common.fill_required_fields", lang));
+      return;
+    }
+
+    const dto: UpdatePricelistInput = {
+      version: pricelist.version,
+      nameEn: form.nameEn.trim() || form.nameAr.trim(),
+      nameAr: form.nameAr.trim() || form.nameEn.trim(),
+      discountPolicy:
+        form.discountPolicy as (typeof PricelistDiscountPolicy)[keyof typeof PricelistDiscountPolicy],
+      startDate: form.startDate || undefined,
+      endDate: form.endDate || undefined,
+      isActive: form.isActive,
+    };
+
+    updateMutation.mutate(
+      { id, dto },
+      {
+        onSuccess: () => {
+          toast.success(t("pricelists.message.updated", lang));
+          setIsEditing(false);
+        },
+        onError: (err: { message?: string }) =>
+          toast.error(err?.message ?? t("pricelists.message.loadFailed", lang)),
+      }
+    );
+  }, [id, pricelist, form, updateMutation, t, lang]);
+
+  const updateField = useCallback(
+    <K extends keyof EditFormState>(key: K, value: EditFormState[K]) => {
+      setForm(prev => ({ ...prev, [key]: value }));
+    },
+    []
+  );
 
   const breadcrumbs = useMemo(
     () => [
@@ -177,19 +273,34 @@ export default function PricelistDetailPage() {
               >
                 {t("pricelists.backToList", lang)}
               </Button>
-              <Button
-                icon={<EditOutlined />}
-                onClick={() => navigate(ROUTES.pricelistDetail(pricelist.id))}
-              >
-                {t("pricelists.edit", lang)}
-              </Button>
-              <Button
-                danger
-                icon={<DeleteOutlined />}
-                onClick={() => setIsDeleteOpen(true)}
-              >
-                {t("common.delete", lang)}
-              </Button>
+              {isEditing ? (
+                <>
+                  <Button icon={<CloseOutlined />} onClick={handleCancelEdit}>
+                    {t("common.cancel", lang)}
+                  </Button>
+                  <Button
+                    type="primary"
+                    icon={<SaveOutlined />}
+                    loading={updateMutation.isPending}
+                    onClick={handleSave}
+                  >
+                    {t("common.save", lang)}
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button icon={<EditOutlined />} onClick={handleEdit}>
+                    {t("pricelists.edit", lang)}
+                  </Button>
+                  <Button
+                    danger
+                    icon={<DeleteOutlined />}
+                    onClick={() => setIsDeleteOpen(true)}
+                  >
+                    {t("common.delete", lang)}
+                  </Button>
+                </>
+              )}
             </Space>
           }
         />
@@ -201,7 +312,16 @@ export default function PricelistDetailPage() {
             {
               key: "details",
               label: t("pricelists.detail", lang),
-              children: <DetailsTab pricelist={pricelist} t={t} lang={lang} />,
+              children: (
+                <DetailsTab
+                  pricelist={pricelist}
+                  t={t}
+                  lang={lang}
+                  isEditing={isEditing}
+                  form={form}
+                  updateField={updateField}
+                />
+              ),
             },
             {
               key: "items",
@@ -264,59 +384,164 @@ function discountPolicyLabel(
 
 // ── Details Tab ──────────────────────────────────────────────────────────────
 
+type DetailsTabProps = {
+  pricelist: Pricelist;
+  t: (k: string, l: string) => string;
+  lang: string;
+  isEditing: boolean;
+  form: EditFormState;
+  updateField: <K extends keyof EditFormState>(
+    key: K,
+    value: EditFormState[K]
+  ) => void;
+};
+
 function DetailsTab({
   pricelist,
   t,
   lang,
-}: {
-  pricelist: Pricelist;
-  t: (k: string, l: string) => string;
-  lang: string;
-}) {
+  isEditing,
+  form,
+  updateField,
+}: DetailsTabProps) {
+  const discountPolicyOptions = [
+    {
+      label: t("pricelists.discountPolicy.includeInPrice", lang),
+      value: PricelistDiscountPolicy.INCLUDE_IN_PRICE,
+    },
+    {
+      label: t("pricelists.discountPolicy.discountOnSale", lang),
+      value: PricelistDiscountPolicy.DISCOUNT_ON_SALE,
+    },
+  ];
+
+  if (!isEditing) {
+    return (
+      <Card>
+        <Descriptions column={{ xs: 1, sm: 2, lg: 3 }} bordered size="small">
+          <Descriptions.Item label={t("pricelists.field.nameEn", lang)}>
+            {pricelist.nameEn}
+          </Descriptions.Item>
+          <Descriptions.Item label={t("pricelists.field.nameAr", lang)}>
+            {pricelist.nameAr}
+          </Descriptions.Item>
+          <Descriptions.Item label={t("pricelists.field.currency", lang)}>
+            {pricelist.currencyCode
+              ? `${pricelist.currencyCode}${pricelist.currencySymbol ? ` (${pricelist.currencySymbol})` : ""}`
+              : "--"}
+          </Descriptions.Item>
+          <Descriptions.Item label={t("pricelists.field.discountPolicy", lang)}>
+            {discountPolicyLabel(pricelist.discountPolicy, t, lang)}
+          </Descriptions.Item>
+          <Descriptions.Item label={t("pricelists.field.startDate", lang)}>
+            {pricelist.startDate
+              ? dayjs(pricelist.startDate).format("DD MMM YYYY")
+              : "--"}
+          </Descriptions.Item>
+          <Descriptions.Item label={t("pricelists.field.endDate", lang)}>
+            {pricelist.endDate
+              ? dayjs(pricelist.endDate).format("DD MMM YYYY")
+              : "--"}
+          </Descriptions.Item>
+          <Descriptions.Item label={t("pricelists.field.isActive", lang)}>
+            {pricelist.isActive ? (
+              <Tag color="success">{t("pricelists.stats.active", lang)}</Tag>
+            ) : (
+              <Tag color="default">{t("pricelists.stats.inactive", lang)}</Tag>
+            )}
+          </Descriptions.Item>
+          <Descriptions.Item label={t("pricelists.column.createdBy", lang)}>
+            {getName({
+              nameEn: pricelist.createdByNameEn,
+              nameAr: pricelist.createdByNameAr,
+            }) || "--"}
+          </Descriptions.Item>
+          <Descriptions.Item label={t("pricelists.column.createdAt", lang)}>
+            {dayjs(pricelist.createdAt).format("DD MMM YYYY HH:mm")}
+          </Descriptions.Item>
+        </Descriptions>
+      </Card>
+    );
+  }
+
   return (
     <Card>
-      <Descriptions column={{ xs: 1, sm: 2, lg: 3 }} bordered size="small">
-        <Descriptions.Item label={t("pricelists.field.nameEn", lang)}>
-          {pricelist.nameEn}
-        </Descriptions.Item>
-        <Descriptions.Item label={t("pricelists.field.nameAr", lang)}>
-          {pricelist.nameAr}
-        </Descriptions.Item>
-        <Descriptions.Item label={t("pricelists.field.currency", lang)}>
-          {pricelist.currencyCode
-            ? `${pricelist.currencyCode}${pricelist.currencySymbol ? ` (${pricelist.currencySymbol})` : ""}`
-            : "--"}
-        </Descriptions.Item>
-        <Descriptions.Item label={t("pricelists.field.discountPolicy", lang)}>
-          {discountPolicyLabel(pricelist.discountPolicy, t, lang)}
-        </Descriptions.Item>
-        <Descriptions.Item label={t("pricelists.field.startDate", lang)}>
-          {pricelist.startDate
-            ? dayjs(pricelist.startDate).format("DD MMM YYYY")
-            : "--"}
-        </Descriptions.Item>
-        <Descriptions.Item label={t("pricelists.field.endDate", lang)}>
-          {pricelist.endDate
-            ? dayjs(pricelist.endDate).format("DD MMM YYYY")
-            : "--"}
-        </Descriptions.Item>
-        <Descriptions.Item label={t("pricelists.field.isActive", lang)}>
-          {pricelist.isActive ? (
-            <Tag color="success">{t("pricelists.stats.active", lang)}</Tag>
-          ) : (
-            <Tag color="default">{t("pricelists.stats.inactive", lang)}</Tag>
-          )}
-        </Descriptions.Item>
-        <Descriptions.Item label={t("pricelists.column.createdBy", lang)}>
-          {getName({
-            nameEn: pricelist.createdByNameEn,
-            nameAr: pricelist.createdByNameAr,
-          }) || "--"}
-        </Descriptions.Item>
-        <Descriptions.Item label={t("pricelists.column.createdAt", lang)}>
-          {dayjs(pricelist.createdAt).format("DD MMM YYYY HH:mm")}
-        </Descriptions.Item>
-      </Descriptions>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <Form.Item
+          label={t("pricelists.field.nameEn", lang)}
+          layout="vertical"
+          required
+          className="mb-0"
+        >
+          <Input
+            value={form.nameEn}
+            onChange={e => updateField("nameEn", e.target.value)}
+            placeholder={t("pricelists.field.nameEn", lang)}
+          />
+        </Form.Item>
+        <Form.Item
+          label={t("pricelists.field.nameAr", lang)}
+          layout="vertical"
+          required
+          className="mb-0"
+        >
+          <Input
+            value={form.nameAr}
+            onChange={e => updateField("nameAr", e.target.value)}
+            placeholder={t("pricelists.field.nameAr", lang)}
+            dir="rtl"
+          />
+        </Form.Item>
+        <Form.Item
+          label={t("pricelists.field.discountPolicy", lang)}
+          layout="vertical"
+          className="mb-0"
+        >
+          <Select
+            value={form.discountPolicy}
+            onChange={v => updateField("discountPolicy", v)}
+            options={discountPolicyOptions}
+          />
+        </Form.Item>
+        <Form.Item
+          label={t("pricelists.field.startDate", lang)}
+          layout="vertical"
+          className="mb-0"
+        >
+          <DatePicker
+            value={form.startDate ? dayjs(form.startDate) : null}
+            style={{ width: "100%" }}
+            onChange={date =>
+              updateField("startDate", date ? date.format("YYYY-MM-DD") : "")
+            }
+            placeholder={t("pricelists.field.startDate", lang)}
+          />
+        </Form.Item>
+        <Form.Item
+          label={t("pricelists.field.endDate", lang)}
+          layout="vertical"
+          className="mb-0"
+        >
+          <DatePicker
+            value={form.endDate ? dayjs(form.endDate) : null}
+            style={{ width: "100%" }}
+            onChange={date =>
+              updateField("endDate", date ? date.format("YYYY-MM-DD") : "")
+            }
+            placeholder={t("pricelists.field.endDate", lang)}
+          />
+        </Form.Item>
+        <Form.Item
+          label={t("pricelists.field.isActive", lang)}
+          layout="vertical"
+          className="mb-0"
+        >
+          <Switch
+            checked={form.isActive}
+            onChange={v => updateField("isActive", v)}
+          />
+        </Form.Item>
+      </div>
     </Card>
   );
 }

@@ -1169,7 +1169,7 @@ export default function ProductDetails() {
               />
             </button>
             <button
-              onClick={() => navigate("/all-orders")}
+              onClick={() => navigate("/sales/orders")}
               className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-secondary/50 transition-colors text-left group"
             >
               <div className="w-9 h-9 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
