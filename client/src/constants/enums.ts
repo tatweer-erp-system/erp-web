@@ -103,7 +103,7 @@ export type PricelistComputation =
 
 // ─── Purchase ─────────────────────────────────────────────────────────────────
 
-/** Purchase order fulfillment status */
+/** Purchase order fulfillment status (legacy — UI pages only) */
 export const PurchaseOrderStatus = {
   DELIVERED: "delivered",
   IN_TRANSIT: "in-transit",
@@ -112,6 +112,34 @@ export const PurchaseOrderStatus = {
 } as const;
 export type PurchaseOrderStatus =
   (typeof PurchaseOrderStatus)[keyof typeof PurchaseOrderStatus];
+
+/** Purchase order status (matches backend PurchaseOrderStatus) */
+export const PurchaseOrderStatusNew = {
+  DRAFT: "draft",
+  CONFIRMED: "confirmed",
+  DONE: "done",
+  CANCELLED: "cancelled",
+} as const;
+export type PurchaseOrderStatusNew =
+  (typeof PurchaseOrderStatusNew)[keyof typeof PurchaseOrderStatusNew];
+
+/** Purchase order bill status (matches backend PurchaseOrderBillStatus) */
+export const PurchaseOrderBillStatus = {
+  NOTHING: "nothing",
+  TO_BILL: "to_bill",
+  BILLED: "billed",
+} as const;
+export type PurchaseOrderBillStatus =
+  (typeof PurchaseOrderBillStatus)[keyof typeof PurchaseOrderBillStatus];
+
+/** Purchase order receipt status (matches backend PurchaseOrderReceiptStatus) */
+export const PurchaseOrderReceiptStatus = {
+  NOTHING: "nothing",
+  PARTIAL: "partial",
+  RECEIVED: "received",
+} as const;
+export type PurchaseOrderReceiptStatus =
+  (typeof PurchaseOrderReceiptStatus)[keyof typeof PurchaseOrderReceiptStatus];
 
 /** Purchase order payment status */
 export const PaymentStatus = {
@@ -583,6 +611,88 @@ export const AdjustmentReasonType = {
 } as const;
 export type AdjustmentReasonType =
   (typeof AdjustmentReasonType)[keyof typeof AdjustmentReasonType];
+
+// ─── Treasury ────────────────────────────────────────────────────────────────
+
+export const TreasuryAccountType = {
+  CASH: "cash",
+  BANK: "bank",
+} as const;
+export type TreasuryAccountType =
+  (typeof TreasuryAccountType)[keyof typeof TreasuryAccountType];
+
+export const TreasuryTransactionType = {
+  RECEIPT: "receipt",
+  PAYMENT: "payment",
+  TRANSFER_IN: "transferIn",
+  TRANSFER_OUT: "transferOut",
+  OPENING_BALANCE: "openingBalance",
+} as const;
+export type TreasuryTransactionType =
+  (typeof TreasuryTransactionType)[keyof typeof TreasuryTransactionType];
+
+export const ReconciliationStatus = {
+  DRAFT: "draft",
+  IN_PROGRESS: "in_progress",
+  COMPLETED: "completed",
+} as const;
+export type ReconciliationStatus =
+  (typeof ReconciliationStatus)[keyof typeof ReconciliationStatus];
+
+export const BankStatementStatus = {
+  OPEN: "open",
+  POSTED: "posted",
+} as const;
+export type BankStatementStatus =
+  (typeof BankStatementStatus)[keyof typeof BankStatementStatus];
+
+// ─── Invoices (new accounting module) ────────────────────────────────────────
+
+/** Invoice type (customer/vendor, invoice/refund) */
+export const InvoiceTypeNew = {
+  OUT_INVOICE: "out_invoice",
+  OUT_REFUND: "out_refund",
+  IN_INVOICE: "in_invoice",
+  IN_REFUND: "in_refund",
+} as const;
+export type InvoiceTypeNew =
+  (typeof InvoiceTypeNew)[keyof typeof InvoiceTypeNew];
+
+/** Invoice document status */
+export const InvoiceStatusNew = {
+  DRAFT: "draft",
+  POSTED: "posted",
+  CANCELLED: "cancelled",
+} as const;
+export type InvoiceStatusNew =
+  (typeof InvoiceStatusNew)[keyof typeof InvoiceStatusNew];
+
+/** Invoice payment status */
+export const InvoicePaymentStatus = {
+  NOT_PAID: "not_paid",
+  PARTIAL: "partial",
+  PAID: "paid",
+  REVERSED: "reversed",
+} as const;
+export type InvoicePaymentStatus =
+  (typeof InvoicePaymentStatus)[keyof typeof InvoicePaymentStatus];
+
+/** Payment type */
+export const PaymentTypeNew = {
+  INBOUND: "inbound",
+  OUTBOUND: "outbound",
+} as const;
+export type PaymentTypeNew =
+  (typeof PaymentTypeNew)[keyof typeof PaymentTypeNew];
+
+/** Payment document status */
+export const PaymentStatusNew = {
+  DRAFT: "draft",
+  POSTED: "posted",
+  CANCELLED: "cancelled",
+} as const;
+export type PaymentStatusNew =
+  (typeof PaymentStatusNew)[keyof typeof PaymentStatusNew];
 
 /** Voucher discount type */
 export const VoucherDiscountType = {

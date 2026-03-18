@@ -1,351 +1,994 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Plus,
-  Download,
-  Printer,
-  RotateCcw,
-  Grid3x3,
-  List,
-} from "lucide-react";
-import { BulkActions } from "@/components/BulkActions";
-import { AdvancedFilters } from "@/components/AdvancedFilters";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { useAppSettings } from "@/contexts/AppSettingsContext";
 import { useLangStore } from "@/stores/lang.store";
-import { ReturnStatus } from "@/constants/enums";
+import { useBranchStore } from "@/stores/branch.store";
+import { t } from "@/i18n";
+import { invoicesService } from "@/services/invoices.service";
+import { getPartnersDropdown } from "@/api/endpoints/partners.api";
+import { InvoiceTypeNew, InvoiceStatusNew } from "@/constants/enums";
+import type { InvoiceRow, InvoiceSummary } from "@/types/modules/invoices";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { getName } from "@/lib/utils";
+import { QUERY_KEYS } from "@/constants/queryKeys";
+import {
+  Table,
+  Button,
+  Tag,
+  Space,
+  Card,
+  Row,
+  Col,
+  Grid,
+  Statistic,
+  Modal,
+  Form,
+  InputNumber,
+  Select,
+  Tooltip,
+  Typography,
+  Dropdown,
+  DatePicker,
+  Drawer,
+  Input,
+  notification,
+} from "antd";
+import type { TableColumnsType, TablePaginationConfig } from "antd";
+import {
+  PlusOutlined,
+  ReloadOutlined,
+  FilterOutlined,
+  MoreOutlined,
+  EyeOutlined,
+  FileTextOutlined,
+  CheckCircleOutlined,
+  DollarOutlined,
+  CloseCircleOutlined,
+  ExclamationCircleOutlined,
+  SendOutlined,
+  DeleteOutlined,
+  RollbackOutlined,
+} from "@ant-design/icons";
+import dayjs from "dayjs";
 
-const purchaseReturnsData = [
+const { Text } = Typography;
+
+// ─── Tag config maps ────────────────────────────────────────────────────────
+
+const STATUS_TAG: Record<InvoiceStatusNew, { color: string; i18nKey: string }> =
   {
-    id: 1,
-    returnNo: "PR-2024-001",
-    vendor: "Tech Supplies Inc.",
-    amount: "$500",
-    reason: "Defective",
-    date: "2024-02-20",
-    status: ReturnStatus.PROCESSED,
-  },
-  {
-    id: 2,
-    returnNo: "PR-2024-002",
-    vendor: "Global Electronics",
-    amount: "$1,250",
-    reason: "Wrong item",
-    date: "2024-02-19",
-    status: ReturnStatus.PENDING,
-  },
-  {
-    id: 3,
-    returnNo: "PR-2024-003",
-    vendor: "Premium Logistics",
-    amount: "$320",
-    reason: "Damaged",
-    date: "2024-02-18",
-    status: ReturnStatus.PROCESSED,
-  },
-];
-
-function getStatusColor(status: string) {
-  switch (status) {
-    case ReturnStatus.PROCESSED:
-      return "bg-green-50 text-green-600";
-    case ReturnStatus.PENDING:
-      return "bg-orange-50 text-orange-600";
-    case ReturnStatus.REJECTED:
-      return "bg-red-50 text-red-600";
-    default:
-      return "dark:bg-secondary bg-secondary text-gray-600";
-  }
-}
-
-export default function PurchaseReturns() {
-  const language = useLangStore(s => s.lang);
-  const isRTL = language === "ar";
-  const [viewMode, setViewMode] = useState<"table" | "grid">("table");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [selectedItems, setSelectedItems] = useState<number[]>([]);
-  const [appliedFilters, setAppliedFilters] = useState<Record<string, string>>(
-    {}
-  );
-
-  const totalPages = Math.ceil(purchaseReturnsData.length / pageSize);
-  const startIndex = (currentPage - 1) * pageSize;
-  const paginatedData = purchaseReturnsData.slice(
-    startIndex,
-    startIndex + pageSize
-  );
-
-  const handlePrint = () => window.print();
-  const handleExport = () => {
-    const csv = [
-      ["Return No", "Vendor", "Amount", "Reason", "Date", "Status"],
-      ...purchaseReturnsData.map(item => [
-        item.returnNo,
-        item.vendor,
-        item.amount,
-        item.reason,
-        item.date,
-        item.status,
-      ]),
-    ]
-      .map(row => row.join(","))
-      .join("\n");
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "purchase-returns-export.csv";
-    a.click();
+    [InvoiceStatusNew.DRAFT]: {
+      color: "default",
+      i18nKey: "invoices.status.draft",
+    },
+    [InvoiceStatusNew.POSTED]: {
+      color: "blue",
+      i18nKey: "invoices.status.posted",
+    },
+    [InvoiceStatusNew.CANCELLED]: {
+      color: "red",
+      i18nKey: "invoices.status.cancelled",
+    },
   };
 
-  const breadcrumbs = [
-    { label: "Dashboard", href: "/" },
-    { label: "Purchases", href: "#" },
-    { label: "Purchase Returns" },
+// ─── Component ──────────────────────────────────────────────────────────────
+
+export default function PurchaseReturns() {
+  const { theme } = useAppSettings();
+  const lang = useLangStore(s => s.lang);
+  const branchId = useBranchStore(s => s.activeBranch?.id ?? null);
+  const screens = Grid.useBreakpoint();
+  const isMobile = !screens.md;
+  const queryClient = useQueryClient();
+
+  const primary = theme === "dark" ? "#37D399" : "#3B82F6";
+  const token = {
+    colorPrimary: primary,
+  };
+
+  // ── State ───────────────────────────────────────────────────────────────
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [viewInvoice, setViewInvoice] = useState<InvoiceRow | null>(null);
+
+  const [createForm] = Form.useForm();
+
+  // ── Queries ─────────────────────────────────────────────────────────────
+
+  const listParams = {
+    page,
+    limit: pageSize,
+    invoiceType: InvoiceTypeNew.IN_REFUND,
+    ...(search ? { search } : {}),
+    ...(statusFilter !== "all" ? { status: statusFilter } : {}),
+    sortBy: "createdAt",
+    sortOrder: "DESC" as const,
+  };
+
+  const {
+    data: invoicesRes,
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: [QUERY_KEYS.INVOICES_LIST, "in_refund", listParams, branchId],
+    queryFn: () => invoicesService.list(listParams),
+    enabled: !!branchId,
+  });
+
+  const invoices: InvoiceRow[] = invoicesRes?.data ?? [];
+  const totalRecords = invoicesRes?.meta?.total ?? 0;
+
+  const { data: summaryRes } = useQuery({
+    queryKey: [QUERY_KEYS.INVOICES_SUMMARY, "in_refund", branchId],
+    queryFn: () =>
+      invoicesService.summary({ invoiceType: InvoiceTypeNew.IN_REFUND }),
+    enabled: !!branchId,
+  });
+  const summary = (summaryRes as Record<string, unknown>)?.data as
+    | InvoiceSummary
+    | undefined;
+
+  // Vendor dropdown
+  const { data: vendorsData } = useQuery({
+    queryKey: ["partners-dropdown-vendors"],
+    queryFn: () => getPartnersDropdown({ limit: 200, type: "supplier" }),
+    staleTime: 60_000,
+  });
+  const vendors = vendorsData?.data ?? [];
+
+  // Posted vendor bills for "Original Invoice" select
+  const { data: vendorBillsData } = useQuery({
+    queryKey: [
+      QUERY_KEYS.INVOICES_LIST,
+      "in_invoice_posted_dropdown",
+      branchId,
+    ],
+    queryFn: () =>
+      invoicesService.list({
+        invoiceType: InvoiceTypeNew.IN_INVOICE,
+        status: InvoiceStatusNew.POSTED,
+        limit: 200,
+      }),
+    enabled: !!branchId,
+    staleTime: 60_000,
+  });
+  const vendorBills: InvoiceRow[] = vendorBillsData?.data ?? [];
+
+  // ── Mutations ───────────────────────────────────────────────────────────
+
+  const invalidate = () => {
+    queryClient.invalidateQueries({
+      queryKey: [QUERY_KEYS.INVOICES_LIST, "in_refund"],
+    });
+    queryClient.invalidateQueries({
+      queryKey: [QUERY_KEYS.INVOICES_SUMMARY, "in_refund"],
+    });
+  };
+
+  const createMutation = useMutation({
+    mutationFn: invoicesService.create,
+    onSuccess: () => {
+      notification.success({
+        message: t("purchasing.returns.msg.created", lang),
+      });
+      invalidate();
+      closeCreateModal();
+    },
+  });
+
+  const postMutation = useMutation({
+    mutationFn: (id: string) => invoicesService.post(id),
+    onSuccess: () => {
+      notification.success({
+        message: t("purchasing.returns.msg.posted", lang),
+      });
+      invalidate();
+    },
+  });
+
+  const cancelMutation = useMutation({
+    mutationFn: (id: string) => invoicesService.cancel(id),
+    onSuccess: () => {
+      notification.success({
+        message: t("purchasing.returns.msg.cancelled", lang),
+      });
+      invalidate();
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => invoicesService.remove(id),
+    onSuccess: () => {
+      notification.success({
+        message: t("purchasing.returns.msg.deleted", lang),
+      });
+      invalidate();
+    },
+  });
+
+  // ── Modal helpers ─────────────────────────────────────────────────────
+
+  const openCreate = useCallback(() => {
+    createForm.resetFields();
+    createForm.setFieldsValue({
+      invoiceDate: dayjs(),
+    });
+    setCreateModalOpen(true);
+  }, [createForm]);
+
+  const closeCreateModal = useCallback(() => {
+    setCreateModalOpen(false);
+    createForm.resetFields();
+  }, [createForm]);
+
+  const openView = useCallback((rec: InvoiceRow) => {
+    setViewInvoice(rec);
+    setDrawerOpen(true);
+  }, []);
+
+  // ── Submit handlers ───────────────────────────────────────────────────
+
+  const handleCreateSubmit = async () => {
+    try {
+      const values = await createForm.validateFields();
+      createMutation.mutate({
+        partnerId: values.partnerId,
+        invoiceType: InvoiceTypeNew.IN_REFUND,
+        invoiceDate: values.invoiceDate.format("YYYY-MM-DD"),
+        reference: values.originalInvoiceId || undefined,
+        lines: (values.lines ?? []).map(
+          (l: {
+            description?: string;
+            quantity: number;
+            unitPrice: number;
+            discountPct?: number;
+            taxRate?: number;
+          }) => ({
+            description: l.description || undefined,
+            quantity: l.quantity,
+            unitPrice: l.unitPrice,
+            discountPct: l.discountPct ?? 0,
+            taxRate: l.taxRate ?? 15,
+          })
+        ),
+      });
+    } catch {
+      // form validation failed
+    }
+  };
+
+  // ── Table columns ─────────────────────────────────────────────────────
+
+  const getVendorName = (rec: InvoiceRow) =>
+    lang === "ar"
+      ? rec.partnerNameAr || rec.partnerNameEn || "\u2014"
+      : rec.partnerNameEn || rec.partnerNameAr || "\u2014";
+
+  const columns: TableColumnsType<InvoiceRow> = [
+    {
+      title: t("purchasing.returns.col.invoiceNumber", lang),
+      dataIndex: "invoiceNumber",
+      render: (v: string) => (
+        <Text
+          strong
+          style={{ color: token.colorPrimary, fontFamily: "monospace" }}
+        >
+          {v}
+        </Text>
+      ),
+    },
+    {
+      title: t("purchasing.returns.col.invoiceDate", lang),
+      dataIndex: "invoiceDate",
+      sorter: true,
+      render: (v: string) => (
+        <Text type="secondary">{dayjs(v).format("YYYY-MM-DD")}</Text>
+      ),
+    },
+    {
+      title: t("purchasing.returns.col.vendor", lang),
+      dataIndex: "partnerNameEn",
+      render: (_: unknown, rec: InvoiceRow) => (
+        <Text strong>{getVendorName(rec)}</Text>
+      ),
+    },
+    {
+      title: t("purchasing.returns.col.originalInvoice", lang),
+      dataIndex: "reference" as keyof InvoiceRow,
+      render: (v: string | null) => (
+        <Text type="secondary" style={{ fontFamily: "monospace" }}>
+          {v || "\u2014"}
+        </Text>
+      ),
+    },
+    {
+      title: t("purchasing.returns.col.amountTotal", lang),
+      dataIndex: "amountTotal",
+      align: "right",
+      sorter: true,
+      render: (v: number | string, rec: InvoiceRow) => (
+        <Text strong>
+          {Number(v).toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}{" "}
+          {rec.currencyCode || "SAR"}
+        </Text>
+      ),
+    },
+    {
+      title: t("purchasing.returns.col.status", lang),
+      dataIndex: "status",
+      render: (v: InvoiceStatusNew) => {
+        const cfg = STATUS_TAG[v];
+        return cfg ? (
+          <Tag
+            color={cfg.color}
+            style={{ borderRadius: 20, padding: "2px 10px" }}
+          >
+            {t(cfg.i18nKey, lang)}
+          </Tag>
+        ) : (
+          v
+        );
+      },
+    },
+    {
+      title: "",
+      align: "center",
+      width: 60,
+      render: (_, rec) => {
+        const isDraft = rec.status === InvoiceStatusNew.DRAFT;
+        const isPosted = rec.status === InvoiceStatusNew.POSTED;
+
+        const items = [
+          {
+            key: "view",
+            label: t("purchasing.returns.action.view", lang),
+            icon: <EyeOutlined />,
+            onClick: () => openView(rec),
+          },
+          ...(isDraft
+            ? [
+                {
+                  key: "post",
+                  label: t("purchasing.returns.action.post", lang),
+                  icon: <SendOutlined />,
+                  onClick: () => {
+                    Modal.confirm({
+                      title: t("purchasing.returns.action.post", lang),
+                      content: t("purchasing.returns.confirm.post", lang),
+                      onOk: () => postMutation.mutate(rec.id),
+                    });
+                  },
+                },
+              ]
+            : []),
+          ...(isDraft || isPosted
+            ? [
+                { type: "divider" as const, key: "d1" },
+                {
+                  key: "cancel",
+                  label: t("purchasing.returns.action.cancel", lang),
+                  icon: <CloseCircleOutlined />,
+                  danger: true,
+                  onClick: () => {
+                    Modal.confirm({
+                      title: t("purchasing.returns.action.cancel", lang),
+                      icon: <ExclamationCircleOutlined />,
+                      content: t("purchasing.returns.confirm.cancel", lang),
+                      okButtonProps: { danger: true },
+                      onOk: () => cancelMutation.mutate(rec.id),
+                    });
+                  },
+                },
+              ]
+            : []),
+          ...(isDraft
+            ? [
+                {
+                  key: "delete",
+                  label: t("purchasing.returns.action.delete", lang),
+                  icon: <DeleteOutlined />,
+                  danger: true,
+                  onClick: () => {
+                    Modal.confirm({
+                      title: t("purchasing.returns.action.delete", lang),
+                      icon: <ExclamationCircleOutlined />,
+                      content: t("purchasing.returns.confirm.delete", lang),
+                      okButtonProps: { danger: true },
+                      onOk: () => deleteMutation.mutate(rec.id),
+                    });
+                  },
+                },
+              ]
+            : []),
+        ];
+
+        return (
+          <Dropdown menu={{ items }} trigger={["click"]}>
+            <Button type="text" icon={<MoreOutlined />} />
+          </Dropdown>
+        );
+      },
+    },
   ];
 
+  // ── Pagination handler ────────────────────────────────────────────────
+
+  const handleTableChange = (pagination: TablePaginationConfig) => {
+    setPage(pagination.current ?? 1);
+    setPageSize(pagination.pageSize ?? 20);
+  };
+
+  // ── Gradient header style for modals ──────────────────────────────────
+
+  const gradientHeader = {
+    background: `linear-gradient(135deg, ${primary}, ${theme === "dark" ? "#2dd4bf" : "#6366f1"})`,
+    padding: "16px 24px",
+    margin: "-20px -24px 16px -24px",
+    borderRadius: "8px 8px 0 0",
+    color: "#fff",
+  };
+
   return (
-    <DashboardLayout currentPage="Purchase Returns" breadcrumbs={breadcrumbs}>
-      <div className="space-y-6">
-        <div
-          className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 ${isRTL ? "text-right" : ""}`}
-        >
-          <Button className="bg-primary hover:bg-blue-700 text-white flex items-center gap-2 w-full sm:w-auto">
-            <Plus size={18} /> Create Return
-          </Button>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className="p-4 dark:bg-card bg-card shadow-sm border-0">
-            <p className="text-sm font-medium text-muted-foreground">
-              Total Returns
-            </p>
-            <h3 className="text-2xl font-bold text-foreground mt-2">89</h3>
-            <p className="text-xs text-muted-foreground mt-2">All time</p>
-          </Card>
-          <Card className="p-4 dark:bg-card bg-card shadow-sm border-0">
-            <p className="text-sm font-medium text-muted-foreground">Pending</p>
-            <h3 className="text-2xl font-bold text-orange-600 mt-2">5</h3>
-            <p className="text-xs text-muted-foreground mt-2">
-              Awaiting processing
-            </p>
-          </Card>
-          <Card className="p-4 dark:bg-card bg-card shadow-sm border-0">
-            <p className="text-sm font-medium text-muted-foreground">
-              Processed
-            </p>
-            <h3 className="text-2xl font-bold text-green-600 mt-2">84</h3>
-            <p className="text-xs text-muted-foreground mt-2">Completed</p>
-          </Card>
-          <Card className="p-4 dark:bg-card bg-card shadow-sm border-0">
-            <p className="text-sm font-medium text-muted-foreground">
-              Total Value
-            </p>
-            <h3 className="text-2xl font-bold text-primary mt-2">$31.8K</h3>
-            <p className="text-xs text-muted-foreground mt-2">
-              Returned amount
-            </p>
-          </Card>
-        </div>
-
-        {selectedItems.length > 0 && (
-          <BulkActions
-            selectedCount={selectedItems.length}
-            isAllSelected={selectedItems.length === paginatedData.length}
-            onSelectAll={checked => {
-              setSelectedItems(
-                checked ? paginatedData.map(item => item.id) : []
-              );
-            }}
-            onDelete={() => setSelectedItems([])}
-            onExport={() => {
-              handleExport();
-              setSelectedItems([]);
-            }}
-            onStatusUpdate={() => setSelectedItems([])}
-          />
-        )}
-
-        <Card className="p-4 dark:bg-card bg-card shadow-sm border-0">
-          <div className={`flex flex-wrap gap-2 items-center`}>
-            <div className="flex-1 min-w-xs">
-              <Input
-                placeholder="Search by return number or vendor..."
-                className={`${isRTL ? "pr-4 text-right" : "pl-4"} bg-secondary border-0`}
-              />
-            </div>
-            <AdvancedFilters
-              onApplyFilters={filters => setAppliedFilters(filters)}
-              onClearFilters={() => setAppliedFilters({})}
-              filterOptions={{
-                status: {
-                  label: "Status",
-                  options: ["Pending", "Processed", "Rejected"],
-                },
-              }}
-            />
-            <Button
-              variant="outline"
-              className="border-border"
-              onClick={() => window.location.reload()}
-            >
-              <RotateCcw size={16} />
-            </Button>
-            <Button
-              variant="outline"
-              className="border-border"
-              onClick={handlePrint}
-            >
-              <Printer size={16} />
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="border-border flex items-center gap-2"
+    <DashboardLayout
+      currentPage={t("purchasing.returns.title", lang)}
+      breadcrumbs={[
+        { label: t("Dashboard", lang), href: "/" },
+        { label: t("PURCHASES", lang), href: "#" },
+        { label: t("purchasing.returns.title", lang) },
+      ]}
+    >
+      <Space direction="vertical" size={20} style={{ width: "100%" }}>
+        {/* ── KPI Cards ────────────────────────────────────────────────── */}
+        <Row gutter={[16, 16]}>
+          {[
+            {
+              title: t("purchasing.returns.kpi.total", lang),
+              value: summary?.totalRecords ?? 0,
+              suffix: t("purchasing.returns.title", lang),
+              icon: <RollbackOutlined />,
+              iconColor: token.colorPrimary,
+              iconBg: `${token.colorPrimary}15`,
+              color: undefined,
+            },
+            {
+              title: t("purchasing.returns.kpi.draft", lang),
+              value: summary?.byStatus?.draft ?? 0,
+              suffix: t("invoices.status.draft", lang),
+              icon: <FileTextOutlined />,
+              iconColor: "#8b8b8b",
+              iconBg: "#8b8b8b15",
+              color: "#8b8b8b",
+            },
+            {
+              title: t("purchasing.returns.kpi.posted", lang),
+              value: summary?.byStatus?.posted ?? 0,
+              suffix: t("invoices.status.posted", lang),
+              icon: <CheckCircleOutlined />,
+              iconColor: "#3b82f6",
+              iconBg: "#3b82f615",
+              color: "#3b82f6",
+            },
+            {
+              title: t("purchasing.returns.kpi.totalAmount", lang),
+              value: Number(summary?.totalAmount ?? 0),
+              suffix: "SAR",
+              icon: <DollarOutlined />,
+              iconColor: "#6366f1",
+              iconBg: "#6366f115",
+              color: "#6366f1",
+              isCurrency: true,
+            },
+          ].map(s => (
+            <Col key={s.title} xs={24} sm={12} lg={6}>
+              <Card size="small" styles={{ body: { padding: "16px 20px" } }}>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "flex-start",
+                  }}
                 >
-                  <Download size={16} />
-                  <span className="hidden sm:inline">Export</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align={isRTL ? "start" : "end"}
-                className="w-48"
+                  <div>
+                    <Text
+                      type="secondary"
+                      style={{
+                        fontSize: 12,
+                        display: "block",
+                        marginBottom: 4,
+                      }}
+                    >
+                      {s.title}
+                    </Text>
+                    <Statistic
+                      value={s.value}
+                      precision={"isCurrency" in s && s.isCurrency ? 2 : 0}
+                      valueStyle={{
+                        fontSize: 24,
+                        lineHeight: 1,
+                        color: s.color ?? "inherit",
+                      }}
+                    />
+                    <Text type="secondary" style={{ fontSize: 12 }}>
+                      {s.suffix}
+                    </Text>
+                  </div>
+                  <div
+                    style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 10,
+                      background: s.iconBg,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: 18,
+                      color: s.iconColor,
+                    }}
+                  >
+                    {s.icon}
+                  </div>
+                </div>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+
+        {/* ── Toolbar Card ─────────────────────────────────────────────── */}
+        <Card size="small" styles={{ body: { padding: "12px 16px" } }}>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 8,
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Space wrap>
+              <Input.Search
+                placeholder={t("purchasing.returns.search", lang)}
+                allowClear
+                onSearch={v => {
+                  setSearch(v);
+                  setPage(1);
+                }}
+                style={{ width: 220 }}
+              />
+              <Select
+                value={statusFilter}
+                onChange={v => {
+                  setStatusFilter(v);
+                  setPage(1);
+                }}
+                style={{ width: 160 }}
+                suffixIcon={<FilterOutlined />}
+                options={[
+                  {
+                    value: "all",
+                    label: t("invoices.allStatuses", lang),
+                  },
+                  {
+                    value: InvoiceStatusNew.DRAFT,
+                    label: t("invoices.status.draft", lang),
+                  },
+                  {
+                    value: InvoiceStatusNew.POSTED,
+                    label: t("invoices.status.posted", lang),
+                  },
+                  {
+                    value: InvoiceStatusNew.CANCELLED,
+                    label: t("invoices.status.cancelled", lang),
+                  },
+                ]}
+              />
+            </Space>
+
+            <Space>
+              <Tooltip title={t("purchasing.returns.reload", lang)}>
+                <Button icon={<ReloadOutlined />} onClick={() => refetch()} />
+              </Tooltip>
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={openCreate}
               >
-                <DropdownMenuItem onClick={handleExport}>
-                  Export as CSV
-                </DropdownMenuItem>
-                <DropdownMenuItem>Export as Excel</DropdownMenuItem>
-                <DropdownMenuItem>Export as PDF</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <div className="flex gap-1 border border-border rounded-lg p-1">
-              <button
-                onClick={() => setViewMode("table")}
-                className={`p-2 rounded transition-colors ${viewMode === "table" ? "bg-primary text-white" : "text-foreground hover:bg-secondary"}`}
-              >
-                <List size={16} />
-              </button>
-              <button
-                onClick={() => setViewMode("grid")}
-                className={`p-2 rounded transition-colors ${viewMode === "grid" ? "bg-primary text-white" : "text-foreground hover:bg-secondary"}`}
-              >
-                <Grid3x3 size={16} />
-              </button>
-            </div>
+                {t("purchasing.returns.new", lang)}
+              </Button>
+            </Space>
           </div>
         </Card>
 
-        {viewMode === "table" && (
-          <Card className="dark:bg-card bg-card shadow-sm border-0 overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-border">
-                    <th className="px-6 py-4 text-sm font-semibold text-foreground text-center">
-                      <input
-                        type="checkbox"
-                        checked={
-                          selectedItems.length === paginatedData.length &&
-                          paginatedData.length > 0
-                        }
-                        onChange={e =>
-                          setSelectedItems(
-                            e.target.checked
-                              ? paginatedData.map(item => item.id)
-                              : []
-                          )
-                        }
-                        className="w-4 h-4 rounded border-border"
-                      />
-                    </th>
-                    <th className="px-6 py-4 text-sm font-semibold text-foreground text-left">
-                      Return No
-                    </th>
-                    <th className="px-6 py-4 text-sm font-semibold text-foreground text-left">
-                      Vendor
-                    </th>
-                    <th className="px-6 py-4 text-sm font-semibold text-foreground text-left">
-                      Amount
-                    </th>
-                    <th className="px-6 py-4 text-sm font-semibold text-foreground text-left">
-                      Reason
-                    </th>
-                    <th className="px-6 py-4 text-sm font-semibold text-foreground text-left">
-                      Date
-                    </th>
-                    <th className="px-6 py-4 text-sm font-semibold text-foreground text-left">
-                      Status
-                    </th>
-                    <th className="px-6 py-4 text-sm font-semibold text-foreground text-center">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {paginatedData.map(item => (
-                    <tr
-                      key={item.id}
-                      className="border-b border-border hover:bg-secondary/30 transition-colors"
-                    >
-                      <td className="px-6 py-4 text-center">
-                        <input
-                          type="checkbox"
-                          checked={selectedItems.includes(item.id)}
-                          onChange={e =>
-                            setSelectedItems(
-                              e.target.checked
-                                ? [...selectedItems, item.id]
-                                : selectedItems.filter(id => id !== item.id)
-                            )
-                          }
-                          className="w-4 h-4 rounded border-border"
+        {/* ── Table ──────────────────────────────────────────────────── */}
+        <Card styles={{ body: { padding: 0 } }}>
+          <Table
+            rowKey="id"
+            columns={columns}
+            dataSource={invoices}
+            loading={isLoading}
+            size="middle"
+            scroll={{ x: "max-content" }}
+            onChange={handleTableChange}
+            pagination={{
+              current: page,
+              pageSize,
+              total: totalRecords,
+              showSizeChanger: true,
+              showTotal: (total, range) =>
+                `${range[0]}\u2013${range[1]} of ${total}`,
+              pageSizeOptions: ["10", "20", "50", "100"],
+            }}
+            locale={{
+              emptyText: (
+                <div style={{ padding: 40, textAlign: "center" }}>
+                  <RollbackOutlined
+                    style={{
+                      fontSize: 48,
+                      color: "#d9d9d9",
+                      marginBottom: 16,
+                    }}
+                  />
+                  <div>
+                    <Text type="secondary">
+                      {t("purchasing.returns.empty", lang)}
+                    </Text>
+                  </div>
+                  <div>
+                    <Text type="secondary" style={{ fontSize: 12 }}>
+                      {t("purchasing.returns.emptyHint", lang)}
+                    </Text>
+                  </div>
+                </div>
+              ),
+            }}
+          />
+        </Card>
+      </Space>
+
+      {/* ── Create Modal ──────────────────────────────────────────────── */}
+      <Modal
+        open={createModalOpen}
+        onCancel={closeCreateModal}
+        onOk={handleCreateSubmit}
+        okText={t("purchasing.returns.new", lang)}
+        confirmLoading={createMutation.isPending}
+        width={isMobile ? "95vw" : 720}
+        destroyOnHidden
+        title={null}
+        styles={{ body: { paddingTop: 20 } }}
+      >
+        <div style={gradientHeader}>
+          <Space>
+            <PlusOutlined />
+            <span style={{ fontSize: 16, fontWeight: 600 }}>
+              {t("purchasing.returns.new", lang)}
+            </span>
+          </Space>
+        </div>
+
+        <Form form={createForm} layout="vertical">
+          <Row gutter={16}>
+            <Col xs={24} sm={12}>
+              <Form.Item
+                label={t("purchasing.returns.form.vendor", lang)}
+                name="partnerId"
+                rules={[{ required: true }]}
+              >
+                <Select
+                  showSearch
+                  optionFilterProp="label"
+                  options={vendors.map(p => ({
+                    value: p.id,
+                    label: getName(p),
+                  }))}
+                  placeholder={t("purchasing.returns.form.vendor", lang)}
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12}>
+              <Form.Item
+                label={t("purchasing.returns.form.invoiceDate", lang)}
+                name="invoiceDate"
+                rules={[{ required: true }]}
+              >
+                <DatePicker style={{ width: "100%" }} />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col xs={24}>
+              <Form.Item
+                label={t("purchasing.returns.form.originalInvoice", lang)}
+                name="originalInvoiceId"
+                rules={[{ required: true }]}
+              >
+                <Select
+                  showSearch
+                  optionFilterProp="label"
+                  options={vendorBills.map(inv => ({
+                    value: inv.invoiceNumber,
+                    label: `${inv.invoiceNumber} — ${lang === "ar" ? inv.partnerNameAr || inv.partnerNameEn || "" : inv.partnerNameEn || inv.partnerNameAr || ""} — ${Number(inv.amountTotal).toLocaleString(undefined, { minimumFractionDigits: 2 })} SAR`,
+                  }))}
+                  placeholder={t(
+                    "purchasing.returns.form.originalInvoice",
+                    lang
+                  )}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          {/* ── Credit Note Lines ──────────────────────────────────────── */}
+          <Text strong style={{ display: "block", marginBottom: 8 }}>
+            {t("purchasing.returns.form.lines", lang)}
+          </Text>
+          <Form.List name="lines">
+            {(fields, { add, remove }) => (
+              <>
+                {fields.map(({ key, name, ...restField }) => (
+                  <Row key={key} gutter={8} align="middle">
+                    <Col xs={24} sm={6}>
+                      <Form.Item
+                        {...restField}
+                        name={[name, "description"]}
+                        rules={[{ required: true }]}
+                      >
+                        <Input
+                          placeholder={t(
+                            "purchasing.returns.form.description",
+                            lang
+                          )}
                         />
-                      </td>
-                      <td className="px-6 py-4 text-sm text-foreground font-medium">
-                        {item.returnNo}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-foreground">
-                        {item.vendor}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-foreground font-semibold">
-                        {item.amount}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-foreground">
-                        {item.reason}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-foreground">
-                        {item.date}
-                      </td>
-                      <td className="px-6 py-4 text-sm">
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(item.status)}`}
-                        >
-                          {item.status.charAt(0).toUpperCase() +
-                            item.status.slice(1)}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <Button variant="ghost" size="sm">
-                          View
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </Card>
+                      </Form.Item>
+                    </Col>
+                    <Col xs={12} sm={3}>
+                      <Form.Item
+                        {...restField}
+                        name={[name, "quantity"]}
+                        rules={[{ required: true }]}
+                      >
+                        <InputNumber
+                          min={1}
+                          style={{ width: "100%" }}
+                          placeholder={t(
+                            "purchasing.returns.form.quantity",
+                            lang
+                          )}
+                        />
+                      </Form.Item>
+                    </Col>
+                    <Col xs={12} sm={4}>
+                      <Form.Item
+                        {...restField}
+                        name={[name, "unitPrice"]}
+                        rules={[{ required: true }]}
+                      >
+                        <InputNumber
+                          min={0}
+                          style={{ width: "100%" }}
+                          placeholder={t(
+                            "purchasing.returns.form.unitPrice",
+                            lang
+                          )}
+                        />
+                      </Form.Item>
+                    </Col>
+                    <Col xs={12} sm={3}>
+                      <Form.Item
+                        {...restField}
+                        name={[name, "discountPct"]}
+                        initialValue={0}
+                      >
+                        <InputNumber
+                          min={0}
+                          max={100}
+                          style={{ width: "100%" }}
+                          placeholder={t(
+                            "purchasing.returns.form.discount",
+                            lang
+                          )}
+                        />
+                      </Form.Item>
+                    </Col>
+                    <Col xs={12} sm={3}>
+                      <Form.Item
+                        {...restField}
+                        name={[name, "taxRate"]}
+                        initialValue={15}
+                      >
+                        <InputNumber
+                          min={0}
+                          max={100}
+                          style={{ width: "100%" }}
+                          placeholder={t(
+                            "purchasing.returns.form.taxRate",
+                            lang
+                          )}
+                        />
+                      </Form.Item>
+                    </Col>
+                    <Col xs={24} sm={2}>
+                      <Button
+                        type="text"
+                        danger
+                        onClick={() => remove(name)}
+                        icon={<DeleteOutlined />}
+                        style={{ marginBottom: 24 }}
+                      />
+                    </Col>
+                  </Row>
+                ))}
+                <Button
+                  type="dashed"
+                  onClick={() =>
+                    add({
+                      quantity: 1,
+                      unitPrice: 0,
+                      discountPct: 0,
+                      taxRate: 15,
+                    })
+                  }
+                  block
+                  icon={<PlusOutlined />}
+                >
+                  {t("purchasing.returns.form.addLine", lang)}
+                </Button>
+              </>
+            )}
+          </Form.List>
+        </Form>
+      </Modal>
+
+      {/* ── Detail Drawer ─────────────────────────────────────────────── */}
+      <Drawer
+        open={drawerOpen}
+        onClose={() => {
+          setDrawerOpen(false);
+          setViewInvoice(null);
+        }}
+        width={isMobile ? "100%" : 560}
+        title={
+          viewInvoice
+            ? `${t("purchasing.returns.view", lang)} \u2014 ${viewInvoice.invoiceNumber}`
+            : ""
+        }
+      >
+        {viewInvoice && (
+          <Space direction="vertical" size={16} style={{ width: "100%" }}>
+            <Row gutter={[16, 12]}>
+              <Col span={12}>
+                <Text type="secondary">
+                  {t("purchasing.returns.col.invoiceNumber", lang)}
+                </Text>
+                <br />
+                <Text strong style={{ fontFamily: "monospace" }}>
+                  {viewInvoice.invoiceNumber}
+                </Text>
+              </Col>
+              <Col span={12}>
+                <Text type="secondary">
+                  {t("purchasing.returns.col.vendor", lang)}
+                </Text>
+                <br />
+                <Text strong>{getVendorName(viewInvoice)}</Text>
+              </Col>
+              <Col span={12}>
+                <Text type="secondary">
+                  {t("purchasing.returns.col.invoiceDate", lang)}
+                </Text>
+                <br />
+                <Text strong>
+                  {dayjs(viewInvoice.invoiceDate).format("YYYY-MM-DD")}
+                </Text>
+              </Col>
+              <Col span={12}>
+                <Text type="secondary">
+                  {t("purchasing.returns.col.status", lang)}
+                </Text>
+                <br />
+                {STATUS_TAG[viewInvoice.status] && (
+                  <Tag
+                    color={STATUS_TAG[viewInvoice.status].color}
+                    style={{ borderRadius: 20, padding: "2px 10px" }}
+                  >
+                    {t(STATUS_TAG[viewInvoice.status].i18nKey, lang)}
+                  </Tag>
+                )}
+              </Col>
+            </Row>
+
+            {/* Amounts */}
+            <Card size="small">
+              <Row gutter={[16, 8]}>
+                <Col span={12}>
+                  <Text type="secondary">
+                    {t("purchasing.returns.detail.amountUntaxed", lang)}
+                  </Text>
+                  <br />
+                  <Text>
+                    {Number(viewInvoice.amountUntaxed).toLocaleString(
+                      undefined,
+                      { minimumFractionDigits: 2 }
+                    )}
+                  </Text>
+                </Col>
+                <Col span={12}>
+                  <Text type="secondary">
+                    {t("purchasing.returns.detail.amountTax", lang)}
+                  </Text>
+                  <br />
+                  <Text>
+                    {Number(viewInvoice.amountTax).toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                    })}
+                  </Text>
+                </Col>
+                <Col span={24}>
+                  <Text type="secondary">
+                    {t("purchasing.returns.detail.amountTotal", lang)}
+                  </Text>
+                  <br />
+                  <Text strong style={{ fontSize: 16 }}>
+                    {Number(viewInvoice.amountTotal).toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                    })}{" "}
+                    {viewInvoice.currencyCode || "SAR"}
+                  </Text>
+                </Col>
+              </Row>
+            </Card>
+
+            {/* Action buttons */}
+            <Space style={{ marginTop: 16 }}>
+              {viewInvoice.status === InvoiceStatusNew.DRAFT && (
+                <Button
+                  type="primary"
+                  icon={<SendOutlined />}
+                  onClick={() => {
+                    Modal.confirm({
+                      title: t("purchasing.returns.action.post", lang),
+                      content: t("purchasing.returns.confirm.post", lang),
+                      onOk: () => {
+                        postMutation.mutate(viewInvoice.id);
+                        setDrawerOpen(false);
+                      },
+                    });
+                  }}
+                >
+                  {t("purchasing.returns.action.post", lang)}
+                </Button>
+              )}
+              {viewInvoice.status !== InvoiceStatusNew.CANCELLED && (
+                <Button
+                  danger
+                  icon={<CloseCircleOutlined />}
+                  onClick={() => {
+                    Modal.confirm({
+                      title: t("purchasing.returns.action.cancel", lang),
+                      icon: <ExclamationCircleOutlined />,
+                      content: t("purchasing.returns.confirm.cancel", lang),
+                      okButtonProps: { danger: true },
+                      onOk: () => {
+                        cancelMutation.mutate(viewInvoice.id);
+                        setDrawerOpen(false);
+                      },
+                    });
+                  }}
+                >
+                  {t("purchasing.returns.action.cancel", lang)}
+                </Button>
+              )}
+            </Space>
+          </Space>
         )}
-      </div>
+      </Drawer>
     </DashboardLayout>
   );
 }

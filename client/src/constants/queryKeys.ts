@@ -69,4 +69,24 @@ export const QUERY_KEYS = {
   GIFT_CARDS_REPORT: "gift-cards-report",
   VOUCHERS_REPORT: "vouchers-report",
   LOYALTY_REPORT_CUSTOMERS: "loyalty-report-customers",
+
+  // Treasury
+  TREASURY_ACCOUNTS: "treasury-accounts",
+  TREASURY_TRANSACTIONS: "treasury-transactions",
+  TREASURY_STATEMENT: "treasury-statement",
+  TRANSFER_REASONS: "transfer-reasons",
+  RECONCILIATIONS: "reconciliations",
+  BANK_STATEMENTS: "bank-statements",
+  BANK_STATEMENT_LINES: "bank-statement-lines",
+
+  // Invoices
+  INVOICES_LIST: "invoices-list",
+  INVOICES_SUMMARY: "invoices-summary",
+  INVOICE_DETAIL: "invoice-detail",
+  PAYMENTS_LIST: "payments-list",
+
+  // Purchase Orders
+  PURCHASE_ORDERS_LIST: "purchase-orders-list",
+  PURCHASE_ORDERS_SUMMARY: "purchase-orders-summary",
+  PURCHASE_ORDER_DETAIL: "purchase-order-detail",
 } as const;
