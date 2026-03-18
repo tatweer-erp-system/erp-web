@@ -48,6 +48,7 @@ import {
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { PageHeader } from "@/components/common/PageHeader";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
+import { CopyableCode } from "@/components/common/CopyableCode";
 import { ROUTES } from "@/shared/constants/routes";
 import { getName } from "@/shared/utils/getName.util";
 import { PartnerType } from "@/constants/enums";
@@ -248,12 +249,14 @@ function CustomerInfoCard({ customer, t, lang }: TabProps) {
           <div className="flex flex-wrap gap-4 text-sm text-gray-500">
             {customer.email && (
               <span className="flex items-center gap-1">
-                <MailOutlined /> {customer.email}
+                <MailOutlined />{" "}
+                <CopyableCode value={customer.email} variant="plain" />
               </span>
             )}
             {customer.phone && (
               <span className="flex items-center gap-1">
-                <PhoneOutlined /> {customer.phone}
+                <PhoneOutlined />{" "}
+                <CopyableCode value={customer.phone} variant="plain" />
               </span>
             )}
             {customer.city && (
@@ -292,16 +295,32 @@ function GeneralTab({ customer, t, lang }: TabProps) {
           {typeLabel[customer.type] ?? customer.type}
         </Descriptions.Item>
         <Descriptions.Item label={t("customers.field.email", lang)}>
-          {customer.email || "--"}
+          {customer.email ? (
+            <CopyableCode value={customer.email} variant="plain" />
+          ) : (
+            "--"
+          )}
         </Descriptions.Item>
         <Descriptions.Item label={t("customers.field.phone", lang)}>
-          {customer.phone || "--"}
+          {customer.phone ? (
+            <CopyableCode value={customer.phone} variant="plain" />
+          ) : (
+            "--"
+          )}
         </Descriptions.Item>
         <Descriptions.Item label={t("customers.field.mobile", lang)}>
-          {customer.mobile || "--"}
+          {customer.mobile ? (
+            <CopyableCode value={customer.mobile} variant="plain" />
+          ) : (
+            "--"
+          )}
         </Descriptions.Item>
         <Descriptions.Item label={t("customers.field.website", lang)}>
-          {customer.website || "--"}
+          {customer.website ? (
+            <CopyableCode value={customer.website} variant="plain" />
+          ) : (
+            "--"
+          )}
         </Descriptions.Item>
         <Descriptions.Item label={t("customers.field.isActive", lang)}>
           <Tag color={customer.isActive ? "green" : "default"}>
@@ -358,10 +377,18 @@ function AccountingTab({ customer, t, lang }: TabProps) {
           </span>
         </Descriptions.Item>
         <Descriptions.Item label={t("customers.field.taxNumber", lang)}>
-          {customer.taxNumber || "--"}
+          {customer.taxNumber ? (
+            <CopyableCode value={customer.taxNumber} variant="plain" />
+          ) : (
+            "--"
+          )}
         </Descriptions.Item>
         <Descriptions.Item label={t("customers.field.vatNumber", lang)}>
-          {customer.vatNumber || "--"}
+          {customer.vatNumber ? (
+            <CopyableCode value={customer.vatNumber} variant="plain" />
+          ) : (
+            "--"
+          )}
         </Descriptions.Item>
         <Descriptions.Item label={t("customers.field.paymentTerm", lang)}>
           {customer.paymentTermId || "--"}
@@ -379,7 +406,11 @@ function AccountingTab({ customer, t, lang }: TabProps) {
           {customer.apAccountId || "--"}
         </Descriptions.Item>
         <Descriptions.Item label={t("customers.field.bankIban", lang)}>
-          {customer.bankIban || "--"}
+          {customer.bankIban ? (
+            <CopyableCode value={customer.bankIban} variant="plain" />
+          ) : (
+            "--"
+          )}
         </Descriptions.Item>
         <Descriptions.Item label={t("customers.field.bankName", lang)}>
           {customer.bankName || "--"}

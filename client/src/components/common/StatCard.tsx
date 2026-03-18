@@ -22,24 +22,24 @@ function StatCardInner({
   const isNegative = change !== undefined && change < 0;
 
   return (
-    <div className="card-component p-6">
-      <div className="flex items-center justify-between mb-4">
-        <p className="text-sm font-medium text-muted-foreground">{title}</p>
+    <div className="card-component px-5 py-4">
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-xs font-medium text-muted-foreground">{title}</p>
         {icon && (
           <div
-            className={`w-10 h-10 rounded-lg flex items-center justify-center ${iconBg ?? "bg-primary/10"}`}
+            className={`w-9 h-9 rounded-lg flex items-center justify-center text-base ${iconBg ?? "bg-primary/10"}`}
           >
             {icon}
           </div>
         )}
       </div>
-      <p className="text-2xl font-bold text-foreground">{value}</p>
+      <p className="text-xl font-bold text-foreground leading-tight">{value}</p>
       {change !== undefined && (
-        <div className="flex items-center gap-1 mt-2">
-          {isPositive && <TrendingUp size={14} className="text-green-500" />}
-          {isNegative && <TrendingDown size={14} className="text-red-500" />}
+        <div className="flex items-center gap-1 mt-1">
+          {isPositive && <TrendingUp size={12} className="text-green-500" />}
+          {isNegative && <TrendingDown size={12} className="text-red-500" />}
           {!isPositive && !isNegative && (
-            <Minus size={14} className="text-muted-foreground" />
+            <Minus size={12} className="text-muted-foreground" />
           )}
           <span
             className={`text-xs font-medium ${isPositive ? "text-green-500" : isNegative ? "text-red-500" : "text-muted-foreground"}`}

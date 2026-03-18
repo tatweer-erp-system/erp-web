@@ -11,14 +11,17 @@ const { Text } = Typography;
 
 type CopyableCodeProps = {
   value: string;
+  /** "code" = monospace primary-colored (order numbers, codes).
+   *  "plain" = normal text style (emails, phones). */
+  variant?: "code" | "plain";
 };
 
 /**
- * Displays a code/order number with a copy button.
- * Used in list tables for order numbers, invoice numbers, codes, etc.
- * Styled as monospace primary-colored text with a subtle copy icon on hover.
+ * Displays text with a copy icon on hover.
+ * - variant="code": monospace, primary color (order numbers, codes)
+ * - variant="plain": normal text style (emails, phones)
  */
-export function CopyableCode({ value }: CopyableCodeProps) {
+export function CopyableCode({ value, variant = "code" }: CopyableCodeProps) {
   const lang = useLangStore(s => s.lang);
 
   const handleCopy = useCallback(
@@ -32,13 +35,17 @@ export function CopyableCode({ value }: CopyableCodeProps) {
 
   return (
     <span className="group inline-flex items-center gap-1">
-      <Text
-        strong
-        className="font-mono"
-        style={{ color: "var(--ant-color-primary)" }}
-      >
-        {value}
-      </Text>
+      {variant === "code" ? (
+        <Text
+          strong
+          className="font-mono"
+          style={{ color: "var(--ant-color-primary)" }}
+        >
+          {value}
+        </Text>
+      ) : (
+        <Text>{value}</Text>
+      )}
       <Tooltip title={t("common.copy", lang)}>
         <CopyOutlined
           className="text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:text-primary"
