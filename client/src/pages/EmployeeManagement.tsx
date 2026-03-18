@@ -185,7 +185,7 @@ export default function EmployeeManagement() {
     queryKey: [QUERY_KEYS.EMPLOYEES, branchId, debouncedSearch],
     queryFn: () =>
       employeesService.list({
-        limit: 200,
+        limit: 100,
         search: debouncedSearch || undefined,
       }),
     staleTime: 30_000,

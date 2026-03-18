@@ -67,6 +67,8 @@ import {
   TagOutlined,
   GiftOutlined,
   UserOutlined,
+  FunnelPlotOutlined,
+  ContactsOutlined,
 } from "@ant-design/icons";
 import { t } from "@/i18n";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
@@ -101,6 +103,11 @@ const NAV_ITEMS: NavItem[] = [
   { name: "Customers", icon: <TeamOutlined />, href: "/sales/customers" },
   { name: "Pricelists", icon: <TagsOutlined />, href: "/sales/pricelists" },
 
+  // ── CRM ────────────────────────────────────────────────────────────────────
+  { name: "CRM", isHeader: true },
+  { name: "Pipeline", icon: <FunnelPlotOutlined />, href: "/crm/pipeline" },
+  { name: "Leads", icon: <ContactsOutlined />, href: "/crm/leads" },
+
   // ── Purchases (Odoo: Purchase > Orders, Vendors, Bills) ─────────────────
   { name: "PURCHASES", isHeader: true },
   {
@@ -109,12 +116,9 @@ const NAV_ITEMS: NavItem[] = [
     href: "/purchase-orders",
   },
   {
-    name: "Vendors",
-    icon: <CarOutlined />,
-    submenu: [
-      { name: "All Vendors", href: "/sales/vendors" },
-      { name: "Vendor Groups", href: "/sales/vendor-groups" },
-    ],
+    name: "Vendor Payments",
+    icon: <DollarOutlined />,
+    href: "/vendor-payments",
   },
   {
     name: "Purchase Invoices",
@@ -125,16 +129,6 @@ const NAV_ITEMS: NavItem[] = [
     name: "Purchase Returns",
     icon: <UndoOutlined />,
     href: "/purchase-returns",
-  },
-  {
-    name: "Definitions",
-    icon: <DatabaseOutlined />,
-    href: "/purchases-definitions",
-  },
-  {
-    name: "Purchases Settings",
-    icon: <SettingOutlined />,
-    href: "/settings/purchases",
   },
 
   // ── Inventory (Odoo: Inventory > Products, Operations, Reporting) ───────
@@ -148,6 +142,7 @@ const NAV_ITEMS: NavItem[] = [
     href: "/stock-adjustments",
   },
   { name: "Stock Transfers", icon: <SwapOutlined />, href: "/stock-transfers" },
+  { name: "Deliveries", icon: <CarOutlined />, href: "/deliveries" },
 
   // ── Accounting (Odoo: Accounting > Journal, Reports, Config) ────────────
   { name: "ACCOUNTING", isHeader: true },
@@ -233,40 +228,38 @@ const NAV_ITEMS: NavItem[] = [
   {
     name: "Cash Accounts",
     icon: <AccountBookOutlined />,
-    href: "/cash-accounts",
+    href: "/treasury/cash-accounts",
   },
-  { name: "Bank Accounts", icon: <BankOutlined />, href: "/bank-accounts" },
+  {
+    name: "Bank Accounts",
+    icon: <BankOutlined />,
+    href: "/treasury/bank-accounts",
+  },
   {
     name: "Customer Receipts",
     icon: <MoneyCollectOutlined />,
-    href: "/sales/customer-receipts",
+    href: "/treasury/customer-receipts",
   },
   {
     name: "Vendor Payments",
     icon: <DollarOutlined />,
-    href: "/vendor-payments",
+    href: "/treasury/vendor-payments",
   },
-  { name: "Payments", icon: <PayCircleOutlined />, href: "/payments" },
-  { name: "Receipts", icon: <WalletOutlined />, href: "/receipts" },
+  {
+    name: "Payments",
+    icon: <PayCircleOutlined />,
+    href: "/treasury/payments",
+  },
+  { name: "Receipts", icon: <WalletOutlined />, href: "/treasury/receipts" },
   {
     name: "Bank Transfers",
     icon: <RetweetOutlined />,
-    href: "/bank-transfers",
+    href: "/treasury/bank-transfers",
   },
   {
     name: "Bank Reconciliation",
     icon: <CheckSquareOutlined />,
-    href: "/bank-reconciliation",
-  },
-  {
-    name: "Definitions",
-    icon: <DatabaseOutlined />,
-    href: "/treasury-definitions",
-  },
-  {
-    name: "Treasury Settings",
-    icon: <SettingOutlined />,
-    href: "/settings/treasury",
+    href: "/treasury/bank-reconciliation",
   },
 
   // ── HR (Odoo: Employees > Employees, Attendance, Leaves, Payroll) ───────
@@ -285,7 +278,11 @@ const NAV_ITEMS: NavItem[] = [
 
   // ── Reports ─────────────────────────────────────────────────────────────
   { name: "REPORTS", isHeader: true },
-  { name: "Sales Reports", icon: <BarChartOutlined />, href: "/sales-reports" },
+  {
+    name: "Sales Reports",
+    icon: <BarChartOutlined />,
+    href: "/sales-reports",
+  },
   {
     name: "Purchase Reports",
     icon: <ShoppingOutlined />,

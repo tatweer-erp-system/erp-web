@@ -94,7 +94,7 @@ export default function InventoryReports() {
     refetch: refetchStock,
   } = useQuery({
     queryKey: [QUERY_KEYS.STOCK_LEVELS, "reports"],
-    queryFn: () => stockService.getStockLevels({ limit: 500 }),
+    queryFn: () => stockService.getStockLevels({ limit: 100 }),
     staleTime: 30_000,
   });
 

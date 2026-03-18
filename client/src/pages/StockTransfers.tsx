@@ -76,7 +76,7 @@ export default function StockTransfers() {
     refetch,
   } = useQuery({
     queryKey: [QUERY_KEYS.STOCK_TRANSFERS],
-    queryFn: () => transfersService.list({ limit: 200 }),
+    queryFn: () => transfersService.list({ limit: 100 }),
     staleTime: 30_000,
   });
 

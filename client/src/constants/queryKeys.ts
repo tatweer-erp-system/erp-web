@@ -131,6 +131,15 @@ export const QUERY_KEYS = {
   PUBLIC_HOLIDAYS: "public-holidays",
   TERMINATION_REASONS: "termination-reasons",
 
+  // CRM
+  CRM_STAGES: "crm-stages",
+  CRM_LEADS: "crm-leads",
+  CRM_PIPELINE: "crm-pipeline",
+  CRM_CONVERSION: "crm-conversion",
+
+  // Deliveries
+  DELIVERIES: "deliveries",
+
   // Inventory — extended
   WAREHOUSES: "warehouses",
   WAREHOUSES_DROPDOWN: "warehouses-dropdown",
@@ -142,4 +151,10 @@ export const QUERY_KEYS = {
   INVENTORY_VALUATION: "inventory-valuation",
   UNITS_OF_MEASURE: "units-of-measure",
   ADJUSTMENT_REASONS: "adjustment-reasons",
+
+  // Sales — Deliveries
+  DELIVERIES_SUMMARY: "deliveries-summary",
+
+  // Sales — Reports
+  SALES_SUMMARY: "sales-summary",
 } as const;

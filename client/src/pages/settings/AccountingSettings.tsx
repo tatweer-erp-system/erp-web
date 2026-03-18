@@ -141,7 +141,7 @@ export default function AccountingSettings() {
   // ─── Fetch accounts for COA dropdowns ──────────────────────────────────────
   const { data: accountsRes, isLoading: accountsLoading } = useQuery({
     queryKey: [QUERY_KEYS.ACCOUNTS_LIST_AS, "accounting-settings-dropdown"],
-    queryFn: () => accountsService.list({ limit: 500 }),
+    queryFn: () => accountsService.list({ limit: 100 }),
   });
 
   const accounts: Account[] = useMemo(() => {

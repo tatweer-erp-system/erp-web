@@ -1,89 +1,117 @@
-import { useState, useMemo, useCallback } from "react";
+/**
+ * Bank Accounts list page.
+ * Follows the AllOrders.tsx design pattern exactly.
+ * Default export for lazy loading via React.lazy().
+ */
+
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
+
+import {
+  Table,
+  Button,
+  Card,
+  Row,
+  Col,
+  Grid,
+  Dropdown,
+  Typography,
+  Tag,
+  Statistic,
+  Input,
+  Tooltip,
+  Segmented,
+  DatePicker,
+  Modal,
+  Form,
+  Select,
+  Switch,
+  Drawer,
+  Divider,
+} from "antd";
+import type { TableColumnsType, TableProps } from "antd";
+import type { Dayjs } from "dayjs";
+import {
+  MoreOutlined,
+  EyeOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+  SearchOutlined,
+  ReloadOutlined,
+  DownloadOutlined,
+  FilterOutlined,
+  AppstoreOutlined,
+  UnorderedListOutlined,
+  ExportOutlined,
+  BankOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
+  DollarOutlined,
+} from "@ant-design/icons";
+import { toast } from "sonner";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { useAppSettings } from "@/contexts/AppSettingsContext";
-import { useLangStore } from "@/stores/lang.store";
-import { t } from "@/i18n";
+import { CopyableCode } from "@/components/common/CopyableCode";
+import { ConfirmDialog } from "@/components/common/ConfirmDialog";
+import { EmptyState } from "@/components/common/EmptyState";
+import { useTranslation } from "@/hooks/ui/useTranslation";
 import { treasuryAccountsService } from "@/services/treasury.service";
 import { accountsService } from "@/services/accounting.service";
 import { TreasuryAccountType } from "@/constants/enums";
+import { QUERY_KEYS } from "@/constants/queryKeys";
+import { getName } from "@/shared/utils/getName.util";
+import { ROUTES } from "@/shared/constants/routes";
 import type {
   TreasuryAccount,
   CreateTreasuryAccountDto,
   UpdateTreasuryAccountDto,
 } from "@/types/modules/treasury";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getName } from "@/lib/utils";
-import { QUERY_KEYS } from "@/constants/queryKeys";
-import {
-  Table,
-  Button,
-  Tag,
-  Space,
-  Card,
-  Row,
-  Col,
-  Grid,
-  Statistic,
-  Modal,
-  Form,
-  Select,
-  Tooltip,
-  Typography,
-  Dropdown,
-  Drawer,
-  Input,
-  Switch,
-  Divider,
-  notification,
-} from "antd";
-import type { TableColumnsType } from "antd";
-import {
-  PlusOutlined,
-  ReloadOutlined,
-  FilterOutlined,
-  EditOutlined,
-  MoreOutlined,
-  EyeOutlined,
-  DeleteOutlined,
-  BankOutlined,
-  CheckCircleOutlined,
-  CloseCircleOutlined,
-  DollarOutlined,
-  CopyOutlined,
-} from "@ant-design/icons";
 
 const { Text } = Typography;
-
-// ─── Component ───────────────────────────────────────────────────────────────
+const { RangePicker } = DatePicker;
+const DEFAULT_PAGE_SIZE = 20;
 
 export default function BankAccounts() {
-  const { theme } = useAppSettings();
-  const lang = useLangStore(s => s.lang);
+  const { t, lang } = useTranslation();
   const screens = Grid.useBreakpoint();
   const isMobile = !screens.md;
   const queryClient = useQueryClient();
 
-  const primary = theme === "dark" ? "#37D399" : "#3B82F6";
-  const textMuted = theme === "dark" ? "#8a9a8a" : "#94a3b8";
-  const token = {
-    colorPrimary: primary,
-    colorTextQuaternary: textMuted,
-  };
+  // ── Search with 400ms debounce ──────────────────────────────────────────
+  const [searchInput, setSearchInput] = useState("");
+  const [search, setSearch] = useState("");
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
-  // ── State ────────────────────────────────────────────────────────────────
+  useEffect(() => {
+    debounceRef.current = setTimeout(() => {
+      setSearch(searchInput);
+      setPage(1);
+    }, 400);
+    return () => clearTimeout(debounceRef.current);
+  }, [searchInput]);
+
+  // ── State ───────────────────────────────────────────────────────────────
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [searchText, setSearchText] = useState<string>("");
-
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const [viewMode, setViewMode] = useState<"table" | "grid">("table");
+  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState<TreasuryAccount | null>(
     null
   );
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [viewAccount, setViewAccount] = useState<TreasuryAccount | null>(null);
+  const [dateRange, setDateRange] = useState<
+    [Dayjs | null, Dayjs | null] | null
+  >(null);
 
   const [form] = Form.useForm();
 
-  // ── Queries ──────────────────────────────────────────────────────────────
+  // ── Queries ─────────────────────────────────────────────────────────────
 
   const {
     data: accountsRaw,
@@ -131,15 +159,15 @@ export default function BankAccounts() {
     }));
   }, [coaAccountsList]);
 
-  // ── Filtered data ────────────────────────────────────────────────────────
+  // ── Filtered data ───────────────────────────────────────────────────────
   const accounts = useMemo(() => {
     let filtered = [...allAccounts];
     if (statusFilter !== "all") {
       const isActive = statusFilter === "active";
       filtered = filtered.filter(a => a.isActive === isActive);
     }
-    if (searchText.trim()) {
-      const q = searchText.trim().toLowerCase();
+    if (search.trim()) {
+      const q = search.trim().toLowerCase();
       filtered = filtered.filter(
         a =>
           a.nameEn.toLowerCase().includes(q) ||
@@ -149,9 +177,11 @@ export default function BankAccounts() {
       );
     }
     return filtered;
-  }, [allAccounts, statusFilter, searchText]);
+  }, [allAccounts, statusFilter, search]);
 
-  // ── KPI values (computed from ALL data, not filtered) ─────────────────
+  const totalRows = accounts.length;
+
+  // ── KPI values (computed from ALL data, not filtered) ───────────────────
   const kpiTotal = allAccounts.length;
   const kpiActive = allAccounts.filter(a => a.isActive).length;
   const kpiInactive = allAccounts.filter(a => !a.isActive).length;
@@ -171,7 +201,7 @@ export default function BankAccounts() {
     mutationFn: (dto: CreateTreasuryAccountDto) =>
       treasuryAccountsService.create(dto),
     onSuccess: () => {
-      notification.success({ message: t("treasury.bank.created", lang) });
+      toast.success(t("treasury.bank.created", lang));
       invalidate();
       closeModal();
     },
@@ -181,7 +211,7 @@ export default function BankAccounts() {
     mutationFn: ({ id, dto }: { id: string; dto: UpdateTreasuryAccountDto }) =>
       treasuryAccountsService.update(id, dto),
     onSuccess: () => {
-      notification.success({ message: t("treasury.bank.updated", lang) });
+      toast.success(t("treasury.bank.updated", lang));
       invalidate();
       closeModal();
     },
@@ -190,12 +220,12 @@ export default function BankAccounts() {
   const deleteMutation = useMutation({
     mutationFn: (id: string) => treasuryAccountsService.remove(id),
     onSuccess: () => {
-      notification.success({ message: t("treasury.bank.deleted", lang) });
+      toast.success(t("treasury.bank.deleted", lang));
       invalidate();
     },
   });
 
-  // ── Modal helpers ────────────────────────────────────────────────────────
+  // ── Modal helpers ─────────────────────────────────────────────────────
 
   const openCreate = useCallback(() => {
     setEditingAccount(null);
@@ -241,7 +271,7 @@ export default function BankAccounts() {
     setDrawerOpen(true);
   }, []);
 
-  // ── Submit handler ─────────────────────────────────────────────────────
+  // ── Submit handler ────────────────────────────────────────────────────
 
   const handleSubmit = async () => {
     try {
@@ -288,223 +318,83 @@ export default function BankAccounts() {
     }
   };
 
-  // ── Copy helper ─────────────────────────────────────────────────────────
+  // ── Delete handler ────────────────────────────────────────────────────
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    notification.success({ message: "Copied!", duration: 1 });
+  const handleDelete = useCallback(() => {
+    if (!deleteId) return;
+    deleteMutation.mutate(deleteId, {
+      onSuccess: () => {
+        toast.success(t("treasury.bank.deleted", lang));
+        setDeleteId(null);
+      },
+      onError: () => toast.error(t("treasury.bank.loadFailed", lang)),
+    });
+  }, [deleteId, deleteMutation, t, lang]);
+
+  // ── Columns ─────────────────────────────────────────────────────────────
+
+  const columns = useBankAccountColumns(
+    t,
+    lang,
+    openView,
+    openEdit,
+    setDeleteId
+  );
+
+  const rowSelection: TableProps<TreasuryAccount>["rowSelection"] = {
+    selectedRowKeys: selectedRows,
+    onChange: keys => setSelectedRows(keys as string[]),
   };
 
-  // ── Truncate IBAN helper ────────────────────────────────────────────────
-
-  const truncateIban = (iban: string) => {
-    if (iban.length <= 10) return iban;
-    return `${iban.slice(0, 6)}...${iban.slice(-4)}`;
-  };
-
-  // ── Table columns ────────────────────────────────────────────────────────
-
-  const columns: TableColumnsType<TreasuryAccount> = [
-    {
-      title: t("treasury.bank.nameEn", lang),
-      dataIndex: "nameEn",
-      sorter: (a, b) => getName(a).localeCompare(getName(b)),
-      render: (_, rec) => (
-        <Text strong style={{ color: token.colorPrimary }}>
-          {getName(rec)}
-        </Text>
-      ),
-    },
-    {
-      title: t("treasury.bank.bankName", lang),
-      dataIndex: "bankName",
-      render: (v: string | null) => <Text>{v ?? "—"}</Text>,
-    },
-    {
-      title: t("treasury.bank.accountNumber", lang),
-      dataIndex: "accountNumber",
-      render: (v: string | null) => (
-        <Text style={{ fontFamily: "monospace" }}>{v ?? "—"}</Text>
-      ),
-    },
-    {
-      title: t("treasury.bank.iban", lang),
-      dataIndex: "iban",
-      render: (v: string | null) => {
-        if (!v) return <Text type="secondary">—</Text>;
-        return (
-          <Space size={4}>
-            <Tooltip title={v}>
-              <Text style={{ fontFamily: "monospace" }}>{truncateIban(v)}</Text>
-            </Tooltip>
-            <Tooltip title="Copy">
-              <Button
-                type="text"
-                size="small"
-                icon={<CopyOutlined />}
-                onClick={e => {
-                  e.stopPropagation();
-                  copyToClipboard(v);
-                }}
-              />
-            </Tooltip>
-          </Space>
-        );
-      },
-    },
-    {
-      title: t("treasury.bank.currency", lang),
-      dataIndex: "currency",
-      width: 100,
-      render: (v: string) => (
-        <Tag style={{ borderRadius: 20, padding: "2px 10px" }}>{v}</Tag>
-      ),
-    },
-    {
-      title: t("treasury.bank.balance", lang),
-      dataIndex: "currentBalance",
-      sorter: (a, b) =>
-        Number(a.currentBalance ?? 0) - Number(b.currentBalance ?? 0),
-      render: (v: number | string) => (
-        <Text strong style={{ fontFamily: "monospace" }}>
-          {Number(v ?? 0).toLocaleString(undefined, {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}
-        </Text>
-      ),
-    },
-    {
-      title: t("treasury.bank.status", lang),
-      dataIndex: "isActive",
-      render: (v: boolean) => (
-        <Tag
-          color={v ? "green" : "red"}
-          style={{ borderRadius: 20, padding: "2px 10px" }}
-        >
-          {v
-            ? t("treasury.bank.active", lang)
-            : t("treasury.bank.inactive", lang)}
-        </Tag>
-      ),
-    },
-    {
-      title: "",
-      align: "center",
-      width: 60,
-      render: (_, rec) => {
-        const items = [
-          {
-            key: "view",
-            label: t("treasury.bank.view", lang),
-            icon: <EyeOutlined />,
-            onClick: () => openView(rec),
-          },
-          {
-            key: "edit",
-            label: t("treasury.bank.edit", lang),
-            icon: <EditOutlined />,
-            onClick: () => openEdit(rec),
-          },
-          { type: "divider" as const, key: "d1" },
-          {
-            key: "delete",
-            label: t("treasury.bank.delete", lang),
-            danger: true,
-            icon: <DeleteOutlined />,
-            onClick: () => {
-              Modal.confirm({
-                title: t("treasury.bank.delete", lang),
-                content: t("treasury.bank.deleteConfirm", lang),
-                okButtonProps: { danger: true },
-                onOk: () => deleteMutation.mutate(rec.id),
-              });
-            },
-          },
-        ];
-
-        return (
-          <Dropdown menu={{ items }} trigger={["click"]}>
-            <Button type="text" icon={<MoreOutlined />} />
-          </Dropdown>
-        );
-      },
-    },
+  const breadcrumbs = [
+    { label: t("Dashboard", lang), href: ROUTES.DASHBOARD },
+    { label: t("treasury.title", lang), href: "#" },
+    { label: t("treasury.bank.title", lang) },
   ];
 
-  // ── Gradient header style for modal ────────────────────────────────────
-
-  const gradientHeader = {
-    background: `linear-gradient(135deg, ${primary}, ${theme === "dark" ? "#2dd4bf" : "#6366f1"})`,
-    padding: "16px 24px",
-    margin: "-20px -24px 16px -24px",
-    borderRadius: "8px 8px 0 0",
-    color: "#fff",
-  };
-
   return (
-    <DashboardLayout
-      currentPage="BankAccounts"
-      breadcrumbs={[
-        { label: "Dashboard", href: "/" },
-        { label: "Treasury", href: "#" },
-        { label: t("treasury.bank.title", lang) },
-      ]}
-    >
-      <Space direction="vertical" size={20} style={{ width: "100%" }}>
-        {/* ── KPI Cards ──────────────────────────────────────────────────── */}
+    <DashboardLayout currentPage="BankAccounts" breadcrumbs={breadcrumbs}>
+      <div className="flex flex-col gap-6">
+        {/* ── 1. Stats Row ──────────────────────────────────────────────── */}
         <Row gutter={[16, 16]}>
           {[
             {
               title: t("treasury.bank.total", lang),
               value: kpiTotal,
-              suffix: t("treasury.bank.title", lang),
+              suffix: "",
               icon: <BankOutlined />,
-              iconColor: token.colorPrimary,
-              iconBg: `${token.colorPrimary}15`,
-              color: undefined,
-              isCurrency: false,
+              iconColor: "#8b5cf6",
+              iconBg: "#8b5cf615",
             },
             {
               title: t("treasury.bank.totalBalance", lang),
               value: kpiTotalBalance,
-              suffix: "SAR",
+              suffix: " SAR",
               icon: <DollarOutlined />,
-              iconColor: "#8b5cf6",
-              iconBg: "#8b5cf615",
-              color: "#8b5cf6",
-              isCurrency: true,
+              iconColor: "#10b981",
+              iconBg: "#10b98115",
+              precision: 2,
             },
             {
               title: t("treasury.bank.totalActive", lang),
               value: kpiActive,
-              suffix: t("treasury.bank.active", lang),
+              suffix: "",
               icon: <CheckCircleOutlined />,
-              iconColor: "#10b981",
-              iconBg: "#10b98115",
-              color: "#10b981",
-              isCurrency: false,
+              iconColor: "#3b82f6",
+              iconBg: "#3b82f615",
             },
             {
               title: t("treasury.bank.totalInactive", lang),
               value: kpiInactive,
-              suffix: t("treasury.bank.inactive", lang),
+              suffix: "",
               icon: <CloseCircleOutlined />,
-              iconColor: "#ef4444",
-              iconBg: "#ef444415",
-              color: "#ef4444",
-              isCurrency: false,
+              iconColor: "#f59e0b",
+              iconBg: "#f59e0b15",
             },
           ].map(s => (
             <Col key={s.title} xs={24} sm={12} lg={6}>
               <Card size="small" styles={{ body: { padding: "16px 20px" } }}>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "flex-start",
-                  }}
-                >
+                <div className="flex justify-between items-start">
                   <div>
                     <Text
                       type="secondary"
@@ -518,16 +408,10 @@ export default function BankAccounts() {
                     </Text>
                     <Statistic
                       value={s.value}
-                      precision={s.isCurrency ? 2 : 0}
-                      valueStyle={{
-                        fontSize: 24,
-                        lineHeight: 1,
-                        color: s.color ?? "inherit",
-                      }}
+                      suffix={s.suffix}
+                      precision={s.precision ?? 0}
+                      valueStyle={{ fontSize: 24, lineHeight: 1 }}
                     />
-                    <Text type="secondary" style={{ fontSize: 12 }}>
-                      {s.suffix}
-                    </Text>
                   </div>
                   <div
                     style={{
@@ -550,51 +434,10 @@ export default function BankAccounts() {
           ))}
         </Row>
 
-        {/* ── Toolbar Card ───────────────────────────────────────────────── */}
+        {/* ── 2. Toolbar + Filters Card ─────────────────────────────────── */}
         <Card size="small" styles={{ body: { padding: "12px 16px" } }}>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: 8,
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Space wrap>
-              <Input.Search
-                placeholder={t("treasury.bank.search", lang)}
-                value={searchText}
-                onChange={e => setSearchText(e.target.value)}
-                allowClear
-                style={{ width: 220 }}
-              />
-              <Select
-                value={statusFilter}
-                onChange={v => setStatusFilter(v)}
-                style={{ width: 160 }}
-                suffixIcon={<FilterOutlined />}
-                options={[
-                  {
-                    value: "all",
-                    label: t("treasury.bank.allStatuses", lang),
-                  },
-                  {
-                    value: "active",
-                    label: t("treasury.bank.active", lang),
-                  },
-                  {
-                    value: "inactive",
-                    label: t("treasury.bank.inactive", lang),
-                  },
-                ]}
-              />
-            </Space>
-
-            <Space>
-              <Tooltip title="Reload">
-                <Button icon={<ReloadOutlined />} onClick={() => refetch()} />
-              </Tooltip>
+          <div className="flex flex-wrap gap-2 justify-between items-center">
+            <div className="flex flex-wrap gap-2 items-center">
               <Button
                 type="primary"
                 icon={<PlusOutlined />}
@@ -602,33 +445,192 @@ export default function BankAccounts() {
               >
                 {t("treasury.bank.new", lang)}
               </Button>
-            </Space>
+            </div>
+
+            <div className="flex flex-wrap gap-2 items-center">
+              <RangePicker
+                value={dateRange}
+                onChange={setDateRange}
+                placeholder={[
+                  t("common.dateFrom", lang),
+                  t("common.dateTo", lang),
+                ]}
+                allowClear
+                style={{ borderRadius: 8 }}
+              />
+              <Input
+                prefix={<SearchOutlined className="text-gray-400" />}
+                placeholder={t("common.search", lang)}
+                value={searchInput}
+                onChange={e => setSearchInput(e.target.value)}
+                allowClear
+                style={{ width: 240 }}
+              />
+              <Tooltip title={t("treasury.bank.allStatuses", lang)}>
+                <Button
+                  icon={<FilterOutlined />}
+                  onClick={() => setIsFilterOpen(!isFilterOpen)}
+                  type={isFilterOpen ? "primary" : "default"}
+                />
+              </Tooltip>
+              <Tooltip title={t("seq.reload", lang)}>
+                <Button icon={<ReloadOutlined />} onClick={() => refetch()} />
+              </Tooltip>
+              <Dropdown
+                menu={{
+                  items: [
+                    { key: "csv", label: "CSV", icon: <ExportOutlined /> },
+                    { key: "excel", label: "Excel", icon: <ExportOutlined /> },
+                    { key: "pdf", label: "PDF", icon: <ExportOutlined /> },
+                  ],
+                }}
+              >
+                <Button icon={<DownloadOutlined />}>
+                  {t("products.export", lang)}
+                </Button>
+              </Dropdown>
+              <Segmented
+                value={viewMode}
+                onChange={v => setViewMode(v as "table" | "grid")}
+                options={[
+                  { value: "table", icon: <UnorderedListOutlined /> },
+                  { value: "grid", icon: <AppstoreOutlined /> },
+                ]}
+              />
+            </div>
           </div>
+
+          {/* Filter panel (collapsible) */}
+          {isFilterOpen && (
+            <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+              <Row gutter={[12, 12]}>
+                <Col xs={24} sm={12} lg={6}>
+                  <Text type="secondary" className="text-xs mb-1 block">
+                    {t("treasury.bank.status", lang)}
+                  </Text>
+                  <Segmented
+                    value={statusFilter}
+                    onChange={v => {
+                      setStatusFilter(v as string);
+                      setPage(1);
+                    }}
+                    block
+                    options={[
+                      {
+                        value: "all",
+                        label: t("treasury.bank.allStatuses", lang),
+                      },
+                      {
+                        value: "active",
+                        label: t("treasury.bank.active", lang),
+                      },
+                      {
+                        value: "inactive",
+                        label: t("treasury.bank.inactive", lang),
+                      },
+                    ]}
+                    size="small"
+                  />
+                </Col>
+              </Row>
+
+              {/* Active filter tags */}
+              <div className="flex flex-wrap gap-1 mt-2">
+                {statusFilter !== "all" && (
+                  <Tag closable onClose={() => setStatusFilter("all")}>
+                    {t("treasury.bank.status", lang)}:{" "}
+                    {statusFilter === "active"
+                      ? t("treasury.bank.active", lang)
+                      : t("treasury.bank.inactive", lang)}
+                  </Tag>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Bulk bar */}
+          {selectedRows.length > 0 && (
+            <div
+              className="mt-3 py-2 px-3 rounded-md flex flex-wrap gap-3 items-center"
+              style={{
+                background: "var(--ant-color-primary-bg)",
+                border: "1px solid var(--ant-color-primary-border)",
+              }}
+            >
+              <Text strong style={{ color: "var(--ant-color-primary)" }}>
+                {selectedRows.length} {t("treasury.bank.selected", lang)}
+              </Text>
+              <Button size="small" icon={<DownloadOutlined />}>
+                {t("products.export", lang)}
+              </Button>
+              <Button size="small" danger icon={<DeleteOutlined />}>
+                {t("treasury.bank.delete", lang)}
+              </Button>
+              <Button
+                size="small"
+                type="text"
+                onClick={() => setSelectedRows([])}
+              >
+                {t("treasury.bank.allStatuses", lang)}
+              </Button>
+            </div>
+          )}
         </Card>
 
-        {/* ── Table ──────────────────────────────────────────────────────── */}
-        <Card styles={{ body: { padding: 0 } }}>
-          <Table
-            rowKey="id"
-            columns={columns}
-            dataSource={accounts}
-            loading={isLoading}
-            size="middle"
-            scroll={{ x: "max-content" }}
-            pagination={{
-              showSizeChanger: true,
-              showTotal: (total, range) =>
-                `${range[0]}–${range[1]} of ${total}`,
-              pageSizeOptions: ["5", "10", "25", "50"],
-            }}
-            locale={{
-              emptyText: t("treasury.bank.title", lang) + " — 0",
-            }}
+        {/* ── 3. Table (desktop) / Grid cards (mobile) ──────────────────── */}
+        {viewMode === "table" && !isMobile ? (
+          <Card styles={{ body: { padding: 0 } }}>
+            <Table
+              rowKey="id"
+              columns={columns}
+              dataSource={accounts}
+              rowSelection={rowSelection}
+              loading={isLoading}
+              size="middle"
+              scroll={{ x: "max-content" }}
+              onRow={rec => ({
+                onClick: () => openView(rec),
+                style: { cursor: "pointer" },
+              })}
+              pagination={{
+                current: page,
+                pageSize,
+                total: totalRows,
+                showSizeChanger: true,
+                pageSizeOptions: ["10", "20", "50", "100"],
+                showTotal: (total, range) =>
+                  `${range[0]}--${range[1]} of ${total}`,
+                onChange: (p, ps) => {
+                  setPage(p);
+                  setPageSize(ps);
+                },
+              }}
+              locale={{ emptyText: <EmptyState /> }}
+            />
+          </Card>
+        ) : (
+          <MobileGrid
+            accounts={accounts}
+            isLoading={isLoading}
+            onClick={openView}
+            t={t}
+            lang={lang}
           />
-        </Card>
-      </Space>
+        )}
+      </div>
 
-      {/* ── Create / Edit Modal ────────────────────────────────────────── */}
+      {/* ── 4. ConfirmDialog for delete ──────────────────────────────────── */}
+      <ConfirmDialog
+        open={!!deleteId}
+        onOpenChange={v => !v && setDeleteId(null)}
+        title={t("treasury.bank.delete", lang)}
+        description={t("treasury.bank.deleteConfirm", lang)}
+        confirmLabel={t("treasury.bank.delete", lang)}
+        onConfirm={handleDelete}
+        variant="danger"
+      />
+
+      {/* ── 5. Fast create / Edit Modal ──────────────────────────────────── */}
       <Modal
         open={modalOpen}
         onCancel={closeModal}
@@ -641,21 +643,12 @@ export default function BankAccounts() {
         confirmLoading={createMutation.isPending || updateMutation.isPending}
         width={isMobile ? "95vw" : 720}
         destroyOnHidden
-        title={null}
-        styles={{ body: { paddingTop: 20 } }}
+        title={
+          editingAccount
+            ? `${t("treasury.bank.edit", lang)} — ${getName(editingAccount)}`
+            : t("treasury.bank.new", lang)
+        }
       >
-        {/* Gradient header */}
-        <div style={gradientHeader}>
-          <Space>
-            {editingAccount ? <EditOutlined /> : <PlusOutlined />}
-            <span style={{ fontSize: 16, fontWeight: 600 }}>
-              {editingAccount
-                ? `${t("treasury.bank.edit", lang)} — ${getName(editingAccount)}`
-                : t("treasury.bank.new", lang)}
-            </span>
-          </Space>
-        </div>
-
         <Form form={form} layout="vertical">
           <Row gutter={16}>
             <Col xs={24} sm={12}>
@@ -795,7 +788,7 @@ export default function BankAccounts() {
           setDrawerOpen(false);
           setViewAccount(null);
         }}
-        size={isMobile ? "100%" : 640}
+        size={isMobile ? "default" : "large"}
         title={
           viewAccount
             ? `${t("treasury.bank.details", lang)} — ${getName(viewAccount)}`
@@ -803,7 +796,7 @@ export default function BankAccounts() {
         }
       >
         {viewAccount && (
-          <Space direction="vertical" size={16} style={{ width: "100%" }}>
+          <div className="flex flex-col gap-4">
             <Row gutter={[16, 12]}>
               <Col span={12}>
                 <Text type="secondary">{t("treasury.bank.nameEn", lang)}</Text>
@@ -897,37 +890,31 @@ export default function BankAccounts() {
                   {t("treasury.bank.accountNumber", lang)}
                 </Text>
                 <br />
-                <Text style={{ fontFamily: "monospace" }}>
-                  {viewAccount.accountNumber ?? "—"}
-                </Text>
+                {viewAccount.accountNumber ? (
+                  <CopyableCode value={viewAccount.accountNumber} />
+                ) : (
+                  <Text type="secondary">—</Text>
+                )}
               </Col>
               <Col span={12}>
                 <Text type="secondary">{t("treasury.bank.iban", lang)}</Text>
                 <br />
-                <Space size={4}>
-                  <Text style={{ fontFamily: "monospace" }}>
-                    {viewAccount.iban ?? "—"}
-                  </Text>
-                  {viewAccount.iban && (
-                    <Tooltip title="Copy">
-                      <Button
-                        type="text"
-                        size="small"
-                        icon={<CopyOutlined />}
-                        onClick={() => copyToClipboard(viewAccount.iban!)}
-                      />
-                    </Tooltip>
-                  )}
-                </Space>
+                {viewAccount.iban ? (
+                  <CopyableCode value={viewAccount.iban} />
+                ) : (
+                  <Text type="secondary">—</Text>
+                )}
               </Col>
               <Col span={12}>
                 <Text type="secondary">
                   {t("treasury.bank.swiftCode", lang)}
                 </Text>
                 <br />
-                <Text style={{ fontFamily: "monospace" }}>
-                  {viewAccount.swiftCode ?? "—"}
-                </Text>
+                {viewAccount.swiftCode ? (
+                  <CopyableCode value={viewAccount.swiftCode} />
+                ) : (
+                  <Text type="secondary">—</Text>
+                )}
               </Col>
               <Col span={24}>
                 <Text type="secondary">
@@ -945,7 +932,7 @@ export default function BankAccounts() {
             </Row>
 
             {/* Action buttons */}
-            <Space style={{ marginTop: 16 }}>
+            <div className="flex gap-2 mt-4">
               <Button
                 icon={<EditOutlined />}
                 onClick={() => {
@@ -959,23 +946,212 @@ export default function BankAccounts() {
                 danger
                 icon={<DeleteOutlined />}
                 onClick={() => {
-                  Modal.confirm({
-                    title: t("treasury.bank.delete", lang),
-                    content: t("treasury.bank.deleteConfirm", lang),
-                    okButtonProps: { danger: true },
-                    onOk: () => {
-                      deleteMutation.mutate(viewAccount.id);
-                      setDrawerOpen(false);
-                    },
-                  });
+                  setDrawerOpen(false);
+                  setDeleteId(viewAccount.id);
                 }}
               >
                 {t("treasury.bank.delete", lang)}
               </Button>
-            </Space>
-          </Space>
+            </div>
+          </div>
         )}
       </Drawer>
     </DashboardLayout>
+  );
+}
+
+// ── Columns hook ──────────────────────────────────────────────────────────
+
+function useBankAccountColumns(
+  t: (k: string, l: string) => string,
+  lang: "ar" | "en",
+  onView: (account: TreasuryAccount) => void,
+  onEdit: (account: TreasuryAccount) => void,
+  setDeleteId: (id: string | null) => void
+): TableColumnsType<TreasuryAccount> {
+  return useMemo(
+    () => [
+      {
+        title: t("treasury.bank.nameEn", lang),
+        dataIndex: "nameEn",
+        width: 200,
+        ellipsis: true,
+        render: (_: unknown, rec: TreasuryAccount) => (
+          <Text strong style={{ color: "var(--ant-color-primary)" }}>
+            {getName(rec)}
+          </Text>
+        ),
+      },
+      {
+        title: t("treasury.bank.bankName", lang),
+        dataIndex: "bankName",
+        width: 160,
+        render: (v: string | null) => <Text>{v ?? "—"}</Text>,
+      },
+      {
+        title: t("treasury.bank.accountNumber", lang),
+        dataIndex: "accountNumber",
+        width: 180,
+        render: (v: string | null) =>
+          v ? <CopyableCode value={v} /> : <Text type="secondary">—</Text>,
+      },
+      {
+        title: t("treasury.bank.iban", lang),
+        dataIndex: "iban",
+        width: 220,
+        render: (v: string | null) =>
+          v ? <CopyableCode value={v} /> : <Text type="secondary">—</Text>,
+      },
+      {
+        title: t("treasury.bank.currency", lang),
+        dataIndex: "currency",
+        width: 100,
+        render: (v: string) => (
+          <Tag style={{ borderRadius: 20, padding: "2px 10px" }}>{v}</Tag>
+        ),
+      },
+      {
+        title: t("treasury.bank.balance", lang),
+        dataIndex: "currentBalance",
+        width: 150,
+        align: "end" as const,
+        render: (v: number | string) => (
+          <Text strong className="font-mono">
+            {Number(v ?? 0).toLocaleString("en-SA", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </Text>
+        ),
+      },
+      {
+        title: t("treasury.bank.status", lang),
+        dataIndex: "isActive",
+        width: 110,
+        render: (v: boolean) => (
+          <Tag
+            color={v ? "green" : "red"}
+            style={{ borderRadius: 20, padding: "2px 10px" }}
+          >
+            {v
+              ? t("treasury.bank.active", lang)
+              : t("treasury.bank.inactive", lang)}
+          </Tag>
+        ),
+      },
+      {
+        title: t("seq.actions", lang),
+        align: "center" as const,
+        width: 60,
+        fixed: "right" as const,
+        render: (_: unknown, rec: TreasuryAccount) => (
+          <Dropdown
+            menu={{
+              items: [
+                {
+                  key: "view",
+                  label: t("treasury.bank.view", lang),
+                  icon: <EyeOutlined />,
+                  onClick: () => onView(rec),
+                },
+                {
+                  key: "edit",
+                  label: t("treasury.bank.edit", lang),
+                  icon: <EditOutlined />,
+                  onClick: () => onEdit(rec),
+                },
+                { type: "divider" as const, key: "d1" },
+                {
+                  key: "delete",
+                  label: t("treasury.bank.delete", lang),
+                  danger: true,
+                  icon: <DeleteOutlined />,
+                  onClick: () => setDeleteId(rec.id),
+                },
+              ],
+            }}
+            trigger={["click"]}
+          >
+            <Button
+              type="text"
+              icon={<MoreOutlined />}
+              onClick={e => e.stopPropagation()}
+            />
+          </Dropdown>
+        ),
+      },
+    ],
+    [t, lang, onView, onEdit, setDeleteId]
+  );
+}
+
+// ── Mobile Grid ───────────────────────────────────────────────────────────
+
+function MobileGrid({
+  accounts,
+  isLoading,
+  onClick,
+  t,
+  lang,
+}: {
+  accounts: TreasuryAccount[];
+  isLoading: boolean;
+  onClick: (account: TreasuryAccount) => void;
+  t: (k: string, l: string) => string;
+  lang: "ar" | "en";
+}) {
+  if (isLoading) return <Card loading />;
+  if (accounts.length === 0) {
+    return (
+      <Card>
+        <EmptyState />
+      </Card>
+    );
+  }
+  return (
+    <Row gutter={[16, 16]}>
+      {accounts.map(a => (
+        <Col key={a.id} xs={24} sm={12} xl={8}>
+          <Card
+            hoverable
+            size="small"
+            className="cursor-pointer"
+            onClick={() => onClick(a)}
+          >
+            <div className="flex items-start justify-between mb-1">
+              <Text
+                strong
+                className="text-base"
+                style={{ color: "var(--ant-color-primary)" }}
+              >
+                {getName(a)}
+              </Text>
+              <Tag
+                color={a.isActive ? "green" : "red"}
+                style={{ borderRadius: 20, padding: "2px 10px" }}
+              >
+                {a.isActive
+                  ? t("treasury.bank.active", lang)
+                  : t("treasury.bank.inactive", lang)}
+              </Tag>
+            </div>
+            <p className="text-sm text-gray-500 mb-2">{a.bankName ?? "—"}</p>
+            <div className="flex items-center justify-between">
+              <span className="text-base font-semibold font-mono">
+                {a.currency ?? "SAR"}{" "}
+                {Number(a.currentBalance ?? 0).toLocaleString("en-SA", {
+                  minimumFractionDigits: 2,
+                })}
+              </span>
+              {a.iban && (
+                <span className="text-xs text-gray-400 font-mono">
+                  {a.iban.slice(0, 6)}...{a.iban.slice(-4)}
+                </span>
+              )}
+            </div>
+          </Card>
+        </Col>
+      ))}
+    </Row>
   );
 }

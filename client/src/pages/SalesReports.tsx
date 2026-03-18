@@ -1,866 +1,457 @@
-import { useState, useMemo } from "react";
-import { DashboardLayout } from "@/components/layout/DashboardLayout";
+/**
+ * Sales Reports page with real API data.
+ * Follows the CashAccounts.tsx design pattern exactly.
+ * Default export for lazy loading via React.lazy().
+ */
+
+import { useState, useMemo, useCallback } from "react";
+
 import {
-  Table,
-  Button,
-  Input,
-  Tag,
-  Space,
   Card,
   Row,
   Col,
+  Grid,
+  Button,
+  Typography,
+  Tag,
   Statistic,
+  DatePicker,
   Select,
   Tooltip,
-  Typography,
+  Table,
   Dropdown,
-  Segmented,
-  DatePicker,
-  Radio,
+  Space,
 } from "antd";
 import type { TableColumnsType } from "antd";
+import type { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 import {
-  SearchOutlined,
   ReloadOutlined,
-  PrinterOutlined,
   DownloadOutlined,
   ExportOutlined,
-  ArrowUpOutlined,
-  ArrowDownOutlined,
-  TrophyOutlined,
+  FileTextOutlined,
   DollarOutlined,
   ShoppingCartOutlined,
-  UserOutlined,
   BarChartOutlined,
+  FilterOutlined,
 } from "@ant-design/icons";
-import {
-  AreaChart,
-  Area,
-  BarChart,
-  Bar,
-  PieChart,
-  Pie,
-  Cell,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip as RTooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
-import { InvoiceStatus } from "@/constants/enums";
 
-const { Text, Title } = Typography;
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
+import { EmptyState } from "@/components/common/EmptyState";
+import { useTranslation } from "@/hooks/ui/useTranslation";
+import { SalesOrderStatus } from "@/constants/enums";
+import { QUERY_KEYS } from "@/constants/queryKeys";
+import { ROUTES } from "@/shared/constants/routes";
+import { getSalesSummary } from "@/api/endpoints/sales-orders.api";
+import { useQuery } from "@tanstack/react-query";
+
+const { Text } = Typography;
 const { RangePicker } = DatePicker;
 
-// ─── Mock data ─────────────────────────────────────────────────────────────────
+// ── Types ────────────────────────────────────────────────────────────────────
 
-const monthlySales = [
-  { month: "Jan", revenue: 142000, orders: 234, returns: 8200, target: 150000 },
-  { month: "Feb", revenue: 168000, orders: 278, returns: 6100, target: 160000 },
-  { month: "Mar", revenue: 195000, orders: 312, returns: 9400, target: 180000 },
-  { month: "Apr", revenue: 183000, orders: 298, returns: 7300, target: 185000 },
-  {
-    month: "May",
-    revenue: 221000,
-    orders: 365,
-    returns: 11200,
-    target: 200000,
-  },
-  {
-    month: "Jun",
-    revenue: 247000,
-    orders: 401,
-    returns: 12800,
-    target: 220000,
-  },
-  {
-    month: "Jul",
-    revenue: 238000,
-    orders: 388,
-    returns: 10500,
-    target: 230000,
-  },
-  {
-    month: "Aug",
-    revenue: 264000,
-    orders: 432,
-    returns: 13100,
-    target: 245000,
-  },
-  {
-    month: "Sep",
-    revenue: 289000,
-    orders: 468,
-    returns: 14200,
-    target: 260000,
-  },
-  {
-    month: "Oct",
-    revenue: 271000,
-    orders: 445,
-    returns: 12900,
-    target: 270000,
-  },
-  {
-    month: "Nov",
-    revenue: 318000,
-    orders: 521,
-    returns: 16400,
-    target: 300000,
-  },
-  {
-    month: "Dec",
-    revenue: 356000,
-    orders: 589,
-    returns: 18700,
-    target: 340000,
-  },
-];
-
-const categoryData = [
-  { name: "Electronics", value: 34, revenue: 892000, color: "#3B82F6" },
-  { name: "Apparel", value: 22, revenue: 578000, color: "#10B981" },
-  { name: "Home & Garden", value: 18, revenue: 473000, color: "#F59E0B" },
-  { name: "Sports", value: 14, revenue: 368000, color: "#8B5CF6" },
-  { name: "Other", value: 12, revenue: 316000, color: "#6B7280" },
-];
-
-const topCustomers = [
-  { name: "Tech Corp", revenue: 284000, orders: 47, growth: 12.4 },
-  { name: "Global Industries", revenue: 231000, orders: 38, growth: 8.7 },
-  { name: "Enterprise Ltd", revenue: 198000, orders: 32, growth: -3.2 },
-  { name: "Startup Inc", revenue: 167000, orders: 28, growth: 22.1 },
-  { name: "Local Business", revenue: 142000, orders: 24, growth: 5.6 },
-];
-
-const topProducts = [
-  {
-    name: "Premium Widget Pro",
-    category: "Electronics",
-    sold: 1842,
-    revenue: 184200,
-    margin: 38,
-  },
-  {
-    name: "Sport Gear Bundle",
-    category: "Sports",
-    sold: 1234,
-    revenue: 123400,
-    margin: 42,
-  },
-  {
-    name: "Home Essentials Kit",
-    category: "Home & Garden",
-    sold: 987,
-    revenue: 98700,
-    margin: 35,
-  },
-  {
-    name: "Classic Apparel Set",
-    category: "Apparel",
-    sold: 876,
-    revenue: 87600,
-    margin: 51,
-  },
-  {
-    name: "Tech Accessories Pack",
-    category: "Electronics",
-    sold: 654,
-    revenue: 65400,
-    margin: 44,
-  },
-];
-
-interface Transaction {
-  id: string;
-  date: string;
-  customer: string;
-  product: string;
-  qty: number;
-  amount: number;
+type StatusBreakdown = {
   status: string;
-  salesperson: string;
-}
-
-const transactions: Transaction[] = [
-  {
-    id: "SI-2024-001",
-    date: "2024-12-15",
-    customer: "Tech Corp",
-    product: "Premium Widget Pro",
-    qty: 12,
-    amount: 14400,
-    status: InvoiceStatus.PAID,
-    salesperson: "Alice Johnson",
-  },
-  {
-    id: "SI-2024-002",
-    date: "2024-12-14",
-    customer: "Global Industries",
-    product: "Sport Gear Bundle",
-    qty: 8,
-    amount: 8000,
-    status: InvoiceStatus.PAID,
-    salesperson: "Bob Smith",
-  },
-  {
-    id: "SI-2024-003",
-    date: "2024-12-14",
-    customer: "Enterprise Ltd",
-    product: "Home Essentials Kit",
-    qty: 15,
-    amount: 12750,
-    status: InvoiceStatus.PENDING,
-    salesperson: "Carol White",
-  },
-  {
-    id: "SI-2024-004",
-    date: "2024-12-13",
-    customer: "Startup Inc",
-    product: "Classic Apparel Set",
-    qty: 20,
-    amount: 9800,
-    status: InvoiceStatus.PAID,
-    salesperson: "Alice Johnson",
-  },
-  {
-    id: "SI-2024-005",
-    date: "2024-12-13",
-    customer: "Local Business",
-    product: "Tech Accessories Pack",
-    qty: 6,
-    amount: 4200,
-    status: InvoiceStatus.OVERDUE,
-    salesperson: "David Brown",
-  },
-  {
-    id: "SI-2024-006",
-    date: "2024-12-12",
-    customer: "Tech Corp",
-    product: "Premium Widget Pro",
-    qty: 9,
-    amount: 10800,
-    status: InvoiceStatus.PAID,
-    salesperson: "Bob Smith",
-  },
-  {
-    id: "SI-2024-007",
-    date: "2024-12-12",
-    customer: "Global Industries",
-    product: "Home Essentials Kit",
-    qty: 11,
-    amount: 9350,
-    status: InvoiceStatus.PENDING,
-    salesperson: "Carol White",
-  },
-  {
-    id: "SI-2024-008",
-    date: "2024-12-11",
-    customer: "Enterprise Ltd",
-    product: "Sport Gear Bundle",
-    qty: 5,
-    amount: 5000,
-    status: InvoiceStatus.PAID,
-    salesperson: "David Brown",
-  },
-  {
-    id: "SI-2024-009",
-    date: "2024-12-11",
-    customer: "Startup Inc",
-    product: "Premium Widget Pro",
-    qty: 18,
-    amount: 21600,
-    status: InvoiceStatus.PAID,
-    salesperson: "Alice Johnson",
-  },
-  {
-    id: "SI-2024-010",
-    date: "2024-12-10",
-    customer: "Local Business",
-    product: "Classic Apparel Set",
-    qty: 7,
-    amount: 3430,
-    status: InvoiceStatus.CANCELLED,
-    salesperson: "Bob Smith",
-  },
-];
-
-// ─── Helpers ───────────────────────────────────────────────────────────────────
-
-function fmt(n: number) {
-  if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `$${(n / 1_000).toFixed(0)}K`;
-  return `$${n}`;
-}
-
-const STATUS_TAG: Record<string, string> = {
-  paid: "success",
-  pending: "warning",
-  overdue: "error",
-  cancelled: "default",
+  count: number;
+  totalAmount: number;
 };
 
-// ─── KPI Card ─────────────────────────────────────────────────────────────────
+type SalesSummaryData = {
+  totalOrders: number;
+  totalRevenue: number;
+  avgOrderValue: number;
+  byStatus: StatusBreakdown[];
+};
 
-function KpiCard({
-  title,
-  value,
-  sub,
-  change,
-  icon,
-}: {
-  title: string;
-  value: string;
-  sub: string;
-  change: number;
-  icon: React.ReactNode;
-}) {
-  const positive = change >= 0;
-  return (
-    <Card size="small" styles={{ body: { padding: "16px 20px" } }}>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
-        }}
-      >
-        <div>
-          <Text
-            type="secondary"
-            style={{
-              fontSize: 12,
-              textTransform: "uppercase",
-              letterSpacing: "0.05em",
-            }}
-          >
-            {title}
-          </Text>
-          <Title
-            level={3}
-            style={{ margin: "4px 0 2px", fontWeight: 700, lineHeight: 1 }}
-          >
-            {value}
-          </Title>
-          <Text type="secondary" style={{ fontSize: 12 }}>
-            {sub}
-          </Text>
-        </div>
-        <div>
-          <div style={{ fontSize: 20, marginBottom: 8 }}>{icon}</div>
-          <Tag
-            icon={positive ? <ArrowUpOutlined /> : <ArrowDownOutlined />}
-            color={positive ? "success" : "error"}
-            style={{ borderRadius: 20, fontWeight: 600 }}
-          >
-            {Math.abs(change)}%
-          </Tag>
-        </div>
-      </div>
-    </Card>
-  );
-}
+// ── Status color map ────────────────────────────────────────────────────────
 
-// ─── Component ────────────────────────────────────────────────────────────────
+const STATUS_COLOR: Record<string, string> = {
+  [SalesOrderStatus.DRAFT]: "blue",
+  [SalesOrderStatus.CONFIRMED]: "gold",
+  [SalesOrderStatus.DONE]: "green",
+  [SalesOrderStatus.CANCELLED]: "default",
+};
+
+const STATUS_ICON_COLOR: Record<string, string> = {
+  [SalesOrderStatus.DRAFT]: "#3b82f6",
+  [SalesOrderStatus.CONFIRMED]: "#f59e0b",
+  [SalesOrderStatus.DONE]: "#10b981",
+  [SalesOrderStatus.CANCELLED]: "#6b7280",
+};
+
+// ── Component ────────────────────────────────────────────────────────────────
 
 export default function SalesReports() {
-  const [chartType, setChartType] = useState<"area" | "bar">("area");
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [page, setPage] = useState(1);
+  const { t, lang } = useTranslation();
+  const screens = Grid.useBreakpoint();
+  const isMobile = !screens.md;
 
-  const filtered = useMemo(() => {
-    let d = transactions;
-    if (search) {
-      const q = search.toLowerCase();
-      d = d.filter(
-        t =>
-          t.id.toLowerCase().includes(q) ||
-          t.customer.toLowerCase().includes(q) ||
-          t.product.toLowerCase().includes(q)
-      );
-    }
-    if (statusFilter !== "all") d = d.filter(t => t.status === statusFilter);
-    return d;
-  }, [search, statusFilter]);
+  // ── Filter State ──────────────────────────────────────────────────────
+  const [dateRange, setDateRange] = useState<
+    [Dayjs | null, Dayjs | null] | null
+  >(null);
+  const [statusFilter, setStatusFilter] = useState<string | undefined>(
+    undefined
+  );
+  const [branchFilter, setBranchFilter] = useState<string | undefined>(
+    undefined
+  );
 
-  function handleExport() {
-    const csv = [
-      [
-        "Invoice #",
-        "Date",
-        "Customer",
-        "Product",
-        "Qty",
-        "Amount",
-        "Status",
-        "Salesperson",
-      ],
-      ...filtered.map(t => [
-        t.id,
-        t.date,
-        t.customer,
-        t.product,
-        t.qty,
-        t.amount,
-        t.status,
-        t.salesperson,
-      ]),
-    ]
-      .map(r => r.join(","))
-      .join("\n");
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
-    a.download = "sales-report.csv";
-    a.click();
-  }
+  // ── Query params ──────────────────────────────────────────────────────
+  const queryParams = useMemo(() => {
+    const p: Record<string, string> = {};
+    if (dateRange?.[0]) p.dateFrom = dateRange[0].format("YYYY-MM-DD");
+    if (dateRange?.[1]) p.dateTo = dateRange[1].format("YYYY-MM-DD");
+    if (statusFilter) p.status = statusFilter;
+    if (branchFilter) p.branchId = branchFilter;
+    return p;
+  }, [dateRange, statusFilter, branchFilter]);
 
-  const txColumns: TableColumnsType<Transaction> = [
+  // ── Query ─────────────────────────────────────────────────────────────
+  const {
+    data: summaryRaw,
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: [QUERY_KEYS.SALES_SUMMARY, queryParams],
+    queryFn: () => getSalesSummary(queryParams),
+    staleTime: 60_000,
+  });
+
+  const summary: SalesSummaryData = useMemo(() => {
+    const d = (summaryRaw as unknown as Record<string, unknown>)?.data as
+      | SalesSummaryData
+      | undefined;
+    return {
+      totalOrders: d?.totalOrders ?? 0,
+      totalRevenue: Number(d?.totalRevenue ?? 0),
+      avgOrderValue: Number(d?.avgOrderValue ?? 0),
+      byStatus: d?.byStatus ?? [],
+    };
+  }, [summaryRaw]);
+
+  // ── Reset filters ─────────────────────────────────────────────────────
+  const resetFilters = useCallback(() => {
+    setDateRange(null);
+    setStatusFilter(undefined);
+    setBranchFilter(undefined);
+  }, []);
+
+  const hasFilters = !!(dateRange || statusFilter || branchFilter);
+
+  const breadcrumbs = [
+    { label: t("Dashboard", lang), href: ROUTES.DASHBOARD },
+    { label: t("REPORTS", lang), href: "#" },
+    { label: t("salesReports.title", lang) },
+  ];
+
+  // ── KPI cards ─────────────────────────────────────────────────────────
+  const kpiCards = [
     {
-      title: "Invoice #",
-      dataIndex: "id",
-      render: v => (
-        <Text code style={{ fontSize: 12, color: "#3b82f6" }}>
-          {v}
-        </Text>
-      ),
+      title: t("salesReports.totalOrders", lang),
+      value: summary.totalOrders,
+      prefix: "",
+      suffix: "",
+      icon: <ShoppingCartOutlined />,
+      iconColor: "#8b5cf6",
+      iconBg: "#8b5cf615",
     },
     {
-      title: "Date",
-      dataIndex: "date",
-      render: v => <Text type="secondary">{v}</Text>,
+      title: t("salesReports.totalRevenue", lang),
+      value: summary.totalRevenue,
+      prefix: "",
+      suffix: " SAR",
+      icon: <DollarOutlined />,
+      iconColor: "#10b981",
+      iconBg: "#10b98115",
     },
     {
-      title: "Customer",
-      dataIndex: "customer",
-      render: v => <Text strong>{v}</Text>,
+      title: t("salesReports.avgOrderValue", lang),
+      value: summary.avgOrderValue,
+      prefix: "",
+      suffix: " SAR",
+      icon: <BarChartOutlined />,
+      iconColor: "#3b82f6",
+      iconBg: "#3b82f615",
     },
     {
-      title: "Product",
-      dataIndex: "product",
-      render: v => (
-        <Text
-          style={{ maxWidth: 160, display: "block" }}
-          ellipsis={{ tooltip: v }}
-        >
-          {v}
-        </Text>
-      ),
-    },
-    { title: "Qty", dataIndex: "qty", align: "center" },
-    {
-      title: "Amount",
-      dataIndex: "amount",
-      sorter: (a, b) => a.amount - b.amount,
-      render: v => <Text strong>${v.toLocaleString()}</Text>,
-    },
-    {
-      title: "Status",
-      dataIndex: "status",
-      filters: ["paid", "pending", "overdue", "cancelled"].map(s => ({
-        text: s.charAt(0).toUpperCase() + s.slice(1),
-        value: s,
-      })),
-      onFilter: (val, rec) => rec.status === val,
-      render: v => (
-        <Tag
-          color={STATUS_TAG[v] ?? "default"}
-          style={{ borderRadius: 20, textTransform: "capitalize" }}
-        >
-          {v}
-        </Tag>
-      ),
-    },
-    {
-      title: "Salesperson",
-      dataIndex: "salesperson",
-      render: v => <Text type="secondary">{v}</Text>,
+      title: t("salesReports.ordersByStatus", lang),
+      value: summary.byStatus.length,
+      prefix: "",
+      suffix: ` ${t("salesReports.statuses", lang)}`,
+      icon: <FileTextOutlined />,
+      iconColor: "#f59e0b",
+      iconBg: "#f59e0b15",
     },
   ];
 
+  // ── Status breakdown columns ─────────────────────────────────────────
+  const breakdownColumns: TableColumnsType<StatusBreakdown> = useMemo(
+    () => [
+      {
+        title: t("common.status", lang),
+        dataIndex: "status",
+        width: 150,
+        render: (v: string) => (
+          <Tag
+            color={STATUS_COLOR[v] ?? "default"}
+            style={{ borderRadius: 20, padding: "2px 10px" }}
+          >
+            {v}
+          </Tag>
+        ),
+      },
+      {
+        title: t("salesReports.count", lang),
+        dataIndex: "count",
+        width: 120,
+        align: "end" as const,
+        render: (v: number) => Number(v ?? 0).toLocaleString(),
+      },
+      {
+        title: t("salesReports.totalAmount", lang),
+        dataIndex: "totalAmount",
+        width: 180,
+        align: "end" as const,
+        render: (v: number) => (
+          <Text strong className="font-mono">
+            {Number(v ?? 0).toLocaleString("en-SA", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}{" "}
+            SAR
+          </Text>
+        ),
+      },
+    ],
+    [t, lang]
+  );
+
   return (
-    <DashboardLayout
-      currentPage="Sales Reports"
-      breadcrumbs={[
-        { label: "Dashboard", href: "/" },
-        { label: "Reports" },
-        { label: "Sales" },
-      ]}
-    >
-      <Space orientation="vertical" size={20} style={{ width: "100%" }}>
-        {/* ── KPI Row ────────────────────────────────────────────────────── */}
-        <Row gutter={16}>
-          <Col xs={24} sm={12} lg={6}>
-            <KpiCard
-              title="Total Revenue"
-              value="$2.96M"
-              sub="vs last year"
-              change={18.2}
-              icon={<DollarOutlined style={{ color: "#3b82f6" }} />}
-            />
-          </Col>
-          <Col xs={24} sm={12} lg={6}>
-            <KpiCard
-              title="Total Orders"
-              value="4,691"
-              sub="vs last year"
-              change={12.8}
-              icon={<ShoppingCartOutlined style={{ color: "#10b981" }} />}
-            />
-          </Col>
-          <Col xs={24} sm={12} lg={6}>
-            <KpiCard
-              title="New Customers"
-              value="248"
-              sub="vs last year"
-              change={9.4}
-              icon={<UserOutlined style={{ color: "#8b5cf6" }} />}
-            />
-          </Col>
-          <Col xs={24} sm={12} lg={6}>
-            <KpiCard
-              title="Avg Order Value"
-              value="$631"
-              sub="vs last year"
-              change={-2.1}
-              icon={<BarChartOutlined style={{ color: "#f59e0b" }} />}
-            />
-          </Col>
-        </Row>
-
-        {/* ── Chart + Pie ────────────────────────────────────────────────── */}
-        <Row gutter={16}>
-          {/* Revenue chart */}
-          <Col xs={24} lg={16}>
-            <Card
-              title={<Text strong>Revenue vs Target</Text>}
-              extra={
-                <Radio.Group
-                  value={chartType}
-                  onChange={e => setChartType(e.target.value)}
-                  size="small"
-                  buttonStyle="solid"
-                >
-                  <Radio.Button value="area">Area</Radio.Button>
-                  <Radio.Button value="bar">Bar</Radio.Button>
-                </Radio.Group>
-              }
-              styles={{ body: { paddingTop: 8 } }}
-            >
-              <ResponsiveContainer width="100%" height={240}>
-                {chartType === "area" ? (
-                  <AreaChart data={monthlySales}>
-                    <defs>
-                      <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop
-                          offset="5%"
-                          stopColor="#3B82F6"
-                          stopOpacity={0.15}
-                        />
-                        <stop
-                          offset="95%"
-                          stopColor="#3B82F6"
-                          stopOpacity={0}
-                        />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      stroke="var(--border, #e2e8f0)"
+    <DashboardLayout currentPage="SalesReports" breadcrumbs={breadcrumbs}>
+      <div className="flex flex-col gap-6">
+        {/* ── 1. KPI Stats Row ─────────────────────────────────────────── */}
+        <Row gutter={[16, 16]}>
+          {kpiCards.map(s => (
+            <Col key={s.title} xs={24} sm={12} lg={6}>
+              <Card size="small" styles={{ body: { padding: "16px 20px" } }}>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <Text
+                      type="secondary"
+                      style={{
+                        fontSize: 12,
+                        display: "block",
+                        marginBottom: 4,
+                      }}
+                    >
+                      {s.title}
+                    </Text>
+                    <Statistic
+                      value={s.value}
+                      prefix={s.prefix || undefined}
+                      suffix={s.suffix || undefined}
+                      precision={s.suffix === " SAR" ? 2 : 0}
+                      valueStyle={{ fontSize: 24, lineHeight: 1 }}
                     />
-                    <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-                    <YAxis
-                      tickFormatter={v => `$${v / 1000}K`}
-                      tick={{ fontSize: 11 }}
-                    />
-                    <RTooltip formatter={(v: number) => fmt(v)} />
-                    <Legend />
-                    <Area
-                      type="monotone"
-                      dataKey="revenue"
-                      stroke="#3B82F6"
-                      fill="url(#revGrad)"
-                      strokeWidth={2}
-                      name="Revenue"
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="target"
-                      stroke="#94a3b8"
-                      strokeDasharray="4 4"
-                      fill="none"
-                      strokeWidth={1.5}
-                      name="Target"
-                    />
-                  </AreaChart>
-                ) : (
-                  <BarChart data={monthlySales}>
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      stroke="var(--border, #e2e8f0)"
-                    />
-                    <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-                    <YAxis
-                      tickFormatter={v => `$${v / 1000}K`}
-                      tick={{ fontSize: 11 }}
-                    />
-                    <RTooltip formatter={(v: number) => fmt(v)} />
-                    <Legend />
-                    <Bar
-                      dataKey="revenue"
-                      fill="#3B82F6"
-                      radius={[4, 4, 0, 0]}
-                      name="Revenue"
-                    />
-                    <Bar
-                      dataKey="target"
-                      fill="#e2e8f0"
-                      radius={[4, 4, 0, 0]}
-                      name="Target"
-                    />
-                  </BarChart>
-                )}
-              </ResponsiveContainer>
-            </Card>
-          </Col>
-
-          {/* Category pie */}
-          <Col xs={24} lg={8}>
-            <Card
-              title={<Text strong>Revenue by Category</Text>}
-              style={{ height: "100%" }}
-              styles={{ body: { paddingTop: 8 } }}
-            >
-              <ResponsiveContainer width="100%" height={180}>
-                <PieChart>
-                  <Pie
-                    data={categoryData}
-                    dataKey="value"
-                    nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={70}
-                    label={({ name, value }) => `${name} ${value}%`}
-                    labelLine={false}
-                  >
-                    {categoryData.map(e => (
-                      <Cell key={e.name} fill={e.color} />
-                    ))}
-                  </Pie>
-                  <RTooltip formatter={(v: number, name) => [`${v}%`, name]} />
-                </PieChart>
-              </ResponsiveContainer>
-              <Space
-                direction="vertical"
-                size={4}
-                style={{ width: "100%", marginTop: 8 }}
-              >
-                {categoryData.map(c => (
+                  </div>
                   <div
-                    key={c.name}
                     style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 10,
+                      background: s.iconBg,
                       display: "flex",
-                      justifyContent: "space-between",
                       alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: 18,
+                      color: s.iconColor,
                     }}
                   >
-                    <Space size={6}>
-                      <div
-                        style={{
-                          width: 10,
-                          height: 10,
-                          borderRadius: "50%",
-                          background: c.color,
-                        }}
-                      />
-                      <Text style={{ fontSize: 12 }}>{c.name}</Text>
-                    </Space>
-                    <Text type="secondary" style={{ fontSize: 12 }}>
-                      {fmt(c.revenue)}
-                    </Text>
+                    {s.icon}
                   </div>
-                ))}
-              </Space>
-            </Card>
-          </Col>
+                </div>
+              </Card>
+            </Col>
+          ))}
         </Row>
 
-        {/* ── Top Customers + Top Products ──────────────────────────────── */}
-        <Row gutter={16}>
-          <Col xs={24} lg={12}>
-            <Card
-              title={
-                <Space>
-                  <TrophyOutlined style={{ color: "#f59e0b" }} />
-                  <Text strong>Top Customers</Text>
-                </Space>
-              }
-              styles={{ body: { padding: 0 } }}
-            >
-              <Table
-                rowKey="name"
-                size="small"
-                pagination={false}
-                dataSource={topCustomers}
-                columns={[
-                  {
-                    title: "Customer",
-                    dataIndex: "name",
-                    render: v => <Text strong>{v}</Text>,
-                  },
-                  {
-                    title: "Revenue",
-                    dataIndex: "revenue",
-                    render: v => fmt(v),
-                  },
-                  { title: "Orders", dataIndex: "orders", align: "center" },
-                  {
-                    title: "Growth",
-                    dataIndex: "growth",
-                    render: v => (
-                      <Tag
-                        icon={
-                          v >= 0 ? <ArrowUpOutlined /> : <ArrowDownOutlined />
-                        }
-                        color={v >= 0 ? "success" : "error"}
-                        style={{ borderRadius: 20 }}
-                      >
-                        {Math.abs(v)}%
-                      </Tag>
-                    ),
-                  },
+        {/* ── 2. Toolbar ──────────────────────────────────────────────── */}
+        <Card size="small" styles={{ body: { padding: "12px 16px" } }}>
+          <div className="flex flex-wrap gap-2 justify-between items-center">
+            <div className="flex flex-wrap gap-2 items-center">
+              <RangePicker
+                value={dateRange}
+                onChange={setDateRange}
+                placeholder={[
+                  t("common.dateFrom", lang),
+                  t("common.dateTo", lang),
                 ]}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} lg={12}>
-            <Card
-              title={<Text strong>Top Products</Text>}
-              styles={{ body: { padding: 0 } }}
-            >
-              <Table
-                rowKey="name"
-                size="small"
-                pagination={false}
-                dataSource={topProducts}
-                columns={[
-                  {
-                    title: "Product",
-                    dataIndex: "name",
-                    render: v => (
-                      <Text strong ellipsis style={{ maxWidth: 140 }}>
-                        {v}
-                      </Text>
-                    ),
-                  },
-                  {
-                    title: "Category",
-                    dataIndex: "category",
-                    render: v => <Tag>{v}</Tag>,
-                  },
-                  { title: "Sold", dataIndex: "sold", align: "center" },
-                  {
-                    title: "Revenue",
-                    dataIndex: "revenue",
-                    render: v => fmt(v),
-                  },
-                  {
-                    title: "Margin",
-                    dataIndex: "margin",
-                    render: v => <Tag color="blue">{v}%</Tag>,
-                  },
-                ]}
-              />
-            </Card>
-          </Col>
-        </Row>
-
-        {/* ── Transactions Table ─────────────────────────────────────────── */}
-        <Card
-          title={<Text strong>Transaction Details</Text>}
-          styles={{ body: { padding: 0 } }}
-          extra={
-            /* Toolbar */
-            <Space wrap>
-              <RangePicker size="small" style={{ width: 220 }} />
-              <Input
-                prefix={<SearchOutlined style={{ color: "#94a3b8" }} />}
-                placeholder="Search…"
-                size="small"
-                value={search}
-                onChange={e => setSearch(e.target.value)}
                 allowClear
-                style={{ width: 200 }}
+                style={{ borderRadius: 8 }}
               />
               <Select
-                size="small"
+                placeholder={t("common.status", lang)}
                 value={statusFilter}
                 onChange={setStatusFilter}
-                style={{ width: 130 }}
+                allowClear
+                style={{ width: 150 }}
                 options={[
-                  { value: "all", label: "All Status" },
-                  { value: "paid", label: "Paid" },
-                  { value: "pending", label: "Pending" },
-                  { value: "overdue", label: "Overdue" },
-                  { value: "cancelled", label: "Cancelled" },
+                  {
+                    value: SalesOrderStatus.DRAFT,
+                    label: t("salesReports.draft", lang),
+                  },
+                  {
+                    value: SalesOrderStatus.CONFIRMED,
+                    label: t("salesReports.confirmed", lang),
+                  },
+                  {
+                    value: SalesOrderStatus.DONE,
+                    label: t("salesReports.done", lang),
+                  },
+                  {
+                    value: SalesOrderStatus.CANCELLED,
+                    label: t("salesReports.cancelledLabel", lang),
+                  },
                 ]}
               />
-              <Tooltip title="Reload">
-                <Button size="small" icon={<ReloadOutlined />} />
-              </Tooltip>
-              <Tooltip title="Print">
-                <Button
-                  size="small"
-                  icon={<PrinterOutlined />}
-                  onClick={() => window.print()}
-                />
+              {hasFilters && (
+                <Button type="link" size="small" onClick={resetFilters}>
+                  {t("salesReports.clearFilters", lang)}
+                </Button>
+              )}
+            </div>
+
+            <div className="flex flex-wrap gap-2 items-center">
+              <Tooltip title={t("seq.reload", lang)}>
+                <Button icon={<ReloadOutlined />} onClick={() => refetch()} />
               </Tooltip>
               <Dropdown
                 menu={{
                   items: [
-                    {
-                      key: "csv",
-                      label: "Export CSV",
-                      icon: <ExportOutlined />,
-                      onClick: handleExport,
-                    },
-                    {
-                      key: "xlsx",
-                      label: "Export Excel",
-                      icon: <ExportOutlined />,
-                    },
-                    {
-                      key: "pdf",
-                      label: "Export PDF",
-                      icon: <ExportOutlined />,
-                    },
+                    { key: "csv", label: "CSV", icon: <ExportOutlined /> },
+                    { key: "excel", label: "Excel", icon: <ExportOutlined /> },
+                    { key: "pdf", label: "PDF", icon: <ExportOutlined /> },
                   ],
                 }}
               >
-                <Button size="small" icon={<DownloadOutlined />}>
-                  Export
+                <Button icon={<DownloadOutlined />}>
+                  {t("products.export", lang)}
                 </Button>
               </Dropdown>
-            </Space>
-          }
+            </div>
+          </div>
+        </Card>
+
+        {/* ── 3. Status Breakdown Cards ──────────────────────────────── */}
+        {summary.byStatus.length > 0 && (
+          <Row gutter={[16, 16]}>
+            {summary.byStatus.map(s => (
+              <Col key={s.status} xs={24} sm={12} lg={6}>
+                <Card size="small" styles={{ body: { padding: "16px 20px" } }}>
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <Tag
+                        color={STATUS_COLOR[s.status] ?? "default"}
+                        style={{
+                          borderRadius: 20,
+                          padding: "2px 10px",
+                          marginBottom: 8,
+                        }}
+                      >
+                        {s.status}
+                      </Tag>
+                      <div className="mt-1">
+                        <Text
+                          type="secondary"
+                          style={{ fontSize: 12, display: "block" }}
+                        >
+                          {t("salesReports.count", lang)}
+                        </Text>
+                        <Text strong style={{ fontSize: 20 }}>
+                          {Number(s.count ?? 0).toLocaleString()}
+                        </Text>
+                      </div>
+                      <div className="mt-2">
+                        <Text
+                          type="secondary"
+                          style={{ fontSize: 12, display: "block" }}
+                        >
+                          {t("salesReports.totalAmount", lang)}
+                        </Text>
+                        <Text
+                          strong
+                          className="font-mono"
+                          style={{
+                            fontSize: 16,
+                            color: STATUS_ICON_COLOR[s.status] ?? "#6b7280",
+                          }}
+                        >
+                          {Number(s.totalAmount ?? 0).toLocaleString("en-SA", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}{" "}
+                          SAR
+                        </Text>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        )}
+
+        {/* ── 4. Status Breakdown Table ──────────────────────────────── */}
+        <Card
+          size="small"
+          title={t("salesReports.statusBreakdown", lang)}
+          styles={{ body: { padding: 0 } }}
         >
           <Table
-            rowKey="id"
-            size="small"
-            columns={txColumns}
-            dataSource={filtered}
+            rowKey="status"
+            columns={breakdownColumns}
+            dataSource={summary.byStatus}
+            loading={isLoading}
+            size="middle"
+            pagination={false}
             scroll={{ x: "max-content" }}
-            pagination={{
-              pageSize: 8,
-              current: page,
-              onChange: setPage,
-              showTotal: (t, r) => `${r[0]}–${r[1]} of ${t}`,
-              showSizeChanger: false,
+            locale={{ emptyText: <EmptyState /> }}
+            summary={() => {
+              if (summary.byStatus.length === 0) return null;
+              const totalCount = summary.byStatus.reduce(
+                (sum, s) => sum + Number(s.count ?? 0),
+                0
+              );
+              const totalAmt = summary.byStatus.reduce(
+                (sum, s) => sum + Number(s.totalAmount ?? 0),
+                0
+              );
+              return (
+                <Table.Summary fixed>
+                  <Table.Summary.Row>
+                    <Table.Summary.Cell index={0}>
+                      <Text strong>{t("salesReports.total", lang)}</Text>
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={1} align="end">
+                      <Text strong>{totalCount.toLocaleString()}</Text>
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={2} align="end">
+                      <Text strong className="font-mono">
+                        {totalAmt.toLocaleString("en-SA", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}{" "}
+                        SAR
+                      </Text>
+                    </Table.Summary.Cell>
+                  </Table.Summary.Row>
+                </Table.Summary>
+              );
             }}
           />
         </Card>
-      </Space>
+      </div>
     </DashboardLayout>
   );
 }

@@ -6,7 +6,11 @@ import { t } from "@/i18n";
 import { leavesService, employeesService } from "@/services/hr.service";
 import { leaveTypesService } from "@/services/definitions.service";
 import { LeaveStatus } from "@/constants/enums";
-import type { LeaveRequest, CreateLeaveDto , LeaveTypeConfig } from "@/types/modules/hr";
+import type {
+  LeaveRequest,
+  CreateLeaveDto,
+  LeaveTypeConfig,
+} from "@/types/modules/hr";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getName } from "@/lib/utils";
 import { QUERY_KEYS } from "@/constants/queryKeys";
@@ -99,7 +103,7 @@ export default function LeaveManagement() {
     refetch,
   } = useQuery({
     queryKey: [QUERY_KEYS.LEAVES],
-    queryFn: () => leavesService.list({ limit: 200 }),
+    queryFn: () => leavesService.list({ limit: 100 }),
     staleTime: 30_000,
   });
 

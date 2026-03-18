@@ -119,28 +119,10 @@ export const routes: RouteConfig[] = [
     breadcrumb: ["Sales", "Customers", "Detail"],
   },
   {
-    path: "/sales/customer-groups",
-    component: lz(() => import("@/pages/CustomerGroups")),
-    permissions: ["sales:read"],
-    breadcrumb: ["Sales", "Customer Groups"],
-  },
-  {
     path: "/sales/orders",
     component: lz(() => import("@/pages/AllOrders")),
     permissions: ["sales:read"],
     breadcrumb: ["Sales", "Orders"],
-  },
-  {
-    path: "/sales/orders/pending",
-    component: lz(() => import("@/pages/PendingOrders")),
-    permissions: ["sales:read"],
-    breadcrumb: ["Sales", "Pending Orders"],
-  },
-  {
-    path: "/sales/orders/completed",
-    component: lz(() => import("@/pages/CompletedOrders")),
-    permissions: ["sales:read"],
-    breadcrumb: ["Sales", "Completed Orders"],
   },
   {
     path: "/sales/orders/create",
@@ -196,44 +178,22 @@ export const routes: RouteConfig[] = [
     permissions: ["sales:read"],
     breadcrumb: ["Sales", "Invoices"],
   },
+
+  // ── CRM ─────────────────────────────────────────────────────────────────────
   {
-    path: "/sales/returns",
-    component: lz(() => import("@/pages/SalesReturns")),
-    permissions: ["sales:read"],
-    breadcrumb: ["Sales", "Returns"],
+    path: "/crm/pipeline",
+    component: lz(() => import("@/pages/CrmPipeline")),
+    permissions: ["crm:read"],
+    breadcrumb: ["CRM", "Pipeline"],
   },
   {
-    path: "/sales/customer-receipts",
-    component: lz(() => import("@/pages/CustomerReceipts")),
-    permissions: ["sales:read"],
-    breadcrumb: ["Sales", "Receipts"],
-  },
-  {
-    path: "/sales/customer-statements",
-    component: lz(() => import("@/pages/CustomerStatements")),
-    permissions: ["sales:read"],
-    breadcrumb: ["Sales", "Statements"],
-  },
-  {
-    path: "/sales/vendors",
-    component: lz(() => import("@/pages/AllVendors")),
-    permissions: ["sales:read"],
-    breadcrumb: ["Sales", "Vendors"],
-  },
-  {
-    path: "/sales/vendor-groups",
-    component: lz(() => import("@/pages/VendorGroups")),
-    permissions: ["sales:read"],
-    breadcrumb: ["Sales", "Vendor Groups"],
+    path: "/crm/leads",
+    component: lz(() => import("@/pages/CrmLeads")),
+    permissions: ["crm:read"],
+    breadcrumb: ["CRM", "Leads"],
   },
 
   // ── Purchase ────────────────────────────────────────────────────────────────
-  {
-    path: "/vendors",
-    component: lz(() => import("@/pages/Vendors")),
-    permissions: ["purchases:read"],
-    breadcrumb: ["Purchase", "Vendors"],
-  },
   {
     path: "/purchase-orders",
     component: lz(() => import("@/pages/PurchaseOrders")),
@@ -257,12 +217,6 @@ export const routes: RouteConfig[] = [
     component: lz(() => import("@/pages/VendorPayments")),
     permissions: ["purchases:read"],
     breadcrumb: ["Purchase", "Vendor Payments"],
-  },
-  {
-    path: "/vendor-statements",
-    component: lz(() => import("@/pages/VendorStatements")),
-    permissions: ["purchases:read"],
-    breadcrumb: ["Purchase", "Vendor Statements"],
   },
 
   // ── Inventory ───────────────────────────────────────────────────────────────
@@ -313,6 +267,13 @@ export const routes: RouteConfig[] = [
     component: lz(() => import("@/pages/StockMovement")),
     permissions: ["inventory:read"],
     breadcrumb: ["Inventory", "Movement"],
+  },
+
+  {
+    path: "/deliveries",
+    component: lz(() => import("@/pages/Deliveries")),
+    permissions: ["inventory:read"],
+    breadcrumb: ["Inventory", "Deliveries"],
   },
 
   // ── Accounting ──────────────────────────────────────────────────────────────
@@ -409,40 +370,52 @@ export const routes: RouteConfig[] = [
 
   // ── Treasury ────────────────────────────────────────────────────────────────
   {
-    path: "/cash-accounts",
+    path: "/treasury/cash-accounts",
     component: lz(() => import("@/pages/CashAccounts")),
     permissions: ["treasury:read"],
     breadcrumb: ["Treasury", "Cash Accounts"],
   },
   {
-    path: "/bank-accounts",
+    path: "/treasury/bank-accounts",
     component: lz(() => import("@/pages/BankAccounts")),
     permissions: ["treasury:read"],
     breadcrumb: ["Treasury", "Bank Accounts"],
   },
   {
-    path: "/receipts",
+    path: "/treasury/receipts",
     component: lz(() => import("@/pages/Receipts")),
     permissions: ["treasury:read"],
     breadcrumb: ["Treasury", "Receipts"],
   },
   {
-    path: "/payments",
+    path: "/treasury/payments",
     component: lz(() => import("@/pages/Payments")),
     permissions: ["treasury:write"],
     breadcrumb: ["Treasury", "Payments"],
   },
   {
-    path: "/bank-transfers",
+    path: "/treasury/bank-transfers",
     component: lz(() => import("@/pages/BankTransfers")),
     permissions: ["treasury:write"],
     breadcrumb: ["Treasury", "Bank Transfers"],
   },
   {
-    path: "/bank-reconciliation",
+    path: "/treasury/bank-reconciliation",
     component: lz(() => import("@/pages/BankReconciliation")),
     permissions: ["treasury:write"],
     breadcrumb: ["Treasury", "Reconciliation"],
+  },
+  {
+    path: "/treasury/customer-receipts",
+    component: lz(() => import("@/pages/CustomerReceipts")),
+    permissions: ["treasury:read"],
+    breadcrumb: ["Treasury", "Customer Receipts"],
+  },
+  {
+    path: "/treasury/vendor-payments",
+    component: lz(() => import("@/pages/VendorPayments")),
+    permissions: ["treasury:read"],
+    breadcrumb: ["Treasury", "Vendor Payments"],
   },
 
   // ── Reports ─────────────────────────────────────────────────────────────────
@@ -659,32 +632,6 @@ export const routes: RouteConfig[] = [
   // ── Module Settings ──────────────────────────────────────────────────────────
 
   {
-    path: "/settings/sales/:tab",
-    component: lz(() => import("@/pages/settings/SalesSettings")),
-    permissions: ["settings:read"],
-    breadcrumb: ["Settings", "Sales Settings"],
-  },
-  {
-    path: "/settings/sales",
-    component: lz(() => import("@/pages/settings/SalesSettings")),
-    permissions: ["settings:read"],
-    breadcrumb: ["Settings", "Sales Settings"],
-  },
-
-  {
-    path: "/settings/purchases/:tab",
-    component: lz(() => import("@/pages/settings/PurchasesSettings")),
-    permissions: ["settings:read"],
-    breadcrumb: ["Settings", "Purchases Settings"],
-  },
-  {
-    path: "/settings/purchases",
-    component: lz(() => import("@/pages/settings/PurchasesSettings")),
-    permissions: ["settings:read"],
-    breadcrumb: ["Settings", "Purchases Settings"],
-  },
-
-  {
     path: "/settings/accounting/:tab",
     component: lz(() => import("@/pages/settings/AccountingSettings")),
     permissions: ["settings:read"],
@@ -695,19 +642,6 @@ export const routes: RouteConfig[] = [
     component: lz(() => import("@/pages/settings/AccountingSettings")),
     permissions: ["settings:read"],
     breadcrumb: ["Settings", "Accounting Settings"],
-  },
-
-  {
-    path: "/settings/treasury/:tab",
-    component: lz(() => import("@/pages/settings/TreasurySettings")),
-    permissions: ["settings:read"],
-    breadcrumb: ["Settings", "Treasury Settings"],
-  },
-  {
-    path: "/settings/treasury",
-    component: lz(() => import("@/pages/settings/TreasurySettings")),
-    permissions: ["settings:read"],
-    breadcrumb: ["Settings", "Treasury Settings"],
   },
 
   {
@@ -725,39 +659,9 @@ export const routes: RouteConfig[] = [
 
   // ── Definitions ─────────────────────────────────────────────────────────────
   {
-    path: "/sales-definitions",
-    component: lz(() => import("@/pages/definitions/SalesDefinitions")),
-    permissions: ["sales:read"],
-    breadcrumb: ["Sales", "Definitions"],
-  },
-  {
-    path: "/purchases-definitions",
-    component: lz(() => import("@/pages/definitions/PurchasesDefinitions")),
-    permissions: ["purchases:read"],
-    breadcrumb: ["Purchase", "Definitions"],
-  },
-  {
-    path: "/treasury-definitions",
-    component: lz(() => import("@/pages/definitions/TreasuryDefinitions")),
-    permissions: ["treasury:read"],
-    breadcrumb: ["Treasury", "Definitions"],
-  },
-  {
     path: "/reports-definitions",
     component: lz(() => import("@/pages/definitions/ReportsDefinitions")),
     permissions: ["reports:read"],
     breadcrumb: ["Reports", "Definitions"],
-  },
-
-  // ── Legacy ──────────────────────────────────────────────────────────────────
-  {
-    path: "/invoice",
-    component: lz(() => import("@/pages/Invoice")),
-    breadcrumb: ["Invoice"],
-  },
-  {
-    path: "/reports",
-    component: lz(() => import("@/pages/ReportsGenerator")),
-    breadcrumb: ["Reports Generator"],
   },
 ];

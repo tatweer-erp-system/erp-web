@@ -101,7 +101,7 @@ export default function Attendance() {
     queryKey: [QUERY_KEYS.ATTENDANCE, dateFilter.format("YYYY-MM-DD")],
     queryFn: () =>
       attendanceService.list({
-        limit: 200,
+        limit: 100,
         search: dateFilter.format("YYYY-MM-DD"),
       }),
     staleTime: 30_000,

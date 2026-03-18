@@ -639,6 +639,54 @@ export const LocationType = {
 } as const;
 export type LocationType = (typeof LocationType)[keyof typeof LocationType];
 
+// ─── CRM ────────────────────────────────────────────────────────────────────
+
+export const LeadType = {
+  LEAD: "lead",
+  OPPORTUNITY: "opportunity",
+} as const;
+export type LeadType = (typeof LeadType)[keyof typeof LeadType];
+
+export const LeadPriority = {
+  LOW: "low",
+  MEDIUM: "medium",
+  HIGH: "high",
+} as const;
+export type LeadPriority = (typeof LeadPriority)[keyof typeof LeadPriority];
+
+export const LeadSource = {
+  WEBSITE: "website",
+  REFERRAL: "referral",
+  SOCIAL_MEDIA: "social_media",
+  COLD_CALL: "cold_call",
+  OTHER: "other",
+} as const;
+export type LeadSource = (typeof LeadSource)[keyof typeof LeadSource];
+
+export const LeadActivityType = {
+  STAGE_CHANGE: "stage_change",
+  NOTE: "note",
+  CALL: "call",
+  EMAIL: "email",
+  MEETING: "meeting",
+  CONVERTED: "converted",
+  WON: "won",
+  LOST: "lost",
+} as const;
+export type LeadActivityType =
+  (typeof LeadActivityType)[keyof typeof LeadActivityType];
+
+// ─── Deliveries ─────────────────────────────────────────────────────────────
+
+export const DeliveryStatus = {
+  DRAFT: "draft",
+  READY: "ready",
+  DONE: "done",
+  CANCELLED: "cancelled",
+} as const;
+export type DeliveryStatus =
+  (typeof DeliveryStatus)[keyof typeof DeliveryStatus];
+
 // ─── Accounting ───────────────────────────────────────────────────────────────
 
 export const AccountType = {

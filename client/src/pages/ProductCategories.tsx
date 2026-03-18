@@ -131,7 +131,7 @@ export default function ProductCategories() {
     refetch,
   } = useQuery({
     queryKey: [QUERY_KEYS.CATEGORIES_DROPDOWN, "full-list"],
-    queryFn: () => categoriesService.list({ limit: 500 }),
+    queryFn: () => categoriesService.list({ limit: 100 }),
     staleTime: 30_000,
   });
 

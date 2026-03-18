@@ -78,7 +78,7 @@ export default function StockAdjustments() {
     refetch,
   } = useQuery({
     queryKey: [QUERY_KEYS.STOCK_ADJUSTMENTS],
-    queryFn: () => adjustmentsService.list({ limit: 200 }),
+    queryFn: () => adjustmentsService.list({ limit: 100 }),
     staleTime: 30_000,
   });
 

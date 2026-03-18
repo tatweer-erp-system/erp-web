@@ -152,7 +152,7 @@ export default function PurchaseReturns() {
       invoicesService.list({
         invoiceType: InvoiceTypeNew.IN_INVOICE,
         status: InvoiceStatusNew.POSTED,
-        limit: 200,
+        limit: 100,
       }),
     enabled: !!branchId,
     staleTime: 60_000,

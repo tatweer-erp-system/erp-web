@@ -1,8 +1,59 @@
-import { useState, useMemo, useCallback } from "react";
+/**
+ * Treasury Payments (cash-out) list page.
+ * Follows the AllOrders.tsx design pattern exactly.
+ * Default export for lazy loading via React.lazy().
+ */
+
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
+
+import {
+  Table,
+  Button,
+  Card,
+  Row,
+  Col,
+  Grid,
+  Tag,
+  Dropdown,
+  Segmented,
+  Statistic,
+  Input,
+  Tooltip,
+  Typography,
+  DatePicker,
+  Modal,
+  Form,
+  Select,
+  InputNumber,
+  Drawer,
+  Space,
+} from "antd";
+import type { TableColumnsType, TableProps } from "antd";
+import type { Dayjs } from "dayjs";
+import {
+  MoreOutlined,
+  EyeOutlined,
+  PlusOutlined,
+  SearchOutlined,
+  ReloadOutlined,
+  DownloadOutlined,
+  FilterOutlined,
+  AppstoreOutlined,
+  UnorderedListOutlined,
+  ExportOutlined,
+  FileTextOutlined,
+  DollarOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
+} from "@ant-design/icons";
+import dayjs from "dayjs";
+import { toast } from "sonner";
+
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { useAppSettings } from "@/contexts/AppSettingsContext";
-import { useLangStore } from "@/stores/lang.store";
-import { t } from "@/i18n";
+import { CopyableCode } from "@/components/common/CopyableCode";
+import { ConfirmDialog } from "@/components/common/ConfirmDialog";
+import { EmptyState } from "@/components/common/EmptyState";
+import { useTranslation } from "@/hooks/ui/useTranslation";
 import {
   treasuryAccountsService,
   treasuryTransactionsService,
@@ -17,71 +68,54 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getName } from "@/lib/utils";
 import { QUERY_KEYS } from "@/constants/queryKeys";
 import { useVendorsDropdown } from "@/hooks/queries/usePartners";
-import {
-  Table,
-  Button,
-  Tag,
-  Space,
-  Card,
-  Row,
-  Col,
-  Grid,
-  Statistic,
-  Modal,
-  Form,
-  Select,
-  Tooltip,
-  Typography,
-  Drawer,
-  Input,
-  InputNumber,
-  DatePicker,
-  notification,
-  Empty,
-} from "antd";
-import type { TableColumnsType } from "antd";
-import {
-  PlusOutlined,
-  ReloadOutlined,
-  EyeOutlined,
-  FileTextOutlined,
-  DollarOutlined,
-  CheckCircleOutlined,
-  CloseCircleOutlined,
-} from "@ant-design/icons";
-import dayjs from "dayjs";
+import { ROUTES } from "@/shared/constants/routes";
 
 const { Text } = Typography;
-
-// ─── Component ───────────────────────────────────────────────────────────────
+const { RangePicker } = DatePicker;
+const DEFAULT_PAGE_SIZE = 20;
 
 export default function Payments() {
-  const { theme } = useAppSettings();
-  const lang = useLangStore(s => s.lang);
+  const { t, lang } = useTranslation();
   const screens = Grid.useBreakpoint();
   const isMobile = !screens.md;
   const queryClient = useQueryClient();
 
-  const primary = theme === "dark" ? "#37D399" : "#3B82F6";
-  const textMuted = theme === "dark" ? "#8a9a8a" : "#94a3b8";
-  const token = {
-    colorPrimary: primary,
-    colorTextQuaternary: textMuted,
-  };
+  // ── Search with 400ms debounce ──────────────────────────────────────────
+  const [searchInput, setSearchInput] = useState("");
+  const [search, setSearch] = useState("");
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
-  // ── State ────────────────────────────────────────────────────────────────
+  useEffect(() => {
+    debounceRef.current = setTimeout(() => {
+      setSearch(searchInput);
+      setPage(1);
+    }, 400);
+    return () => clearTimeout(debounceRef.current);
+  }, [searchInput]);
+
+  // ── State ──────────────────────────────────────────────────────────────
   const [selectedAccountId, setSelectedAccountId] = useState<string | null>(
     null
   );
-  const [searchText, setSearchText] = useState<string>("");
+  const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [reconciledFilter, setReconciledFilter] = useState<string>("all");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const [viewMode, setViewMode] = useState<"table" | "grid">("table");
+  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [dateRange, setDateRange] = useState<
+    [Dayjs | null, Dayjs | null] | null
+  >(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [viewTransaction, setViewTransaction] =
     useState<TreasuryTransaction | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const [form] = Form.useForm();
 
-  // ── Queries ──────────────────────────────────────────────────────────────
+  // ── Queries ────────────────────────────────────────────────────────────
 
   const { data: accountsRaw } = useQuery({
     queryKey: [QUERY_KEYS.TREASURY_ACCOUNTS],
@@ -120,7 +154,7 @@ export default function Payments() {
     queryKey: [QUERY_KEYS.TREASURY_TRANSACTIONS, "payments", selectedAccountId],
     queryFn: () =>
       treasuryTransactionsService.listByAccount(selectedAccountId!, {
-        limit: 200,
+        limit: 100,
       }),
     enabled: !!selectedAccountId,
     staleTime: 15_000,
@@ -137,7 +171,7 @@ export default function Payments() {
     );
   }, [transactionsRaw]);
 
-  // ── Vendors dropdown for partner select ──────────────────────────────────
+  // ── Vendors dropdown ───────────────────────────────────────────────────
   const { data: vendorsDropdown } = useVendorsDropdown();
   const vendorOptions = useMemo(
     () =>
@@ -148,25 +182,54 @@ export default function Payments() {
     [vendorsDropdown]
   );
 
-  // ── Filtered data ────────────────────────────────────────────────────────
+  // ── Filtered data ──────────────────────────────────────────────────────
   const transactions = useMemo(() => {
-    if (!searchText.trim()) return allTransactions;
-    const q = searchText.trim().toLowerCase();
-    return allTransactions.filter(
-      tx =>
-        (tx.reference ?? "").toLowerCase().includes(q) ||
-        (tx.description ?? "").toLowerCase().includes(q)
-    );
-  }, [allTransactions, searchText]);
+    let filtered = allTransactions;
+    if (search.trim()) {
+      const q = search.trim().toLowerCase();
+      filtered = filtered.filter(
+        tx =>
+          (tx.reference ?? "").toLowerCase().includes(q) ||
+          (tx.description ?? "").toLowerCase().includes(q)
+      );
+    }
+    if (typeFilter !== "all") {
+      filtered = filtered.filter(tx => tx.type === typeFilter);
+    }
+    if (reconciledFilter !== "all") {
+      filtered = filtered.filter(tx =>
+        reconciledFilter === "reconciled" ? tx.isReconciled : !tx.isReconciled
+      );
+    }
+    if (dateRange?.[0]) {
+      const from = dateRange[0];
+      filtered = filtered.filter(tx => {
+        const d = dayjs(tx.date);
+        return d.isAfter(from) || d.isSame(from, "day");
+      });
+    }
+    if (dateRange?.[1]) {
+      const to = dateRange[1];
+      filtered = filtered.filter(tx => {
+        const d = dayjs(tx.date);
+        return d.isBefore(to) || d.isSame(to, "day");
+      });
+    }
+    return filtered;
+  }, [allTransactions, search, typeFilter, reconciledFilter, dateRange]);
 
-  // ── KPI values ───────────────────────────────────────────────────────────
+  const totalRows = transactions.length;
+
+  // ── KPI values ─────────────────────────────────────────────────────────
   const kpiTotalCount = allTransactions.length;
   const kpiTotalAmount = allTransactions.reduce(
     (sum, tx) => sum + Number(tx.amount ?? 0),
     0
   );
+  const kpiReconciled = allTransactions.filter(tx => tx.isReconciled).length;
+  const kpiUnreconciled = kpiTotalCount - kpiReconciled;
 
-  // ── Mutations ────────────────────────────────────────────────────────────
+  // ── Mutations ──────────────────────────────────────────────────────────
 
   const invalidate = () => {
     queryClient.invalidateQueries({
@@ -181,12 +244,11 @@ export default function Payments() {
     mutationFn: (dto: CreateTreasuryTransactionDto) =>
       treasuryTransactionsService.create(dto),
     onSuccess: () => {
-      notification.success({
-        message: t("treasury.payments.created", lang),
-      });
+      toast.success(t("treasury.payments.created", lang));
       invalidate();
       closeModal();
     },
+    onError: () => toast.error(t("treasury.payments.createFailed", lang)),
   });
 
   // ── Modal helpers ──────────────────────────────────────────────────────
@@ -210,7 +272,7 @@ export default function Payments() {
     setDrawerOpen(true);
   }, []);
 
-  // ── Submit handler ───────────────────────────────────────────────────────
+  // ── Submit handler ─────────────────────────────────────────────────────
 
   const handleSubmit = async () => {
     try {
@@ -229,142 +291,33 @@ export default function Payments() {
     }
   };
 
-  // ── Table columns ──────────────────────────────────────────────────────
-
-  const columns: TableColumnsType<TreasuryTransaction> = [
-    {
-      title: t("treasury.payments.date", lang),
-      dataIndex: "date",
-      sorter: (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
-      render: (v: string) => <Text>{dayjs(v).format("YYYY-MM-DD")}</Text>,
-    },
-    {
-      title: t("treasury.payments.reference", lang),
-      dataIndex: "reference",
-      render: (v: string | null) =>
-        v ? (
-          <Text style={{ fontFamily: "monospace" }}>{v}</Text>
-        ) : (
-          <Text type="secondary">--</Text>
-        ),
-    },
-    {
-      title: t("treasury.payments.description", lang),
-      dataIndex: "description",
-      ellipsis: true,
-      render: (v: string | null) =>
-        v ? <Text>{v}</Text> : <Text type="secondary">--</Text>,
-    },
-    {
-      title: t("treasury.payments.amount", lang),
-      dataIndex: "amount",
-      sorter: (a, b) => Number(a.amount) - Number(b.amount),
-      render: (v: number) => (
-        <Text
-          strong
-          style={{
-            fontFamily: "monospace",
-            color: "#ef4444",
-          }}
-        >
-          {Number(v ?? 0).toLocaleString(undefined, {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}
-        </Text>
-      ),
-    },
-    {
-      title: t("treasury.payments.type", lang),
-      dataIndex: "type",
-      render: (v: string) => {
-        if (v === TreasuryTransactionType.PAYMENT) {
-          return (
-            <Tag color="red" style={{ borderRadius: 20, padding: "2px 10px" }}>
-              {t("treasury.payments.payment", lang)}
-            </Tag>
-          );
-        }
-        if (v === TreasuryTransactionType.TRANSFER_OUT) {
-          return (
-            <Tag
-              color="orange"
-              style={{ borderRadius: 20, padding: "2px 10px" }}
-            >
-              {t("treasury.payments.transferOut", lang)}
-            </Tag>
-          );
-        }
-        return <Text type="secondary">{v}</Text>;
-      },
-    },
-    {
-      title: t("treasury.payments.reconciled", lang),
-      dataIndex: "isReconciled",
-      render: (v: boolean) => (
-        <Tag
-          color={v ? "green" : "default"}
-          style={{ borderRadius: 20, padding: "2px 10px" }}
-        >
-          {v
-            ? t("treasury.payments.reconciled", lang)
-            : t("treasury.payments.notReconciled", lang)}
-        </Tag>
-      ),
-    },
-    {
-      title: "",
-      align: "center",
-      width: 60,
-      render: (_, rec) => (
-        <Tooltip title={t("treasury.payments.view", lang)}>
-          <Button
-            type="text"
-            icon={<EyeOutlined />}
-            onClick={() => openView(rec)}
-          />
-        </Tooltip>
-      ),
-    },
-  ];
-
-  // ── Gradient header style for modal ──────────────────────────────────────
-
-  const gradientHeader = {
-    background: `linear-gradient(135deg, ${primary}, ${theme === "dark" ? "#2dd4bf" : "#6366f1"})`,
-    padding: "16px 24px",
-    margin: "-20px -24px 16px -24px",
-    borderRadius: "8px 8px 0 0",
-    color: "#fff",
-  };
-
-  // ── Helper: find vendor name ─────────────────────────────────────────────
+  // ── Helper: find vendor name ───────────────────────────────────────────
   const getVendorName = (partnerId: string | null | undefined) => {
     if (!partnerId) return "--";
     const vendor = vendorOptions.find(v => v.value === partnerId);
     return vendor ? vendor.label : "--";
   };
 
+  // ── Table columns ─────────────────────────────────────────────────────
+  const columns = usePaymentColumns(t, lang, openView);
+
+  const rowSelection: TableProps<TreasuryTransaction>["rowSelection"] = {
+    selectedRowKeys: selectedRows,
+    onChange: keys => setSelectedRows(keys as string[]),
+  };
+
+  const breadcrumbs = [
+    { label: t("Dashboard", lang), href: ROUTES.DASHBOARD },
+    { label: t("treasury.title", lang), href: "#" },
+    { label: t("treasury.payments.title", lang) },
+  ];
+
   return (
-    <DashboardLayout
-      currentPage="Payments"
-      breadcrumbs={[
-        { label: "Dashboard", href: "/" },
-        { label: "Treasury", href: "#" },
-        { label: t("treasury.payments.title", lang) },
-      ]}
-    >
-      <Space direction="vertical" size={20} style={{ width: "100%" }}>
-        {/* ── Account Selector ──────────────────────────────────────────── */}
+    <DashboardLayout currentPage="Payments" breadcrumbs={breadcrumbs}>
+      <div className="flex flex-col gap-6">
+        {/* ── Account Selector ──────────────────────────────────────── */}
         <Card size="small" styles={{ body: { padding: "12px 16px" } }}>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: 8,
-              alignItems: "center",
-            }}
-          >
+          <div className="flex flex-wrap gap-2 items-center">
             <Text strong style={{ marginInlineEnd: 8 }}>
               {t("treasury.payments.selectAccount", lang)}
             </Text>
@@ -381,39 +334,49 @@ export default function Payments() {
           </div>
         </Card>
 
-        {/* ── KPI Cards ────────────────────────────────────────────────── */}
+        {/* ── Stats Row (4 KPI cards) ──────────────────────────────── */}
         <Row gutter={[16, 16]}>
           {[
             {
               title: t("treasury.payments.total", lang),
               value: kpiTotalCount,
-              suffix: t("treasury.payments.title", lang),
               icon: <FileTextOutlined />,
-              iconColor: token.colorPrimary,
-              iconBg: `${token.colorPrimary}15`,
+              iconColor: "#8b5cf6",
+              iconBg: "#8b5cf615",
               color: undefined as string | undefined,
               isCurrency: false,
             },
             {
               title: t("treasury.payments.totalAmount", lang),
               value: kpiTotalAmount,
-              suffix: selectedAccount?.currency ?? "SAR",
               icon: <DollarOutlined />,
               iconColor: "#ef4444",
               iconBg: "#ef444415",
               color: "#ef4444",
               isCurrency: true,
             },
+            {
+              title: t("treasury.payments.reconciled", lang),
+              value: kpiReconciled,
+              icon: <CheckCircleOutlined />,
+              iconColor: "#10b981",
+              iconBg: "#10b98115",
+              color: "#10b981",
+              isCurrency: false,
+            },
+            {
+              title: t("treasury.payments.notReconciled", lang),
+              value: kpiUnreconciled,
+              icon: <CloseCircleOutlined />,
+              iconColor: "#f59e0b",
+              iconBg: "#f59e0b15",
+              color: "#f59e0b",
+              isCurrency: false,
+            },
           ].map(s => (
-            <Col key={s.title} xs={24} sm={12}>
+            <Col key={s.title} xs={24} sm={12} lg={6}>
               <Card size="small" styles={{ body: { padding: "16px 20px" } }}>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "flex-start",
-                  }}
-                >
+                <div className="flex justify-between items-start">
                   <div>
                     <Text
                       type="secondary"
@@ -428,15 +391,17 @@ export default function Payments() {
                     <Statistic
                       value={s.value}
                       precision={s.isCurrency ? 2 : 0}
+                      suffix={
+                        s.isCurrency
+                          ? ` ${selectedAccount?.currency ?? "SAR"}`
+                          : ""
+                      }
                       valueStyle={{
                         fontSize: 24,
                         lineHeight: 1,
                         color: s.color ?? "inherit",
                       }}
                     />
-                    <Text type="secondary" style={{ fontSize: 12 }}>
-                      {s.suffix}
-                    </Text>
                   </div>
                   <div
                     style={{
@@ -459,35 +424,10 @@ export default function Payments() {
           ))}
         </Row>
 
-        {/* ── Toolbar Card ─────────────────────────────────────────────── */}
+        {/* ── Toolbar Card ─────────────────────────────────────────── */}
         <Card size="small" styles={{ body: { padding: "12px 16px" } }}>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: 8,
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Space wrap>
-              <Input.Search
-                placeholder={t("treasury.payments.search", lang)}
-                value={searchText}
-                onChange={e => setSearchText(e.target.value)}
-                allowClear
-                style={{ width: 220 }}
-              />
-            </Space>
-
-            <Space>
-              <Tooltip title="Reload">
-                <Button
-                  icon={<ReloadOutlined />}
-                  onClick={() => refetch()}
-                  disabled={!selectedAccountId}
-                />
-              </Tooltip>
+          <div className="flex flex-wrap gap-2 justify-between items-center">
+            <div className="flex flex-wrap gap-2 items-center">
               <Button
                 type="primary"
                 icon={<PlusOutlined />}
@@ -495,39 +435,230 @@ export default function Payments() {
               >
                 {t("treasury.payments.new", lang)}
               </Button>
-            </Space>
-          </div>
-        </Card>
+            </div>
 
-        {/* ── Table ────────────────────────────────────────────────────── */}
-        <Card styles={{ body: { padding: 0 } }}>
-          {selectedAccountId ? (
-            <Table
-              rowKey="id"
-              columns={columns}
-              dataSource={transactions}
-              loading={isLoading}
-              size="middle"
-              scroll={{ x: "max-content" }}
-              pagination={{
-                showSizeChanger: true,
-                showTotal: (total, range) =>
-                  `${range[0]}--${range[1]} of ${total}`,
-                pageSizeOptions: ["5", "10", "25", "50"],
+            <div className="flex flex-wrap gap-2 items-center">
+              <RangePicker
+                value={dateRange}
+                onChange={setDateRange}
+                placeholder={[
+                  t("common.dateFrom", lang),
+                  t("common.dateTo", lang),
+                ]}
+                allowClear
+                style={{ borderRadius: 8 }}
+              />
+              <Input
+                prefix={<SearchOutlined className="text-gray-400" />}
+                placeholder={t("common.search", lang)}
+                value={searchInput}
+                onChange={e => setSearchInput(e.target.value)}
+                allowClear
+                style={{ width: 240 }}
+              />
+              <Tooltip title={t("sales.filter.allStatuses", lang)}>
+                <Button
+                  icon={<FilterOutlined />}
+                  onClick={() => setIsFilterOpen(!isFilterOpen)}
+                  type={isFilterOpen ? "primary" : "default"}
+                />
+              </Tooltip>
+              <Tooltip title={t("seq.reload", lang)}>
+                <Button
+                  icon={<ReloadOutlined />}
+                  onClick={() => refetch()}
+                  disabled={!selectedAccountId}
+                />
+              </Tooltip>
+              <Dropdown
+                menu={{
+                  items: [
+                    { key: "csv", label: "CSV", icon: <ExportOutlined /> },
+                    { key: "excel", label: "Excel", icon: <ExportOutlined /> },
+                    { key: "pdf", label: "PDF", icon: <ExportOutlined /> },
+                  ],
+                }}
+              >
+                <Button icon={<DownloadOutlined />}>
+                  {t("products.export", lang)}
+                </Button>
+              </Dropdown>
+              <Segmented
+                value={viewMode}
+                onChange={v => setViewMode(v as "table" | "grid")}
+                options={[
+                  { value: "table", icon: <UnorderedListOutlined /> },
+                  { value: "grid", icon: <AppstoreOutlined /> },
+                ]}
+              />
+            </div>
+          </div>
+
+          {/* ── Filter Panel ─────────────────────────────────────── */}
+          {isFilterOpen && (
+            <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+              <Row gutter={[12, 12]}>
+                <Col xs={24} sm={12} lg={6}>
+                  <Text type="secondary" className="text-xs mb-1 block">
+                    {t("treasury.payments.type", lang)}
+                  </Text>
+                  <Segmented
+                    value={typeFilter}
+                    onChange={v => {
+                      setTypeFilter(v as string);
+                      setPage(1);
+                    }}
+                    block
+                    options={[
+                      {
+                        value: "all",
+                        label: t("sales.filter.allStatuses", lang),
+                      },
+                      {
+                        value: TreasuryTransactionType.PAYMENT,
+                        label: t("treasury.payments.payment", lang),
+                      },
+                      {
+                        value: TreasuryTransactionType.TRANSFER_OUT,
+                        label: t("treasury.payments.transferOut", lang),
+                      },
+                    ]}
+                    size="small"
+                  />
+                </Col>
+                <Col xs={24} sm={12} lg={6}>
+                  <Text type="secondary" className="text-xs mb-1 block">
+                    {t("treasury.payments.reconciled", lang)}
+                  </Text>
+                  <Segmented
+                    value={reconciledFilter}
+                    onChange={v => {
+                      setReconciledFilter(v as string);
+                      setPage(1);
+                    }}
+                    block
+                    options={[
+                      {
+                        value: "all",
+                        label: t("sales.filter.allStatuses", lang),
+                      },
+                      {
+                        value: "reconciled",
+                        label: t("treasury.payments.reconciled", lang),
+                      },
+                      {
+                        value: "unreconciled",
+                        label: t("treasury.payments.notReconciled", lang),
+                      },
+                    ]}
+                    size="small"
+                  />
+                </Col>
+              </Row>
+
+              {/* Active filter tags */}
+              <div className="flex flex-wrap gap-1 mt-2">
+                {typeFilter !== "all" && (
+                  <Tag closable onClose={() => setTypeFilter("all")}>
+                    {t("treasury.payments.type", lang)}: {typeFilter}
+                  </Tag>
+                )}
+                {reconciledFilter !== "all" && (
+                  <Tag closable onClose={() => setReconciledFilter("all")}>
+                    {t("treasury.payments.reconciled", lang)}:{" "}
+                    {reconciledFilter}
+                  </Tag>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* ── Bulk Bar ─────────────────────────────────────────── */}
+          {selectedRows.length > 0 && (
+            <div
+              className="mt-3 py-2 px-3 rounded-md flex flex-wrap gap-3 items-center"
+              style={{
+                background: "var(--ant-color-primary-bg)",
+                border: "1px solid var(--ant-color-primary-border)",
               }}
-              locale={{
-                emptyText: t("treasury.payments.title", lang) + " -- 0",
-              }}
-            />
-          ) : (
-            <div style={{ padding: 48 }}>
-              <Empty description={t("treasury.payments.selectAccount", lang)} />
+            >
+              <Text strong style={{ color: "var(--ant-color-primary)" }}>
+                {selectedRows.length} {t("common.selected", lang)}
+              </Text>
+              <Button size="small" icon={<DownloadOutlined />}>
+                {t("products.export", lang)}
+              </Button>
+              <Button
+                size="small"
+                type="text"
+                onClick={() => setSelectedRows([])}
+              >
+                {t("sales.filter.allStatuses", lang)}
+              </Button>
             </div>
           )}
         </Card>
-      </Space>
 
-      {/* ── Create Payment Modal ──────────────────────────────────────── */}
+        {/* ── Table / Mobile Grid ──────────────────────────────────── */}
+        {viewMode === "table" && !isMobile ? (
+          <Card styles={{ body: { padding: 0 } }}>
+            {selectedAccountId ? (
+              <Table
+                rowKey="id"
+                columns={columns}
+                dataSource={transactions}
+                rowSelection={rowSelection}
+                loading={isLoading}
+                size="middle"
+                scroll={{ x: "max-content" }}
+                onRow={rec => ({
+                  onClick: () => openView(rec),
+                  style: { cursor: "pointer" },
+                })}
+                pagination={{
+                  current: page,
+                  pageSize,
+                  total: totalRows,
+                  showSizeChanger: true,
+                  pageSizeOptions: ["10", "20", "50", "100"],
+                  showTotal: (total, range) =>
+                    `${range[0]}--${range[1]} of ${total}`,
+                  onChange: (p, ps) => {
+                    setPage(p);
+                    setPageSize(ps);
+                  },
+                }}
+                locale={{ emptyText: <EmptyState /> }}
+              />
+            ) : (
+              <div className="py-12">
+                <EmptyState />
+              </div>
+            )}
+          </Card>
+        ) : (
+          <MobileGrid
+            transactions={transactions}
+            isLoading={isLoading}
+            onClick={openView}
+            t={t}
+            lang={lang}
+          />
+        )}
+      </div>
+
+      {/* ── Confirm Delete Dialog ──────────────────────────────────── */}
+      <ConfirmDialog
+        open={!!deleteId}
+        onOpenChange={v => !v && setDeleteId(null)}
+        title={t("treasury.payments.deleteConfirm", lang)}
+        description={t("treasury.payments.deleteConfirmNote", lang)}
+        confirmLabel={t("sales.action.delete", lang)}
+        onConfirm={() => setDeleteId(null)}
+        variant="danger"
+      />
+
+      {/* ── Create Payment Modal ───────────────────────────────────── */}
       <Modal
         open={modalOpen}
         onCancel={closeModal}
@@ -539,8 +670,15 @@ export default function Payments() {
         title={null}
         styles={{ body: { paddingTop: 20 } }}
       >
-        {/* Gradient header */}
-        <div style={gradientHeader}>
+        <div
+          style={{
+            background: "linear-gradient(135deg, #3B82F6, #6366f1)",
+            padding: "16px 24px",
+            margin: "-20px -24px 16px -24px",
+            borderRadius: "8px 8px 0 0",
+            color: "#fff",
+          }}
+        >
           <Space>
             <PlusOutlined />
             <span style={{ fontSize: 16, fontWeight: 600 }}>
@@ -627,14 +765,14 @@ export default function Payments() {
         </Form>
       </Modal>
 
-      {/* ── Detail Drawer ─────────────────────────────────────────────── */}
+      {/* ── Detail Drawer ──────────────────────────────────────────── */}
       <Drawer
         open={drawerOpen}
         onClose={() => {
           setDrawerOpen(false);
           setViewTransaction(null);
         }}
-        size={isMobile ? "100%" : 640}
+        width={isMobile ? "100%" : 640}
         title={
           viewTransaction
             ? `${t("treasury.payments.details", lang)} -- ${viewTransaction.reference ?? viewTransaction.id.slice(0, 8)}`
@@ -781,5 +919,201 @@ export default function Payments() {
         )}
       </Drawer>
     </DashboardLayout>
+  );
+}
+
+// ── Columns hook ──────────────────────────────────────────────────────────
+
+function usePaymentColumns(
+  t: (k: string, l: "ar" | "en") => string,
+  lang: "ar" | "en",
+  onView: (tx: TreasuryTransaction) => void
+): TableColumnsType<TreasuryTransaction> {
+  return useMemo(
+    () => [
+      {
+        title: t("treasury.payments.date", lang),
+        dataIndex: "date",
+        width: 130,
+        sorter: (a: TreasuryTransaction, b: TreasuryTransaction) =>
+          new Date(a.date).getTime() - new Date(b.date).getTime(),
+        render: (v: string) => (
+          <Text type="secondary">{dayjs(v).format("DD MMM YYYY")}</Text>
+        ),
+      },
+      {
+        title: t("treasury.payments.reference", lang),
+        dataIndex: "reference",
+        width: 160,
+        render: (v: string | null) =>
+          v ? <CopyableCode value={v} /> : <Text type="secondary">--</Text>,
+      },
+      {
+        title: t("treasury.payments.description", lang),
+        dataIndex: "description",
+        width: 200,
+        ellipsis: true,
+        render: (v: string | null) =>
+          v ? <Text>{v}</Text> : <Text type="secondary">--</Text>,
+      },
+      {
+        title: t("treasury.payments.amount", lang),
+        dataIndex: "amount",
+        width: 150,
+        align: "end" as const,
+        sorter: (a: TreasuryTransaction, b: TreasuryTransaction) =>
+          Number(a.amount) - Number(b.amount),
+        render: (v: number) => (
+          <Text strong className="font-mono" style={{ color: "#ef4444" }}>
+            {Number(v ?? 0).toLocaleString("en-SA", {
+              minimumFractionDigits: 2,
+            })}
+          </Text>
+        ),
+      },
+      {
+        title: t("treasury.payments.type", lang),
+        dataIndex: "type",
+        width: 130,
+        render: (v: string) => {
+          if (v === TreasuryTransactionType.PAYMENT) {
+            return (
+              <Tag
+                color="red"
+                style={{ borderRadius: 20, padding: "2px 10px" }}
+              >
+                {t("treasury.payments.payment", lang)}
+              </Tag>
+            );
+          }
+          if (v === TreasuryTransactionType.TRANSFER_OUT) {
+            return (
+              <Tag
+                color="orange"
+                style={{ borderRadius: 20, padding: "2px 10px" }}
+              >
+                {t("treasury.payments.transferOut", lang)}
+              </Tag>
+            );
+          }
+          return <Text type="secondary">{v}</Text>;
+        },
+      },
+      {
+        title: t("treasury.payments.reconciled", lang),
+        dataIndex: "isReconciled",
+        width: 130,
+        render: (v: boolean) => (
+          <Tag
+            color={v ? "green" : "default"}
+            style={{ borderRadius: 20, padding: "2px 10px" }}
+          >
+            {v
+              ? t("treasury.payments.reconciled", lang)
+              : t("treasury.payments.notReconciled", lang)}
+          </Tag>
+        ),
+      },
+      {
+        title: t("seq.actions", lang),
+        align: "center" as const,
+        width: 60,
+        fixed: "right" as const,
+        render: (_: unknown, rec: TreasuryTransaction) => (
+          <Dropdown
+            menu={{
+              items: [
+                {
+                  key: "view",
+                  label: t("common.view", lang),
+                  icon: <EyeOutlined />,
+                  onClick: () => onView(rec),
+                },
+              ],
+            }}
+            trigger={["click"]}
+          >
+            <Button
+              type="text"
+              icon={<MoreOutlined />}
+              onClick={e => e.stopPropagation()}
+            />
+          </Dropdown>
+        ),
+      },
+    ],
+    [t, lang, onView]
+  );
+}
+
+// ── Mobile Grid ───────────────────────────────────────────────────────────
+
+function MobileGrid({
+  transactions,
+  isLoading,
+  onClick,
+  t,
+  lang,
+}: {
+  transactions: TreasuryTransaction[];
+  isLoading: boolean;
+  onClick: (tx: TreasuryTransaction) => void;
+  t: (k: string, l: "ar" | "en") => string;
+  lang: "ar" | "en";
+}) {
+  if (isLoading) return <Card loading />;
+  if (transactions.length === 0) {
+    return (
+      <Card>
+        <EmptyState />
+      </Card>
+    );
+  }
+  return (
+    <Row gutter={[16, 16]}>
+      {transactions.map(tx => (
+        <Col key={tx.id} xs={24} sm={12} xl={8}>
+          <Card
+            size="small"
+            hoverable
+            onClick={() => onClick(tx)}
+            styles={{ body: { padding: "12px 16px" } }}
+          >
+            <div className="flex justify-between items-start mb-2">
+              <Text
+                strong
+                style={{ fontFamily: "monospace", color: "#ef4444" }}
+              >
+                {Number(tx.amount ?? 0).toLocaleString("en-SA", {
+                  minimumFractionDigits: 2,
+                })}
+              </Text>
+              <Tag
+                color={
+                  tx.type === TreasuryTransactionType.PAYMENT ? "red" : "orange"
+                }
+                style={{ borderRadius: 20, padding: "2px 10px" }}
+              >
+                {tx.type === TreasuryTransactionType.PAYMENT
+                  ? t("treasury.payments.payment", lang)
+                  : t("treasury.payments.transferOut", lang)}
+              </Tag>
+            </div>
+            <Text type="secondary" className="text-xs block">
+              {dayjs(tx.date).format("DD MMM YYYY")}
+            </Text>
+            {tx.reference && (
+              <Text
+                type="secondary"
+                className="text-xs block"
+                style={{ fontFamily: "monospace" }}
+              >
+                {tx.reference}
+              </Text>
+            )}
+          </Card>
+        </Col>
+      ))}
+    </Row>
   );
 }

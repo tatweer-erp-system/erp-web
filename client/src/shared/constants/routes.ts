@@ -34,7 +34,7 @@ export const ROUTES = {
   quotationDetail: (id: string) => `/sales/quotations/${id}` as const,
   SALES_INVOICES: "/sales/invoices",
   SALES_RETURNS: "/sales/returns",
-  CUSTOMER_RECEIPTS: "/sales/customer-receipts",
+  CUSTOMER_RECEIPTS: "/treasury/customer-receipts",
   CUSTOMER_STATEMENTS: "/sales/customer-statements",
   ALL_VENDORS: "/sales/vendors",
   VENDOR_GROUPS: "/sales/vendor-groups",
@@ -59,6 +59,7 @@ export const ROUTES = {
   STOCK_COUNT: "/stock-count",
   INVENTORY_VALUATION: "/inventory-valuation",
   STOCK_MOVEMENT: "/stock-movement",
+  DELIVERIES: "/deliveries",
 
   // ── Accounting ──────────────────────────────────────────────────────────────
   CHART_OF_ACCOUNTS: "/chart-of-accounts",
@@ -78,12 +79,14 @@ export const ROUTES = {
   OPENING_BALANCES: "/opening-balances",
 
   // ── Treasury ────────────────────────────────────────────────────────────────
-  CASH_ACCOUNTS: "/cash-accounts",
-  BANK_ACCOUNTS: "/bank-accounts",
-  RECEIPTS: "/receipts",
-  PAYMENTS: "/payments",
-  BANK_TRANSFERS: "/bank-transfers",
-  BANK_RECONCILIATION: "/bank-reconciliation",
+  CASH_ACCOUNTS: "/treasury/cash-accounts",
+  BANK_ACCOUNTS: "/treasury/bank-accounts",
+  RECEIPTS: "/treasury/receipts",
+  PAYMENTS: "/treasury/payments",
+  BANK_TRANSFERS: "/treasury/bank-transfers",
+  BANK_RECONCILIATION: "/treasury/bank-reconciliation",
+  CUSTOMER_RECEIPTS_TREASURY: "/treasury/customer-receipts",
+  VENDOR_PAYMENTS_TREASURY: "/treasury/vendor-payments",
 
   // ── Reports ─────────────────────────────────────────────────────────────────
   SALES_REPORTS: "/sales-reports",
@@ -146,8 +149,6 @@ export const ROUTES = {
   SETTINGS_ACCOUNTING: "/settings/accounting",
   settingsAccountingTab: (tab: string) =>
     `/settings/accounting/${tab}` as const,
-  SETTINGS_TREASURY: "/settings/treasury",
-  settingsTreasuryTab: (tab: string) => `/settings/treasury/${tab}` as const,
   SETTINGS_HR: "/settings/hr",
   settingsHrTab: (tab: string) => `/settings/hr/${tab}` as const,
   SETTINGS_REPORTS: "/settings/reports",
@@ -157,7 +158,6 @@ export const ROUTES = {
   INVENTORY_DEFINITIONS: "/inventory-definitions",
   SALES_DEFINITIONS: "/sales-definitions",
   PURCHASES_DEFINITIONS: "/purchases-definitions",
-  TREASURY_DEFINITIONS: "/treasury-definitions",
   HR_DEFINITIONS: "/hr-definitions",
   REPORTS_DEFINITIONS: "/reports-definitions",
 
@@ -169,6 +169,13 @@ export const ROUTES = {
   POS_PAYMENT_BREAKDOWN: "/pos/reports/payments",
   POS_CASH_MOVEMENTS: "/pos/reports/cash-movements",
   POS_TABLE_TURNOVER: "/pos/reports/table-turnover",
+
+  // ── Deliveries ─────────────────────────────────────────────────────────────
+  DELIVERIES: "/sales/deliveries",
+
+  // ── CRM ────────────────────────────────────────────────────────────────────
+  CRM_LEADS: "/crm/leads",
+  CRM_PIPELINE: "/crm/pipeline",
 
   // ── Legacy ──────────────────────────────────────────────────────────────────
   INVOICE: "/invoice",
