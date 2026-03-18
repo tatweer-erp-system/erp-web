@@ -69,6 +69,7 @@ import {
   UserOutlined,
   FunnelPlotOutlined,
   ContactsOutlined,
+  SafetyOutlined,
 } from "@ant-design/icons";
 import { t } from "@/i18n";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
@@ -325,16 +326,6 @@ const NAV_ITEMS: NavItem[] = [
     icon: <SwapOutlined />,
     href: "/stock-movement",
   },
-  {
-    name: "Definitions",
-    icon: <DatabaseOutlined />,
-    href: "/reports-definitions",
-  },
-  {
-    name: "Reports Settings",
-    icon: <SettingOutlined />,
-    href: "/settings/reports",
-  },
 
   // ── Settings ────────────────────────────────────────────────────────────
   { name: "SETTINGS", isHeader: true },
@@ -348,10 +339,11 @@ const NAV_ITEMS: NavItem[] = [
     icon: <ApartmentOutlined />,
     href: "/settings/company",
   },
+  { name: "Users", icon: <UsergroupAddOutlined />, href: "/users" },
   {
-    name: "Users & Permissions",
-    icon: <UsergroupAddOutlined />,
-    href: "/settings/users",
+    name: "Roles & Permissions",
+    icon: <SafetyOutlined />,
+    href: "/roles-permissions",
   },
   {
     name: "Notifications",

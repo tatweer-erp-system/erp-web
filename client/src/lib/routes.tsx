@@ -554,18 +554,6 @@ export const routes: RouteConfig[] = [
   },
 
   // ── Settings pages ──────────────────────────────────────────────────────────
-  {
-    path: "/app-settings",
-    component: lz(() => import("@/pages/AppSettings")),
-    permissions: ["settings:write"],
-    breadcrumb: ["Settings", "App Settings"],
-  },
-  {
-    path: "/system-settings",
-    component: lz(() => import("@/pages/SystemSettings")),
-    permissions: ["settings:write"],
-    breadcrumb: ["Settings", "System Settings"],
-  },
 
   // ── Company Profile settings ─────────────────────────────────────────────────
   {
@@ -579,20 +567,6 @@ export const routes: RouteConfig[] = [
     component: lz(() => import("@/pages/settings/CompanyProfile")),
     permissions: ["settings:read"],
     breadcrumb: ["Settings", "Company Profile"],
-  },
-
-  // ── Users & Permissions settings ─────────────────────────────────────────────
-  {
-    path: "/settings/users/:tab",
-    component: lz(() => import("@/pages/settings/UsersPermissions")),
-    permissions: ["settings:read"],
-    breadcrumb: ["Settings", "Users & Permissions"],
-  },
-  {
-    path: "/settings/users",
-    component: lz(() => import("@/pages/settings/UsersPermissions")),
-    permissions: ["settings:read"],
-    breadcrumb: ["Settings", "Users & Permissions"],
   },
 
   // ── Notifications settings ───────────────────────────────────────────────────
@@ -636,26 +610,5 @@ export const routes: RouteConfig[] = [
     component: lz(() => import("@/pages/settings/AccountingSettings")),
     permissions: ["settings:read"],
     breadcrumb: ["Settings", "Accounting Settings"],
-  },
-
-  {
-    path: "/settings/reports/:tab",
-    component: lz(() => import("@/pages/settings/ReportsSettings")),
-    permissions: ["settings:read"],
-    breadcrumb: ["Settings", "Reports Settings"],
-  },
-  {
-    path: "/settings/reports",
-    component: lz(() => import("@/pages/settings/ReportsSettings")),
-    permissions: ["settings:read"],
-    breadcrumb: ["Settings", "Reports Settings"],
-  },
-
-  // ── Definitions ─────────────────────────────────────────────────────────────
-  {
-    path: "/reports-definitions",
-    component: lz(() => import("@/pages/definitions/ReportsDefinitions")),
-    permissions: ["reports:read"],
-    breadcrumb: ["Reports", "Definitions"],
   },
 ];
