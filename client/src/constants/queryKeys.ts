@@ -157,4 +157,16 @@ export const QUERY_KEYS = {
 
   // Sales — Reports
   SALES_SUMMARY: "sales-summary",
+
+  // Reports
+  PURCHASE_REPORT: "purchase-report",
+  FINANCIAL_REPORT: "financial-report",
+  AGING_REPORT: "aging-report",
+  TAX_REPORT: "tax-report",
+
+  // Audit Logs
+  AUDIT_LOGS: "audit-logs",
+
+  // Sequences
+  SEQUENCES: "sequences",
 } as const;

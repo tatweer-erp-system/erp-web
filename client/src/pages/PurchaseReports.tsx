@@ -1,366 +1,225 @@
-import { useState, useMemo } from "react";
-import { DashboardLayout } from "@/components/layout/DashboardLayout";
+/**
+ * Purchase Reports page with real API data.
+ * Default export for lazy loading via React.lazy().
+ */
+
+import { useState, useMemo, useCallback } from "react";
+
 import {
   Card,
   Row,
   Col,
-  Table,
-  Tag,
-  Space,
-  Typography,
   Button,
-  Select,
+  Typography,
+  Tag,
+  Statistic,
   DatePicker,
-  Input,
+  Select,
   Tooltip,
+  Table,
   Dropdown,
-  Progress,
-  theme as antTheme,
+  notification,
 } from "antd";
 import type { TableColumnsType } from "antd";
+import type { Dayjs } from "dayjs";
 import {
-  ShoppingOutlined,
-  DollarOutlined,
-  CarOutlined,
-  FileTextOutlined,
-  DownloadOutlined,
-  PrinterOutlined,
   ReloadOutlined,
-  SearchOutlined,
-  ArrowUpOutlined,
-  ArrowDownOutlined,
+  DownloadOutlined,
   ExportOutlined,
+  DollarOutlined,
+  ShoppingCartOutlined,
+  BarChartOutlined,
+  TeamOutlined,
 } from "@ant-design/icons";
-import {
-  BarChart,
-  Bar,
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip as RTooltip,
-  Legend,
-  ResponsiveContainer,
-  Cell,
-} from "recharts";
-import { PurchaseReportStatus } from "@/constants/enums";
 
-const { Text, Title } = Typography;
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
+import { EmptyState } from "@/components/common/EmptyState";
+import { useTranslation } from "@/hooks/ui/useTranslation";
+import { PurchaseOrderStatusNew } from "@/constants/enums";
+import { QUERY_KEYS } from "@/constants/queryKeys";
+import { ROUTES } from "@/shared/constants/routes";
+import apiClient from "@/lib/api";
+import { useQuery } from "@tanstack/react-query";
+
+const { Text } = Typography;
 const { RangePicker } = DatePicker;
 
-// ─── Mock data ─────────────────────────────────────────────────────────────────
+// ── Types ────────────────────────────────────────────────────────────────────
 
-const monthlySpend = [
-  { month: "Jan", purchases: 98000, budget: 110000, returns: 4200 },
-  { month: "Feb", purchases: 112000, budget: 110000, returns: 5100 },
-  { month: "Mar", purchases: 87000, budget: 110000, returns: 3800 },
-  { month: "Apr", purchases: 134000, budget: 120000, returns: 6700 },
-  { month: "May", purchases: 121000, budget: 120000, returns: 5500 },
-  { month: "Jun", purchases: 108000, budget: 120000, returns: 4900 },
-  { month: "Jul", purchases: 145000, budget: 130000, returns: 7200 },
-  { month: "Aug", purchases: 139000, budget: 130000, returns: 6100 },
-  { month: "Sep", purchases: 156000, budget: 140000, returns: 8400 },
-  { month: "Oct", purchases: 148000, budget: 140000, returns: 7800 },
-  { month: "Nov", purchases: 172000, budget: 155000, returns: 9100 },
-  { month: "Dec", purchases: 189000, budget: 165000, returns: 10200 },
-];
-
-const topVendors = [
-  {
-    name: "Alpha Supplies Co.",
-    spend: 312000,
-    orders: 48,
-    onTime: 94,
-    color: "#3B82F6",
-  },
-  {
-    name: "Beta Manufacturing",
-    spend: 267000,
-    orders: 37,
-    onTime: 88,
-    color: "#10B981",
-  },
-  {
-    name: "Gamma Distribution",
-    spend: 198000,
-    orders: 29,
-    onTime: 97,
-    color: "#8B5CF6",
-  },
-  {
-    name: "Delta Trading LLC",
-    spend: 154000,
-    orders: 22,
-    onTime: 79,
-    color: "#F59E0B",
-  },
-  {
-    name: "Epsilon Global",
-    spend: 132000,
-    orders: 19,
-    onTime: 91,
-    color: "#EC4899",
-  },
-  {
-    name: "Zeta Industrial",
-    spend: 98000,
-    orders: 14,
-    onTime: 85,
-    color: "#06B6D4",
-  },
-];
-
-const categorySpend = [
-  { category: "Raw Materials", spend: 524000, pct: 38 },
-  { category: "Packaging", spend: 207000, pct: 15 },
-  { category: "Machinery Parts", spend: 276000, pct: 20 },
-  { category: "Office Supplies", spend: 97000, pct: 7 },
-  { category: "Services", spend: 138000, pct: 10 },
-  { category: "Utilities", spend: 138000, pct: 10 },
-];
-
-interface PurchaseOrder {
-  id: string;
-  date: string;
-  vendor: string;
-  category: string;
-  amount: number;
-  items: number;
+type StatusBreakdown = {
   status: string;
-  dueDate: string;
-}
-
-const orders: PurchaseOrder[] = [
-  {
-    id: "PO-2024-001",
-    date: "2024-12-15",
-    vendor: "Alpha Supplies Co.",
-    category: "Raw Materials",
-    amount: 42800,
-    items: 12,
-    status: PurchaseReportStatus.RECEIVED,
-    dueDate: "2024-12-20",
-  },
-  {
-    id: "PO-2024-002",
-    date: "2024-12-14",
-    vendor: "Beta Manufacturing",
-    category: "Machinery Parts",
-    amount: 31200,
-    items: 5,
-    status: PurchaseReportStatus.PENDING,
-    dueDate: "2024-12-28",
-  },
-  {
-    id: "PO-2024-003",
-    date: "2024-12-13",
-    vendor: "Gamma Distribution",
-    category: "Packaging",
-    amount: 18500,
-    items: 8,
-    status: PurchaseReportStatus.RECEIVED,
-    dueDate: "2024-12-18",
-  },
-  {
-    id: "PO-2024-004",
-    date: "2024-12-12",
-    vendor: "Delta Trading LLC",
-    category: "Office Supplies",
-    amount: 7400,
-    items: 20,
-    status: PurchaseReportStatus.OVERDUE,
-    dueDate: "2024-12-10",
-  },
-  {
-    id: "PO-2024-005",
-    date: "2024-12-11",
-    vendor: "Epsilon Global",
-    category: "Services",
-    amount: 24600,
-    items: 3,
-    status: PurchaseReportStatus.PENDING,
-    dueDate: "2025-01-05",
-  },
-  {
-    id: "PO-2024-006",
-    date: "2024-12-10",
-    vendor: "Alpha Supplies Co.",
-    category: "Raw Materials",
-    amount: 38900,
-    items: 9,
-    status: PurchaseReportStatus.RECEIVED,
-    dueDate: "2024-12-15",
-  },
-  {
-    id: "PO-2024-007",
-    date: "2024-12-09",
-    vendor: "Zeta Industrial",
-    category: "Machinery Parts",
-    amount: 56700,
-    items: 4,
-    status: PurchaseReportStatus.CANCELLED,
-    dueDate: "2024-12-25",
-  },
-  {
-    id: "PO-2024-008",
-    date: "2024-12-08",
-    vendor: "Beta Manufacturing",
-    category: "Raw Materials",
-    amount: 29100,
-    items: 7,
-    status: PurchaseReportStatus.RECEIVED,
-    dueDate: "2024-12-12",
-  },
-];
-
-const STATUS_COLOR: Record<string, string> = {
-  received: "success",
-  pending: "processing",
-  overdue: "error",
-  cancelled: "default",
+  count: number;
+  totalAmount: number;
 };
 
-function fmt(n: number) {
-  if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `$${(n / 1_000).toFixed(0)}K`;
-  return `$${n}`;
+type PurchaseReportData = {
+  totalOrders: number;
+  totalAmount: number;
+  avgOrderValue: number;
+  topVendor: string;
+  byStatus: StatusBreakdown[];
+};
+
+// ── API ──────────────────────────────────────────────────────────────────────
+
+const purchaseReportApi = {
+  get: (params?: Record<string, string>) =>
+    apiClient
+      .get("/reporting/purchases", { params })
+      .then(r => r.data.data as PurchaseReportData),
+  getSummary: (params?: Record<string, string>) =>
+    apiClient
+      .get("/purchase-orders/summary", { params })
+      .then(r => r.data.data),
+};
+
+// ── Status color map ────────────────────────────────────────────────────────
+
+const STATUS_COLOR: Record<string, string> = {
+  [PurchaseOrderStatusNew.DRAFT]: "blue",
+  [PurchaseOrderStatusNew.CONFIRMED]: "gold",
+  [PurchaseOrderStatusNew.DONE]: "green",
+  [PurchaseOrderStatusNew.CANCELLED]: "default",
+};
+
+const STATUS_ICON_COLOR: Record<string, string> = {
+  [PurchaseOrderStatusNew.DRAFT]: "#3b82f6",
+  [PurchaseOrderStatusNew.CONFIRMED]: "#f59e0b",
+  [PurchaseOrderStatusNew.DONE]: "#10b981",
+  [PurchaseOrderStatusNew.CANCELLED]: "#6b7280",
+};
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+function fmtSAR(n: number): string {
+  return Number(n ?? 0).toLocaleString("en-SA", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 }
 
-// ─── KPI strip ────────────────────────────────────────────────────────────────
-
-function KpiStrip() {
-  const { token } = antTheme.useToken();
-  const kpis = [
-    {
-      label: "Total Spend",
-      value: "$1.61M",
-      change: +14.2,
-      icon: <DollarOutlined />,
-      color: token.colorPrimary,
-    },
-    {
-      label: "Purchase Orders",
-      value: "248",
-      change: +8.7,
-      icon: <FileTextOutlined />,
-      color: "#10B981",
-    },
-    {
-      label: "Active Vendors",
-      value: "34",
-      change: +2,
-      icon: <CarOutlined />,
-      color: "#8B5CF6",
-    },
-    {
-      label: "Avg Lead Time",
-      value: "6.2d",
-      change: -1.4,
-      icon: <ShoppingOutlined />,
-      color: "#F59E0B",
-    },
-  ];
-
-  return (
-    <Row gutter={16}>
-      {kpis.map(k => (
-        <Col xs={24} sm={12} lg={6} key={k.label}>
-          <Card size="small" styles={{ body: { padding: "16px 20px" } }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <div
-                style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: 12,
-                  flexShrink: 0,
-                  background: `${k.color}18`,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: 20,
-                  color: k.color,
-                }}
-              >
-                {k.icon}
-              </div>
-              <div style={{ flex: 1 }}>
-                <Text
-                  type="secondary"
-                  style={{
-                    fontSize: 11,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.06em",
-                  }}
-                >
-                  {k.label}
-                </Text>
-                <Title
-                  level={4}
-                  style={{ margin: "2px 0 0", fontWeight: 700, lineHeight: 1 }}
-                >
-                  {k.value}
-                </Title>
-              </div>
-              <Tag
-                icon={
-                  k.change >= 0 ? <ArrowUpOutlined /> : <ArrowDownOutlined />
-                }
-                color={k.change >= 0 ? "success" : "error"}
-                style={{ borderRadius: 20, fontWeight: 600, margin: 0 }}
-              >
-                {Math.abs(k.change)}%
-              </Tag>
-            </div>
-          </Card>
-        </Col>
-      ))}
-    </Row>
-  );
-}
-
-// ─── Component ────────────────────────────────────────────────────────────────
+// ── Component ────────────────────────────────────────────────────────────────
 
 export default function PurchaseReports() {
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [page, setPage] = useState(1);
+  const { t, lang } = useTranslation();
+  // ── Filter State ──────────────────────────────────────────────────────
+  const [dateRange, setDateRange] = useState<
+    [Dayjs | null, Dayjs | null] | null
+  >(null);
+  const [statusFilter, setStatusFilter] = useState<string | undefined>(
+    undefined
+  );
 
-  const filtered = useMemo(() => {
-    let d = orders;
-    if (search) {
-      const q = search.toLowerCase();
-      d = d.filter(
-        o =>
-          o.id.toLowerCase().includes(q) || o.vendor.toLowerCase().includes(q)
-      );
-    }
-    if (statusFilter !== "all") d = d.filter(o => o.status === statusFilter);
-    return d;
-  }, [search, statusFilter]);
+  // ── Query params ──────────────────────────────────────────────────────
+  const queryParams = useMemo(() => {
+    const p: Record<string, string> = {};
+    if (dateRange?.[0]) p.dateFrom = dateRange[0].format("YYYY-MM-DD");
+    if (dateRange?.[1]) p.dateTo = dateRange[1].format("YYYY-MM-DD");
+    if (statusFilter) p.status = statusFilter;
+    return p;
+  }, [dateRange, statusFilter]);
 
-  function handleExport() {
+  // ── Query: try reporting endpoint first, fallback to summary ──────────
+  const {
+    data: reportRaw,
+    isLoading: reportLoading,
+    refetch: refetchReport,
+  } = useQuery({
+    queryKey: [QUERY_KEYS.PURCHASE_REPORT, queryParams],
+    queryFn: async () => {
+      try {
+        return await purchaseReportApi.get(queryParams);
+      } catch {
+        // Reporting endpoint not available yet — fall back to summary
+        return null;
+      }
+    },
+    staleTime: 60_000,
+  });
+
+  const {
+    data: summaryRaw,
+    isLoading: summaryLoading,
+    refetch: refetchSummary,
+  } = useQuery({
+    queryKey: [QUERY_KEYS.PURCHASE_ORDERS_SUMMARY, queryParams],
+    queryFn: () => purchaseReportApi.getSummary(queryParams),
+    enabled: !reportRaw,
+    staleTime: 60_000,
+  });
+
+  const isLoading = reportLoading || summaryLoading;
+
+  const report: PurchaseReportData = useMemo(() => {
+    if (reportRaw) return reportRaw;
+
+    // Build from summary fallback
+    const s = summaryRaw as Record<string, unknown> | undefined;
+    const totalOrders = Number(s?.totalRecords ?? 0);
+    const totalDraft = Number(s?.totalDraft ?? 0);
+    const totalConfirmed = Number(s?.totalConfirmed ?? 0);
+    const totalDone = Number(s?.totalDone ?? 0);
+    const totalCancelled = Number(s?.totalCancelled ?? 0);
+    const totalAmount = Number(s?.totalAmount ?? 0);
+
+    const byStatus: StatusBreakdown[] = [];
+    if (totalDraft > 0)
+      byStatus.push({
+        status: PurchaseOrderStatusNew.DRAFT,
+        count: totalDraft,
+        totalAmount: 0,
+      });
+    if (totalConfirmed > 0)
+      byStatus.push({
+        status: PurchaseOrderStatusNew.CONFIRMED,
+        count: totalConfirmed,
+        totalAmount: 0,
+      });
+    if (totalDone > 0)
+      byStatus.push({
+        status: PurchaseOrderStatusNew.DONE,
+        count: totalDone,
+        totalAmount: 0,
+      });
+    if (totalCancelled > 0)
+      byStatus.push({
+        status: PurchaseOrderStatusNew.CANCELLED,
+        count: totalCancelled,
+        totalAmount: 0,
+      });
+
+    return {
+      totalOrders,
+      totalAmount,
+      avgOrderValue: totalOrders > 0 ? totalAmount / totalOrders : 0,
+      topVendor: "—",
+      byStatus,
+    };
+  }, [reportRaw, summaryRaw]);
+
+  // ── Reset filters ─────────────────────────────────────────────────────
+  const resetFilters = useCallback(() => {
+    setDateRange(null);
+    setStatusFilter(undefined);
+  }, []);
+
+  const hasFilters = !!(dateRange || statusFilter);
+
+  const handleRefetch = useCallback(() => {
+    refetchReport();
+    refetchSummary();
+  }, [refetchReport, refetchSummary]);
+
+  // ── Export handler ────────────────────────────────────────────────────
+  const handleExport = useCallback(() => {
+    const rows = report.byStatus.map(s => [s.status, s.count, s.totalAmount]);
     const csv = [
       [
-        "PO #",
-        "Date",
-        "Vendor",
-        "Category",
-        "Amount",
-        "Items",
-        "Status",
-        "Due Date",
+        t("common.status", lang),
+        t("purchaseReports.count", lang),
+        t("purchaseReports.amount", lang),
       ],
-      ...filtered.map(o => [
-        o.id,
-        o.date,
-        o.vendor,
-        o.category,
-        o.amount,
-        o.items,
-        o.status,
-        o.dueDate,
-      ]),
+      ...rows,
     ]
       .map(r => r.join(","))
       .join("\n");
@@ -368,341 +227,332 @@ export default function PurchaseReports() {
     a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
     a.download = "purchase-report.csv";
     a.click();
-  }
+    notification.success({ message: "CSV exported" });
+  }, [report, t, lang]);
 
-  const maxSpend = Math.max(...topVendors.map(v => v.spend));
+  const breadcrumbs = [
+    { label: t("Dashboard", lang), href: ROUTES.DASHBOARD },
+    { label: t("REPORTS", lang), href: "#" },
+    { label: t("purchaseReports.title", lang) },
+  ];
 
-  const columns: TableColumnsType<PurchaseOrder> = [
+  // ── KPI cards ─────────────────────────────────────────────────────────
+  const kpiCards = [
     {
-      title: "PO #",
-      dataIndex: "id",
-      render: v => (
-        <Text code style={{ fontSize: 12, color: "#8B5CF6" }}>
-          {v}
-        </Text>
-      ),
+      title: t("purchaseReports.totalPOs", lang),
+      value: report.totalOrders,
+      suffix: "",
+      isSAR: false,
+      icon: <ShoppingCartOutlined />,
+      iconColor: "#8b5cf6",
+      iconBg: "#8b5cf615",
     },
     {
-      title: "Date",
-      dataIndex: "date",
-      render: v => <Text type="secondary">{v}</Text>,
+      title: t("purchaseReports.totalAmount", lang),
+      value: report.totalAmount,
+      suffix: " SAR",
+      isSAR: true,
+      icon: <DollarOutlined />,
+      iconColor: "#10b981",
+      iconBg: "#10b98115",
     },
     {
-      title: "Vendor",
-      dataIndex: "vendor",
-      render: v => <Text strong>{v}</Text>,
-    },
-    { title: "Category", dataIndex: "category", render: v => <Tag>{v}</Tag> },
-    {
-      title: "Amount",
-      dataIndex: "amount",
-      sorter: (a, b) => a.amount - b.amount,
-      render: v => <Text strong>{fmt(v)}</Text>,
-    },
-    { title: "Items", dataIndex: "items", align: "center" },
-    {
-      title: "Due Date",
-      dataIndex: "dueDate",
-      render: v => <Text type="secondary">{v}</Text>,
+      title: t("purchaseReports.avgPOValue", lang),
+      value: report.avgOrderValue,
+      suffix: " SAR",
+      isSAR: true,
+      icon: <BarChartOutlined />,
+      iconColor: "#3b82f6",
+      iconBg: "#3b82f615",
     },
     {
-      title: "Status",
-      dataIndex: "status",
-      filters: ["received", "pending", "overdue", "cancelled"].map(s => ({
-        text: s.charAt(0).toUpperCase() + s.slice(1),
-        value: s,
-      })),
-      onFilter: (val, rec) => rec.status === val,
-      render: v => (
-        <Tag
-          color={STATUS_COLOR[v]}
-          style={{ borderRadius: 20, textTransform: "capitalize" }}
-        >
-          {v}
-        </Tag>
-      ),
+      title: t("purchaseReports.topVendor", lang),
+      value: 0,
+      suffix: "",
+      isSAR: false,
+      displayValue: report.topVendor || "—",
+      icon: <TeamOutlined />,
+      iconColor: "#f59e0b",
+      iconBg: "#f59e0b15",
     },
   ];
 
+  // ── Status breakdown columns ───────────────────────────────────────────
+  const breakdownColumns: TableColumnsType<StatusBreakdown> = useMemo(
+    () => [
+      {
+        title: t("common.status", lang),
+        dataIndex: "status",
+        width: 150,
+        render: (v: string) => (
+          <Tag
+            color={STATUS_COLOR[v] ?? "default"}
+            style={{ borderRadius: 20, padding: "2px 10px" }}
+          >
+            {v}
+          </Tag>
+        ),
+      },
+      {
+        title: t("purchaseReports.count", lang),
+        dataIndex: "count",
+        width: 120,
+        align: "end" as const,
+        render: (v: number) => Number(v ?? 0).toLocaleString(),
+      },
+      {
+        title: t("purchaseReports.amount", lang),
+        dataIndex: "totalAmount",
+        width: 180,
+        align: "end" as const,
+        render: (v: number) => (
+          <Text strong className="font-mono">
+            {fmtSAR(v)} SAR
+          </Text>
+        ),
+      },
+    ],
+    [t, lang]
+  );
+
   return (
-    <DashboardLayout
-      currentPage="Purchase Reports"
-      breadcrumbs={[
-        { label: "Dashboard", href: "/" },
-        { label: "Reports" },
-        { label: "Purchase" },
-      ]}
-    >
-      <Space orientation="vertical" size={20} style={{ width: "100%" }}>
-        <KpiStrip />
-
-        {/* ── Spend Trend + Category Breakdown ───────────────────────────── */}
-        <Row gutter={16}>
-          {/* Monthly spend line chart */}
-          <Col xs={24} lg={16}>
-            <Card
-              title={<Text strong>Monthly Spend vs Budget</Text>}
-              styles={{ body: { paddingTop: 8 } }}
-            >
-              <ResponsiveContainer width="100%" height={240}>
-                <LineChart data={monthlySpend}>
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    stroke="var(--border,#e2e8f0)"
-                  />
-                  <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-                  <YAxis
-                    tickFormatter={v => `$${v / 1000}K`}
-                    tick={{ fontSize: 11 }}
-                  />
-                  <RTooltip formatter={(v: number) => fmt(v)} />
-                  <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="purchases"
-                    stroke="#8B5CF6"
-                    strokeWidth={2.5}
-                    dot={false}
-                    name="Purchases"
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="budget"
-                    stroke="#94a3b8"
-                    strokeDasharray="4 4"
-                    strokeWidth={1.5}
-                    dot={false}
-                    name="Budget"
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="returns"
-                    stroke="#F59E0B"
-                    strokeWidth={1.5}
-                    dot={false}
-                    name="Returns"
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </Card>
-          </Col>
-
-          {/* Category spend breakdown */}
-          <Col xs={24} lg={8}>
-            <Card
-              title={<Text strong>Spend by Category</Text>}
-              style={{ height: "100%" }}
-              styles={{ body: { paddingTop: 12 } }}
-            >
-              <Space orientation="vertical" size={14} style={{ width: "100%" }}>
-                {categorySpend.map((c, i) => {
-                  const colors = [
-                    "#3B82F6",
-                    "#10B981",
-                    "#8B5CF6",
-                    "#F59E0B",
-                    "#EC4899",
-                    "#06B6D4",
-                  ];
-                  return (
-                    <div key={c.category}>
-                      <div
+    <DashboardLayout currentPage="PurchaseReports" breadcrumbs={breadcrumbs}>
+      <div className="flex flex-col gap-6">
+        {/* ── 1. KPI Stats Row ─────────────────────────────────────────── */}
+        <Row gutter={[16, 16]}>
+          {kpiCards.map(s => (
+            <Col key={s.title} xs={24} sm={12} lg={6}>
+              <Card size="small" styles={{ body: { padding: "16px 20px" } }}>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <Text
+                      type="secondary"
+                      style={{
+                        fontSize: 12,
+                        display: "block",
+                        marginBottom: 4,
+                      }}
+                    >
+                      {s.title}
+                    </Text>
+                    {"displayValue" in s && s.displayValue ? (
+                      <Text
+                        strong
                         style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          marginBottom: 4,
+                          fontSize: 24,
+                          lineHeight: 1,
+                          display: "block",
                         }}
                       >
-                        <Text style={{ fontSize: 12 }}>{c.category}</Text>
-                        <Space size={8}>
-                          <Text type="secondary" style={{ fontSize: 12 }}>
-                            {fmt(c.spend)}
-                          </Text>
-                          <Text
-                            style={{
-                              fontSize: 12,
-                              color: colors[i],
-                              fontWeight: 600,
-                            }}
-                          >
-                            {c.pct}%
-                          </Text>
-                        </Space>
-                      </div>
-                      <Progress
-                        percent={c.pct}
-                        showInfo={false}
-                        strokeColor={colors[i]}
-                        railColor="var(--border,#e2e8f0)"
-                        size="small"
+                        {s.displayValue}
+                      </Text>
+                    ) : (
+                      <Statistic
+                        value={s.value}
+                        suffix={s.suffix || undefined}
+                        precision={s.isSAR ? 2 : 0}
+                        valueStyle={{ fontSize: 24, lineHeight: 1 }}
                       />
-                    </div>
-                  );
-                })}
-              </Space>
-            </Card>
-          </Col>
-        </Row>
-
-        {/* ── Top Vendors horizontal bars ─────────────────────────────────── */}
-        <Card
-          title={
-            <Space>
-              <CarOutlined style={{ color: "#8B5CF6" }} />
-              <Text strong>Top Vendors by Spend</Text>
-            </Space>
-          }
-        >
-          <Space orientation="vertical" size={12} style={{ width: "100%" }}>
-            {topVendors.map(v => (
-              <div
-                key={v.name}
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "200px 1fr 80px 80px 70px",
-                  alignItems: "center",
-                  gap: 12,
-                }}
-              >
-                <Text strong style={{ fontSize: 13 }}>
-                  {v.name}
-                </Text>
-                <div
-                  style={{
-                    background: "var(--border,#e2e8f0)",
-                    borderRadius: 99,
-                    overflow: "hidden",
-                    height: 8,
-                  }}
-                >
+                    )}
+                  </div>
                   <div
                     style={{
-                      width: `${(v.spend / maxSpend) * 100}%`,
-                      height: "100%",
-                      background: v.color,
-                      borderRadius: 99,
-                      transition: "width 0.5s",
+                      width: 40,
+                      height: 40,
+                      borderRadius: 10,
+                      background: s.iconBg,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: 18,
+                      color: s.iconColor,
                     }}
-                  />
+                  >
+                    {s.icon}
+                  </div>
                 </div>
-                <Text
-                  style={{ fontSize: 13, fontWeight: 600, textAlign: "right" }}
-                >
-                  {fmt(v.spend)}
-                </Text>
-                <Text
-                  type="secondary"
-                  style={{ fontSize: 12, textAlign: "center" }}
-                >
-                  {v.orders} orders
-                </Text>
-                <Tag
-                  color={
-                    v.onTime >= 90
-                      ? "success"
-                      : v.onTime >= 80
-                        ? "warning"
-                        : "error"
-                  }
-                  style={{ borderRadius: 20, textAlign: "center" }}
-                >
-                  {v.onTime}%
-                </Tag>
-              </div>
-            ))}
-          </Space>
-          <Text
-            type="secondary"
-            style={{ fontSize: 11, marginTop: 12, display: "block" }}
-          >
-            Last column = on-time delivery rate
-          </Text>
-        </Card>
+              </Card>
+            </Col>
+          ))}
+        </Row>
 
-        {/* ── Purchase Orders Table ───────────────────────────────────────── */}
-        <Card
-          title={<Text strong>Purchase Orders</Text>}
-          styles={{ body: { padding: 0 } }}
-          extra={
-            <Space wrap>
-              <RangePicker size="small" style={{ width: 220 }} />
-              <Input
-                prefix={<SearchOutlined style={{ color: "#94a3b8" }} />}
-                placeholder="Search PO / vendor…"
-                size="small"
-                value={search}
-                onChange={e => setSearch(e.target.value)}
+        {/* ── 2. Toolbar ──────────────────────────────────────────────── */}
+        <Card size="small" styles={{ body: { padding: "12px 16px" } }}>
+          <div className="flex flex-wrap gap-2 justify-between items-center">
+            <div className="flex flex-wrap gap-2 items-center">
+              <RangePicker
+                value={dateRange}
+                onChange={setDateRange}
+                placeholder={[
+                  t("common.dateFrom", lang),
+                  t("common.dateTo", lang),
+                ]}
                 allowClear
-                style={{ width: 200 }}
+                style={{ borderRadius: 8 }}
               />
               <Select
-                size="small"
+                placeholder={t("common.status", lang)}
                 value={statusFilter}
                 onChange={setStatusFilter}
-                style={{ width: 130 }}
+                allowClear
+                style={{ width: 150 }}
                 options={[
-                  { value: "all", label: "All Status" },
-                  { value: "received", label: "Received" },
-                  { value: "pending", label: "Pending" },
-                  { value: "overdue", label: "Overdue" },
-                  { value: "cancelled", label: "Cancelled" },
+                  {
+                    value: PurchaseOrderStatusNew.DRAFT,
+                    label: t("purchaseReports.draft", lang),
+                  },
+                  {
+                    value: PurchaseOrderStatusNew.CONFIRMED,
+                    label: t("purchaseReports.confirmed", lang),
+                  },
+                  {
+                    value: PurchaseOrderStatusNew.DONE,
+                    label: t("purchaseReports.done", lang),
+                  },
+                  {
+                    value: PurchaseOrderStatusNew.CANCELLED,
+                    label: t("purchaseReports.cancelledLabel", lang),
+                  },
                 ]}
               />
-              <Tooltip title="Reload">
-                <Button size="small" icon={<ReloadOutlined />} />
-              </Tooltip>
-              <Tooltip title="Print">
-                <Button
-                  size="small"
-                  icon={<PrinterOutlined />}
-                  onClick={() => window.print()}
-                />
+              {hasFilters && (
+                <Button type="link" size="small" onClick={resetFilters}>
+                  {t("purchaseReports.clearFilters", lang)}
+                </Button>
+              )}
+            </div>
+
+            <div className="flex flex-wrap gap-2 items-center">
+              <Tooltip title={t("seq.reload", lang)}>
+                <Button icon={<ReloadOutlined />} onClick={handleRefetch} />
               </Tooltip>
               <Dropdown
                 menu={{
                   items: [
                     {
                       key: "csv",
-                      label: "Export CSV",
+                      label: "CSV",
                       icon: <ExportOutlined />,
                       onClick: handleExport,
                     },
-                    {
-                      key: "xlsx",
-                      label: "Export Excel",
-                      icon: <ExportOutlined />,
-                    },
-                    {
-                      key: "pdf",
-                      label: "Export PDF",
-                      icon: <ExportOutlined />,
-                    },
+                    { key: "excel", label: "Excel", icon: <ExportOutlined /> },
+                    { key: "pdf", label: "PDF", icon: <ExportOutlined /> },
                   ],
                 }}
               >
-                <Button size="small" icon={<DownloadOutlined />}>
-                  Export
+                <Button icon={<DownloadOutlined />}>
+                  {t("products.export", lang)}
                 </Button>
               </Dropdown>
-            </Space>
-          }
+            </div>
+          </div>
+        </Card>
+
+        {/* ── 3. Status Breakdown Cards ──────────────────────────────── */}
+        {report.byStatus.length > 0 && (
+          <Row gutter={[16, 16]}>
+            {report.byStatus.map(s => (
+              <Col key={s.status} xs={24} sm={12} lg={6}>
+                <Card size="small" styles={{ body: { padding: "16px 20px" } }}>
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <Tag
+                        color={STATUS_COLOR[s.status] ?? "default"}
+                        style={{
+                          borderRadius: 20,
+                          padding: "2px 10px",
+                          marginBottom: 8,
+                        }}
+                      >
+                        {s.status}
+                      </Tag>
+                      <div className="mt-1">
+                        <Text
+                          type="secondary"
+                          style={{ fontSize: 12, display: "block" }}
+                        >
+                          {t("purchaseReports.count", lang)}
+                        </Text>
+                        <Text strong style={{ fontSize: 20 }}>
+                          {Number(s.count ?? 0).toLocaleString()}
+                        </Text>
+                      </div>
+                      <div className="mt-2">
+                        <Text
+                          type="secondary"
+                          style={{ fontSize: 12, display: "block" }}
+                        >
+                          {t("purchaseReports.amount", lang)}
+                        </Text>
+                        <Text
+                          strong
+                          className="font-mono"
+                          style={{
+                            fontSize: 16,
+                            color: STATUS_ICON_COLOR[s.status] ?? "#6b7280",
+                          }}
+                        >
+                          {fmtSAR(s.totalAmount)} SAR
+                        </Text>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        )}
+
+        {/* ── 4. Status Breakdown Table ──────────────────────────────── */}
+        <Card
+          size="small"
+          title={t("purchaseReports.statusBreakdown", lang)}
+          styles={{ body: { padding: 0 } }}
         >
           <Table
-            rowKey="id"
-            size="small"
-            columns={columns}
-            dataSource={filtered}
+            rowKey="status"
+            columns={breakdownColumns}
+            dataSource={report.byStatus}
+            loading={isLoading}
+            size="middle"
+            pagination={false}
             scroll={{ x: "max-content" }}
-            pagination={{
-              pageSize: 8,
-              current: page,
-              onChange: setPage,
-              showTotal: (t, r) => `${r[0]}–${r[1]} of ${t}`,
-              showSizeChanger: false,
+            locale={{
+              emptyText: (
+                <EmptyState description={t("purchaseReports.noData", lang)} />
+              ),
+            }}
+            summary={() => {
+              if (report.byStatus.length === 0) return null;
+              const totalCount = report.byStatus.reduce(
+                (sum, s) => sum + Number(s.count ?? 0),
+                0
+              );
+              const totalAmt = report.byStatus.reduce(
+                (sum, s) => sum + Number(s.totalAmount ?? 0),
+                0
+              );
+              return (
+                <Table.Summary fixed>
+                  <Table.Summary.Row>
+                    <Table.Summary.Cell index={0}>
+                      <Text strong>{t("purchaseReports.total", lang)}</Text>
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={1} align="end">
+                      <Text strong>{totalCount.toLocaleString()}</Text>
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={2} align="end">
+                      <Text strong className="font-mono">
+                        {fmtSAR(totalAmt)} SAR
+                      </Text>
+                    </Table.Summary.Cell>
+                  </Table.Summary.Row>
+                </Table.Summary>
+              );
             }}
           />
         </Card>
-      </Space>
+      </div>
     </DashboardLayout>
   );
 }

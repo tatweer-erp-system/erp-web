@@ -1,321 +1,191 @@
-import { useState, useMemo } from "react";
-import { DashboardLayout } from "@/components/layout/DashboardLayout";
+/**
+ * Aging Reports page with real API data.
+ * Default export for lazy loading via React.lazy().
+ */
+
+import { useState, useMemo, useCallback } from "react";
+
 import {
   Card,
   Row,
   Col,
-  Table,
-  Tag,
-  Space,
-  Typography,
   Button,
+  Typography,
+  Tag,
+  DatePicker,
   Segmented,
-  Input,
   Tooltip,
+  Table,
   Dropdown,
-  theme as antTheme,
   Alert,
+  notification,
+  theme as antTheme,
 } from "antd";
 import type { TableColumnsType } from "antd";
+import type { Dayjs } from "dayjs";
 import {
-  SearchOutlined,
-  DownloadOutlined,
-  PrinterOutlined,
-  ExportOutlined,
   ReloadOutlined,
+  DownloadOutlined,
+  ExportOutlined,
   WarningOutlined,
-  CheckCircleOutlined,
 } from "@ant-design/icons";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip as RTooltip,
-  Legend,
-  ResponsiveContainer,
-  Cell,
-} from "recharts";
 
-const { Text, Title } = Typography;
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
+import { EmptyState } from "@/components/common/EmptyState";
+import { useTranslation } from "@/hooks/ui/useTranslation";
+import { QUERY_KEYS } from "@/constants/queryKeys";
+import { ROUTES } from "@/shared/constants/routes";
+import apiClient from "@/lib/api";
+import { useQuery } from "@tanstack/react-query";
 
-// ─── Types & data ─────────────────────────────────────────────────────────────
+const { Text } = Typography;
 
-type AgingMode = "ar" | "ap";
+// ── Types ────────────────────────────────────────────────────────────────────
 
-interface AgingRow {
-  id: string;
-  name: string;
-  current: number;
-  d30: number;
-  d60: number;
-  d90: number;
-  d90plus: number;
+type AgingMode = "receivable" | "payable";
+
+type AgingRow = {
+  partnerId: string;
+  partnerNameEn: string;
+  partnerNameAr: string;
   total: number;
-  type: "ar" | "ap";
-}
+  current: number;
+  d31_60: number;
+  d61_90: number;
+  d90plus: number;
+};
 
-const arData: AgingRow[] = [
-  {
-    id: "C001",
-    name: "Tech Corp",
-    current: 42000,
-    d30: 18000,
-    d60: 8500,
-    d90: 3200,
-    d90plus: 0,
-    total: 71700,
-    type: "ar",
-  },
-  {
-    id: "C002",
-    name: "Global Industries",
-    current: 31500,
-    d30: 0,
-    d60: 0,
-    d90: 7800,
-    d90plus: 4200,
-    total: 43500,
-    type: "ar",
-  },
-  {
-    id: "C003",
-    name: "Enterprise Ltd",
-    current: 19200,
-    d30: 12400,
-    d60: 0,
-    d90: 0,
-    d90plus: 0,
-    total: 31600,
-    type: "ar",
-  },
-  {
-    id: "C004",
-    name: "Startup Inc",
-    current: 8700,
-    d30: 4100,
-    d60: 6200,
-    d90: 0,
-    d90plus: 2800,
-    total: 21800,
-    type: "ar",
-  },
-  {
-    id: "C005",
-    name: "Local Business",
-    current: 15400,
-    d30: 0,
-    d60: 3300,
-    d90: 1900,
-    d90plus: 0,
-    total: 20600,
-    type: "ar",
-  },
-  {
-    id: "C006",
-    name: "Metro Retail",
-    current: 28900,
-    d30: 9800,
-    d60: 0,
-    d90: 0,
-    d90plus: 0,
-    total: 38700,
-    type: "ar",
-  },
-  {
-    id: "C007",
-    name: "Premium Partners",
-    current: 0,
-    d30: 16200,
-    d60: 4800,
-    d90: 3100,
-    d90plus: 6700,
-    total: 30800,
-    type: "ar",
-  },
-  {
-    id: "C008",
-    name: "Swift Solutions",
-    current: 22100,
-    d30: 0,
-    d60: 0,
-    d90: 0,
-    d90plus: 0,
-    total: 22100,
-    type: "ar",
-  },
-];
+type AgingReportData = {
+  rows: AgingRow[];
+  totals: {
+    total: number;
+    current: number;
+    d31_60: number;
+    d61_90: number;
+    d90plus: number;
+  };
+};
 
-const apData: AgingRow[] = [
-  {
-    id: "V001",
-    name: "Alpha Supplies Co.",
-    current: 38400,
-    d30: 14200,
-    d60: 0,
-    d90: 0,
-    d90plus: 0,
-    total: 52600,
-    type: "ap",
-  },
-  {
-    id: "V002",
-    name: "Beta Manufacturing",
-    current: 21700,
-    d30: 8900,
-    d60: 5400,
-    d90: 2100,
-    d90plus: 0,
-    total: 38100,
-    type: "ap",
-  },
-  {
-    id: "V003",
-    name: "Gamma Distribution",
-    current: 14200,
-    d30: 0,
-    d60: 0,
-    d90: 0,
-    d90plus: 0,
-    total: 14200,
-    type: "ap",
-  },
-  {
-    id: "V004",
-    name: "Delta Trading LLC",
-    current: 9800,
-    d30: 4300,
-    d60: 3100,
-    d90: 1800,
-    d90plus: 3400,
-    total: 22400,
-    type: "ap",
-  },
-  {
-    id: "V005",
-    name: "Epsilon Global",
-    current: 31200,
-    d30: 0,
-    d60: 7800,
-    d90: 0,
-    d90plus: 0,
-    total: 39000,
-    type: "ap",
-  },
-  {
-    id: "V006",
-    name: "Zeta Industrial",
-    current: 18900,
-    d30: 6700,
-    d60: 0,
-    d90: 4200,
-    d90plus: 1800,
-    total: 31600,
-    type: "ap",
-  },
-];
+// ── API ──────────────────────────────────────────────────────────────────────
+
+const agingReportApi = {
+  get: (params?: Record<string, string>) =>
+    apiClient
+      .get("/reporting/aging", { params })
+      .then(r => r.data.data as AgingReportData),
+};
+
+// ── Bucket colors ────────────────────────────────────────────────────────────
 
 const BUCKET_COLORS = {
   current: "#10B981",
-  d30: "#3B82F6",
-  d60: "#F59E0B",
-  d90: "#F97316",
+  d31_60: "#F59E0B",
+  d61_90: "#F97316",
   d90plus: "#EF4444",
-};
+} as const;
 
-const BUCKET_LABELS = {
-  current: "Current",
-  d30: "1–30 Days",
-  d60: "31–60 Days",
-  d90: "61–90 Days",
-  d90plus: "90+ Days",
-};
+// ── Helpers ──────────────────────────────────────────────────────────────────
 
-function fmt(n: number) {
-  if (n === 0) return "—";
-  if (n >= 1_000) return `$${(n / 1_000).toFixed(0)}K`;
-  return `$${n}`;
+function fmtSAR(n: number): string {
+  return Number(n ?? 0).toLocaleString("en-SA", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 }
 
-function riskTag(row: AgingRow) {
-  const overdue = row.d60 + row.d90 + row.d90plus;
+function getRiskTag(
+  row: AgingRow,
+  t: (key: string, lang: "ar" | "en") => string,
+  lang: "ar" | "en"
+): React.ReactNode {
+  const overdue = (row.d61_90 ?? 0) + (row.d90plus ?? 0);
   const pct = row.total ? overdue / row.total : 0;
   if (pct > 0.4)
     return (
       <Tag color="error" style={{ borderRadius: 20 }}>
-        High Risk
+        {t("agingReports.highRisk", lang)}
       </Tag>
     );
   if (pct > 0.15)
     return (
       <Tag color="warning" style={{ borderRadius: 20 }}>
-        Medium
+        {t("agingReports.mediumRisk", lang)}
       </Tag>
     );
   return (
     <Tag color="success" style={{ borderRadius: 20 }}>
-      Good
+      {t("agingReports.lowRisk", lang)}
     </Tag>
   );
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
+// ── Component ────────────────────────────────────────────────────────────────
 
 export default function AgingReports() {
+  const { t, lang, direction } = useTranslation();
   const { token } = antTheme.useToken();
-  const [mode, setMode] = useState<AgingMode>("ar");
-  const [search, setSearch] = useState("");
+  const isRTL = direction === "rtl";
 
-  const data = mode === "ar" ? arData : apData;
+  // ── Filter State ──────────────────────────────────────────────────────
+  const [mode, setMode] = useState<AgingMode>("receivable");
+  const [asOfDate, setAsOfDate] = useState<Dayjs | null>(null);
 
-  const filtered = useMemo(() => {
-    if (!search) return data;
-    const q = search.toLowerCase();
-    return data.filter(
-      r => r.name.toLowerCase().includes(q) || r.id.toLowerCase().includes(q)
-    );
-  }, [data, search]);
+  // ── Query params ──────────────────────────────────────────────────────
+  const queryParams = useMemo(() => {
+    const p: Record<string, string> = { type: mode };
+    if (asOfDate) p.asOfDate = asOfDate.format("YYYY-MM-DD");
+    return p;
+  }, [mode, asOfDate]);
 
-  // Bucket totals
-  const totals = useMemo(
-    () =>
-      filtered.reduce(
-        (acc, r) => ({
-          current: acc.current + r.current,
-          d30: acc.d30 + r.d30,
-          d60: acc.d60 + r.d60,
-          d90: acc.d90 + r.d90,
-          d90plus: acc.d90plus + r.d90plus,
-          total: acc.total + r.total,
-        }),
-        { current: 0, d30: 0, d60: 0, d90: 0, d90plus: 0, total: 0 }
-      ),
-    [filtered]
-  );
+  // ── Query ─────────────────────────────────────────────────────────────
+  const {
+    data: reportRaw,
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: [QUERY_KEYS.AGING_REPORT, queryParams],
+    queryFn: async () => {
+      try {
+        return await agingReportApi.get(queryParams);
+      } catch {
+        return null;
+      }
+    },
+    staleTime: 60_000,
+  });
 
-  // Chart data: one row per entity, stacked by bucket
-  const chartData = filtered.map(r => ({
-    name: r.name.split(" ")[0],
-    Current: r.current,
-    "1–30 Days": r.d30,
-    "31–60 Days": r.d60,
-    "61–90 Days": r.d90,
-    "90+ Days": r.d90plus,
-  }));
+  const report: AgingReportData = useMemo(() => {
+    if (reportRaw) return reportRaw;
+    return {
+      rows: [],
+      totals: { total: 0, current: 0, d31_60: 0, d61_90: 0, d90plus: 0 },
+    };
+  }, [reportRaw]);
 
-  function handleExport() {
+  const totals = report.totals;
+  const overdueTotal = (totals.d61_90 ?? 0) + (totals.d90plus ?? 0);
+  const overdueRate = totals.total
+    ? ((overdueTotal / totals.total) * 100).toFixed(1)
+    : "0";
+
+  // ── Export handler ────────────────────────────────────────────────────
+  const handleExport = useCallback(() => {
     const csv = [
-      ["ID", "Name", "Current", "1-30", "31-60", "61-90", "90+", "Total"],
-      ...filtered.map(r => [
-        r.id,
-        r.name,
-        r.current,
-        r.d30,
-        r.d60,
-        r.d90,
-        r.d90plus,
+      [
+        t("agingReports.partnerName", lang),
+        t("agingReports.totalOutstanding", lang),
+        t("agingReports.current", lang),
+        t("agingReports.overdue31_60", lang),
+        t("agingReports.overdue61_90", lang),
+        t("agingReports.overdue90plus", lang),
+      ],
+      ...report.rows.map(r => [
+        lang === "ar" ? r.partnerNameAr : r.partnerNameEn,
         r.total,
+        r.current,
+        r.d31_60,
+        r.d61_90,
+        r.d90plus,
       ]),
     ]
       .map(r => r.join(","))
@@ -324,350 +194,323 @@ export default function AgingReports() {
     a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
     a.download = `aging-${mode}-report.csv`;
     a.click();
-  }
+    notification.success({ message: "CSV exported" });
+  }, [report, mode, t, lang]);
 
-  const overdueTotal = totals.d60 + totals.d90 + totals.d90plus;
-  const overdueRate = totals.total
-    ? ((overdueTotal / totals.total) * 100).toFixed(1)
-    : "0";
+  const breadcrumbs = [
+    { label: t("Dashboard", lang), href: ROUTES.DASHBOARD },
+    { label: t("REPORTS", lang), href: "#" },
+    { label: t("agingReports.title", lang) },
+  ];
 
-  const columns: TableColumnsType<AgingRow> = [
-    {
-      title: mode === "ar" ? "Customer" : "Vendor",
-      dataIndex: "name",
-      render: (v, row) => (
-        <Space>
-          <Text
-            style={{ fontFamily: "monospace", fontSize: 11 }}
-            type="secondary"
-          >
-            {row.id}
+  // ── Table columns ─────────────────────────────────────────────────────
+  const columns: TableColumnsType<AgingRow> = useMemo(
+    () => [
+      {
+        title: t("agingReports.partnerName", lang),
+        key: "partnerName",
+        width: 220,
+        render: (_: unknown, row: AgingRow) => (
+          <Text strong>
+            {lang === "ar"
+              ? row.partnerNameAr || row.partnerNameEn
+              : row.partnerNameEn || row.partnerNameAr}
           </Text>
-          <Text strong>{v}</Text>
-        </Space>
-      ),
-      width: 220,
+        ),
+      },
+      {
+        title: t("agingReports.totalOutstanding", lang),
+        dataIndex: "total",
+        align: "end" as const,
+        width: 150,
+        sorter: (a: AgingRow, b: AgingRow) => (a.total ?? 0) - (b.total ?? 0),
+        render: (v: number) => <Text strong>{fmtSAR(v)}</Text>,
+      },
+      {
+        title: t("agingReports.current", lang),
+        dataIndex: "current",
+        align: "end" as const,
+        width: 130,
+        render: (v: number) => (
+          <Text
+            style={{
+              color: BUCKET_COLORS.current,
+              fontWeight: v ? 600 : 400,
+            }}
+          >
+            {v ? fmtSAR(v) : "—"}
+          </Text>
+        ),
+      },
+      {
+        title: t("agingReports.overdue31_60", lang),
+        dataIndex: "d31_60",
+        align: "end" as const,
+        width: 130,
+        render: (v: number) => (
+          <Text
+            style={{
+              color: BUCKET_COLORS.d31_60,
+              fontWeight: v ? 600 : 400,
+            }}
+          >
+            {v ? fmtSAR(v) : "—"}
+          </Text>
+        ),
+      },
+      {
+        title: t("agingReports.overdue61_90", lang),
+        dataIndex: "d61_90",
+        align: "end" as const,
+        width: 130,
+        render: (v: number) => (
+          <Text
+            style={{
+              color: BUCKET_COLORS.d61_90,
+              fontWeight: v ? 600 : 400,
+            }}
+          >
+            {v ? fmtSAR(v) : "—"}
+          </Text>
+        ),
+      },
+      {
+        title: t("agingReports.overdue90plus", lang),
+        dataIndex: "d90plus",
+        align: "end" as const,
+        width: 130,
+        render: (v: number) => (
+          <Text
+            style={{
+              color: BUCKET_COLORS.d90plus,
+              fontWeight: v ? 600 : 400,
+            }}
+          >
+            {v ? fmtSAR(v) : "—"}
+          </Text>
+        ),
+      },
+      {
+        title: t("agingReports.risk", lang),
+        key: "risk",
+        align: "center" as const,
+        width: 110,
+        render: (_: unknown, row: AgingRow) => getRiskTag(row, t, lang),
+      },
+    ],
+    [t, lang]
+  );
+
+  // ── Bucket KPI definitions ────────────────────────────────────────────
+  const bucketKpis = [
+    {
+      key: "total" as const,
+      label: t("agingReports.totalOutstanding", lang),
+      value: totals.total,
+      color: token.colorPrimary,
+      bg: token.colorPrimaryBg,
     },
     {
-      title: "Current",
-      dataIndex: "current",
-      align: "right",
-      render: v => (
-        <Text
-          style={{ color: BUCKET_COLORS.current, fontWeight: v ? 600 : 400 }}
-        >
-          {fmt(v)}
-        </Text>
-      ),
+      key: "current" as const,
+      label: t("agingReports.current", lang),
+      value: totals.current,
+      color: BUCKET_COLORS.current,
+      bg: `${BUCKET_COLORS.current}08`,
     },
     {
-      title: "1–30 Days",
-      dataIndex: "d30",
-      align: "right",
-      render: v => (
-        <Text style={{ color: BUCKET_COLORS.d30, fontWeight: v ? 600 : 400 }}>
-          {fmt(v)}
-        </Text>
-      ),
+      key: "d31_60" as const,
+      label: t("agingReports.overdue31_60", lang),
+      value: totals.d31_60,
+      color: BUCKET_COLORS.d31_60,
+      bg: `${BUCKET_COLORS.d31_60}08`,
     },
     {
-      title: "31–60 Days",
-      dataIndex: "d60",
-      align: "right",
-      render: v => (
-        <Text style={{ color: BUCKET_COLORS.d60, fontWeight: v ? 600 : 400 }}>
-          {fmt(v)}
-        </Text>
-      ),
+      key: "d61_90" as const,
+      label: t("agingReports.overdue61_90", lang),
+      value: totals.d61_90,
+      color: BUCKET_COLORS.d61_90,
+      bg: `${BUCKET_COLORS.d61_90}08`,
     },
     {
-      title: "61–90 Days",
-      dataIndex: "d90",
-      align: "right",
-      render: v => (
-        <Text style={{ color: BUCKET_COLORS.d90, fontWeight: v ? 600 : 400 }}>
-          {fmt(v)}
-        </Text>
-      ),
-    },
-    {
-      title: "90+ Days",
-      dataIndex: "d90plus",
-      align: "right",
-      render: v => (
-        <Text
-          style={{ color: BUCKET_COLORS.d90plus, fontWeight: v ? 600 : 400 }}
-        >
-          {fmt(v)}
-        </Text>
-      ),
-    },
-    {
-      title: "Total",
-      dataIndex: "total",
-      align: "right",
-      render: v => <Text strong>${(v / 1000).toFixed(0)}K</Text>,
-      sorter: (a, b) => a.total - b.total,
-    },
-    {
-      title: "Risk",
-      key: "risk",
-      align: "center",
-      render: (_, row) => riskTag(row),
+      key: "d90plus" as const,
+      label: t("agingReports.overdue90plus", lang),
+      value: totals.d90plus,
+      color: BUCKET_COLORS.d90plus,
+      bg: `${BUCKET_COLORS.d90plus}08`,
     },
   ];
 
   return (
-    <DashboardLayout
-      currentPage="Aging Reports"
-      breadcrumbs={[
-        { label: "Dashboard", href: "/" },
-        { label: "Reports" },
-        { label: "Aging" },
-      ]}
-    >
-      <Space orientation="vertical" size={20} style={{ width: "100%" }}>
-        {/* ── Mode toggle ─────────────────────────────────────────────────── */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            flexWrap: "wrap",
-            gap: 12,
-          }}
-        >
-          <div>
-            <Title level={4} style={{ margin: 0 }}>
-              {mode === "ar" ? "Accounts Receivable" : "Accounts Payable"} Aging
-            </Title>
-            <Text type="secondary" style={{ fontSize: 12 }}>
-              As of December 31, 2024
-            </Text>
-          </div>
-          <Space>
-            <Segmented
-              value={mode}
-              onChange={v => {
-                setMode(v as AgingMode);
-                setSearch("");
-              }}
-              options={[
-                { value: "ar", label: "A/R Aging" },
-                { value: "ap", label: "A/P Aging" },
-              ]}
-            />
-            <Tooltip title="Print">
-              <Button
-                icon={<PrinterOutlined />}
-                onClick={() => window.print()}
+    <DashboardLayout currentPage="AgingReports" breadcrumbs={breadcrumbs}>
+      <div
+        className="flex flex-col gap-6"
+        style={{ direction: isRTL ? "rtl" : "ltr" }}
+      >
+        {/* ── 1. Toolbar ──────────────────────────────────────────────── */}
+        <Card size="small" styles={{ body: { padding: "12px 16px" } }}>
+          <div className="flex flex-wrap gap-2 justify-between items-center">
+            <div className="flex flex-wrap gap-2 items-center">
+              <Segmented
+                value={mode}
+                onChange={v => setMode(v as AgingMode)}
+                options={[
+                  {
+                    value: "receivable",
+                    label: t("agingReports.arAging", lang),
+                  },
+                  {
+                    value: "payable",
+                    label: t("agingReports.apAging", lang),
+                  },
+                ]}
               />
-            </Tooltip>
-            <Dropdown
-              menu={{
-                items: [
-                  {
-                    key: "csv",
-                    label: "Export CSV",
-                    icon: <ExportOutlined />,
-                    onClick: handleExport,
-                  },
-                  {
-                    key: "xlsx",
-                    label: "Export Excel",
-                    icon: <ExportOutlined />,
-                  },
-                  { key: "pdf", label: "Export PDF", icon: <ExportOutlined /> },
-                ],
-              }}
-            >
-              <Button icon={<DownloadOutlined />}>Export</Button>
-            </Dropdown>
-          </Space>
-        </div>
+              <DatePicker
+                value={asOfDate}
+                onChange={setAsOfDate}
+                placeholder={t("agingReports.asOfDate", lang)}
+                allowClear
+                style={{ borderRadius: 8, width: 160 }}
+              />
+            </div>
 
-        {/* ── Alert if high overdue ───────────────────────────────────────── */}
+            <div className="flex flex-wrap gap-2 items-center">
+              <Tooltip title={t("seq.reload", lang)}>
+                <Button icon={<ReloadOutlined />} onClick={() => refetch()} />
+              </Tooltip>
+              <Dropdown
+                menu={{
+                  items: [
+                    {
+                      key: "csv",
+                      label: "CSV",
+                      icon: <ExportOutlined />,
+                      onClick: handleExport,
+                    },
+                    { key: "excel", label: "Excel", icon: <ExportOutlined /> },
+                    { key: "pdf", label: "PDF", icon: <ExportOutlined /> },
+                  ],
+                }}
+              >
+                <Button icon={<DownloadOutlined />}>
+                  {t("products.export", lang)}
+                </Button>
+              </Dropdown>
+            </div>
+          </div>
+        </Card>
+
+        {/* ── 2. Overdue warning ──────────────────────────────────────── */}
         {parseFloat(overdueRate) > 20 && (
           <Alert
             icon={<WarningOutlined />}
             showIcon
             type="warning"
-            message={`${overdueRate}% of total ${mode === "ar" ? "receivables" : "payables"} ($${(overdueTotal / 1000).toFixed(0)}K) are overdue by more than 60 days.`}
+            message={`${overdueRate}% of total ${mode === "receivable" ? t("agingReports.receivable", lang) : t("agingReports.payable", lang)} (${fmtSAR(overdueTotal)} SAR) are overdue by more than 60 days.`}
             style={{ borderRadius: 8 }}
           />
         )}
 
-        {/* ── Bucket totals strip ─────────────────────────────────────────── */}
+        {/* ── 3. Bucket KPI Cards ─────────────────────────────────────── */}
         <Row gutter={[12, 12]}>
-          {(["current", "d30", "d60", "d90", "d90plus"] as const).map(k => (
-            <Col xs={12} sm={8} lg={4} key={k} style={{ flex: 1 }}>
+          {bucketKpis.map(k => (
+            <Col xs={12} sm={8} lg={4} key={k.key} style={{ flex: 1 }}>
               <Card
                 size="small"
                 styles={{ body: { padding: "14px 16px" } }}
                 style={{
-                  borderLeft: `4px solid ${BUCKET_COLORS[k]}`,
-                  background: `${BUCKET_COLORS[k]}08`,
+                  borderInlineStart: `4px solid ${k.color}`,
+                  background: k.bg,
                 }}
               >
                 <Text type="secondary" style={{ fontSize: 11 }}>
-                  {BUCKET_LABELS[k]}
+                  {k.label}
                 </Text>
                 <div
                   style={{
                     fontWeight: 700,
                     fontSize: 20,
-                    color: BUCKET_COLORS[k],
+                    color: k.color,
                     marginTop: 4,
                   }}
                 >
-                  ${(totals[k] / 1000).toFixed(0)}K
+                  {fmtSAR(k.value)}
                 </div>
                 <Text type="secondary" style={{ fontSize: 11 }}>
                   {totals.total
-                    ? ((totals[k] / totals.total) * 100).toFixed(1)
+                    ? ((k.value / totals.total) * 100).toFixed(1)
                     : 0}
                   % of total
                 </Text>
               </Card>
             </Col>
           ))}
-          <Col xs={12} sm={8} lg={4} style={{ flex: 1 }}>
-            <Card
-              size="small"
-              styles={{ body: { padding: "14px 16px" } }}
-              style={{
-                borderLeft: `4px solid ${token.colorPrimary}`,
-                background: token.colorPrimaryBg,
-              }}
-            >
-              <Text type="secondary" style={{ fontSize: 11 }}>
-                Total Outstanding
-              </Text>
-              <div
-                style={{
-                  fontWeight: 700,
-                  fontSize: 20,
-                  color: token.colorPrimary,
-                  marginTop: 4,
-                }}
-              >
-                ${(totals.total / 1000).toFixed(0)}K
-              </div>
-              <Space size={4}>
-                <CheckCircleOutlined
-                  style={{ fontSize: 11, color: token.colorSuccess }}
-                />
-                <Text type="secondary" style={{ fontSize: 11 }}>
-                  {filtered.length} {mode === "ar" ? "customers" : "vendors"}
-                </Text>
-              </Space>
-            </Card>
-          </Col>
         </Row>
 
-        {/* ── Stacked bar chart ───────────────────────────────────────────── */}
+        {/* ── 4. Aging Detail Table ───────────────────────────────────── */}
         <Card
-          title={
-            <Text strong>
-              Aging Distribution by {mode === "ar" ? "Customer" : "Vendor"}
-            </Text>
-          }
-          styles={{ body: { paddingTop: 8 } }}
-        >
-          <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={chartData} layout="vertical" margin={{ left: 20 }}>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="var(--border,#e2e8f0)"
-                horizontal={false}
-              />
-              <XAxis
-                type="number"
-                tickFormatter={v => `$${v / 1000}K`}
-                tick={{ fontSize: 11 }}
-              />
-              <YAxis
-                type="category"
-                dataKey="name"
-                tick={{ fontSize: 11 }}
-                width={80}
-              />
-              <RTooltip
-                formatter={(v: number) => `$${(v / 1000).toFixed(0)}K`}
-              />
-              <Legend />
-              <Bar dataKey="Current" stackId="a" fill={BUCKET_COLORS.current} />
-              <Bar dataKey="1–30 Days" stackId="a" fill={BUCKET_COLORS.d30} />
-              <Bar dataKey="31–60 Days" stackId="a" fill={BUCKET_COLORS.d60} />
-              <Bar dataKey="61–90 Days" stackId="a" fill={BUCKET_COLORS.d90} />
-              <Bar
-                dataKey="90+ Days"
-                stackId="a"
-                fill={BUCKET_COLORS.d90plus}
-                radius={[0, 4, 4, 0]}
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </Card>
-
-        {/* ── Detail table ────────────────────────────────────────────────── */}
-        <Card
-          title={<Text strong>Aging Detail</Text>}
+          size="small"
+          title={t("agingReports.title", lang)}
           styles={{ body: { padding: 0 } }}
-          extra={
-            <Space>
-              <Input
-                prefix={<SearchOutlined style={{ color: "#94a3b8" }} />}
-                placeholder={`Search ${mode === "ar" ? "customer" : "vendor"}…`}
-                size="small"
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                allowClear
-                style={{ width: 200 }}
-              />
-              <Tooltip title="Reload">
-                <Button size="small" icon={<ReloadOutlined />} />
-              </Tooltip>
-            </Space>
-          }
         >
           <Table
-            rowKey="id"
-            size="small"
+            rowKey="partnerId"
             columns={columns}
-            dataSource={filtered}
-            scroll={{ x: "max-content" }}
+            dataSource={report.rows}
+            loading={isLoading}
+            size="middle"
             pagination={false}
-            summary={() => (
-              <Table.Summary.Row
-                style={{ background: token.colorFillAlter, fontWeight: 700 }}
-              >
-                <Table.Summary.Cell index={0}>
-                  <Text strong>TOTAL</Text>
-                </Table.Summary.Cell>
-                {(
-                  ["current", "d30", "d60", "d90", "d90plus", "total"] as const
-                ).map((k, i) => (
-                  <Table.Summary.Cell key={k} index={i + 1} align="right">
-                    <Text
-                      strong
-                      style={{
-                        color:
-                          k !== "total"
-                            ? BUCKET_COLORS[k as keyof typeof BUCKET_COLORS]
-                            : token.colorPrimary,
-                      }}
-                    >
-                      ${(totals[k] / 1000).toFixed(0)}K
-                    </Text>
-                  </Table.Summary.Cell>
-                ))}
-                <Table.Summary.Cell index={7} />
-              </Table.Summary.Row>
-            )}
+            scroll={{ x: "max-content" }}
+            locale={{
+              emptyText: (
+                <EmptyState description={t("agingReports.noData", lang)} />
+              ),
+            }}
+            summary={() => {
+              if (report.rows.length === 0) return null;
+              return (
+                <Table.Summary fixed>
+                  <Table.Summary.Row
+                    style={{
+                      background: token.colorFillAlter,
+                      fontWeight: 700,
+                    }}
+                  >
+                    <Table.Summary.Cell index={0}>
+                      <Text strong>{t("agingReports.total", lang)}</Text>
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={1} align="end">
+                      <Text strong style={{ color: token.colorPrimary }}>
+                        {fmtSAR(totals.total)}
+                      </Text>
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={2} align="end">
+                      <Text strong style={{ color: BUCKET_COLORS.current }}>
+                        {fmtSAR(totals.current)}
+                      </Text>
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={3} align="end">
+                      <Text strong style={{ color: BUCKET_COLORS.d31_60 }}>
+                        {fmtSAR(totals.d31_60)}
+                      </Text>
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={4} align="end">
+                      <Text strong style={{ color: BUCKET_COLORS.d61_90 }}>
+                        {fmtSAR(totals.d61_90)}
+                      </Text>
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={5} align="end">
+                      <Text strong style={{ color: BUCKET_COLORS.d90plus }}>
+                        {fmtSAR(totals.d90plus)}
+                      </Text>
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={6} />
+                  </Table.Summary.Row>
+                </Table.Summary>
+              );
+            }}
           />
         </Card>
-      </Space>
+      </div>
     </DashboardLayout>
   );
 }

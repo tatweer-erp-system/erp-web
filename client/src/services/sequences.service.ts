@@ -1,29 +1,43 @@
 import apiClient from "@/lib/api";
-import type { ApiResponse, PaginatedResponse } from "@/types/api";
+import type { ApiResponse } from "@/types/api";
 
 export interface Sequence {
   id: string;
   entityType: string;
   prefix: string;
+  separator: string;
   currentValue: number;
   padding: number;
-  branchId?: string;
+  resetCycle: string;
+  fiscalYear: number | null;
+  fiscalMonth: number | null;
+  branchId: string | null;
+  branchCode: string | null;
+  version: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UpdateSequenceDto {
+  prefix?: string;
+  padding?: number;
+  resetCycle?: string;
+  separator?: string;
+  version: number;
 }
 
 export const sequencesService = {
-  list: () =>
-    apiClient.get<ApiResponse<Sequence[]>>("/sequences").then(r => r.data),
-
-  create: (data: Omit<Sequence, "id">) =>
-    apiClient.post<ApiResponse<Sequence>>("/sequences", data).then(r => r.data),
-
-  update: (id: string, data: Partial<Sequence>) =>
+  list: (params?: Record<string, unknown>) =>
     apiClient
-      .put<ApiResponse<Sequence>>(`/sequences/${id}`, data)
+      .get<ApiResponse<Sequence[]>>("/sequences", { params })
       .then(r => r.data),
 
-  reset: (id: string) =>
+  get: (id: string) =>
+    apiClient.get<ApiResponse<Sequence>>(`/sequences/${id}`).then(r => r.data),
+
+  update: (id: string, data: UpdateSequenceDto) =>
     apiClient
-      .post<ApiResponse<Sequence>>(`/sequences/${id}/reset`)
+      .put<ApiResponse<Sequence>>(`/sequences/${id}`, data)
       .then(r => r.data),
 };

@@ -470,12 +470,6 @@ export const routes: RouteConfig[] = [
     breadcrumb: ["Settings", "Taxes"],
   },
   {
-    path: "/numbering-series",
-    component: lz(() => import("@/pages/NumberingSeries")),
-    permissions: ["settings:write"],
-    breadcrumb: ["Settings", "Numbering Series"],
-  },
-  {
     path: "/settings/sequences",
     component: lz(() => import("@/pages/SequenceSettings")),
     permissions: ["settings:write"],
