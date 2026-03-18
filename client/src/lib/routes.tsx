@@ -340,54 +340,6 @@ export const routes: RouteConfig[] = [
     permissions: ["accounting:write"],
     breadcrumb: ["Accounting", "Journal Entries"],
   },
-  {
-    path: "/opening-balances",
-    component: lz(() => import("@/pages/OpeningBalances")),
-    permissions: ["accounting:write"],
-    breadcrumb: ["Accounting", "Opening Balances"],
-  },
-  {
-    path: "/period-closing",
-    component: lz(() => import("@/pages/PeriodClosing")),
-    permissions: ["accounting:write"],
-    breadcrumb: ["Accounting", "Period Closing"],
-  },
-  {
-    path: "/account-statements",
-    component: lz(() => import("@/pages/AccountStatements")),
-    permissions: ["accounting:read"],
-    breadcrumb: ["Accounting", "Statements"],
-  },
-  {
-    path: "/trial-balance",
-    component: lz(() => import("@/pages/TrialBalance")),
-    permissions: ["accounting:read"],
-    breadcrumb: ["Accounting", "Trial Balance"],
-  },
-  {
-    path: "/general-ledger",
-    component: lz(() => import("@/pages/GeneralLedger")),
-    permissions: ["accounting:read"],
-    breadcrumb: ["Accounting", "General Ledger"],
-  },
-  {
-    path: "/income-statement",
-    component: lz(() => import("@/pages/IncomeStatement")),
-    permissions: ["accounting:read"],
-    breadcrumb: ["Accounting", "Income Statement"],
-  },
-  {
-    path: "/balance-sheet",
-    component: lz(() => import("@/pages/BalanceSheet")),
-    permissions: ["accounting:read"],
-    breadcrumb: ["Accounting", "Balance Sheet"],
-  },
-  {
-    path: "/cash-flow",
-    component: lz(() => import("@/pages/CashFlow")),
-    permissions: ["accounting:read"],
-    breadcrumb: ["Accounting", "Cash Flow"],
-  },
 
   // ── Treasury ────────────────────────────────────────────────────────────────
   {
@@ -674,19 +626,6 @@ export const routes: RouteConfig[] = [
   },
 
   {
-    path: "/settings/accounting/:tab",
-    component: lz(() => import("@/pages/settings/AccountingSettings")),
-    permissions: ["settings:read"],
-    breadcrumb: ["Settings", "Accounting Settings"],
-  },
-  {
-    path: "/settings/accounting",
-    component: lz(() => import("@/pages/settings/AccountingSettings")),
-    permissions: ["settings:read"],
-    breadcrumb: ["Settings", "Accounting Settings"],
-  },
-
-  {
     path: "/settings/treasury/:tab",
     component: lz(() => import("@/pages/settings/TreasurySettings")),
     permissions: ["settings:read"],
@@ -743,12 +682,6 @@ export const routes: RouteConfig[] = [
     component: lz(() => import("@/pages/definitions/PurchasesDefinitions")),
     permissions: ["purchases:read"],
     breadcrumb: ["Purchase", "Definitions"],
-  },
-  {
-    path: "/accounting-definitions",
-    component: lz(() => import("@/pages/definitions/AccountingDefinitions")),
-    permissions: ["accounting:read"],
-    breadcrumb: ["Accounting", "Definitions"],
   },
   {
     path: "/treasury-definitions",

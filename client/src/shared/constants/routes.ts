@@ -63,14 +63,6 @@ export const ROUTES = {
   // ── Accounting ──────────────────────────────────────────────────────────────
   CHART_OF_ACCOUNTS: "/chart-of-accounts",
   JOURNAL_ENTRIES: "/journal-entries",
-  OPENING_BALANCES: "/opening-balances",
-  PERIOD_CLOSING: "/period-closing",
-  ACCOUNT_STATEMENTS: "/account-statements",
-  TRIAL_BALANCE: "/trial-balance",
-  GENERAL_LEDGER: "/general-ledger",
-  INCOME_STATEMENT: "/income-statement",
-  BALANCE_SHEET: "/balance-sheet",
-  CASH_FLOW: "/cash-flow",
 
   // ── Treasury ────────────────────────────────────────────────────────────────
   CASH_ACCOUNTS: "/cash-accounts",
@@ -150,7 +142,6 @@ export const ROUTES = {
   INVENTORY_DEFINITIONS: "/inventory-definitions",
   SALES_DEFINITIONS: "/sales-definitions",
   PURCHASES_DEFINITIONS: "/purchases-definitions",
-  ACCOUNTING_DEFINITIONS: "/accounting-definitions",
   TREASURY_DEFINITIONS: "/treasury-definitions",
   HR_DEFINITIONS: "/hr-definitions",
   REPORTS_DEFINITIONS: "/reports-definitions",

@@ -41,14 +41,7 @@ import {
   // Accounting
   UnorderedListOutlined,
   BookOutlined,
-  FundOutlined,
   CalendarOutlined,
-  LockOutlined,
-  FileSearchOutlined,
-  CalculatorOutlined,
-  ContainerOutlined,
-  PieChartOutlined,
-  NodeIndexOutlined,
   // Treasury
   AccountBookOutlined,
   BankOutlined,
@@ -175,58 +168,6 @@ const NAV_ITEMS: NavItem[] = [
     href: "/chart-of-accounts",
   },
   { name: "Journal Entries", icon: <BookOutlined />, href: "/journal-entries" },
-  {
-    name: "Opening Balances",
-    icon: <FundOutlined />,
-    href: "/opening-balances",
-  },
-  { name: "Period Closing", icon: <LockOutlined />, href: "/period-closing" },
-  {
-    name: "Account Statements",
-    icon: <FileSearchOutlined />,
-    href: "/account-statements",
-  },
-  {
-    name: "Customer Statements",
-    icon: <LineChartOutlined />,
-    href: "/sales/customer-statements",
-  },
-  {
-    name: "Vendor Statements",
-    icon: <OrderedListOutlined />,
-    href: "/vendor-statements",
-  },
-  {
-    name: "Trial Balance",
-    icon: <CalculatorOutlined />,
-    href: "/trial-balance",
-  },
-  {
-    name: "General Ledger",
-    icon: <ContainerOutlined />,
-    href: "/general-ledger",
-  },
-  {
-    name: "Income Statement",
-    icon: <LineChartOutlined />,
-    href: "/income-statement",
-  },
-  { name: "Balance Sheet", icon: <PieChartOutlined />, href: "/balance-sheet" },
-  {
-    name: "Cash Flow Statement",
-    icon: <NodeIndexOutlined />,
-    href: "/cash-flow",
-  },
-  {
-    name: "Definitions",
-    icon: <DatabaseOutlined />,
-    href: "/accounting-definitions",
-  },
-  {
-    name: "Accounting Settings",
-    icon: <SettingOutlined />,
-    href: "/settings/accounting",
-  },
 
   // ── Treasury (Odoo: Accounting > Bank & Cash) ───────────────────────────
   { name: "TREASURY", isHeader: true },
