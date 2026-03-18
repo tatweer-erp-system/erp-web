@@ -169,4 +169,7 @@ export const QUERY_KEYS = {
 
   // Sequences
   SEQUENCES: "sequences",
+
+  // Dashboard
+  DASHBOARD: "dashboard",
 } as const;

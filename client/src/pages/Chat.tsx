@@ -1,413 +1,269 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import {
+  Alert,
   Avatar,
   Badge,
   Button,
+  Empty,
   Input,
-  Tabs,
+  List,
+  Tooltip,
   Typography,
+  Grid,
   theme as antTheme,
 } from "antd";
 import {
   SendOutlined,
   SearchOutlined,
-  TeamOutlined,
-  CustomerServiceOutlined,
-  PhoneOutlined,
-  VideoCameraOutlined,
-  MoreOutlined,
+  PlusOutlined,
   PaperClipOutlined,
-  SmileOutlined,
-  CheckOutlined,
+  ArrowLeftOutlined,
+  MessageOutlined,
 } from "@ant-design/icons";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
+import { useLangStore } from "@/stores/lang.store";
+import { t } from "@/i18n";
 
 const { Text } = Typography;
+const { TextArea } = Input;
+const { useBreakpoint } = Grid;
 
 // ─── Types ───────────────────────────────────────────────────────────────────
-
-interface Message {
-  id: string;
-  sender: string;
-  avatar: string;
-  content: string;
-  time: string;
-  isMe: boolean;
-  read: boolean;
-}
 
 interface Conversation {
   id: string;
   name: string;
-  avatar: string;
+  initials: string;
   lastMessage: string;
-  time: string;
+  timestamp: string;
   unread: number;
   online: boolean;
-  role?: string;
 }
 
-// ─── Mock Data ────────────────────────────────────────────────────────────────
+interface Message {
+  id: string;
+  senderId: string;
+  senderName: string;
+  senderInitials: string;
+  content: string;
+  timestamp: string;
+  isSelf: boolean;
+}
 
-const TEAM_CONVERSATIONS: Conversation[] = [
-  {
-    id: "1",
-    name: "Sarah Ahmed",
-    avatar: "SA",
-    lastMessage: "Can you check the Q3 report?",
-    time: "2m",
-    unread: 2,
-    online: true,
-    role: "Sales Manager",
-  },
-  {
-    id: "2",
-    name: "Omar Hassan",
-    avatar: "OH",
-    lastMessage: "Invoice #INV-2024-001 is approved",
-    time: "15m",
-    unread: 0,
-    online: true,
-    role: "Accountant",
-  },
-  {
-    id: "3",
-    name: "Lisa Chen",
-    avatar: "LC",
-    lastMessage: "New employee onboarding done",
-    time: "1h",
-    unread: 1,
-    online: false,
-    role: "HR Manager",
-  },
-  {
-    id: "4",
-    name: "Mark Johnson",
-    avatar: "MJ",
-    lastMessage: "Stock transfer request sent",
-    time: "2h",
-    unread: 0,
-    online: false,
-    role: "Warehouse",
-  },
-  {
-    id: "5",
-    name: "Team General",
-    avatar: "TG",
-    lastMessage: "Monthly meeting at 3PM today",
-    time: "3h",
-    unread: 5,
-    online: true,
-    role: "Group",
-  },
-];
-
-const SUPPORT_CONVERSATIONS: Conversation[] = [
-  {
-    id: "s1",
-    name: "Tatweer Support",
-    avatar: "TS",
-    lastMessage: "Your ticket #T-4821 is resolved",
-    time: "1h",
-    unread: 1,
-    online: true,
-    role: "Support Agent",
-  },
-  {
-    id: "s2",
-    name: "Technical Team",
-    avatar: "TT",
-    lastMessage: "We're looking into the issue",
-    time: "1d",
-    unread: 0,
-    online: false,
-    role: "Tech Support",
-  },
-];
-
-const TEAM_MESSAGES: Message[] = [
-  {
-    id: "1",
-    sender: "Sarah Ahmed",
-    avatar: "SA",
-    content: "Hey, can you check the Q3 sales report when you get a chance?",
-    time: "10:02 AM",
-    isMe: false,
-    read: true,
-  },
-  {
-    id: "2",
-    sender: "Me",
-    avatar: "ME",
-    content: "Sure, I'll take a look right now.",
-    time: "10:04 AM",
-    isMe: true,
-    read: true,
-  },
-  {
-    id: "3",
-    sender: "Sarah Ahmed",
-    avatar: "SA",
-    content: "Thanks! Also, the invoice for Acme Corp is pending approval.",
-    time: "10:05 AM",
-    isMe: false,
-    read: true,
-  },
-  {
-    id: "4",
-    sender: "Me",
-    avatar: "ME",
-    content: "Got it. I'll approve it once I verify the amounts.",
-    time: "10:08 AM",
-    isMe: true,
-    read: true,
-  },
-  {
-    id: "5",
-    sender: "Sarah Ahmed",
-    avatar: "SA",
-    content: "Can you check the Q3 report?",
-    time: "10:20 AM",
-    isMe: false,
-    read: false,
-  },
-];
-
-const SUPPORT_MESSAGES: Message[] = [
-  {
-    id: "1",
-    sender: "Tatweer Support",
-    avatar: "TS",
-    content: "Hello! Welcome to Tatweer Support. How can we help you today?",
-    time: "Yesterday 9:00 AM",
-    isMe: false,
-    read: true,
-  },
-  {
-    id: "2",
-    sender: "Me",
-    avatar: "ME",
-    content: "Hi, we're having an issue with the bank reconciliation module.",
-    time: "Yesterday 9:05 AM",
-    isMe: true,
-    read: true,
-  },
-  {
-    id: "3",
-    sender: "Tatweer Support",
-    avatar: "TS",
-    content:
-      "Thank you for reaching out. We've opened ticket #T-4821 for you. Our technical team is investigating.",
-    time: "Yesterday 9:10 AM",
-    isMe: false,
-    read: true,
-  },
-  {
-    id: "4",
-    sender: "Tatweer Support",
-    avatar: "TS",
-    content:
-      "Your ticket #T-4821 is resolved. The issue was a timezone mismatch in the reconciliation engine. Please try again.",
-    time: "1h ago",
-    isMe: false,
-    read: false,
-  },
-];
-
-// ─── Conversation List ────────────────────────────────────────────────────────
+// ─── Conversation List ───────────────────────────────────────────────────────
 
 function ConversationList({
   conversations,
   activeId,
   onSelect,
-  accentColor,
+  search,
+  onSearchChange,
+  lang,
 }: {
   conversations: Conversation[];
-  activeId: string;
+  activeId: string | null;
   onSelect: (id: string) => void;
-  accentColor: string;
+  search: string;
+  onSearchChange: (value: string) => void;
+  lang: string;
 }) {
   const { token } = antTheme.useToken();
-  const [search, setSearch] = useState("");
 
-  const filtered = conversations.filter(c =>
-    c.name.toLowerCase().includes(search.toLowerCase())
+  const filtered = useMemo(
+    () =>
+      conversations.filter(c =>
+        c.name.toLowerCase().includes(search.toLowerCase())
+      ),
+    [conversations, search]
   );
 
   return (
     <div
       style={{
-        width: 280,
-        flexShrink: 0,
-        borderRight: `1px solid ${token.colorBorderSecondary}`,
         display: "flex",
         flexDirection: "column",
         height: "100%",
       }}
     >
-      {/* Search */}
-      <div style={{ padding: "12px 12px 8px" }}>
+      {/* Search + New */}
+      <div
+        style={{
+          padding: 12,
+          display: "flex",
+          gap: 8,
+          borderBottom: `1px solid ${token.colorBorderSecondary}`,
+          flexShrink: 0,
+        }}
+      >
         <Input
           prefix={
             <SearchOutlined style={{ color: token.colorTextQuaternary }} />
           }
-          placeholder="Search conversations..."
+          placeholder={t("chat.searchConversations", lang)}
           size="small"
           value={search}
-          onChange={e => setSearch(e.target.value)}
-          style={{ borderRadius: 8 }}
+          onChange={e => onSearchChange(e.target.value)}
+          style={{ borderRadius: 8, flex: 1 }}
+          allowClear
         />
+        <Tooltip title={t("chat.newConversation", lang)}>
+          <Button
+            type="primary"
+            size="small"
+            icon={<PlusOutlined />}
+            style={{ borderRadius: 8 }}
+          />
+        </Tooltip>
       </div>
 
-      {/* List */}
+      {/* Conversation items */}
       <div style={{ flex: 1, overflowY: "auto" }}>
-        {filtered.map(conv => {
-          const isActive = conv.id === activeId;
-          return (
-            <div
-              key={conv.id}
-              onClick={() => onSelect(conv.id)}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-                padding: "10px 14px",
-                cursor: "pointer",
-                background: isActive ? `${accentColor}12` : "transparent",
-                borderLeft: isActive
-                  ? `3px solid ${accentColor}`
-                  : "3px solid transparent",
-                transition: "all 0.15s",
-              }}
-              onMouseEnter={e => {
-                if (!isActive)
-                  e.currentTarget.style.background = token.colorFillAlter;
-              }}
-              onMouseLeave={e => {
-                if (!isActive) e.currentTarget.style.background = "transparent";
-              }}
-            >
-              <Badge
-                dot
-                status={conv.online ? "success" : "default"}
-                offset={[-2, 30]}
-              >
-                <Avatar
-                  size={38}
+        {filtered.length === 0 ? (
+          <div style={{ padding: 24, textAlign: "center" }}>
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description={
+                <Text type="secondary">{t("chat.noConversations", lang)}</Text>
+              }
+            />
+          </div>
+        ) : (
+          <List
+            dataSource={filtered}
+            split={false}
+            renderItem={conv => {
+              const isActive = conv.id === activeId;
+              return (
+                <List.Item
+                  onClick={() => onSelect(conv.id)}
                   style={{
+                    padding: "10px 14px",
+                    cursor: "pointer",
                     background: isActive
-                      ? accentColor
-                      : token.colorFillSecondary,
-                    color: isActive ? "#fff" : token.colorTextSecondary,
-                    fontWeight: 700,
-                    fontSize: 12,
-                    flexShrink: 0,
+                      ? `${token.colorPrimary}12`
+                      : "transparent",
+                    borderInlineStart: isActive
+                      ? `3px solid ${token.colorPrimary}`
+                      : "3px solid transparent",
+                    transition: "all 0.15s",
+                    margin: 0,
                   }}
                 >
-                  {conv.avatar}
-                </Avatar>
-              </Badge>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <Text
-                    strong
-                    style={{
-                      fontSize: 13,
-                      color: isActive ? accentColor : token.colorText,
-                    }}
-                  >
-                    {conv.name}
-                  </Text>
-                  <Text
-                    style={{ fontSize: 10, color: token.colorTextTertiary }}
-                  >
-                    {conv.time}
-                  </Text>
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginTop: 2,
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontSize: 12,
-                      color: token.colorTextSecondary,
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                      maxWidth: 150,
-                    }}
-                  >
-                    {conv.lastMessage}
-                  </Text>
-                  {conv.unread > 0 && (
-                    <div
-                      style={{
-                        background: accentColor,
-                        color: "#fff",
-                        borderRadius: "50%",
-                        width: 18,
-                        height: 18,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontSize: 10,
-                        fontWeight: 700,
-                        flexShrink: 0,
-                      }}
-                    >
-                      {conv.unread}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          );
-        })}
+                  <List.Item.Meta
+                    avatar={
+                      <Badge
+                        dot
+                        status={conv.online ? "success" : "default"}
+                        offset={[-2, 30]}
+                      >
+                        <Avatar
+                          size={40}
+                          style={{
+                            background: isActive
+                              ? token.colorPrimary
+                              : token.colorFillSecondary,
+                            color: isActive ? "#fff" : token.colorTextSecondary,
+                            fontWeight: 700,
+                            fontSize: 13,
+                          }}
+                        >
+                          {conv.initials}
+                        </Avatar>
+                      </Badge>
+                    }
+                    title={
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Text
+                          strong
+                          style={{
+                            fontSize: 13,
+                            color: isActive
+                              ? token.colorPrimary
+                              : token.colorText,
+                          }}
+                        >
+                          {conv.name}
+                        </Text>
+                        <Text
+                          style={{
+                            fontSize: 10,
+                            color: token.colorTextTertiary,
+                          }}
+                        >
+                          {conv.timestamp}
+                        </Text>
+                      </div>
+                    }
+                    description={
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Text
+                          style={{
+                            fontSize: 12,
+                            color: token.colorTextSecondary,
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                            maxWidth: 170,
+                          }}
+                        >
+                          {conv.lastMessage}
+                        </Text>
+                        {conv.unread > 0 && (
+                          <Badge
+                            count={conv.unread}
+                            size="small"
+                            style={{ backgroundColor: token.colorPrimary }}
+                          />
+                        )}
+                      </div>
+                    }
+                  />
+                </List.Item>
+              );
+            }}
+          />
+        )}
       </div>
     </div>
   );
 }
 
-// ─── Message Bubble ───────────────────────────────────────────────────────────
+// ─── Message Bubble ──────────────────────────────────────────────────────────
 
-function MessageBubble({
-  msg,
-  accentColor,
-}: {
-  msg: Message;
-  accentColor: string;
-}) {
+function MessageBubble({ msg }: { msg: Message }) {
   const { token } = antTheme.useToken();
 
-  if (msg.isMe) {
+  if (msg.isSelf) {
     return (
       <div
         style={{
           display: "flex",
           justifyContent: "flex-end",
-          marginBottom: 12,
+          marginBottom: 14,
         }}
       >
         <div style={{ maxWidth: "65%" }}>
           <div
             style={{
-              background: accentColor,
+              background: token.colorPrimary,
               color: "#fff",
               borderRadius: "16px 16px 4px 16px",
               padding: "10px 14px",
               fontSize: 13,
-              lineHeight: 1.5,
+              lineHeight: 1.6,
+              wordBreak: "break-word",
             }}
           >
             {msg.content}
@@ -416,20 +272,12 @@ function MessageBubble({
             style={{
               display: "flex",
               justifyContent: "flex-end",
-              alignItems: "center",
-              gap: 4,
               marginTop: 3,
             }}
           >
             <Text style={{ fontSize: 10, color: token.colorTextTertiary }}>
-              {msg.time}
+              {msg.timestamp}
             </Text>
-            <CheckOutlined
-              style={{
-                fontSize: 10,
-                color: msg.read ? accentColor : token.colorTextQuaternary,
-              }}
-            />
           </div>
         </div>
       </div>
@@ -437,7 +285,7 @@ function MessageBubble({
   }
 
   return (
-    <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+    <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
       <Avatar
         size={30}
         style={{
@@ -449,7 +297,7 @@ function MessageBubble({
           marginTop: 2,
         }}
       >
-        {msg.avatar}
+        {msg.senderInitials}
       </Avatar>
       <div style={{ maxWidth: "65%" }}>
         <Text
@@ -460,7 +308,7 @@ function MessageBubble({
             marginBottom: 3,
           }}
         >
-          {msg.sender}
+          {msg.senderName}
         </Text>
         <div
           style={{
@@ -469,8 +317,9 @@ function MessageBubble({
             borderRadius: "4px 16px 16px 16px",
             padding: "10px 14px",
             fontSize: 13,
-            lineHeight: 1.5,
+            lineHeight: 1.6,
             color: token.colorText,
+            wordBreak: "break-word",
           }}
         >
           {msg.content}
@@ -483,58 +332,56 @@ function MessageBubble({
             display: "block",
           }}
         >
-          {msg.time}
+          {msg.timestamp}
         </Text>
       </div>
     </div>
   );
 }
 
-// ─── Chat Window ──────────────────────────────────────────────────────────────
+// ─── Chat Window ─────────────────────────────────────────────────────────────
 
 function ChatWindow({
   conversation,
   messages,
-  accentColor,
+  onSendMessage,
+  onBack,
+  showBackButton,
+  lang,
 }: {
-  conversation: Conversation | undefined;
+  conversation: Conversation | null;
   messages: Message[];
-  accentColor: string;
+  onSendMessage: (content: string) => void;
+  onBack: () => void;
+  showBackButton: boolean;
+  lang: string;
 }) {
   const { token } = antTheme.useToken();
   const [input, setInput] = useState("");
-  const [msgs, setMsgs] = useState<Message[]>(messages);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setMsgs(messages);
-  }, [messages]);
-  useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [msgs]);
+  }, [messages]);
 
-  function send() {
-    if (!input.trim()) return;
-    const now = new Date();
-    const time = now.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-    setMsgs(prev => [
-      ...prev,
-      {
-        id: String(Date.now()),
-        sender: "Me",
-        avatar: "ME",
-        content: input.trim(),
-        time,
-        isMe: true,
-        read: false,
-      },
-    ]);
+  const handleSend = useCallback(() => {
+    const trimmed = input.trim();
+    if (!trimmed) return;
+    onSendMessage(trimmed);
     setInput("");
-  }
+  }, [input, onSendMessage]);
 
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        handleSend();
+      }
+    },
+    [handleSend]
+  );
+
+  // Empty state — no conversation selected
   if (!conversation) {
     return (
       <div
@@ -544,11 +391,16 @@ function ChatWindow({
           alignItems: "center",
           justifyContent: "center",
           flexDirection: "column",
-          gap: 12,
+          gap: 16,
+          padding: 24,
         }}
       >
-        <div style={{ fontSize: 48, opacity: 0.15 }}>💬</div>
-        <Text type="secondary">Select a conversation to start chatting</Text>
+        <MessageOutlined
+          style={{ fontSize: 56, color: token.colorTextQuaternary }}
+        />
+        <Text type="secondary" style={{ fontSize: 14 }}>
+          {t("chat.selectConversation", lang)}
+        </Text>
       </div>
     );
   }
@@ -564,52 +416,53 @@ function ChatWindow({
           borderBottom: `1px solid ${token.colorBorderSecondary}`,
           display: "flex",
           alignItems: "center",
-          justifyContent: "space-between",
+          gap: 10,
           flexShrink: 0,
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <Badge
-            dot
-            status={conversation.online ? "success" : "default"}
-            offset={[-2, 30]}
+        {showBackButton && (
+          <Button
+            type="text"
+            icon={<ArrowLeftOutlined />}
+            size="small"
+            onClick={onBack}
+          />
+        )}
+        <Badge
+          dot
+          status={conversation.online ? "success" : "default"}
+          offset={[-2, 30]}
+        >
+          <Avatar
+            size={36}
+            style={{
+              background: token.colorPrimary,
+              color: "#fff",
+              fontWeight: 700,
+              fontSize: 12,
+            }}
           >
-            <Avatar
-              size={36}
-              style={{
-                background: accentColor,
-                color: "#fff",
-                fontWeight: 700,
-                fontSize: 12,
-              }}
-            >
-              {conversation.avatar}
-            </Avatar>
-          </Badge>
-          <div>
-            <Text strong style={{ fontSize: 14, display: "block" }}>
-              {conversation.name}
-            </Text>
-            <Text
-              style={{
-                fontSize: 11,
-                color: conversation.online
-                  ? "#10B981"
-                  : token.colorTextTertiary,
-              }}
-            >
-              {conversation.online ? "Online" : "Offline"} · {conversation.role}
-            </Text>
-          </div>
-        </div>
-        <div style={{ display: "flex", gap: 4 }}>
-          <Button type="text" icon={<PhoneOutlined />} size="small" />
-          <Button type="text" icon={<VideoCameraOutlined />} size="small" />
-          <Button type="text" icon={<MoreOutlined />} size="small" />
+            {conversation.initials}
+          </Avatar>
+        </Badge>
+        <div>
+          <Text strong style={{ fontSize: 14, display: "block" }}>
+            {conversation.name}
+          </Text>
+          <Text
+            style={{
+              fontSize: 11,
+              color: conversation.online ? "#10B981" : token.colorTextTertiary,
+            }}
+          >
+            {conversation.online
+              ? t("chat.online", lang)
+              : t("chat.offline", lang)}
+          </Text>
         </div>
       </div>
 
-      {/* Messages */}
+      {/* Messages area */}
       <div
         style={{
           flex: 1,
@@ -619,196 +472,209 @@ function ChatWindow({
           flexDirection: "column",
         }}
       >
-        {msgs.map(msg => (
-          <MessageBubble key={msg.id} msg={msg} accentColor={accentColor} />
-        ))}
+        {messages.length === 0 ? (
+          <div
+            style={{
+              flex: 1,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description={
+                <Text type="secondary">{t("chat.noMessages", lang)}</Text>
+              }
+            />
+          </div>
+        ) : (
+          messages.map(msg => <MessageBubble key={msg.id} msg={msg} />)
+        )}
         <div ref={bottomRef} />
       </div>
 
-      {/* Input */}
+      {/* Input area */}
       <div
         style={{
           padding: "12px 16px",
           borderTop: `1px solid ${token.colorBorderSecondary}`,
           display: "flex",
-          alignItems: "center",
+          alignItems: "flex-end",
           gap: 8,
           flexShrink: 0,
         }}
       >
-        <Button type="text" icon={<PaperClipOutlined />} size="small" />
-        <Button type="text" icon={<SmileOutlined />} size="small" />
-        <Input
+        <Tooltip title={t("chat.comingSoon", lang)}>
+          <Button
+            type="text"
+            icon={<PaperClipOutlined />}
+            size="small"
+            disabled
+          />
+        </Tooltip>
+        <TextArea
           value={input}
           onChange={e => setInput(e.target.value)}
-          onPressEnter={send}
-          placeholder="Type a message..."
-          style={{ borderRadius: 20, flex: 1 }}
-          suffix={
-            <SendOutlined
-              onClick={send}
-              style={{
-                color: input.trim() ? accentColor : token.colorTextQuaternary,
-                cursor: input.trim() ? "pointer" : "default",
-                transition: "color 0.15s",
-              }}
-            />
-          }
+          onKeyDown={handleKeyDown}
+          placeholder={t("chat.typeMessage", lang)}
+          autoSize={{ minRows: 1, maxRows: 4 }}
+          style={{ borderRadius: 12, flex: 1 }}
+        />
+        <Button
+          type="primary"
+          icon={<SendOutlined />}
+          size="small"
+          onClick={handleSend}
+          disabled={!input.trim()}
+          style={{ borderRadius: 8 }}
         />
       </div>
     </div>
   );
 }
 
-// ─── Chat Panel ───────────────────────────────────────────────────────────────
-
-function ChatPanel({
-  conversations,
-  messages,
-  accentColor,
-}: {
-  conversations: Conversation[];
-  messages: Record<string, Message[]>;
-  accentColor: string;
-}) {
-  const [activeId, setActiveId] = useState(conversations[0]?.id ?? "");
-  const activeConv = conversations.find(c => c.id === activeId);
-  const activeMessages = messages[activeId] ?? [];
-
-  return (
-    <div style={{ display: "flex", flex: 1, minHeight: 0, overflow: "hidden" }}>
-      <ConversationList
-        conversations={conversations}
-        activeId={activeId}
-        onSelect={setActiveId}
-        accentColor={accentColor}
-      />
-      <ChatWindow
-        conversation={activeConv}
-        messages={activeMessages}
-        accentColor={accentColor}
-      />
-    </div>
-  );
-}
-
-// ─── Main Page ────────────────────────────────────────────────────────────────
+// ─── Main Page ───────────────────────────────────────────────────────────────
 
 export default function Chat() {
   const { token } = antTheme.useToken();
-  const accentColor = token.colorPrimary;
+  const { lang, direction } = useLangStore();
+  const screens = useBreakpoint();
+  const isMobile = !screens.md;
 
-  const teamMessages: Record<string, Message[]> = {
-    "1": TEAM_MESSAGES,
-    "2": [],
-    "3": [],
-    "4": [],
-    "5": [],
-  };
+  // ─── Local state ─────────────────────────────────────────────────────────
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [messagesMap, setMessagesMap] = useState<Record<string, Message[]>>({});
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+  const [showMessages, setShowMessages] = useState(false);
 
-  const supportMessages: Record<string, Message[]> = {
-    s1: SUPPORT_MESSAGES,
-    s2: [],
-  };
+  const activeConversation = useMemo(
+    () => conversations.find(c => c.id === activeId) ?? null,
+    [conversations, activeId]
+  );
+  const activeMessages = useMemo(
+    () => (activeId ? (messagesMap[activeId] ?? []) : []),
+    [messagesMap, activeId]
+  );
 
-  const teamUnread = TEAM_CONVERSATIONS.reduce((s, c) => s + c.unread, 0);
-  const supportUnread = SUPPORT_CONVERSATIONS.reduce((s, c) => s + c.unread, 0);
+  // ─── Handlers ────────────────────────────────────────────────────────────
+  const handleSelectConversation = useCallback(
+    (id: string) => {
+      setActiveId(id);
+      if (isMobile) setShowMessages(true);
+    },
+    [isMobile]
+  );
+
+  const handleBack = useCallback(() => {
+    setShowMessages(false);
+  }, []);
+
+  const handleSendMessage = useCallback(
+    (content: string) => {
+      if (!activeId) return;
+      const now = new Date();
+      const timestamp = now.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+      const newMsg: Message = {
+        id: `msg-${Date.now()}`,
+        senderId: "self",
+        senderName: t("chat.you", lang),
+        senderInitials: "ME",
+        content,
+        timestamp,
+        isSelf: true,
+      };
+
+      setMessagesMap(prev => ({
+        ...prev,
+        [activeId]: [...(prev[activeId] ?? []), newMsg],
+      }));
+
+      // Update last message in conversation list
+      setConversations(prev =>
+        prev.map(c =>
+          c.id === activeId
+            ? { ...c, lastMessage: content, timestamp: t("chat.justNow", lang) }
+            : c
+        )
+      );
+    },
+    [activeId, lang]
+  );
+
+  // ─── Layout: mobile vs desktop ───────────────────────────────────────────
+  const showLeftPanel = !isMobile || !showMessages;
+  const showRightPanel = !isMobile || showMessages;
 
   return (
     <DashboardLayout
-      currentPage="Chat"
-      breadcrumbs={[{ label: "Dashboard", href: "/" }, { label: "Chat" }]}
+      currentPage={t("chat.title", lang)}
+      breadcrumbs={[
+        { label: t("Dashboard", lang), href: "/" },
+        { label: t("chat.title", lang) },
+      ]}
     >
+      {/* Connection notice */}
+      <Alert
+        message={t("chat.connectionNotice", lang)}
+        type="info"
+        showIcon
+        closable
+        style={{ marginBottom: 16, borderRadius: token.borderRadiusLG }}
+      />
+
+      {/* Chat container */}
       <div
+        dir={direction}
         style={{
-          height: "calc(100vh - 130px)",
+          height: "calc(100vh - 210px)",
           border: `1px solid ${token.colorBorderSecondary}`,
           borderRadius: token.borderRadiusLG,
           overflow: "hidden",
           display: "flex",
-          flexDirection: "column",
           background: token.colorBgContainer,
         }}
       >
-        {/* Tab bar */}
-        <div
-          style={{
-            borderBottom: `1px solid ${token.colorBorderSecondary}`,
-            flexShrink: 0,
-          }}
-        >
-          <Tabs
-            defaultActiveKey="team"
-            style={{ padding: "0 16px" }}
-            items={[
-              {
-                key: "team",
-                label: (
-                  <span
-                    style={{ display: "flex", alignItems: "center", gap: 6 }}
-                  >
-                    <TeamOutlined />
-                    Team Chat
-                    {teamUnread > 0 && (
-                      <span
-                        style={{
-                          background: accentColor,
-                          color: "#fff",
-                          borderRadius: 10,
-                          padding: "0 6px",
-                          fontSize: 10,
-                          fontWeight: 700,
-                        }}
-                      >
-                        {teamUnread}
-                      </span>
-                    )}
-                  </span>
-                ),
-                children: (
-                  <ChatPanel
-                    conversations={TEAM_CONVERSATIONS}
-                    messages={teamMessages}
-                    accentColor={accentColor}
-                  />
-                ),
-              },
-              {
-                key: "support",
-                label: (
-                  <span
-                    style={{ display: "flex", alignItems: "center", gap: 6 }}
-                  >
-                    <CustomerServiceOutlined />
-                    Support
-                    {supportUnread > 0 && (
-                      <span
-                        style={{
-                          background: "#f97316",
-                          color: "#fff",
-                          borderRadius: 10,
-                          padding: "0 6px",
-                          fontSize: 10,
-                          fontWeight: 700,
-                        }}
-                      >
-                        {supportUnread}
-                      </span>
-                    )}
-                  </span>
-                ),
-                children: (
-                  <ChatPanel
-                    conversations={SUPPORT_CONVERSATIONS}
-                    messages={supportMessages}
-                    accentColor="#f97316"
-                  />
-                ),
-              },
-            ]}
-            tabBarStyle={{ margin: 0 }}
+        {/* Left panel — Conversations */}
+        {showLeftPanel && (
+          <div
+            style={{
+              width: isMobile ? "100%" : 300,
+              flexShrink: 0,
+              borderInlineEnd: isMobile
+                ? "none"
+                : `1px solid ${token.colorBorderSecondary}`,
+              display: "flex",
+              flexDirection: "column",
+              height: "100%",
+            }}
+          >
+            <ConversationList
+              conversations={conversations}
+              activeId={activeId}
+              onSelect={handleSelectConversation}
+              search={search}
+              onSearchChange={setSearch}
+              lang={lang}
+            />
+          </div>
+        )}
+
+        {/* Right panel — Messages */}
+        {showRightPanel && (
+          <ChatWindow
+            conversation={activeConversation}
+            messages={activeMessages}
+            onSendMessage={handleSendMessage}
+            onBack={handleBack}
+            showBackButton={isMobile}
+            lang={lang}
           />
-        </div>
+        )}
       </div>
     </DashboardLayout>
   );

@@ -1,261 +1,104 @@
-import { useState } from "react";
+/**
+ * Executive Dashboard page.
+ * Fetches KPIs from GET /reporting/dashboard and displays stat cards,
+ * module quick stats, and recent activity.
+ * Default export for lazy loading via React.lazy().
+ */
+
+import { useState, useMemo } from "react";
 import {
-  Avatar,
-  Badge,
   Button,
   Card,
   Col,
-  List,
-  Progress,
+  DatePicker,
+  Empty,
   Row,
-  Select,
   Space,
+  Spin,
   Statistic,
   Table,
   Tag,
-  Tooltip,
   Typography,
   theme as antTheme,
 } from "antd";
+import type { TableColumnsType } from "antd";
+import type { Dayjs } from "dayjs";
 import {
-  ArrowUpOutlined,
-  ArrowDownOutlined,
-  ShoppingCartOutlined,
   DollarOutlined,
+  ShoppingCartOutlined,
   TeamOutlined,
   AppstoreOutlined,
-  AlertOutlined,
-  CheckCircleOutlined,
-  ClockCircleOutlined,
-  FileTextOutlined,
-  RightOutlined,
-  ReloadOutlined,
-  WarningOutlined,
   BankOutlined,
+  ReloadOutlined,
+  RightOutlined,
+  WalletOutlined,
+  CreditCardOutlined,
+  UserOutlined,
+  InboxOutlined,
   BarChartOutlined,
-  ShoppingOutlined,
 } from "@ant-design/icons";
-import {
-  AreaChart,
-  Area,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip as RTooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Legend,
-} from "recharts";
+import { useQuery } from "@tanstack/react-query";
+
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { useLangStore } from "@/stores/lang.store";
+import { useTranslation } from "@/hooks/ui/useTranslation";
+import { useBranchStore } from "@/stores/branch.store";
+import { QUERY_KEYS } from "@/constants/queryKeys";
+import apiClient from "@/lib/api";
 import { Link } from "react-router-dom";
-import { OrderStatus } from "@/constants/enums";
 
-const { Title, Text } = Typography;
+const { Text, Title } = Typography;
+const { RangePicker } = DatePicker;
 
-// ─── Mock Data ────────────────────────────────────────────────────────────────
+// ─── API ──────────────────────────────────────────────────────────────────────
 
-const revenueData = [
-  { month: "Jul", revenue: 62000, expenses: 41000, profit: 21000 },
-  { month: "Aug", revenue: 74000, expenses: 47000, profit: 27000 },
-  { month: "Sep", revenue: 68000, expenses: 43000, profit: 25000 },
-  { month: "Oct", revenue: 91000, expenses: 52000, profit: 39000 },
-  { month: "Nov", revenue: 85000, expenses: 49000, profit: 36000 },
-  { month: "Dec", revenue: 110000, expenses: 61000, profit: 49000 },
-  { month: "Jan", revenue: 99000, expenses: 57000, profit: 42000 },
-  { month: "Feb", revenue: 115000, expenses: 63000, profit: 52000 },
-  { month: "Mar", revenue: 125430, expenses: 68000, profit: 57430 },
-];
+interface DashboardData {
+  // Primary KPIs
+  totalRevenue?: number;
+  totalOrders?: number;
+  totalCustomers?: number;
+  totalProducts?: number;
 
-const salesByModuleData = [
-  { name: "Electronics", value: 38400 },
-  { name: "Furniture", value: 22100 },
-  { name: "Clothing", value: 17800 },
-  { name: "Accessories", value: 12300 },
-  { name: "Software", value: 9800 },
-];
+  // Financial summary
+  accountsReceivable?: number;
+  accountsPayable?: number;
+  cashBalance?: number;
+  netProfit?: number;
 
-const inventoryData = [
-  { name: "In Stock", value: 65, color: "#10B981" },
-  { name: "Low Stock", value: 20, color: "#F59E0B" },
-  { name: "Out of Stock", value: 15, color: "#EF4444" },
-];
+  // Sales module stats
+  draftOrders?: number;
+  confirmedOrders?: number;
+  completedOrders?: number;
+  pendingInvoices?: number;
 
-const recentOrders = [
-  {
-    key: "1",
-    order: "ORD-2024-091",
-    customer: "Acme Corp",
-    amount: "$4,200",
-    status: OrderStatus.COMPLETED,
-    date: "Today 10:24",
-  },
-  {
-    key: "2",
-    order: "ORD-2024-090",
-    customer: "TechStart LLC",
-    amount: "$1,800",
-    status: OrderStatus.PENDING,
-    date: "Today 09:11",
-  },
-  {
-    key: "3",
-    order: "ORD-2024-089",
-    customer: "Global Trade Co",
-    amount: "$9,560",
-    status: OrderStatus.PROCESSING,
-    date: "Yesterday",
-  },
-  {
-    key: "4",
-    order: "ORD-2024-088",
-    customer: "Bright Retail",
-    amount: "$640",
-    status: OrderStatus.COMPLETED,
-    date: "Yesterday",
-  },
-  {
-    key: "5",
-    order: "ORD-2024-087",
-    customer: "Nova Systems",
-    amount: "$3,100",
-    status: OrderStatus.CANCELLED,
-    date: "Mar 8",
-  },
-];
+  // Inventory module stats
+  lowStockAlerts?: number;
+  totalStockValue?: number;
 
-const pendingApprovals = [
-  {
-    id: "1",
-    type: "Purchase Order",
-    ref: "PO-2024-044",
-    amount: "$12,400",
-    from: "Omar Hassan",
-    time: "2h ago",
-  },
-  {
-    id: "2",
-    type: "Leave Request",
-    ref: "LV-2024-019",
-    amount: "5 days",
-    from: "Lisa Chen",
-    time: "3h ago",
-  },
-  {
-    id: "3",
-    type: "Sales Return",
-    ref: "RET-2024-007",
-    amount: "$850",
-    from: "Sarah Ahmed",
-    time: "5h ago",
-  },
-  {
-    id: "4",
-    type: "Journal Entry",
-    ref: "JE-2024-112",
-    amount: "$5,200",
-    from: "Finance Dept",
-    time: "Yesterday",
-  },
-];
+  // HR module stats
+  activeEmployees?: number;
+  pendingLeaves?: number;
 
-const alerts = [
-  {
-    id: "1",
-    severity: "error",
-    message: "14 products are out of stock",
-    action: "/products",
-  },
-  {
-    id: "2",
-    severity: "warning",
-    message: "Invoice INV-2024-031 is 7 days overdue",
-    action: "/sales/invoices",
-  },
-  {
-    id: "3",
-    severity: "warning",
-    message: "Bank reconciliation pending for February",
-    action: "/bank-reconciliation",
-  },
-  {
-    id: "4",
-    severity: "info",
-    message: "Payroll processing due in 3 days",
-    action: "/payroll",
-  },
-];
+  // Recent activity
+  recentActivity?: RecentActivityItem[];
 
-const topTeamActivity = [
-  {
-    user: "Sarah Ahmed",
-    avatar: "SA",
-    action: "Created quotation QUO-2024-055",
-    time: "5m ago",
-    color: "#6366f1",
-  },
-  {
-    user: "Omar Hassan",
-    avatar: "OH",
-    action: "Approved PO-2024-043 · $8,200",
-    time: "18m ago",
-    color: "#10b981",
-  },
-  {
-    user: "Mark Johnson",
-    avatar: "MJ",
-    action: "Updated stock count — Warehouse 1",
-    time: "34m ago",
-    color: "#f97316",
-  },
-  {
-    user: "Lisa Chen",
-    avatar: "LC",
-    action: "Submitted leave request (5 days)",
-    time: "1h ago",
-    color: "#8b5cf6",
-  },
-  {
-    user: "John Doe",
-    avatar: "JD",
-    action: "Posted journal entry JE-2024-112",
-    time: "2h ago",
-    color: "#ef4444",
-  },
-];
+  // Currency
+  currency?: string;
+}
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+interface RecentActivityItem {
+  id: string;
+  date: string;
+  type: string;
+  reference: string;
+  amount: number;
+  status: string;
+}
 
-const statusTag = (s: string) => {
-  const map: Record<string, string> = {
-    completed: "success",
-    pending: "warning",
-    processing: "processing",
-    cancelled: "error",
-  };
-  return (
-    <Tag
-      color={map[s] ?? "default"}
-      style={{ fontSize: 11, textTransform: "capitalize" }}
-    >
-      {s}
-    </Tag>
-  );
-};
-
-const alertColor: Record<string, string> = {
-  error: "#EF4444",
-  warning: "#F59E0B",
-  info: "#3B82F6",
-};
-const alertIcon: Record<string, React.ReactNode> = {
-  error: <AlertOutlined />,
-  warning: <WarningOutlined />,
-  info: <CheckCircleOutlined />,
+const dashboardApi = {
+  get: (params?: { dateFrom?: string; dateTo?: string; branchId?: string }) =>
+    apiClient
+      .get("/reporting/dashboard", { params })
+      .then(r => r.data.data as DashboardData),
 };
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -265,19 +108,19 @@ function KPICard({
   value,
   prefix,
   suffix,
-  change,
-  up,
   icon,
   iconBg,
+  iconColor,
+  loading,
 }: {
   title: string;
   value: string | number;
   prefix?: string;
   suffix?: string;
-  change: string;
-  up: boolean;
   icon: React.ReactNode;
   iconBg: string;
+  iconColor: string;
+  loading?: boolean;
 }) {
   const { token } = antTheme.useToken();
   return (
@@ -293,42 +136,21 @@ function KPICard({
         gap: 12,
       }}
     >
-      <div>
+      <div style={{ minWidth: 0, flex: 1 }}>
         <Text type="secondary" style={{ fontSize: 12 }}>
           {title}
         </Text>
         <div style={{ marginTop: 6 }}>
-          <Text strong style={{ fontSize: 22 }}>
-            {prefix}
-            {value}
-            {suffix}
-          </Text>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 4,
-            marginTop: 6,
-          }}
-        >
-          {up ? (
-            <ArrowUpOutlined style={{ color: "#10B981", fontSize: 11 }} />
+          {loading ? (
+            <Spin size="small" />
           ) : (
-            <ArrowDownOutlined style={{ color: "#EF4444", fontSize: 11 }} />
+            <Statistic
+              value={value}
+              prefix={prefix}
+              suffix={suffix}
+              valueStyle={{ fontSize: 22, lineHeight: 1 }}
+            />
           )}
-          <Text
-            style={{
-              fontSize: 11,
-              color: up ? "#10B981" : "#EF4444",
-              fontWeight: 600,
-            }}
-          >
-            {change}
-          </Text>
-          <Text type="secondary" style={{ fontSize: 11 }}>
-            vs last month
-          </Text>
         </div>
       </div>
       <div
@@ -341,6 +163,7 @@ function KPICard({
           alignItems: "center",
           justifyContent: "center",
           fontSize: 18,
+          color: iconColor,
           flexShrink: 0,
         }}
       >
@@ -350,70 +173,283 @@ function KPICard({
   );
 }
 
+function ModuleStatCard({
+  title,
+  icon,
+  iconColor,
+  items,
+  loading,
+}: {
+  title: string;
+  icon: React.ReactNode;
+  iconColor: string;
+  items: { label: string; value: string | number }[];
+  loading?: boolean;
+}) {
+  return (
+    <Card
+      size="small"
+      styles={{ body: { padding: "16px 20px" } }}
+      style={{ height: "100%" }}
+    >
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          marginBottom: 16,
+        }}
+      >
+        <span style={{ color: iconColor, fontSize: 16 }}>{icon}</span>
+        <Text strong style={{ fontSize: 14 }}>
+          {title}
+        </Text>
+      </div>
+      {loading ? (
+        <div style={{ textAlign: "center", padding: 20 }}>
+          <Spin size="small" />
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {items.map(item => (
+            <div
+              key={item.label}
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <Text type="secondary" style={{ fontSize: 13 }}>
+                {item.label}
+              </Text>
+              <Text strong style={{ fontSize: 14, fontFamily: "monospace" }}>
+                {item.value}
+              </Text>
+            </div>
+          ))}
+        </div>
+      )}
+    </Card>
+  );
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function formatCurrency(value: number | undefined, _currency = "SAR"): string {
+  if (value == null) return "0.00";
+  return Number(value).toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
+
+function formatNumber(value: number | undefined): string | number {
+  if (value == null) return 0;
+  return Number(value).toLocaleString();
+}
+
+const statusTagColor: Record<string, string> = {
+  completed: "success",
+  done: "success",
+  confirmed: "processing",
+  pending: "warning",
+  draft: "default",
+  cancelled: "error",
+  paid: "success",
+  overdue: "error",
+};
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function Dashboard() {
-  const language = useLangStore(s => s.lang);
+  const { t, lang } = useTranslation();
   const { token } = antTheme.useToken();
-  const [period, setPeriod] = useState("9m");
+  const branchId = useBranchStore(s => s.activeBranch?.id ?? null);
 
-  const greeting = (() => {
-    const h = new Date().getHours();
-    if (h < 12) return "Good morning";
-    if (h < 17) return "Good afternoon";
-    return "Good evening";
-  })();
+  const [dateRange, setDateRange] = useState<
+    [Dayjs | null, Dayjs | null] | null
+  >(null);
 
-  const today = new Date().toLocaleDateString("en-US", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
+  const dateFrom = dateRange?.[0]?.format("YYYY-MM-DD");
+  const dateTo = dateRange?.[1]?.format("YYYY-MM-DD");
+
+  // ── Query ────────────────────────────────────────────────────────────────
+  const { data, isLoading, refetch, isError } = useQuery({
+    queryKey: [QUERY_KEYS.DASHBOARD, dateFrom, dateTo, branchId],
+    queryFn: () =>
+      dashboardApi.get({
+        dateFrom: dateFrom ?? undefined,
+        dateTo: dateTo ?? undefined,
+        branchId: branchId ?? undefined,
+      }),
+    staleTime: 60_000,
+    enabled: !!branchId,
   });
 
-  const orderCols = [
-    {
-      title: "Order",
-      dataIndex: "order",
-      render: (v: string) => (
-        <Text strong style={{ fontSize: 12 }}>
-          {v}
-        </Text>
-      ),
-    },
-    {
-      title: "Customer",
-      dataIndex: "customer",
-      render: (v: string) => <Text style={{ fontSize: 12 }}>{v}</Text>,
-    },
-    {
-      title: "Amount",
-      dataIndex: "amount",
-      render: (v: string) => (
-        <Text strong style={{ fontSize: 12 }}>
-          {v}
-        </Text>
-      ),
-    },
-    { title: "Status", dataIndex: "status", render: statusTag },
-    {
-      title: "Date",
-      dataIndex: "date",
-      render: (v: string) => (
-        <Text type="secondary" style={{ fontSize: 11 }}>
-          {v}
-        </Text>
-      ),
-    },
-  ];
+  const currency = data?.currency ?? "SAR";
+  const hasData = !!data && !isError;
+
+  // ── Primary KPI card configs ─────────────────────────────────────────────
+  const primaryKpis = useMemo(
+    () => [
+      {
+        title: t("dashboard.totalRevenue", lang),
+        value: formatCurrency(data?.totalRevenue, currency),
+        suffix: ` ${currency}`,
+        icon: <DollarOutlined />,
+        iconColor: "#10B981",
+        iconBg: "#10B98115",
+      },
+      {
+        title: t("dashboard.totalOrders", lang),
+        value: formatNumber(data?.totalOrders),
+        icon: <ShoppingCartOutlined />,
+        iconColor: "#3B82F6",
+        iconBg: "#3B82F615",
+      },
+      {
+        title: t("dashboard.totalCustomers", lang),
+        value: formatNumber(data?.totalCustomers),
+        icon: <TeamOutlined />,
+        iconColor: "#8B5CF6",
+        iconBg: "#8B5CF615",
+      },
+      {
+        title: t("dashboard.totalProducts", lang),
+        value: formatNumber(data?.totalProducts),
+        icon: <AppstoreOutlined />,
+        iconColor: "#14B8A6",
+        iconBg: "#14B8A615",
+      },
+    ],
+    [data, currency, t, lang]
+  );
+
+  // ── Financial Summary card configs ───────────────────────────────────────
+  const financialKpis = useMemo(
+    () => [
+      {
+        title: t("dashboard.accountsReceivable", lang),
+        value: formatCurrency(data?.accountsReceivable, currency),
+        suffix: ` ${currency}`,
+        icon: <WalletOutlined />,
+        iconColor: "#F97316",
+        iconBg: "#F9731615",
+      },
+      {
+        title: t("dashboard.accountsPayable", lang),
+        value: formatCurrency(data?.accountsPayable, currency),
+        suffix: ` ${currency}`,
+        icon: <CreditCardOutlined />,
+        iconColor: "#EF4444",
+        iconBg: "#EF444415",
+      },
+      {
+        title: t("dashboard.cashBalance", lang),
+        value: formatCurrency(data?.cashBalance, currency),
+        suffix: ` ${currency}`,
+        icon: <BankOutlined />,
+        iconColor: "#10B981",
+        iconBg: "#10B98115",
+      },
+      {
+        title: t("dashboard.netProfit", lang),
+        value: formatCurrency(data?.netProfit, currency),
+        suffix: ` ${currency}`,
+        icon: <BarChartOutlined />,
+        iconColor: "#3B82F6",
+        iconBg: "#3B82F615",
+      },
+    ],
+    [data, currency, t, lang]
+  );
+
+  // ── Recent Activity columns ──────────────────────────────────────────────
+  const activityColumns: TableColumnsType<RecentActivityItem> = useMemo(
+    () => [
+      {
+        title: t("dashboard.date", lang),
+        dataIndex: "date",
+        width: 140,
+        render: (v: string) => (
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            {v}
+          </Text>
+        ),
+      },
+      {
+        title: t("dashboard.type", lang),
+        dataIndex: "type",
+        width: 100,
+        render: (v: string) => {
+          const typeKey = `dashboard.${v}` as string;
+          return (
+            <Tag style={{ fontSize: 11, textTransform: "capitalize" }}>
+              {t(typeKey, lang) !== typeKey ? t(typeKey, lang) : v}
+            </Tag>
+          );
+        },
+      },
+      {
+        title: t("dashboard.reference", lang),
+        dataIndex: "reference",
+        width: 160,
+        render: (v: string) => (
+          <Text strong style={{ fontSize: 12 }}>
+            {v}
+          </Text>
+        ),
+      },
+      {
+        title: t("dashboard.amount", lang),
+        dataIndex: "amount",
+        width: 140,
+        align: "end" as const,
+        render: (v: number) => (
+          <Text strong style={{ fontSize: 12, fontFamily: "monospace" }}>
+            {formatCurrency(v, currency)} {currency}
+          </Text>
+        ),
+      },
+      {
+        title: t("dashboard.status", lang),
+        dataIndex: "status",
+        width: 120,
+        render: (v: string) => (
+          <Tag
+            color={statusTagColor[v?.toLowerCase()] ?? "default"}
+            style={{ fontSize: 11, textTransform: "capitalize" }}
+          >
+            {v}
+          </Tag>
+        ),
+      },
+    ],
+    [t, lang, currency]
+  );
+
+  const recentActivity = data?.recentActivity ?? [];
+
+  // ── Empty state component ────────────────────────────────────────────────
+  const NoDataState = () => (
+    <div style={{ textAlign: "center", padding: "40px 0" }}>
+      <Empty
+        image={Empty.PRESENTED_IMAGE_SIMPLE}
+        description={
+          <Text type="secondary">{t("dashboard.noData", lang)}</Text>
+        }
+      />
+    </div>
+  );
 
   return (
     <DashboardLayout
       currentPage="Dashboard"
-      breadcrumbs={[{ label: "Dashboard" }]}
+      breadcrumbs={[{ label: t("dashboard.title", lang) }]}
     >
       <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-        {/* ── Greeting ─────────────────────────────────────────── */}
+        {/* ── Header ──────────────────────────────────────────────── */}
         <div
           style={{
             display: "flex",
@@ -423,749 +459,185 @@ export default function Dashboard() {
             gap: 12,
           }}
         >
-          <div>
-            <Title level={4} style={{ margin: 0 }}>
-              {greeting}, John 👋
-            </Title>
-            <Text type="secondary" style={{ fontSize: 13 }}>
-              {today}
-            </Text>
-          </div>
-          <Space>
-            <Select
-              size="small"
-              value={period}
-              onChange={setPeriod}
-              style={{ width: 130 }}
-              options={[
-                { value: "1m", label: "Last Month" },
-                { value: "3m", label: "Last 3 Months" },
-                { value: "9m", label: "Last 9 Months" },
-                { value: "1y", label: "This Year" },
+          <Title level={4} style={{ margin: 0 }}>
+            {t("dashboard.title", lang)}
+          </Title>
+          <Space wrap>
+            <RangePicker
+              value={dateRange}
+              onChange={val =>
+                setDateRange(val as [Dayjs | null, Dayjs | null] | null)
+              }
+              placeholder={[
+                t("dashboard.dateFrom", lang),
+                t("dashboard.dateTo", lang),
               ]}
+              allowClear
+              size="middle"
+              style={{ borderRadius: 8 }}
             />
-            <Button size="small" icon={<ReloadOutlined />}>
-              Refresh
+            <Button
+              icon={<ReloadOutlined />}
+              onClick={() => refetch()}
+              loading={isLoading}
+            >
+              {t("dashboard.reload", lang)}
             </Button>
           </Space>
         </div>
 
-        {/* ── KPI Cards ────────────────────────────────────────── */}
+        {/* ── Row 1: Primary KPI Cards ───────────────────────────── */}
         <Row gutter={[16, 16]}>
-          {[
-            {
-              title: "Total Revenue",
-              value: "125,430",
-              prefix: "$",
-              change: "+12.5%",
-              up: true,
-              icon: <DollarOutlined style={{ color: "#3B82F6" }} />,
-              iconBg: "#3B82F610",
-            },
-            {
-              title: "Total Orders",
-              value: "1,234",
-              prefix: "",
-              change: "+8.2%",
-              up: true,
-              icon: <ShoppingCartOutlined style={{ color: "#10B981" }} />,
-              iconBg: "#10B98110",
-            },
-            {
-              title: "Total Expenses",
-              value: "68,000",
-              prefix: "$",
-              change: "+4.1%",
-              up: false,
-              icon: <ShoppingOutlined style={{ color: "#F59E0B" }} />,
-              iconBg: "#F59E0B10",
-            },
-            {
-              title: "Net Profit",
-              value: "57,430",
-              prefix: "$",
-              change: "+18.3%",
-              up: true,
-              icon: <BarChartOutlined style={{ color: "#8B5CF6" }} />,
-              iconBg: "#8B5CF610",
-            },
-            {
-              title: "Active Customers",
-              value: "542",
-              prefix: "",
-              change: "+5.3%",
-              up: true,
-              icon: <TeamOutlined style={{ color: "#6366F1" }} />,
-              iconBg: "#6366F110",
-            },
-            {
-              title: "Products",
-              value: "856",
-              prefix: "",
-              change: "-2.1%",
-              up: false,
-              icon: <AppstoreOutlined style={{ color: "#EF4444" }} />,
-              iconBg: "#EF444410",
-            },
-            {
-              title: "Pending Invoices",
-              value: "23",
-              prefix: "",
-              change: "-3 new",
-              up: false,
-              icon: <FileTextOutlined style={{ color: "#F97316" }} />,
-              iconBg: "#F9731610",
-            },
-            {
-              title: "Bank Balance",
-              value: "284,900",
-              prefix: "$",
-              change: "+6.7%",
-              up: true,
-              icon: <BankOutlined style={{ color: "#14B8A6" }} />,
-              iconBg: "#14B8A610",
-            },
-          ].map(kpi => (
+          {primaryKpis.map(kpi => (
             <Col xs={24} sm={12} md={6} key={kpi.title}>
-              <KPICard {...kpi} />
+              <KPICard {...kpi} loading={isLoading} />
             </Col>
           ))}
         </Row>
 
-        {/* ── Revenue Chart + Inventory Pie ────────────────────── */}
+        {/* ── Row 2: Financial Summary Cards ─────────────────────── */}
         <Row gutter={[16, 16]}>
-          {/* Revenue Area Chart */}
-          <Col xs={24} lg={16}>
-            <div
-              style={{
-                background: token.colorBgContainer,
-                border: `1px solid ${token.colorBorderSecondary}`,
-                borderRadius: token.borderRadiusLG,
-                padding: "20px 20px 12px",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "flex-start",
-                  marginBottom: 20,
-                }}
-              >
-                <div>
-                  <Text strong style={{ fontSize: 15 }}>
-                    Revenue vs Expenses
-                  </Text>
-                  <br />
-                  <Text type="secondary" style={{ fontSize: 12 }}>
-                    Monthly financial overview
-                  </Text>
-                </div>
-                <Space>
-                  <Tag color="blue">Revenue</Tag>
-                  <Tag color="orange">Expenses</Tag>
-                  <Tag color="green">Profit</Tag>
-                </Space>
-              </div>
-              <ResponsiveContainer width="100%" height={260}>
-                <AreaChart
-                  data={revenueData}
-                  margin={{ top: 4, right: 4, left: 0, bottom: 0 }}
-                >
-                  <defs>
-                    <linearGradient
-                      id="colorRevenue"
-                      x1="0"
-                      y1="0"
-                      x2="0"
-                      y2="1"
-                    >
-                      <stop
-                        offset="5%"
-                        stopColor={token.colorPrimary}
-                        stopOpacity={0.2}
-                      />
-                      <stop
-                        offset="95%"
-                        stopColor={token.colorPrimary}
-                        stopOpacity={0}
-                      />
-                    </linearGradient>
-                    <linearGradient
-                      id="colorProfit"
-                      x1="0"
-                      y1="0"
-                      x2="0"
-                      y2="1"
-                    >
-                      <stop offset="5%" stopColor="#10B981" stopOpacity={0.2} />
-                      <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    stroke={token.colorBorderSecondary}
-                  />
-                  <XAxis
-                    dataKey="month"
-                    tick={{ fontSize: 11, fill: token.colorTextTertiary }}
-                    axisLine={false}
-                    tickLine={false}
-                  />
-                  <YAxis
-                    tick={{ fontSize: 11, fill: token.colorTextTertiary }}
-                    axisLine={false}
-                    tickLine={false}
-                    tickFormatter={v => `$${(v / 1000).toFixed(0)}k`}
-                  />
-                  <RTooltip
-                    formatter={(v: number) => [`$${v.toLocaleString()}`, ""]}
-                    contentStyle={{
-                      borderRadius: 8,
-                      border: `1px solid ${token.colorBorderSecondary}`,
-                      fontSize: 12,
-                    }}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="revenue"
-                    stroke={token.colorPrimary}
-                    strokeWidth={2}
-                    fill="url(#colorRevenue)"
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="expenses"
-                    stroke="#F59E0B"
-                    strokeWidth={2}
-                    fill="none"
-                    strokeDasharray="4 3"
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="profit"
-                    stroke="#10B981"
-                    strokeWidth={2}
-                    fill="url(#colorProfit)"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
+          {financialKpis.map(kpi => (
+            <Col xs={24} sm={12} md={6} key={kpi.title}>
+              <KPICard {...kpi} loading={isLoading} />
+            </Col>
+          ))}
+        </Row>
+
+        {/* ── Row 3: Module Quick Stats ──────────────────────────── */}
+        <Row gutter={[16, 16]}>
+          {/* Sales */}
+          <Col xs={24} md={8}>
+            <ModuleStatCard
+              title={t("dashboard.salesOverview", lang)}
+              icon={<ShoppingCartOutlined />}
+              iconColor="#3B82F6"
+              loading={isLoading}
+              items={
+                hasData
+                  ? [
+                      {
+                        label: t("dashboard.draftOrders", lang),
+                        value: formatNumber(data?.draftOrders),
+                      },
+                      {
+                        label: t("dashboard.confirmedOrders", lang),
+                        value: formatNumber(data?.confirmedOrders),
+                      },
+                      {
+                        label: t("dashboard.completedOrders", lang),
+                        value: formatNumber(data?.completedOrders),
+                      },
+                      {
+                        label: t("dashboard.pendingInvoices", lang),
+                        value: formatNumber(data?.pendingInvoices),
+                      },
+                    ]
+                  : []
+              }
+            />
           </Col>
 
-          {/* Inventory Pie */}
-          <Col xs={24} lg={8}>
-            <div
-              style={{
-                background: token.colorBgContainer,
-                border: `1px solid ${token.colorBorderSecondary}`,
-                borderRadius: token.borderRadiusLG,
-                padding: "20px 20px 12px",
-                height: "100%",
-              }}
-            >
-              <Text strong style={{ fontSize: 15 }}>
-                Inventory Status
-              </Text>
-              <br />
-              <Text type="secondary" style={{ fontSize: 12 }}>
-                Current stock distribution
-              </Text>
-              <ResponsiveContainer width="100%" height={200}>
-                <PieChart>
-                  <Pie
-                    data={inventoryData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={55}
-                    outerRadius={80}
-                    paddingAngle={3}
-                    dataKey="value"
-                  >
-                    {inventoryData.map((entry, i) => (
-                      <Cell key={i} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <RTooltip
-                    formatter={(v: number) => [`${v}%`, ""]}
-                    contentStyle={{ borderRadius: 8, fontSize: 12 }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {inventoryData.map(d => (
-                  <div
-                    key={d.name}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Space size={6}>
-                      <div
-                        style={{
-                          width: 10,
-                          height: 10,
-                          borderRadius: 3,
-                          background: d.color,
-                        }}
-                      />
-                      <Text style={{ fontSize: 12 }}>{d.name}</Text>
-                    </Space>
-                    <Text strong style={{ fontSize: 12 }}>
-                      {d.value}%
-                    </Text>
-                  </div>
-                ))}
-              </div>
-            </div>
+          {/* Inventory */}
+          <Col xs={24} md={8}>
+            <ModuleStatCard
+              title={t("dashboard.inventoryOverview", lang)}
+              icon={<InboxOutlined />}
+              iconColor="#F59E0B"
+              loading={isLoading}
+              items={
+                hasData
+                  ? [
+                      {
+                        label: t("dashboard.lowStockAlerts", lang),
+                        value: formatNumber(data?.lowStockAlerts),
+                      },
+                      {
+                        label: t("dashboard.totalStockValue", lang),
+                        value: `${formatCurrency(data?.totalStockValue, currency)} ${currency}`,
+                      },
+                    ]
+                  : []
+              }
+            />
+          </Col>
+
+          {/* HR */}
+          <Col xs={24} md={8}>
+            <ModuleStatCard
+              title={t("dashboard.hrOverview", lang)}
+              icon={<UserOutlined />}
+              iconColor="#8B5CF6"
+              loading={isLoading}
+              items={
+                hasData
+                  ? [
+                      {
+                        label: t("dashboard.activeEmployees", lang),
+                        value: formatNumber(data?.activeEmployees),
+                      },
+                      {
+                        label: t("dashboard.pendingLeaves", lang),
+                        value: formatNumber(data?.pendingLeaves),
+                      },
+                    ]
+                  : []
+              }
+            />
           </Col>
         </Row>
 
-        {/* ── Sales by Category + Alerts ───────────────────────── */}
-        <Row gutter={[16, 16]}>
-          {/* Bar Chart */}
-          <Col xs={24} lg={14}>
-            <div
-              style={{
-                background: token.colorBgContainer,
-                border: `1px solid ${token.colorBorderSecondary}`,
-                borderRadius: token.borderRadiusLG,
-                padding: "20px 20px 12px",
-              }}
-            >
-              <Text strong style={{ fontSize: 15 }}>
-                Sales by Category
-              </Text>
-              <br />
-              <Text type="secondary" style={{ fontSize: 12 }}>
-                Top performing product categories this month
-              </Text>
-              <ResponsiveContainer width="100%" height={220}>
-                <BarChart
-                  data={salesByModuleData}
-                  margin={{ top: 16, right: 4, left: 0, bottom: 0 }}
-                >
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    stroke={token.colorBorderSecondary}
-                    vertical={false}
-                  />
-                  <XAxis
-                    dataKey="name"
-                    tick={{ fontSize: 11, fill: token.colorTextTertiary }}
-                    axisLine={false}
-                    tickLine={false}
-                  />
-                  <YAxis
-                    tick={{ fontSize: 11, fill: token.colorTextTertiary }}
-                    axisLine={false}
-                    tickLine={false}
-                    tickFormatter={v => `$${(v / 1000).toFixed(0)}k`}
-                  />
-                  <RTooltip
-                    formatter={(v: number) => [
-                      `$${v.toLocaleString()}`,
-                      "Revenue",
-                    ]}
-                    contentStyle={{ borderRadius: 8, fontSize: 12 }}
-                  />
-                  <Bar
-                    dataKey="value"
-                    fill={token.colorPrimary}
-                    radius={[6, 6, 0, 0]}
-                    maxBarSize={48}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </Col>
-
-          {/* Alerts */}
-          <Col xs={24} lg={10}>
-            <div
-              style={{
-                background: token.colorBgContainer,
-                border: `1px solid ${token.colorBorderSecondary}`,
-                borderRadius: token.borderRadiusLG,
-                padding: "20px",
-                height: "100%",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  marginBottom: 14,
-                }}
-              >
-                <Text strong style={{ fontSize: 15 }}>
-                  Alerts
-                </Text>
-                <Badge count={alerts.length} color="#EF4444" size="small" />
-              </div>
-              <div
-                style={{ display: "flex", flexDirection: "column", gap: 10 }}
-              >
-                {alerts.map(a => (
-                  <Link key={a.id} to={a.action}>
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 10,
-                        padding: "10px 12px",
-                        background: `${alertColor[a.severity]}08`,
-                        border: `1px solid ${alertColor[a.severity]}30`,
-                        borderLeft: `3px solid ${alertColor[a.severity]}`,
-                        borderRadius: 8,
-                        cursor: "pointer",
-                        transition: "opacity 0.15s",
-                      }}
-                    >
-                      <span
-                        style={{
-                          color: alertColor[a.severity],
-                          fontSize: 14,
-                          flexShrink: 0,
-                        }}
-                      >
-                        {alertIcon[a.severity]}
-                      </span>
-                      <Text style={{ fontSize: 12, flex: 1 }}>{a.message}</Text>
-                      <RightOutlined
-                        style={{ fontSize: 10, color: token.colorTextTertiary }}
-                      />
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </Col>
-        </Row>
-
-        {/* ── Recent Orders + Pending Approvals ────────────────── */}
-        <Row gutter={[16, 16]}>
-          {/* Recent Orders */}
-          <Col xs={24} lg={14}>
-            <div
-              style={{
-                background: token.colorBgContainer,
-                border: `1px solid ${token.colorBorderSecondary}`,
-                borderRadius: token.borderRadiusLG,
-                overflow: "hidden",
-              }}
-            >
-              <div
-                style={{
-                  padding: "16px 20px",
-                  borderBottom: `1px solid ${token.colorBorderSecondary}`,
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <Text strong style={{ fontSize: 15 }}>
-                  Recent Orders
-                </Text>
-                <Link to="/sales/orders">
-                  <Button
-                    type="link"
-                    size="small"
-                    style={{ padding: 0, fontSize: 12 }}
-                  >
-                    View all <RightOutlined style={{ fontSize: 10 }} />
-                  </Button>
-                </Link>
-              </div>
-              <Table
+        {/* ── Row 4: Recent Activity ─────────────────────────────── */}
+        <div
+          style={{
+            background: token.colorBgContainer,
+            border: `1px solid ${token.colorBorderSecondary}`,
+            borderRadius: token.borderRadiusLG,
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{
+              padding: "16px 20px",
+              borderBottom: `1px solid ${token.colorBorderSecondary}`,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Text strong style={{ fontSize: 15 }}>
+              {t("dashboard.recentActivity", lang)}
+            </Text>
+            <Link to="/sales/orders">
+              <Button
+                type="link"
                 size="small"
-                dataSource={recentOrders}
-                columns={orderCols}
-                pagination={false}
-                style={{ fontSize: 12 }}
-              />
-            </div>
-          </Col>
+                style={{ padding: 0, fontSize: 12 }}
+              >
+                {t("dashboard.viewAll", lang)}{" "}
+                <RightOutlined style={{ fontSize: 10 }} />
+              </Button>
+            </Link>
+          </div>
 
-          {/* Pending Approvals */}
-          <Col xs={24} lg={10}>
-            <div
-              style={{
-                background: token.colorBgContainer,
-                border: `1px solid ${token.colorBorderSecondary}`,
-                borderRadius: token.borderRadiusLG,
-                overflow: "hidden",
-              }}
-            >
-              <div
-                style={{
-                  padding: "16px 20px",
-                  borderBottom: `1px solid ${token.colorBorderSecondary}`,
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <Text strong style={{ fontSize: 15 }}>
-                  Pending Approvals
-                </Text>
-                <Badge
-                  count={pendingApprovals.length}
-                  color={token.colorPrimary}
-                  size="small"
-                />
-              </div>
-              <div style={{ padding: "8px 0" }}>
-                {pendingApprovals.map(item => (
-                  <div
-                    key={item.id}
-                    style={{
-                      padding: "10px 20px",
-                      borderBottom: `1px solid ${token.colorBorderSecondary}`,
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 12,
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: 36,
-                        height: 36,
-                        borderRadius: 8,
-                        flexShrink: 0,
-                        background: token.colorPrimaryBg,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <ClockCircleOutlined
-                        style={{ color: token.colorPrimary, fontSize: 14 }}
-                      />
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                        }}
-                      >
-                        <Text strong style={{ fontSize: 12 }}>
-                          {item.type}
-                        </Text>
-                        <Text type="secondary" style={{ fontSize: 11 }}>
-                          {item.time}
-                        </Text>
-                      </div>
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          marginTop: 2,
-                        }}
-                      >
-                        <Text type="secondary" style={{ fontSize: 11 }}>
-                          {item.ref} · {item.from}
-                        </Text>
-                        <Text
-                          strong
-                          style={{ fontSize: 12, color: token.colorPrimary }}
-                        >
-                          {item.amount}
-                        </Text>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-                <div style={{ padding: "10px 20px" }}>
-                  <Button block size="small" type="dashed">
-                    View all approvals
-                  </Button>
-                </div>
-              </div>
+          {isLoading ? (
+            <div style={{ textAlign: "center", padding: 40 }}>
+              <Spin />
             </div>
-          </Col>
-        </Row>
-
-        {/* ── Team Activity ─────────────────────────────────────── */}
-        <Row gutter={[16, 16]}>
-          <Col xs={24} lg={10}>
-            <div
-              style={{
-                background: token.colorBgContainer,
-                border: `1px solid ${token.colorBorderSecondary}`,
-                borderRadius: token.borderRadiusLG,
-                padding: "20px",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  marginBottom: 14,
-                }}
-              >
-                <Text strong style={{ fontSize: 15 }}>
-                  Team Activity
-                </Text>
-                <Link to="/chat">
-                  <Button
-                    type="link"
-                    size="small"
-                    style={{ padding: 0, fontSize: 12 }}
-                  >
-                    Open chat <RightOutlined style={{ fontSize: 10 }} />
-                  </Button>
-                </Link>
-              </div>
-              <div
-                style={{ display: "flex", flexDirection: "column", gap: 12 }}
-              >
-                {topTeamActivity.map((a, i) => (
-                  <div
-                    key={i}
-                    style={{ display: "flex", alignItems: "center", gap: 10 }}
-                  >
-                    <Avatar
-                      size={32}
-                      style={{
-                        background: a.color,
-                        fontWeight: 700,
-                        fontSize: 11,
-                        flexShrink: 0,
-                      }}
-                    >
-                      {a.avatar}
-                    </Avatar>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <Text strong style={{ fontSize: 12 }}>
-                        {a.user}
-                      </Text>
-                      <br />
-                      <Text
-                        type="secondary"
-                        style={{
-                          fontSize: 11,
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          whiteSpace: "nowrap",
-                          display: "block",
-                        }}
-                      >
-                        {a.action}
-                      </Text>
-                    </div>
-                    <Text
-                      type="secondary"
-                      style={{ fontSize: 10, flexShrink: 0 }}
-                    >
-                      {a.time}
-                    </Text>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </Col>
-
-          {/* Module Health */}
-          <Col xs={24} lg={14}>
-            <div
-              style={{
-                background: token.colorBgContainer,
-                border: `1px solid ${token.colorBorderSecondary}`,
-                borderRadius: token.borderRadiusLG,
-                padding: "20px",
-              }}
-            >
-              <Text strong style={{ fontSize: 15 }}>
-                Module Health
-              </Text>
-              <br />
-              <Text type="secondary" style={{ fontSize: 12 }}>
-                Performance score per module this month
-              </Text>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 14,
-                  marginTop: 16,
-                }}
-              >
-                {[
-                  {
-                    name: "Sales",
-                    pct: 87,
-                    color: "#3B82F6",
-                    detail: "1,234 orders · $125k revenue",
-                  },
-                  {
-                    name: "Purchases",
-                    pct: 72,
-                    color: "#10B981",
-                    detail: "89 POs · $68k expenses",
-                  },
-                  {
-                    name: "Inventory",
-                    pct: 65,
-                    color: "#F59E0B",
-                    detail: "856 products · 14 out of stock",
-                  },
-                  {
-                    name: "Accounting",
-                    pct: 91,
-                    color: "#8B5CF6",
-                    detail: "All journals posted · balanced",
-                  },
-                  {
-                    name: "HR",
-                    pct: 78,
-                    color: "#6366F1",
-                    detail: "48 employees · payroll on track",
-                  },
-                  {
-                    name: "Treasury",
-                    pct: 83,
-                    color: "#14B8A6",
-                    detail: "$284k balance · 2 accounts",
-                  },
-                ].map(m => (
-                  <div key={m.name}>
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        marginBottom: 4,
-                      }}
-                    >
-                      <Text style={{ fontSize: 12, fontWeight: 600 }}>
-                        {m.name}
-                      </Text>
-                      <Space size={8}>
-                        <Text type="secondary" style={{ fontSize: 11 }}>
-                          {m.detail}
-                        </Text>
-                        <Text strong style={{ fontSize: 12, color: m.color }}>
-                          {m.pct}%
-                        </Text>
-                      </Space>
-                    </div>
-                    <Progress
-                      percent={m.pct}
-                      showInfo={false}
-                      strokeColor={m.color}
-                      railColor={token.colorFillSecondary}
-                      size="small"
-                      strokeLinecap="round"
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          </Col>
-        </Row>
+          ) : recentActivity.length > 0 ? (
+            <Table
+              rowKey="id"
+              size="small"
+              dataSource={recentActivity}
+              columns={activityColumns}
+              pagination={false}
+              scroll={{ x: "max-content" }}
+              style={{ fontSize: 12 }}
+            />
+          ) : (
+            <NoDataState />
+          )}
+        </div>
       </div>
     </DashboardLayout>
   );
