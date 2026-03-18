@@ -521,6 +521,39 @@ export const FiscalPeriodType = {
 export type FiscalPeriodType =
   (typeof FiscalPeriodType)[keyof typeof FiscalPeriodType];
 
+export const JournalType = {
+  SALE: "sale",
+  PURCHASE: "purchase",
+  CASH: "cash",
+  BANK: "bank",
+  GENERAL: "general",
+} as const;
+export type JournalType = (typeof JournalType)[keyof typeof JournalType];
+
+// ─── Tax Setup ───────────────────────────────────────────────────────────────
+
+export const TaxType = {
+  PERCENTAGE: "percentage",
+  FIXED: "fixed",
+} as const;
+export type TaxType = (typeof TaxType)[keyof typeof TaxType];
+
+export const TaxScope = {
+  SALE: "sale",
+  PURCHASE: "purchase",
+  BOTH: "both",
+} as const;
+export type TaxScope = (typeof TaxScope)[keyof typeof TaxScope];
+
+/** Payment term line type */
+export const PaymentTermLineType = {
+  PERCENT: "percent",
+  FIXED: "fixed",
+  BALANCE: "balance",
+} as const;
+export type PaymentTermLineType =
+  (typeof PaymentTermLineType)[keyof typeof PaymentTermLineType];
+
 // ─── Definitions ──────────────────────────────────────────────────────────────
 
 /** Termination reason type */

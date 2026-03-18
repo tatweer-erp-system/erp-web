@@ -335,10 +335,88 @@ export const routes: RouteConfig[] = [
     breadcrumb: ["Accounting", "Chart of Accounts"],
   },
   {
+    path: "/opening-balances",
+    component: lz(() => import("@/pages/OpeningBalances")),
+    permissions: ["accounting:write"],
+    breadcrumb: ["Accounting", "Opening Balances"],
+  },
+  {
     path: "/journal-entries",
     component: lz(() => import("@/pages/JournalEntries")),
     permissions: ["accounting:write"],
     breadcrumb: ["Accounting", "Journal Entries"],
+  },
+  {
+    path: "/cost-centers",
+    component: lz(() => import("@/pages/CostCenters")),
+    permissions: ["accounting:read"],
+    breadcrumb: ["Accounting", "Cost Centers"],
+  },
+  {
+    path: "/fiscal-periods",
+    component: lz(() => import("@/pages/FiscalPeriods")),
+    permissions: ["accounting:read"],
+    breadcrumb: ["Accounting", "Fiscal Periods"],
+  },
+  {
+    path: "/journals",
+    component: lz(() => import("@/pages/Journals")),
+    permissions: ["accounting:read"],
+    breadcrumb: ["Accounting", "Journals"],
+  },
+  {
+    path: "/account-groups",
+    component: lz(() => import("@/pages/AccountGroups")),
+    permissions: ["accounting:read"],
+    breadcrumb: ["Accounting", "Account Groups"],
+  },
+  {
+    path: "/taxes-setup",
+    component: lz(() => import("@/pages/TaxesSetup")),
+    permissions: ["accounting:read"],
+    breadcrumb: ["Accounting", "Taxes"],
+  },
+  {
+    path: "/payment-terms",
+    component: lz(() => import("@/pages/PaymentTerms")),
+    permissions: ["accounting:read"],
+    breadcrumb: ["Accounting", "Payment Terms"],
+  },
+  {
+    path: "/trial-balance",
+    component: lz(() => import("@/pages/TrialBalance")),
+    permissions: ["accounting:read"],
+    breadcrumb: ["Accounting", "Trial Balance"],
+  },
+  {
+    path: "/general-ledger",
+    component: lz(() => import("@/pages/GeneralLedger")),
+    permissions: ["accounting:read"],
+    breadcrumb: ["Accounting", "General Ledger"],
+  },
+  {
+    path: "/income-statement",
+    component: lz(() => import("@/pages/IncomeStatement")),
+    permissions: ["accounting:read"],
+    breadcrumb: ["Accounting", "Income Statement"],
+  },
+  {
+    path: "/balance-sheet",
+    component: lz(() => import("@/pages/BalanceSheet")),
+    permissions: ["accounting:read"],
+    breadcrumb: ["Accounting", "Balance Sheet"],
+  },
+  {
+    path: "/account-statements",
+    component: lz(() => import("@/pages/AccountStatements")),
+    permissions: ["accounting:read"],
+    breadcrumb: ["Accounting", "Account Statements"],
+  },
+  {
+    path: "/cash-flow",
+    component: lz(() => import("@/pages/CashFlow")),
+    permissions: ["accounting:read"],
+    breadcrumb: ["Accounting", "Cash Flow"],
   },
 
   // ── Treasury ────────────────────────────────────────────────────────────────
@@ -623,6 +701,19 @@ export const routes: RouteConfig[] = [
     component: lz(() => import("@/pages/settings/PurchasesSettings")),
     permissions: ["settings:read"],
     breadcrumb: ["Settings", "Purchases Settings"],
+  },
+
+  {
+    path: "/settings/accounting/:tab",
+    component: lz(() => import("@/pages/settings/AccountingSettings")),
+    permissions: ["settings:read"],
+    breadcrumb: ["Settings", "Accounting Settings"],
+  },
+  {
+    path: "/settings/accounting",
+    component: lz(() => import("@/pages/settings/AccountingSettings")),
+    permissions: ["settings:read"],
+    breadcrumb: ["Settings", "Accounting Settings"],
   },
 
   {

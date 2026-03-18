@@ -4,18 +4,33 @@ import type {
   Account,
   CreateAccountDto,
   UpdateAccountDto,
+  AccountGroup,
+  CreateAccountGroupDto,
+  UpdateAccountGroupDto,
+  Journal,
+  CreateJournalDto,
+  UpdateJournalDto,
   JournalEntry,
   CreateJournalEntryDto,
   UpdateJournalEntryDto,
   CostCenter,
   FiscalPeriod,
   CreateFiscalPeriodDto,
+  TaxGroup,
+  CreateTaxGroupDto,
+  UpdateTaxGroupDto,
+  Tax,
+  CreateTaxDto,
+  UpdateTaxDto,
   TrialBalanceResult,
   GeneralLedgerRow,
   AccountStatementResult,
   IncomeStatementResult,
   BalanceSheetResult,
   AccountingConfig,
+  PaymentTerm,
+  CreatePaymentTermDto,
+  UpdatePaymentTermDto,
 } from "@/types/modules/accounting";
 import { JournalEntryStatus } from "@/constants/enums";
 
@@ -272,6 +287,146 @@ export const reportsService = {
         ApiResponse<AccountStatementResult>
       >("/accounting/reports/account-statement", { params: { accountId, from, to } })
       .then(r => r.data.data),
+};
+
+// ─── Account Groups ──────────────────────────────────────────────────────────
+
+export const accountGroupsService = {
+  list: (params?: Partial<TableParams>) =>
+    apiClient
+      .get<PaginatedResponse<AccountGroup>>("/account-groups", { params })
+      .then(r => r.data),
+
+  tree: () =>
+    apiClient
+      .get<ApiResponse<AccountGroup[]>>("/account-groups/tree")
+      .then(r => r.data.data),
+
+  get: (id: string) =>
+    apiClient
+      .get<ApiResponse<AccountGroup>>(`/account-groups/${id}`)
+      .then(r => r.data.data),
+
+  create: (dto: CreateAccountGroupDto) =>
+    apiClient
+      .post<ApiResponse<AccountGroup>>("/account-groups", dto)
+      .then(r => r.data.data),
+
+  update: (id: string, dto: UpdateAccountGroupDto) =>
+    apiClient
+      .patch<ApiResponse<AccountGroup>>(`/account-groups/${id}`, dto)
+      .then(r => r.data.data),
+
+  remove: (id: string) =>
+    apiClient
+      .delete<ApiResponse<void>>(`/account-groups/${id}`)
+      .then(r => r.data),
+};
+
+// ─── Journals ────────────────────────────────────────────────────────────────
+
+export const journalsService = {
+  list: (params?: Partial<TableParams>) =>
+    apiClient
+      .get<PaginatedResponse<Journal>>("/journals", { params })
+      .then(r => r.data),
+
+  get: (id: string) =>
+    apiClient
+      .get<ApiResponse<Journal>>(`/journals/${id}`)
+      .then(r => r.data.data),
+
+  create: (dto: CreateJournalDto) =>
+    apiClient
+      .post<ApiResponse<Journal>>("/journals", dto)
+      .then(r => r.data.data),
+
+  update: (id: string, dto: UpdateJournalDto) =>
+    apiClient
+      .patch<ApiResponse<Journal>>(`/journals/${id}`, dto)
+      .then(r => r.data.data),
+
+  remove: (id: string) =>
+    apiClient.delete<ApiResponse<void>>(`/journals/${id}`).then(r => r.data),
+};
+
+// ─── Tax Groups ──────────────────────────────────────────────────────────────
+
+export const taxGroupsService = {
+  list: (params?: Partial<TableParams>) =>
+    apiClient
+      .get<PaginatedResponse<TaxGroup>>("/tax-groups", { params })
+      .then(r => r.data),
+
+  get: (id: string) =>
+    apiClient
+      .get<ApiResponse<TaxGroup>>(`/tax-groups/${id}`)
+      .then(r => r.data.data),
+
+  create: (dto: CreateTaxGroupDto) =>
+    apiClient
+      .post<ApiResponse<TaxGroup>>("/tax-groups", dto)
+      .then(r => r.data.data),
+
+  update: (id: string, dto: UpdateTaxGroupDto) =>
+    apiClient
+      .patch<ApiResponse<TaxGroup>>(`/tax-groups/${id}`, dto)
+      .then(r => r.data.data),
+
+  remove: (id: string) =>
+    apiClient.delete<ApiResponse<void>>(`/tax-groups/${id}`).then(r => r.data),
+};
+
+// ─── Taxes ───────────────────────────────────────────────────────────────────
+
+export const taxesService = {
+  list: (params?: Partial<TableParams>) =>
+    apiClient
+      .get<PaginatedResponse<Tax>>("/taxes", { params })
+      .then(r => r.data),
+
+  get: (id: string) =>
+    apiClient.get<ApiResponse<Tax>>(`/taxes/${id}`).then(r => r.data.data),
+
+  create: (dto: CreateTaxDto) =>
+    apiClient.post<ApiResponse<Tax>>("/taxes", dto).then(r => r.data.data),
+
+  update: (id: string, dto: UpdateTaxDto) =>
+    apiClient
+      .patch<ApiResponse<Tax>>(`/taxes/${id}`, dto)
+      .then(r => r.data.data),
+
+  remove: (id: string) =>
+    apiClient.delete<ApiResponse<void>>(`/taxes/${id}`).then(r => r.data),
+};
+
+// ─── Payment Terms ───────────────────────────────────────────────────────────
+
+export const paymentTermsService = {
+  list: (params?: Partial<TableParams>) =>
+    apiClient
+      .get<PaginatedResponse<PaymentTerm>>("/payment-terms", { params })
+      .then(r => r.data),
+
+  get: (id: string) =>
+    apiClient
+      .get<ApiResponse<PaymentTerm>>(`/payment-terms/${id}`)
+      .then(r => r.data.data),
+
+  create: (dto: CreatePaymentTermDto) =>
+    apiClient
+      .post<ApiResponse<PaymentTerm>>("/payment-terms", dto)
+      .then(r => r.data.data),
+
+  update: (id: string, dto: UpdatePaymentTermDto) =>
+    apiClient
+      .patch<ApiResponse<PaymentTerm>>(`/payment-terms/${id}`, dto)
+      .then(r => r.data.data),
+
+  remove: (id: string) =>
+    apiClient
+      .delete<ApiResponse<void>>(`/payment-terms/${id}`)
+      .then(r => r.data),
 };
 
 // ─── Accounting Config ────────────────────────────────────────────────────────

@@ -18,6 +18,10 @@ export const QUERY_KEYS = {
   JOURNAL_ENTRIES: "journal-entries",
   COST_CENTERS_FOR_JE: "cost-centers-for-je",
   COST_CENTERS_LIST: "cost-centers-list",
+  COST_CENTERS_TREE: "cost-centers-tree",
+
+  // Accounting — Account Groups
+  ACCOUNT_GROUPS_TREE: "account-groups-tree",
 
   // Accounting — Reports
   TRIAL_BALANCE: "trial-balance",
@@ -29,7 +33,20 @@ export const QUERY_KEYS = {
   // Accounting — Periods
   FISCAL_PERIODS: "fiscal-periods",
 
+  // Accounting — Journals
+  JOURNALS_LIST: "journals-list",
+
+  // Accounting — Taxes
+  TAX_GROUPS_LIST: "tax-groups-list",
+  TAXES_LIST: "taxes-list",
+
+  // Accounting — Payment Terms
+  PAYMENT_TERMS_LIST: "payment-terms-list",
+
   // Accounting — Opening Balances (uses ACCOUNTS_TREE)
+
+  // Accounting — Config
+  ACCOUNTING_CONFIG: "accounting-config",
 
   // Settings
   PROFILE: "profile",

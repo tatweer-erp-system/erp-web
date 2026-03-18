@@ -63,6 +63,19 @@ export const ROUTES = {
   // ── Accounting ──────────────────────────────────────────────────────────────
   CHART_OF_ACCOUNTS: "/chart-of-accounts",
   JOURNAL_ENTRIES: "/journal-entries",
+  COST_CENTERS: "/cost-centers",
+  FISCAL_PERIODS: "/fiscal-periods",
+  JOURNALS: "/journals",
+  ACCOUNT_GROUPS: "/account-groups",
+  TAXES_SETUP: "/taxes-setup",
+  PAYMENT_TERMS: "/payment-terms",
+  TRIAL_BALANCE: "/trial-balance",
+  GENERAL_LEDGER: "/general-ledger",
+  INCOME_STATEMENT: "/income-statement",
+  BALANCE_SHEET: "/balance-sheet",
+  ACCOUNT_STATEMENTS: "/account-statements",
+  CASH_FLOW: "/cash-flow",
+  OPENING_BALANCES: "/opening-balances",
 
   // ── Treasury ────────────────────────────────────────────────────────────────
   CASH_ACCOUNTS: "/cash-accounts",

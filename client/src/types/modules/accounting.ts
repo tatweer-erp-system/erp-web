@@ -5,6 +5,10 @@ import type {
   JournalEntryStatus,
   FiscalPeriodStatus,
   FiscalPeriodType,
+  JournalType,
+  TaxType,
+  TaxScope,
+  PaymentTermLineType,
 } from "@/constants/enums";
 
 // ─── Chart of Accounts ───────────────────────────────────────────────────────
@@ -117,6 +121,69 @@ export interface CostCenter {
   version?: number;
 }
 
+// ─── Account Groups ──────────────────────────────────────────────────────────
+
+export interface AccountGroup {
+  id: string;
+  codePrefix: string;
+  nameEn: string;
+  nameAr: string;
+  parentId?: string | null;
+  isActive?: boolean;
+  children?: AccountGroup[];
+  version?: number;
+}
+
+export interface CreateAccountGroupDto {
+  codePrefix: string;
+  nameEn: string;
+  nameAr: string;
+  parentId?: string;
+}
+
+export interface UpdateAccountGroupDto extends Partial<CreateAccountGroupDto> {
+  version: number;
+}
+
+// ─── Journals ────────────────────────────────────────────────────────────────
+
+export interface Journal {
+  id: string;
+  nameEn: string;
+  nameAr: string;
+  type: JournalType;
+  code: string;
+  defaultAccountId?: string | null;
+  suspenseAccountId?: string | null;
+  currencyId?: string | null;
+  sequencePrefix?: string | null;
+  isActive: boolean;
+  version?: number;
+  defaultAccountCode?: string | null;
+  defaultAccountNameEn?: string | null;
+  defaultAccountNameAr?: string | null;
+  suspenseAccountCode?: string | null;
+  suspenseAccountNameEn?: string | null;
+  suspenseAccountNameAr?: string | null;
+  currencyCode?: string | null;
+}
+
+export interface CreateJournalDto {
+  nameEn: string;
+  nameAr: string;
+  type: JournalType;
+  code: string;
+  defaultAccountId?: string;
+  suspenseAccountId?: string;
+  currencyId?: string;
+  sequencePrefix?: string;
+  isActive?: boolean;
+}
+
+export interface UpdateJournalDto extends Partial<CreateJournalDto> {
+  version: number;
+}
+
 // ─── Fiscal Periods ───────────────────────────────────────────────────────────
 
 export interface FiscalPeriod {
@@ -142,6 +209,92 @@ export interface CreateFiscalPeriodDto {
   nameAr: string;
   startDate: string;
   endDate: string;
+}
+
+// ─── Tax Groups ──────────────────────────────────────────────────────────────
+
+export interface TaxGroup {
+  id: string;
+  nameEn: string;
+  nameAr: string;
+  version?: number;
+}
+
+export interface CreateTaxGroupDto {
+  nameEn: string;
+  nameAr: string;
+}
+
+export interface UpdateTaxGroupDto extends Partial<CreateTaxGroupDto> {
+  version: number;
+}
+
+// ─── Taxes ───────────────────────────────────────────────────────────────────
+
+export interface Tax {
+  id: string;
+  nameEn: string;
+  nameAr: string;
+  type: TaxType;
+  amount: number;
+  scope: TaxScope;
+  includeInPrice: boolean;
+  taxGroupId?: string | null;
+  taxGroupNameEn?: string;
+  taxGroupNameAr?: string;
+  saleAccountId?: string | null;
+  purchaseAccountId?: string | null;
+  isActive: boolean;
+  version?: number;
+}
+
+export interface CreateTaxDto {
+  nameEn: string;
+  nameAr: string;
+  type?: TaxType;
+  amount?: number;
+  scope?: TaxScope;
+  includeInPrice?: boolean;
+  taxGroupId?: string;
+  saleAccountId?: string;
+  purchaseAccountId?: string;
+  isActive?: boolean;
+}
+
+export interface UpdateTaxDto extends Partial<CreateTaxDto> {
+  version: number;
+}
+
+// ─── Payment Terms ───────────────────────────────────────────────────────────
+
+export interface PaymentTermLine {
+  id?: string;
+  sequence: number;
+  type: PaymentTermLineType;
+  value: number;
+  days: number;
+  dayOfMonth?: number;
+}
+
+export interface PaymentTerm {
+  id: string;
+  nameEn: string;
+  nameAr: string;
+  note?: string | null;
+  lines?: PaymentTermLine[];
+  isActive?: boolean;
+  version?: number;
+}
+
+export interface CreatePaymentTermDto {
+  nameEn: string;
+  nameAr: string;
+  note?: string;
+  lines?: Omit<PaymentTermLine, "id">[];
+}
+
+export interface UpdatePaymentTermDto extends Partial<CreatePaymentTermDto> {
+  version: number;
 }
 
 // ─── Reports ──────────────────────────────────────────────────────────────────

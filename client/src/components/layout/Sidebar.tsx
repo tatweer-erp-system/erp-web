@@ -168,6 +168,76 @@ const NAV_ITEMS: NavItem[] = [
     href: "/chart-of-accounts",
   },
   { name: "Journal Entries", icon: <BookOutlined />, href: "/journal-entries" },
+  {
+    name: "Opening Balances",
+    icon: <UnorderedListOutlined />,
+    href: "/opening-balances",
+  },
+  {
+    name: "Cost Centers",
+    icon: <ApartmentOutlined />,
+    href: "/cost-centers",
+  },
+  {
+    name: "Fiscal Periods",
+    icon: <CalendarOutlined />,
+    href: "/fiscal-periods",
+  },
+  {
+    name: "Journals",
+    icon: <BookOutlined />,
+    href: "/journals",
+  },
+  {
+    name: "Account Groups",
+    icon: <ApartmentOutlined />,
+    href: "/account-groups",
+  },
+  {
+    name: "Taxes",
+    icon: <FileTextOutlined />,
+    href: "/taxes-setup",
+  },
+  {
+    name: "Payment Terms",
+    icon: <UnorderedListOutlined />,
+    href: "/payment-terms",
+  },
+  {
+    name: "Trial Balance",
+    icon: <UnorderedListOutlined />,
+    href: "/trial-balance",
+  },
+  {
+    name: "General Ledger",
+    icon: <BookOutlined />,
+    href: "/general-ledger",
+  },
+  {
+    name: "Income Statement",
+    icon: <BookOutlined />,
+    href: "/income-statement",
+  },
+  {
+    name: "Balance Sheet",
+    icon: <BookOutlined />,
+    href: "/balance-sheet",
+  },
+  {
+    name: "Account Statements",
+    icon: <FileTextOutlined />,
+    href: "/account-statements",
+  },
+  {
+    name: "Cash Flow Statement",
+    icon: <BookOutlined />,
+    href: "/cash-flow",
+  },
+  {
+    name: "Accounting Settings",
+    icon: <SettingOutlined />,
+    href: "/settings/accounting",
+  },
 
   // ── Treasury (Odoo: Accounting > Bank & Cash) ───────────────────────────
   { name: "TREASURY", isHeader: true },
