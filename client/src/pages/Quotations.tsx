@@ -41,6 +41,7 @@ import dayjs from "dayjs";
 
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { SalesStatusBadge } from "@/components/sales/SalesStatusBadge";
+import { CopyableCode } from "@/components/common/CopyableCode";
 import { SalesOrderCard } from "@/components/sales/SalesOrderCard";
 import { QuotationStats } from "@/components/sales/QuotationStats";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
@@ -262,15 +263,7 @@ function useQuotationColumns(
         title: t("sales.column.orderNumber", lang),
         dataIndex: "orderNumber",
         width: 150,
-        render: (v: string) => (
-          <Text
-            strong
-            className="font-mono"
-            style={{ color: "var(--ant-color-primary)" }}
-          >
-            {v}
-          </Text>
-        ),
+        render: (v: string) => <CopyableCode value={v} />,
       },
       {
         title: t("sales.column.customer", lang),

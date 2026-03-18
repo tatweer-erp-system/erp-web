@@ -1131,6 +1131,7 @@ All list pages **must** follow the same structure and style as `AllOrders.tsx`. 
 | `StatCard`        | `@/components/common/StatCard`        | Individual stat card (used by StatsRow)                                                          |
 | `SearchInput`     | `@/components/common/SearchInput`     | Debounced search input (300ms built-in)                                                          |
 | `ActionDropdown`  | `@/components/common/ActionDropdown`  | Row actions "..." menu                                                                           |
+| `CopyableCode`    | `@/components/common/CopyableCode`    | Order number / code with copy icon on hover — use for all identifier columns                     |
 | `ConfirmDialog`   | `@/components/common/ConfirmDialog`   | Confirmation dialogs for destructive actions                                                     |
 | `EmptyState`      | `@/components/common/EmptyState`      | Empty table state                                                                                |
 

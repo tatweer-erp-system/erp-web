@@ -5,6 +5,7 @@ import dayjs from "dayjs";
 
 import { useTranslation } from "@/hooks/ui/useTranslation";
 import { getName } from "@/shared/utils/getName.util";
+import { CopyableCode } from "@/components/common/CopyableCode";
 import { SalesStatusBadge } from "@/components/sales/SalesStatusBadge";
 import { OrderLinesTable } from "@/components/sales/OrderLinesTable";
 import { OrderTotals } from "@/components/sales/OrderTotals";
@@ -22,8 +23,8 @@ export function SalesOrderInfoCard({ order }: InfoCardProps) {
   return (
     <Card size="small">
       <div className="flex flex-wrap items-center gap-3 mb-4">
-        <span className="font-mono text-xl font-bold text-primary">
-          {order.orderNumber}
+        <span className="text-xl">
+          <CopyableCode value={order.orderNumber} />
         </span>
         <SalesStatusBadge status={order.status} type="order" />
         <SalesStatusBadge status={order.invoiceStatus} type="invoice" />

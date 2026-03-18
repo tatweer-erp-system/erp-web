@@ -1329,4 +1329,6 @@ export const en: Record<string, string> = {
   "common.view": "View",
   "sales.error.customerRequired": "Customer is required",
   "sales.error.atLeastOneLine": "At least one product line is required",
+  "common.copy": "Copy",
+  "common.copied": "Copied to clipboard",
 };

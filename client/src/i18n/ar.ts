@@ -1303,4 +1303,6 @@ export const ar: Record<string, string> = {
   "common.view": "عرض",
   "sales.error.customerRequired": "العميل مطلوب",
   "sales.error.atLeastOneLine": "يجب إضافة بند واحد على الأقل",
+  "common.copy": "نسخ",
+  "common.copied": "تم النسخ",
 };

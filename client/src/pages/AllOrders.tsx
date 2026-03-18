@@ -32,6 +32,7 @@ import dayjs from "dayjs";
 
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { SalesStatusBadge } from "@/components/sales/SalesStatusBadge";
+import { CopyableCode } from "@/components/common/CopyableCode";
 import { SalesOrderCard } from "@/components/sales/SalesOrderCard";
 import { SalesOrdersStats } from "@/components/sales/SalesOrdersStats";
 import { SalesOrdersToolbar } from "@/components/sales/SalesOrdersToolbar";
@@ -332,15 +333,7 @@ function useOrderColumns(
         dataIndex: "orderNumber",
         width: 150,
         sorter: false,
-        render: (v: string) => (
-          <Text
-            strong
-            className="font-mono"
-            style={{ color: "var(--ant-color-primary)" }}
-          >
-            {v}
-          </Text>
-        ),
+        render: (v: string) => <CopyableCode value={v} />,
       },
       {
         title: t("sales.column.customer", lang),

@@ -37,6 +37,7 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { PageHeader } from "@/components/common/PageHeader";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { SalesStatusBadge } from "@/components/sales/SalesStatusBadge";
+import { CopyableCode } from "@/components/common/CopyableCode";
 import { getName } from "@/shared/utils/getName.util";
 import {
   LinesTabContent,
@@ -214,8 +215,8 @@ export default function QuotationDetailPage() {
 
         <Card size="small">
           <div className="flex flex-wrap items-center gap-3 mb-4">
-            <span className="font-mono text-xl font-bold text-primary">
-              {order.orderNumber}
+            <span className="text-xl">
+              <CopyableCode value={order.orderNumber} />
             </span>
             <SalesStatusBadge status={order.status} type="order" />
           </div>
