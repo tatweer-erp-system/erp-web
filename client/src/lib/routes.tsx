@@ -107,6 +107,18 @@ export const routes: RouteConfig[] = [
     breadcrumb: ["Sales", "Customers"],
   },
   {
+    path: "/all-customers/create",
+    component: lz(() => import("@/pages/CustomerCreatePage")),
+    permissions: ["sales:manage"],
+    breadcrumb: ["Sales", "Customers", "Create"],
+  },
+  {
+    path: "/all-customers/:id",
+    component: lz(() => import("@/pages/CustomerDetails")),
+    permissions: ["sales:read"],
+    breadcrumb: ["Sales", "Customers", "Detail"],
+  },
+  {
     path: "/customer-groups",
     component: lz(() => import("@/pages/CustomerGroups")),
     permissions: ["sales:read"],
@@ -474,9 +486,21 @@ export const routes: RouteConfig[] = [
   },
   {
     path: "/price-lists",
-    component: lz(() => import("@/pages/PriceLists")),
+    component: lz(() => import("@/pages/pricelists/PricelistsPage")),
     permissions: ["settings:write"],
     breadcrumb: ["Settings", "Price Lists"],
+  },
+  {
+    path: "/pricelists/create",
+    component: lz(() => import("@/pages/pricelists/PricelistCreatePage")),
+    permissions: ["settings:write"],
+    breadcrumb: ["Settings", "Price Lists", "Create"],
+  },
+  {
+    path: "/pricelists/:id",
+    component: lz(() => import("@/pages/pricelists/PricelistDetailPage")),
+    permissions: ["settings:read"],
+    breadcrumb: ["Settings", "Price Lists", "Detail"],
   },
   {
     path: "/users",

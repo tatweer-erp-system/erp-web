@@ -1305,4 +1305,238 @@ export const ar: Record<string, string> = {
   "sales.error.atLeastOneLine": "يجب إضافة بند واحد على الأقل",
   "common.copy": "نسخ",
   "common.copied": "تم النسخ",
+
+  // ── Pricelists ──────────────────────────────────────────────────────────────
+  // Page titles
+  "pricelists.title": "قوائم الأسعار",
+  "pricelists.create": "إنشاء قائمة أسعار",
+  "pricelists.edit": "تعديل قائمة الأسعار",
+  "pricelists.detail": "تفاصيل قائمة الأسعار",
+  "pricelists.items": "بنود قائمة الأسعار",
+  "pricelists.addItem": "إضافة بند",
+  "pricelists.editItem": "تعديل البند",
+  "pricelists.computePrice": "حساب السعر",
+
+  // Columns
+  "pricelists.column.name": "الاسم",
+  "pricelists.column.currency": "العملة",
+  "pricelists.column.discountPolicy": "سياسة الخصم",
+  "pricelists.column.startDate": "تاريخ البداية",
+  "pricelists.column.endDate": "تاريخ النهاية",
+  "pricelists.column.isActive": "نشط",
+  "pricelists.column.createdBy": "أنشئ بواسطة",
+  "pricelists.column.createdAt": "تاريخ الإنشاء",
+
+  // Item columns
+  "pricelists.column.applyOn": "تطبيق على",
+  "pricelists.column.product": "المنتج",
+  "pricelists.column.category": "الفئة",
+  "pricelists.column.minQty": "الحد الأدنى للكمية",
+  "pricelists.column.computation": "طريقة الحساب",
+  "pricelists.column.price": "السعر",
+  "pricelists.column.discountPct": "نسبة الخصم",
+  "pricelists.column.sequence": "الترتيب",
+
+  // Form fields
+  "pricelists.field.nameEn": "الاسم (إنجليزي)",
+  "pricelists.field.nameAr": "الاسم (عربي)",
+  "pricelists.field.currency": "العملة",
+  "pricelists.field.discountPolicy": "سياسة الخصم",
+  "pricelists.field.startDate": "تاريخ البداية",
+  "pricelists.field.endDate": "تاريخ النهاية",
+  "pricelists.field.isActive": "نشط",
+  "pricelists.field.applyOn": "تطبيق على",
+  "pricelists.field.product": "المنتج",
+  "pricelists.field.category": "الفئة",
+  "pricelists.field.minQty": "الحد الأدنى للكمية",
+  "pricelists.field.computation": "طريقة الحساب",
+  "pricelists.field.price": "السعر الثابت",
+  "pricelists.field.discountPct": "نسبة الخصم",
+  "pricelists.field.sequence": "الترتيب",
+
+  // Enum labels
+  "pricelists.discountPolicy.includeInPrice": "تضمين في السعر",
+  "pricelists.discountPolicy.discountOnSale": "خصم على البيع",
+  "pricelists.applyOn.all": "جميع المنتجات",
+  "pricelists.applyOn.category": "فئة المنتج",
+  "pricelists.applyOn.product": "منتج محدد",
+  "pricelists.computation.fixed": "سعر ثابت",
+  "pricelists.computation.percentage": "خصم بالنسبة المئوية",
+  "pricelists.computation.formula": "معادلة",
+
+  // Actions & messages
+  "pricelists.action.activate": "تفعيل",
+  "pricelists.action.deactivate": "إلغاء التفعيل",
+  "pricelists.message.created": "تم إنشاء قائمة الأسعار بنجاح",
+  "pricelists.message.updated": "تم تحديث قائمة الأسعار بنجاح",
+  "pricelists.message.deleted": "تم حذف قائمة الأسعار بنجاح",
+  "pricelists.message.itemCreated": "تمت إضافة بند قائمة الأسعار بنجاح",
+  "pricelists.message.itemUpdated": "تم تحديث بند قائمة الأسعار بنجاح",
+  "pricelists.message.itemDeleted": "تم حذف بند قائمة الأسعار بنجاح",
+  "pricelists.message.deleteConfirm": "هل أنت متأكد من حذف قائمة الأسعار هذه؟",
+  "pricelists.message.deleteItemConfirm":
+    "هل أنت متأكد من حذف هذا البند من قائمة الأسعار؟",
+  "pricelists.message.noItems": "لا توجد بنود في قائمة الأسعار بعد",
+
+  // Stats
+  "pricelists.stats.total": "إجمالي قوائم الأسعار",
+  "pricelists.stats.active": "نشطة",
+  "pricelists.stats.inactive": "غير نشطة",
+  "pricelists.backToList": "العودة للقائمة",
+  "pricelists.message.loadFailed": "فشل في تحميل بيانات قائمة الأسعار",
+  "pricelists.noItems": "لم تتم إضافة بنود بعد",
+
+  // Compute price
+  "pricelists.computePrice.originalPrice": "السعر الأصلي",
+  "pricelists.computePrice.computedPrice": "السعر المحسوب",
+  "pricelists.computePrice.discount": "الخصم",
+
+  // ── Customers / Partners Module ───────────────────────────────────────────
+
+  // Page titles
+  "customers.title": "العملاء",
+  "customers.subtitle": "إدارة العملاء وجهات الاتصال الخاصة بهم",
+  "customers.allCustomers": "جميع العملاء",
+  "vendors.title": "الموردون",
+  "vendors.subtitle": "إدارة الموردين والمزودين",
+  "vendors.allVendors": "جميع الموردين",
+
+  // Actions
+  "customers.addCustomer": "إضافة عميل",
+  "customers.editCustomer": "تعديل العميل",
+  "customers.deleteCustomer": "حذف العميل",
+  "customers.viewDetails": "عرض التفاصيل",
+  "vendors.addVendor": "إضافة مورد",
+  "vendors.editVendor": "تعديل المورد",
+  "vendors.deleteVendor": "حذف المورد",
+
+  // Column headers
+  "customers.column.name": "الاسم",
+  "customers.column.type": "النوع",
+  "customers.column.email": "البريد الإلكتروني",
+  "customers.column.phone": "الهاتف",
+  "customers.column.mobile": "الجوال",
+  "customers.column.city": "المدينة",
+  "customers.column.country": "الدولة",
+  "customers.column.creditLimit": "حد الائتمان",
+  "customers.column.taxNumber": "الرقم الضريبي",
+  "customers.column.vatNumber": "رقم ضريبة القيمة المضافة",
+  "customers.column.status": "الحالة",
+  "customers.column.createdAt": "تاريخ الإنشاء",
+  "customers.column.createdBy": "أنشئ بواسطة",
+  "customers.column.actions": "الإجراءات",
+
+  // Form fields
+  "customers.field.nameEn": "الاسم (إنجليزي)",
+  "customers.field.nameAr": "الاسم (عربي)",
+  "customers.field.type": "نوع الشريك",
+  "customers.field.email": "البريد الإلكتروني",
+  "customers.field.phone": "رقم الهاتف",
+  "customers.field.mobile": "رقم الجوال",
+  "customers.field.website": "الموقع الإلكتروني",
+  "customers.field.street": "العنوان",
+  "customers.field.city": "المدينة",
+  "customers.field.state": "المنطقة / المحافظة",
+  "customers.field.country": "الدولة",
+  "customers.field.zip": "الرمز البريدي",
+  "customers.field.creditLimit": "حد الائتمان",
+  "customers.field.taxNumber": "رقم السجل الضريبي",
+  "customers.field.vatNumber": "رقم ضريبة القيمة المضافة",
+  "customers.field.paymentTerm": "شروط الدفع",
+  "customers.field.pricelist": "قائمة الأسعار",
+  "customers.field.arAccount": "حساب المدينين",
+  "customers.field.apAccount": "حساب الدائنين",
+  "customers.field.fiscalPosition": "الوضع الضريبي",
+  "customers.field.bankIban": "رقم الآيبان",
+  "customers.field.bankName": "اسم البنك",
+  "customers.field.notes": "ملاحظات",
+  "customers.field.isActive": "نشط",
+
+  // Partner type values
+  "customers.type.customer": "عميل",
+  "customers.type.supplier": "مورد",
+  "customers.type.both": "عميل ومورد",
+  "customers.type.individual": "فرد",
+
+  // Status labels
+  "customers.status.active": "نشط",
+  "customers.status.inactive": "غير نشط",
+
+  // Messages
+  "customers.createSuccess": "تم إنشاء العميل بنجاح",
+  "customers.updateSuccess": "تم تحديث العميل بنجاح",
+  "customers.deleteSuccess": "تم حذف العميل بنجاح",
+  "customers.deleteConfirm": "هل أنت متأكد من حذف هذا العميل؟",
+  "vendors.createSuccess": "تم إنشاء المورد بنجاح",
+  "vendors.updateSuccess": "تم تحديث المورد بنجاح",
+  "vendors.deleteSuccess": "تم حذف المورد بنجاح",
+  "vendors.deleteConfirm": "هل أنت متأكد من حذف هذا المورد؟",
+
+  // Search & Filters
+  "customers.search": "البحث بالاسم أو البريد أو الهاتف أو الرقم الضريبي...",
+  "customers.filter.type": "نوع الشريك",
+  "customers.filter.status": "الحالة",
+  "customers.filter.allTypes": "جميع الأنواع",
+  "customers.filter.allStatuses": "جميع الحالات",
+  "customers.filter.active": "نشط",
+  "customers.filter.inactive": "غير نشط",
+  "customers.filter.clearFilters": "مسح الفلاتر",
+
+  // Statistics
+  "customers.stats.totalCustomers": "إجمالي العملاء",
+  "customers.stats.activeCustomers": "العملاء النشطون",
+  "customers.stats.totalVendors": "إجمالي الموردين",
+  "customers.stats.activeVendors": "الموردون النشطون",
+
+  // Empty state
+  "customers.noCustomers": "لم يتم العثور على عملاء",
+  "customers.noVendors": "لم يتم العثور على موردين",
+  "customers.noContacts": "لم تتم إضافة جهات اتصال بعد",
+
+  // Contacts section
+  "customers.contacts.title": "جهات الاتصال",
+  "customers.contacts.addContact": "إضافة جهة اتصال",
+  "customers.contacts.editContact": "تعديل جهة الاتصال",
+  "customers.contacts.deleteContact": "حذف جهة الاتصال",
+  "customers.contacts.deleteConfirm": "هل أنت متأكد من حذف جهة الاتصال هذه؟",
+  "customers.contacts.createSuccess": "تم إنشاء جهة الاتصال بنجاح",
+  "customers.contacts.updateSuccess": "تم تحديث جهة الاتصال بنجاح",
+  "customers.contacts.deleteSuccess": "تم حذف جهة الاتصال بنجاح",
+  "customers.contacts.firstName": "الاسم الأول",
+  "customers.contacts.lastName": "اسم العائلة",
+  "customers.contacts.email": "البريد الإلكتروني",
+  "customers.contacts.phone": "الهاتف",
+  "customers.contacts.mobile": "الجوال",
+  "customers.contacts.position": "المسمى الوظيفي",
+  "customers.contacts.isMain": "جهة الاتصال الرئيسية",
+
+  // Tabs / Sections
+  "customers.tab.general": "المعلومات العامة",
+  "customers.tab.address": "العنوان",
+  "customers.tab.accounting": "المحاسبة",
+  "customers.tab.banking": "المعلومات البنكية",
+  "customers.tab.contacts": "جهات الاتصال",
+  "customers.tab.notes": "ملاحظات",
+
+  // Pagination
+  "customers.showing": "عرض",
+  "customers.of": "من",
+  "customers.perPage": "لكل صفحة",
+
+  // Export
+  "customers.export": "تصدير",
+  "customers.exportCsv": "تصدير CSV",
+  "customers.exportExcel": "تصدير Excel",
+  "customers.exportPdf": "تصدير PDF",
+  "customers.print": "طباعة",
+  "customers.reload": "تحديث",
+
+  // Fast-create
+  "customers.fastCreate.subtitle": "إنشاء سجل عميل سريع",
+  "customers.fastCreate.saveAndOpen": "حفظ وفتح",
+  "customers.fastCreate.note":
+    "يمكنك إضافة المزيد من التفاصيل من صفحة التفاصيل",
+
+  // Navigation
+  "customers.backToList": "العودة إلى العملاء",
 };

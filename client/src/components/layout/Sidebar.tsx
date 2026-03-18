@@ -101,6 +101,8 @@ const NAV_ITEMS: NavItem[] = [
   { name: "SALES", isHeader: true },
   { name: "Quotations", icon: <FileTextOutlined />, href: "/quotations" },
   { name: "Sales Orders", icon: <ShoppingCartOutlined />, href: "/all-orders" },
+  { name: "Customers", icon: <TeamOutlined />, href: "/all-customers" },
+  { name: "Pricelists", icon: <TagsOutlined />, href: "/price-lists" },
   {
     name: "Definitions",
     icon: <DatabaseOutlined />,

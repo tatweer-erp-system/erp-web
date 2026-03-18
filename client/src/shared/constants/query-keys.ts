@@ -223,6 +223,18 @@ export const queryKeys = {
     unreadCount: ["chat", "unread-count"],
   },
 
+  pricelists: {
+    all: ["pricelists"],
+    list: (params?: Record<string, unknown>) => ["pricelists", "list", params],
+    detail: (id: string) => ["pricelists", "detail", id],
+    items: (pricelistId: string) => ["pricelists", "items", pricelistId],
+    computePrice: (params?: Record<string, unknown>) => [
+      "pricelists",
+      "compute-price",
+      params,
+    ],
+  },
+
   treasury: {
     cashAccounts: ["treasury", "cash-accounts"],
     bankAccounts: ["treasury", "bank-accounts"],

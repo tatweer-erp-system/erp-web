@@ -73,6 +73,34 @@ export const SalesDiscountType = {
 export type SalesDiscountType =
   (typeof SalesDiscountType)[keyof typeof SalesDiscountType];
 
+// ─── Pricelists ──────────────────────────────────────────────────────────────
+
+/** Pricelist discount policy */
+export const PricelistDiscountPolicy = {
+  INCLUDE_IN_PRICE: "include_in_price",
+  DISCOUNT_ON_SALE: "discount_on_sale",
+} as const;
+export type PricelistDiscountPolicy =
+  (typeof PricelistDiscountPolicy)[keyof typeof PricelistDiscountPolicy];
+
+/** Pricelist item — what the rule applies to */
+export const PricelistApplyOn = {
+  ALL: "all",
+  CATEGORY: "category",
+  PRODUCT: "product",
+} as const;
+export type PricelistApplyOn =
+  (typeof PricelistApplyOn)[keyof typeof PricelistApplyOn];
+
+/** Pricelist item computation method */
+export const PricelistComputation = {
+  FIXED: "fixed",
+  PERCENTAGE: "percentage",
+  FORMULA: "formula",
+} as const;
+export type PricelistComputation =
+  (typeof PricelistComputation)[keyof typeof PricelistComputation];
+
 // ─── Purchase ─────────────────────────────────────────────────────────────────
 
 /** Purchase order fulfillment status */
@@ -163,6 +191,17 @@ export const KpiStatus = {
   GOOD: "good",
 } as const;
 export type KpiStatus = (typeof KpiStatus)[keyof typeof KpiStatus];
+
+// ─── Partners ────────────────────────────────────────────────────────────────
+
+/** Partner type (matches backend PartnerType) */
+export const PartnerType = {
+  CUSTOMER: "customer",
+  SUPPLIER: "supplier",
+  BOTH: "both",
+  INDIVIDUAL: "individual",
+} as const;
+export type PartnerType = (typeof PartnerType)[keyof typeof PartnerType];
 
 // ─── Customers ────────────────────────────────────────────────────────────────
 

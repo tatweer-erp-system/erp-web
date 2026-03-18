@@ -1331,4 +1331,239 @@ export const en: Record<string, string> = {
   "sales.error.atLeastOneLine": "At least one product line is required",
   "common.copy": "Copy",
   "common.copied": "Copied to clipboard",
+
+  // ── Pricelists ──────────────────────────────────────────────────────────────
+  // Page titles
+  "pricelists.title": "Pricelists",
+  "pricelists.create": "Create Pricelist",
+  "pricelists.edit": "Edit Pricelist",
+  "pricelists.detail": "Pricelist Details",
+  "pricelists.items": "Pricelist Items",
+  "pricelists.addItem": "Add Item",
+  "pricelists.editItem": "Edit Item",
+  "pricelists.computePrice": "Compute Price",
+
+  // Columns
+  "pricelists.column.name": "Name",
+  "pricelists.column.currency": "Currency",
+  "pricelists.column.discountPolicy": "Discount Policy",
+  "pricelists.column.startDate": "Start Date",
+  "pricelists.column.endDate": "End Date",
+  "pricelists.column.isActive": "Active",
+  "pricelists.column.createdBy": "Created By",
+  "pricelists.column.createdAt": "Created At",
+
+  // Item columns
+  "pricelists.column.applyOn": "Apply On",
+  "pricelists.column.product": "Product",
+  "pricelists.column.category": "Category",
+  "pricelists.column.minQty": "Min. Quantity",
+  "pricelists.column.computation": "Computation",
+  "pricelists.column.price": "Price",
+  "pricelists.column.discountPct": "Discount %",
+  "pricelists.column.sequence": "Sequence",
+
+  // Form fields
+  "pricelists.field.nameEn": "Name (English)",
+  "pricelists.field.nameAr": "Name (Arabic)",
+  "pricelists.field.currency": "Currency",
+  "pricelists.field.discountPolicy": "Discount Policy",
+  "pricelists.field.startDate": "Start Date",
+  "pricelists.field.endDate": "End Date",
+  "pricelists.field.isActive": "Active",
+  "pricelists.field.applyOn": "Apply On",
+  "pricelists.field.product": "Product",
+  "pricelists.field.category": "Category",
+  "pricelists.field.minQty": "Minimum Quantity",
+  "pricelists.field.computation": "Computation Method",
+  "pricelists.field.price": "Fixed Price",
+  "pricelists.field.discountPct": "Discount Percentage",
+  "pricelists.field.sequence": "Sequence",
+
+  // Enum labels
+  "pricelists.discountPolicy.includeInPrice": "Include in Price",
+  "pricelists.discountPolicy.discountOnSale": "Discount on Sale",
+  "pricelists.applyOn.all": "All Products",
+  "pricelists.applyOn.category": "Product Category",
+  "pricelists.applyOn.product": "Specific Product",
+  "pricelists.computation.fixed": "Fixed Price",
+  "pricelists.computation.percentage": "Percentage Discount",
+  "pricelists.computation.formula": "Formula",
+
+  // Actions & messages
+  "pricelists.action.activate": "Activate",
+  "pricelists.action.deactivate": "Deactivate",
+  "pricelists.message.created": "Pricelist created successfully",
+  "pricelists.message.updated": "Pricelist updated successfully",
+  "pricelists.message.deleted": "Pricelist deleted successfully",
+  "pricelists.message.itemCreated": "Pricelist item added successfully",
+  "pricelists.message.itemUpdated": "Pricelist item updated successfully",
+  "pricelists.message.itemDeleted": "Pricelist item deleted successfully",
+  "pricelists.message.deleteConfirm":
+    "Are you sure you want to delete this pricelist?",
+  "pricelists.message.deleteItemConfirm":
+    "Are you sure you want to delete this pricelist item?",
+  "pricelists.message.noItems": "No items in this pricelist yet",
+
+  // Stats
+  "pricelists.stats.total": "Total Pricelists",
+  "pricelists.stats.active": "Active",
+  "pricelists.stats.inactive": "Inactive",
+  "pricelists.backToList": "Back to List",
+  "pricelists.message.loadFailed": "Failed to load pricelist data",
+  "pricelists.noItems": "No items added yet",
+
+  // Compute price
+  "pricelists.computePrice.originalPrice": "Original Price",
+  "pricelists.computePrice.computedPrice": "Computed Price",
+  "pricelists.computePrice.discount": "Discount",
+
+  // ── Customers / Partners Module ───────────────────────────────────────────
+
+  // Page titles
+  "customers.title": "Customers",
+  "customers.subtitle": "Manage your customers and their contacts",
+  "customers.allCustomers": "All Customers",
+  "vendors.title": "Vendors",
+  "vendors.subtitle": "Manage your vendors and suppliers",
+  "vendors.allVendors": "All Vendors",
+
+  // Actions
+  "customers.addCustomer": "Add Customer",
+  "customers.editCustomer": "Edit Customer",
+  "customers.deleteCustomer": "Delete Customer",
+  "customers.viewDetails": "View Details",
+  "vendors.addVendor": "Add Vendor",
+  "vendors.editVendor": "Edit Vendor",
+  "vendors.deleteVendor": "Delete Vendor",
+
+  // Column headers
+  "customers.column.name": "Name",
+  "customers.column.type": "Type",
+  "customers.column.email": "Email",
+  "customers.column.phone": "Phone",
+  "customers.column.mobile": "Mobile",
+  "customers.column.city": "City",
+  "customers.column.country": "Country",
+  "customers.column.creditLimit": "Credit Limit",
+  "customers.column.taxNumber": "Tax Number",
+  "customers.column.vatNumber": "VAT Number",
+  "customers.column.status": "Status",
+  "customers.column.createdAt": "Created",
+  "customers.column.createdBy": "Created By",
+  "customers.column.actions": "Actions",
+
+  // Form fields
+  "customers.field.nameEn": "Name (English)",
+  "customers.field.nameAr": "Name (Arabic)",
+  "customers.field.type": "Partner Type",
+  "customers.field.email": "Email Address",
+  "customers.field.phone": "Phone Number",
+  "customers.field.mobile": "Mobile Number",
+  "customers.field.website": "Website",
+  "customers.field.street": "Street Address",
+  "customers.field.city": "City",
+  "customers.field.state": "State / Province",
+  "customers.field.country": "Country",
+  "customers.field.zip": "ZIP / Postal Code",
+  "customers.field.creditLimit": "Credit Limit",
+  "customers.field.taxNumber": "Tax Registration Number",
+  "customers.field.vatNumber": "VAT Registration Number",
+  "customers.field.paymentTerm": "Payment Terms",
+  "customers.field.pricelist": "Price List",
+  "customers.field.arAccount": "Receivable Account",
+  "customers.field.apAccount": "Payable Account",
+  "customers.field.fiscalPosition": "Fiscal Position",
+  "customers.field.bankIban": "Bank IBAN",
+  "customers.field.bankName": "Bank Name",
+  "customers.field.notes": "Notes",
+  "customers.field.isActive": "Active",
+
+  // Partner type values
+  "customers.type.customer": "Customer",
+  "customers.type.supplier": "Supplier",
+  "customers.type.both": "Customer & Supplier",
+  "customers.type.individual": "Individual",
+
+  // Status labels
+  "customers.status.active": "Active",
+  "customers.status.inactive": "Inactive",
+
+  // Messages
+  "customers.createSuccess": "Customer created successfully",
+  "customers.updateSuccess": "Customer updated successfully",
+  "customers.deleteSuccess": "Customer deleted successfully",
+  "customers.deleteConfirm": "Are you sure you want to delete this customer?",
+  "vendors.createSuccess": "Vendor created successfully",
+  "vendors.updateSuccess": "Vendor updated successfully",
+  "vendors.deleteSuccess": "Vendor deleted successfully",
+  "vendors.deleteConfirm": "Are you sure you want to delete this vendor?",
+
+  // Search & Filters
+  "customers.search": "Search by name, email, phone, or tax number...",
+  "customers.filter.type": "Partner Type",
+  "customers.filter.status": "Status",
+  "customers.filter.allTypes": "All Types",
+  "customers.filter.allStatuses": "All Statuses",
+  "customers.filter.active": "Active",
+  "customers.filter.inactive": "Inactive",
+  "customers.filter.clearFilters": "Clear Filters",
+
+  // Statistics
+  "customers.stats.totalCustomers": "Total Customers",
+  "customers.stats.activeCustomers": "Active Customers",
+  "customers.stats.totalVendors": "Total Vendors",
+  "customers.stats.activeVendors": "Active Vendors",
+
+  // Empty state
+  "customers.noCustomers": "No customers found",
+  "customers.noVendors": "No vendors found",
+  "customers.noContacts": "No contacts added yet",
+
+  // Contacts section
+  "customers.contacts.title": "Contacts",
+  "customers.contacts.addContact": "Add Contact",
+  "customers.contacts.editContact": "Edit Contact",
+  "customers.contacts.deleteContact": "Delete Contact",
+  "customers.contacts.deleteConfirm":
+    "Are you sure you want to delete this contact?",
+  "customers.contacts.createSuccess": "Contact created successfully",
+  "customers.contacts.updateSuccess": "Contact updated successfully",
+  "customers.contacts.deleteSuccess": "Contact deleted successfully",
+  "customers.contacts.firstName": "First Name",
+  "customers.contacts.lastName": "Last Name",
+  "customers.contacts.email": "Email",
+  "customers.contacts.phone": "Phone",
+  "customers.contacts.mobile": "Mobile",
+  "customers.contacts.position": "Job Position",
+  "customers.contacts.isMain": "Primary Contact",
+
+  // Tabs / Sections
+  "customers.tab.general": "General Information",
+  "customers.tab.address": "Address",
+  "customers.tab.accounting": "Accounting",
+  "customers.tab.banking": "Banking",
+  "customers.tab.contacts": "Contacts",
+  "customers.tab.notes": "Notes",
+
+  // Pagination
+  "customers.showing": "Showing",
+  "customers.of": "of",
+  "customers.perPage": "per page",
+
+  // Export
+  "customers.export": "Export",
+  "customers.exportCsv": "Export as CSV",
+  "customers.exportExcel": "Export as Excel",
+  "customers.exportPdf": "Export as PDF",
+  "customers.print": "Print",
+  "customers.reload": "Reload",
+
+  // Fast-create
+  "customers.fastCreate.subtitle": "Create a quick customer record",
+  "customers.fastCreate.saveAndOpen": "Save & Open",
+  "customers.fastCreate.note": "You can add more details from the detail page",
+
+  // Navigation
+  "customers.backToList": "Back to Customers",
 };

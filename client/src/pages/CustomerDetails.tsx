@@ -1,640 +1,680 @@
-import { useState } from "react";
-import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+/**
+ * Customer detail page displaying partner info with tabs.
+ * Follows the SalesOrderDetailPage pattern.
+ * Default export for lazy loading via React.lazy().
+ */
+
+import { useState, useMemo, useCallback } from "react";
+
 import {
-  ChevronLeft,
-  Edit,
-  MoreVertical,
-  User,
-  Mail,
-  Phone,
-  MapPin,
-  Building2,
+  Button,
+  Tabs,
+  Skeleton,
+  Result,
+  Card,
+  Space,
+  Descriptions,
   Tag,
-  ShoppingCart,
-  DollarSign,
-  Calendar,
-  MessageSquare,
-  Send,
-  Bell,
-  Shield,
-  Trash2,
-  ExternalLink,
-  Users,
-  FileText,
-} from "lucide-react";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+  Table,
+  Modal,
+  Form,
+  Input,
+  Switch,
+} from "antd";
+import type { TableColumnsType } from "antd";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+  ArrowLeftOutlined,
+  ArrowRightOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+  UserOutlined,
+  MailOutlined,
+  PhoneOutlined,
+  EnvironmentOutlined,
+} from "@ant-design/icons";
+import { toast } from "sonner";
+import dayjs from "dayjs";
+import { useParams, useNavigate } from "react-router-dom";
+
+import { useTranslation } from "@/hooks/ui/useTranslation";
+import { useCustomer } from "@/hooks/queries/usePartners";
+import {
+  useDeletePartner,
+  useCreatePartnerContact,
+  useUpdatePartnerContact,
+  useDeletePartnerContact,
+} from "@/hooks/mutations/usePartnerMutations";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { PageHeader } from "@/components/common/PageHeader";
-import { StatCard } from "@/components/common/StatCard";
-import { CollapsibleCard } from "@/components/common/CollapsibleCard";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
-import { AnimatedModal } from "@/components/AnimatedModal";
-import { AttachmentsTab } from "@/components/AttachmentsTab";
-import { useNavigate } from "react-router-dom";
-import { CustomerStatus } from "@/constants/enums";
-
-// ── Mock customer data ────────────────────────────────────────────────────────
-
-const CUSTOMER = {
-  id: 1,
-  name: "Sarah Williams",
-  email: "sarah@techcorp.com",
-  phone: "+1 (555) 456-7890",
-  company: "Tech Corp",
-  address: "123 Business Ave, San Francisco, CA 94105",
-  segment: "Premium",
-  status: CustomerStatus.ACTIVE,
-  since: "Jan 2021",
-  totalOrders: 15,
-  totalSpent: "$42,100",
-  avgOrderValue: "$2,807",
-  lastOrder: "Feb 20, 2024",
-};
-
-const ORDER_HISTORY = [
-  {
-    id: "ORD-2024-001",
-    date: "Feb 20, 2024",
-    items: 3,
-    amount: "$3,117",
-    status: "In Transit",
-  },
-  {
-    id: "ORD-2024-002",
-    date: "Feb 15, 2024",
-    items: 1,
-    amount: "$1,245",
-    status: "Delivered",
-  },
-  {
-    id: "ORD-2024-003",
-    date: "Feb 10, 2024",
-    items: 5,
-    amount: "$2,890",
-    status: "Delivered",
-  },
-  {
-    id: "ORD-2024-004",
-    date: "Jan 28, 2024",
-    items: 2,
-    amount: "$5,600",
-    status: "Delivered",
-  },
-  {
-    id: "ORD-2024-005",
-    date: "Jan 15, 2024",
-    items: 4,
-    amount: "$4,100",
-    status: "Delivered",
-  },
-];
-
-const COMMS_LOG = [
-  {
-    type: "Email",
-    Icon: Mail,
-    message: "Order confirmation sent",
-    date: "Feb 20, 2024",
-    agent: "System",
-  },
-  {
-    type: "Phone",
-    Icon: Phone,
-    message: "Customer called regarding shipping",
-    date: "Feb 19, 2024",
-    agent: "John (Sales)",
-  },
-  {
-    type: "Email",
-    Icon: Mail,
-    message: "Promotional offer sent",
-    date: "Feb 15, 2024",
-    agent: "Marketing",
-  },
-  {
-    type: "Note",
-    Icon: MessageSquare,
-    message: "Customer requested priority shipping for next order",
-    date: "Feb 10, 2024",
-    agent: "Jane (Support)",
-  },
-];
-
-const ORDER_STATUS_STYLES: Record<string, string> = {
-  "In Transit":
-    "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-  Delivered:
-    "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-  Pending:
-    "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
-  Cancelled: "bg-secondary text-muted-foreground",
-};
-
-// ── Page ──────────────────────────────────────────────────────────────────────
+import { ROUTES } from "@/shared/constants/routes";
+import { getName } from "@/shared/utils/getName.util";
+import { PartnerType } from "@/constants/enums";
+import type {
+  Partner,
+  PartnerContact,
+  CreatePartnerContactInput,
+  UpdatePartnerContactInput,
+} from "@/types/modules/partners";
 
 export default function CustomerDetails() {
+  const { t, lang, direction } = useTranslation();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [editOpen, setEditOpen] = useState(false);
-  const [deleteOpen, setDeleteOpen] = useState(false);
-  const [editForm, setEditForm] = useState({
-    name: CUSTOMER.name,
-    email: CUSTOMER.email,
-    phone: CUSTOMER.phone,
-    address: CUSTOMER.address,
-    company: CUSTOMER.company,
-  });
 
-  const breadcrumbs = [
-    { label: "Dashboard", href: "/" },
-    { label: "Sales", href: "#" },
-    { label: "Customers", href: "/customers" },
-    { label: CUSTOMER.name },
-  ];
+  const { data: customer, isLoading, isError } = useCustomer(id);
+  const deleteMutation = useDeletePartner();
+
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+
+  const BackIcon = direction === "rtl" ? ArrowRightOutlined : ArrowLeftOutlined;
+
+  const handleDelete = useCallback(() => {
+    if (!id) return;
+    deleteMutation.mutate(id, {
+      onSuccess: () => {
+        toast.success(t("customers.deleteSuccess", lang));
+        navigate(ROUTES.ALL_CUSTOMERS);
+      },
+      onError: (err: { message?: string }) =>
+        toast.error(err?.message ?? t("common.error_occurred", lang)),
+    });
+  }, [id, deleteMutation, t, lang, navigate]);
+
+  const breadcrumbs = useMemo(
+    () => [
+      { label: t("Dashboard", lang), href: ROUTES.DASHBOARD },
+      { label: t("customers.allCustomers", lang), href: ROUTES.ALL_CUSTOMERS },
+      { label: customer ? getName(customer) : "..." },
+    ],
+    [t, lang, customer]
+  );
+
+  if (isLoading) {
+    return (
+      <DashboardLayout currentPage="" breadcrumbs={[]}>
+        <div className="space-y-4">
+          <Skeleton active paragraph={{ rows: 1 }} />
+          <Skeleton.Input active block style={{ height: 48 }} />
+          <Card>
+            <Skeleton active paragraph={{ rows: 4 }} />
+          </Card>
+          <Card>
+            <Skeleton active paragraph={{ rows: 6 }} />
+          </Card>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  if (isError || !customer) {
+    return (
+      <DashboardLayout currentPage="" breadcrumbs={[]}>
+        <Result
+          status="404"
+          title="404"
+          subTitle={t("customers.noCustomers", lang)}
+          extra={
+            <Button
+              type="primary"
+              onClick={() => navigate(ROUTES.ALL_CUSTOMERS)}
+            >
+              {t("customers.backToList", lang)}
+            </Button>
+          }
+        />
+      </DashboardLayout>
+    );
+  }
+
+  const typeLabel: Record<string, string> = {
+    [PartnerType.CUSTOMER]: t("customers.type.customer", lang),
+    [PartnerType.SUPPLIER]: t("customers.type.supplier", lang),
+    [PartnerType.BOTH]: t("customers.type.both", lang),
+    [PartnerType.INDIVIDUAL]: t("customers.type.individual", lang),
+  };
 
   return (
-    <DashboardLayout currentPage="Customer Details" breadcrumbs={breadcrumbs}>
-      <div className="space-y-6">
-        {/* 1. Page Header */}
+    <DashboardLayout currentPage={getName(customer)} breadcrumbs={breadcrumbs}>
+      <div className="space-y-4">
         <PageHeader
-          title={CUSTOMER.name}
-          subtitle={`${CUSTOMER.company} · Customer since ${CUSTOMER.since}`}
+          title={getName(customer)}
+          subtitle={`${typeLabel[customer.type] ?? customer.type} ${"\u00B7"} ${dayjs(customer.createdAt).format("DD MMM YYYY")}`}
           actions={
-            <div className="flex items-center gap-2">
+            <Space wrap>
               <Button
-                variant="outline"
-                onClick={() => navigate("/customers")}
-                className="gap-2"
+                icon={<BackIcon />}
+                onClick={() => navigate(ROUTES.ALL_CUSTOMERS)}
               >
-                <ChevronLeft size={15} />
-                Back
+                {t("customers.backToList", lang)}
               </Button>
               <Button
-                onClick={() => setEditOpen(true)}
-                className="gap-2 bg-primary hover:bg-primary/90 text-white"
+                type="primary"
+                icon={<EditOutlined />}
+                onClick={() => navigate(ROUTES.customerDetail(customer.id))}
               >
-                <Edit size={15} />
-                Edit
+                {t("customers.editCustomer", lang)}
               </Button>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="icon">
-                    <MoreVertical size={15} />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem>Send Email</DropdownMenuItem>
-                  <DropdownMenuItem>Export Data</DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="text-destructive"
-                    onClick={() => setDeleteOpen(true)}
-                  >
-                    Delete Customer
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+              <Button
+                danger
+                icon={<DeleteOutlined />}
+                onClick={() => setIsDeleteOpen(true)}
+              >
+                {t("customers.deleteCustomer", lang)}
+              </Button>
+            </Space>
           }
         />
 
-        {/* 2. Key Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard
-            title="Total Orders"
-            value={CUSTOMER.totalOrders}
-            icon={<ShoppingCart size={18} className="text-primary" />}
-            iconBg="bg-primary/10"
-          />
-          <StatCard
-            title="Total Spent"
-            value={CUSTOMER.totalSpent}
-            icon={<DollarSign size={18} className="text-green-500" />}
-            iconBg="bg-green-100 dark:bg-green-900/30"
-            change={12.5}
-          />
-          <StatCard
-            title="Avg Order Value"
-            value={CUSTOMER.avgOrderValue}
-            icon={<Tag size={18} className="text-orange-500" />}
-            iconBg="bg-orange-100 dark:bg-orange-900/30"
-          />
-          <StatCard
-            title="Last Order"
-            value={CUSTOMER.lastOrder}
-            icon={<Calendar size={18} className="text-muted-foreground" />}
-            iconBg="bg-secondary"
-          />
-        </div>
+        {/* Info Card */}
+        <CustomerInfoCard customer={customer} t={t} lang={lang} />
 
-        {/* 3. Tabs */}
-        <Tabs defaultValue="overview">
-          <TabsList className="w-full sm:w-auto">
-            <TabsTrigger value="overview" className="gap-1.5">
-              <User size={14} />
-              Overview
-            </TabsTrigger>
-            <TabsTrigger value="orders" className="gap-1.5">
-              <ShoppingCart size={14} />
-              Orders
-            </TabsTrigger>
-            <TabsTrigger value="communications" className="gap-1.5">
-              <MessageSquare size={14} />
-              Communications
-            </TabsTrigger>
-            <TabsTrigger value="attachments" className="gap-1.5">
-              <Tag size={14} />
-              Attachments
-            </TabsTrigger>
-            <TabsTrigger value="settings" className="gap-1.5">
-              <Shield size={14} />
-              Settings
-            </TabsTrigger>
-          </TabsList>
-
-          {/* Overview */}
-          <TabsContent value="overview" className="space-y-4 mt-4">
-            <CollapsibleCard
-              title="Contact Information"
-              icon={<User size={15} />}
-            >
-              <div className="flex items-start gap-6">
-                <Avatar className="h-16 w-16 text-lg">
-                  <AvatarFallback className="bg-primary/10 text-primary font-bold">
-                    {CUSTOMER.name
-                      .split(" ")
-                      .map(n => n[0])
-                      .join("")}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
-                  <InfoRow
-                    icon={<User size={14} />}
-                    label="Full Name"
-                    value={CUSTOMER.name}
-                  />
-                  <InfoRow
-                    icon={<Mail size={14} />}
-                    label="Email"
-                    value={CUSTOMER.email}
-                  />
-                  <InfoRow
-                    icon={<Phone size={14} />}
-                    label="Phone"
-                    value={CUSTOMER.phone}
-                  />
-                  <InfoRow
-                    icon={<Building2 size={14} />}
-                    label="Company"
-                    value={CUSTOMER.company}
-                  />
-                  <InfoRow
-                    icon={<MapPin size={14} />}
-                    label="Address"
-                    value={CUSTOMER.address}
-                    className="sm:col-span-2"
-                  />
-                </div>
-              </div>
-            </CollapsibleCard>
-
-            <CollapsibleCard title="Account Details" icon={<Tag size={15} />}>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <InfoRow label="Customer ID" value={`#${CUSTOMER.id}`} />
-                <InfoRow label="Segment" value={CUSTOMER.segment} />
-                <InfoRow
-                  label="Status"
-                  value={
-                    <span className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                      Active
-                    </span>
-                  }
-                />
-                <InfoRow label="Customer Since" value={CUSTOMER.since} />
-              </div>
-            </CollapsibleCard>
-
-            {/* Cross-Module Navigation Links */}
-            <CollapsibleCard
-              title="Related Modules"
-              icon={<ExternalLink size={15} />}
-            >
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <button
-                  onClick={() =>
-                    navigate(`/all-orders?customerId=${CUSTOMER.id}`)
-                  }
-                  className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-secondary/50 transition-colors text-left group"
-                >
-                  <div className="w-9 h-9 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
-                    <ShoppingCart size={16} className="text-blue-600" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground">
-                      Related Sales Orders
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      View orders placed by this customer
-                    </p>
-                  </div>
-                  <ExternalLink
-                    size={14}
-                    className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity"
-                  />
-                </button>
-                <button
-                  onClick={() =>
-                    navigate(`/all-customers?relatedLeads=${CUSTOMER.id}`)
-                  }
-                  className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-secondary/50 transition-colors text-left group"
-                >
-                  <div className="w-9 h-9 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center shrink-0">
-                    <Users size={16} className="text-purple-600" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground">
-                      Related Leads
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      View leads linked to this contact
-                    </p>
-                  </div>
-                  <ExternalLink
-                    size={14}
-                    className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity"
-                  />
-                </button>
-              </div>
-            </CollapsibleCard>
-          </TabsContent>
-
-          {/* Orders */}
-          <TabsContent value="orders" className="space-y-4 mt-4">
-            <CollapsibleCard
-              title="Order History"
-              subtitle={`${CUSTOMER.totalOrders} orders total`}
-              icon={<ShoppingCart size={15} />}
-            >
-              <div className="divide-y divide-border">
-                {ORDER_HISTORY.map(order => (
-                  <div
-                    key={order.id}
-                    className="flex items-center justify-between py-3 first:pt-0 last:pb-0"
-                  >
-                    <div>
-                      <p className="text-sm font-medium text-foreground font-mono">
-                        {order.id}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {order.date} · {order.items} item
-                        {order.items !== 1 ? "s" : ""}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span
-                        className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${ORDER_STATUS_STYLES[order.status] ?? ""}`}
-                      >
-                        {order.status}
-                      </span>
-                      <span className="text-sm font-semibold text-foreground">
-                        {order.amount}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CollapsibleCard>
-          </TabsContent>
-
-          {/* Communications */}
-          <TabsContent value="communications" className="space-y-4 mt-4">
-            <CollapsibleCard
-              title="Communication Log"
-              icon={<MessageSquare size={15} />}
-              actions={
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="h-7 text-xs gap-1"
-                >
-                  <Send size={12} /> Send Email
-                </Button>
-              }
-            >
-              <div className="space-y-4">
-                {COMMS_LOG.map((entry, idx) => (
-                  <div key={idx} className="flex gap-3">
-                    <div className="mt-0.5 w-7 h-7 rounded-full bg-secondary flex items-center justify-center shrink-0">
-                      <entry.Icon size={13} className="text-muted-foreground" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm text-foreground">{entry.message}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {entry.date} · {entry.agent}
-                      </p>
-                    </div>
-                    <span className="shrink-0 text-xs px-2 py-0.5 rounded-full bg-secondary text-muted-foreground self-start">
-                      {entry.type}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </CollapsibleCard>
-
-            <CollapsibleCard
-              title="Notification Preferences"
-              icon={<Bell size={15} />}
-              defaultOpen={false}
-            >
-              <div className="space-y-3 text-sm text-muted-foreground">
-                <p>
-                  · Order confirmations:{" "}
-                  <span className="text-green-600 font-medium">Enabled</span>
-                </p>
-                <p>
-                  · Promotional emails:{" "}
-                  <span className="text-green-600 font-medium">Enabled</span>
-                </p>
-                <p>
-                  · SMS notifications:{" "}
-                  <span className="text-muted-foreground font-medium">
-                    Disabled
-                  </span>
-                </p>
-              </div>
-            </CollapsibleCard>
-          </TabsContent>
-
-          {/* Attachments */}
-          <TabsContent value="attachments" className="mt-4">
-            <AttachmentsTab entityName={`Customer: ${CUSTOMER.name}`} />
-          </TabsContent>
-
-          {/* Settings */}
-          <TabsContent value="settings" className="space-y-4 mt-4">
-            <CollapsibleCard
-              title="Account Settings"
-              icon={<Shield size={15} />}
-            >
-              <div className="space-y-4">
-                <div className="flex items-center justify-between py-2 border-b border-border">
-                  <div>
-                    <p className="text-sm font-medium text-foreground">
-                      Account Status
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Activate or deactivate this customer account
-                    </p>
-                  </div>
-                  <Badge
-                    variant="outline"
-                    className="text-green-600 border-green-300"
-                  >
-                    Active
-                  </Badge>
-                </div>
-                <div className="flex items-center justify-between py-2 border-b border-border">
-                  <div>
-                    <p className="text-sm font-medium text-foreground">
-                      Customer Segment
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Currently: {CUSTOMER.segment}
-                    </p>
-                  </div>
-                  <Button variant="outline" size="sm">
-                    Change
-                  </Button>
-                </div>
-              </div>
-            </CollapsibleCard>
-
-            <CollapsibleCard
-              title="Danger Zone"
-              icon={<Trash2 size={15} />}
-              defaultOpen={false}
-            >
-              <div className="space-y-3">
-                <p className="text-sm text-muted-foreground">
-                  Permanently delete this customer and all associated data. This
-                  cannot be undone.
-                </p>
-                <Button
-                  variant="outline"
-                  className="border-destructive text-destructive hover:bg-destructive hover:text-white gap-2"
-                  onClick={() => setDeleteOpen(true)}
-                >
-                  <Trash2 size={14} />
-                  Delete Customer
-                </Button>
-              </div>
-            </CollapsibleCard>
-          </TabsContent>
-        </Tabs>
+        {/* Tabs */}
+        <Tabs
+          type="line"
+          defaultActiveKey="general"
+          items={[
+            {
+              key: "general",
+              label: t("customers.tab.general", lang),
+              children: <GeneralTab customer={customer} t={t} lang={lang} />,
+            },
+            {
+              key: "address",
+              label: t("customers.tab.address", lang),
+              children: <AddressTab customer={customer} t={t} lang={lang} />,
+            },
+            {
+              key: "accounting",
+              label: t("customers.tab.accounting", lang),
+              children: <AccountingTab customer={customer} t={t} lang={lang} />,
+            },
+            {
+              key: "contacts",
+              label: t("customers.tab.contacts", lang),
+              children: <ContactsTab customer={customer} t={t} lang={lang} />,
+            },
+            {
+              key: "notes",
+              label: t("customers.tab.notes", lang),
+              children: <NotesTab customer={customer} t={t} lang={lang} />,
+            },
+          ]}
+        />
       </div>
 
-      {/* Edit Modal */}
-      <AnimatedModal
-        isOpen={editOpen}
-        onClose={() => setEditOpen(false)}
-        title="Edit Customer"
-        onSubmit={() => setEditOpen(false)}
-        submitLabel="Save Changes"
-        size="md"
-      >
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <Label>Full Name</Label>
-              <Input
-                value={editForm.name}
-                onChange={e =>
-                  setEditForm({ ...editForm, name: e.target.value })
-                }
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Company</Label>
-              <Input
-                value={editForm.company}
-                onChange={e =>
-                  setEditForm({ ...editForm, company: e.target.value })
-                }
-              />
-            </div>
-          </div>
-          <div className="space-y-1.5">
-            <Label>Email</Label>
-            <Input
-              type="email"
-              value={editForm.email}
-              onChange={e =>
-                setEditForm({ ...editForm, email: e.target.value })
-              }
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label>Phone</Label>
-            <Input
-              value={editForm.phone}
-              onChange={e =>
-                setEditForm({ ...editForm, phone: e.target.value })
-              }
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label>Address</Label>
-            <Input
-              value={editForm.address}
-              onChange={e =>
-                setEditForm({ ...editForm, address: e.target.value })
-              }
-            />
-          </div>
-        </div>
-      </AnimatedModal>
-
-      {/* Delete Confirm */}
       <ConfirmDialog
-        open={deleteOpen}
-        onOpenChange={v => !v && setDeleteOpen(false)}
-        title="Delete Customer"
-        description={`"${CUSTOMER.name}" and all their data will be permanently deleted. This cannot be undone.`}
-        confirmLabel="Delete Customer"
-        onConfirm={() => setDeleteOpen(false)}
+        open={isDeleteOpen}
+        onOpenChange={v => !v && setIsDeleteOpen(false)}
+        title={t("customers.deleteCustomer", lang)}
+        description={t("customers.deleteConfirm", lang)}
+        confirmLabel={t("common.delete", lang)}
+        onConfirm={handleDelete}
+        variant="danger"
       />
     </DashboardLayout>
   );
 }
 
-// ── Helper ────────────────────────────────────────────────────────────────────
+// ── Tab type ──────────────────────────────────────────────────────────────
 
-function InfoRow({
-  icon,
-  label,
-  value,
-  className,
-}: {
-  icon?: React.ReactNode;
-  label: string;
-  value: React.ReactNode;
-  className?: string;
-}) {
+type TabProps = {
+  customer: Partner;
+  t: (k: string, l: string) => string;
+  lang: "ar" | "en";
+};
+
+// ── Info Card ─────────────────────────────────────────────────────────────
+
+function CustomerInfoCard({ customer, t, lang }: TabProps) {
   return (
-    <div className={className}>
-      <p className="text-xs text-muted-foreground flex items-center gap-1 mb-0.5">
-        {icon}
-        {label}
-      </p>
-      <p className="text-sm font-medium text-foreground">{value}</p>
-    </div>
+    <Card size="small">
+      <div className="flex items-center gap-4">
+        <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+          <UserOutlined
+            style={{ fontSize: 24, color: "var(--ant-color-primary)" }}
+          />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-lg font-bold">{getName(customer)}</span>
+            <Tag color={customer.isActive ? "green" : "default"}>
+              {customer.isActive
+                ? t("customers.status.active", lang)
+                : t("customers.status.inactive", lang)}
+            </Tag>
+          </div>
+          <div className="flex flex-wrap gap-4 text-sm text-gray-500">
+            {customer.email && (
+              <span className="flex items-center gap-1">
+                <MailOutlined /> {customer.email}
+              </span>
+            )}
+            {customer.phone && (
+              <span className="flex items-center gap-1">
+                <PhoneOutlined /> {customer.phone}
+              </span>
+            )}
+            {customer.city && (
+              <span className="flex items-center gap-1">
+                <EnvironmentOutlined /> {customer.city}
+                {customer.country ? `, ${customer.country}` : ""}
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+// ── General Tab ───────────────────────────────────────────────────────────
+
+function GeneralTab({ customer, t, lang }: TabProps) {
+  const typeLabel: Record<string, string> = {
+    [PartnerType.CUSTOMER]: t("customers.type.customer", lang),
+    [PartnerType.SUPPLIER]: t("customers.type.supplier", lang),
+    [PartnerType.BOTH]: t("customers.type.both", lang),
+    [PartnerType.INDIVIDUAL]: t("customers.type.individual", lang),
+  };
+
+  return (
+    <Card size="small">
+      <Descriptions column={{ xs: 1, sm: 2, lg: 3 }} size="small" bordered>
+        <Descriptions.Item label={t("customers.field.nameEn", lang)}>
+          {customer.nameEn || "--"}
+        </Descriptions.Item>
+        <Descriptions.Item label={t("customers.field.nameAr", lang)}>
+          {customer.nameAr || "--"}
+        </Descriptions.Item>
+        <Descriptions.Item label={t("customers.field.type", lang)}>
+          {typeLabel[customer.type] ?? customer.type}
+        </Descriptions.Item>
+        <Descriptions.Item label={t("customers.field.email", lang)}>
+          {customer.email || "--"}
+        </Descriptions.Item>
+        <Descriptions.Item label={t("customers.field.phone", lang)}>
+          {customer.phone || "--"}
+        </Descriptions.Item>
+        <Descriptions.Item label={t("customers.field.mobile", lang)}>
+          {customer.mobile || "--"}
+        </Descriptions.Item>
+        <Descriptions.Item label={t("customers.field.website", lang)}>
+          {customer.website || "--"}
+        </Descriptions.Item>
+        <Descriptions.Item label={t("customers.field.isActive", lang)}>
+          <Tag color={customer.isActive ? "green" : "default"}>
+            {customer.isActive
+              ? t("customers.status.active", lang)
+              : t("customers.status.inactive", lang)}
+          </Tag>
+        </Descriptions.Item>
+        <Descriptions.Item label={t("customers.column.createdAt", lang)}>
+          {dayjs(customer.createdAt).format("DD MMM YYYY HH:mm")}
+        </Descriptions.Item>
+      </Descriptions>
+    </Card>
+  );
+}
+
+// ── Address Tab ───────────────────────────────────────────────────────────
+
+function AddressTab({ customer, t, lang }: TabProps) {
+  return (
+    <Card size="small">
+      <Descriptions column={{ xs: 1, sm: 2, lg: 3 }} size="small" bordered>
+        <Descriptions.Item label={t("customers.field.street", lang)}>
+          {customer.street || "--"}
+        </Descriptions.Item>
+        <Descriptions.Item label={t("customers.field.city", lang)}>
+          {customer.city || "--"}
+        </Descriptions.Item>
+        <Descriptions.Item label={t("customers.field.state", lang)}>
+          {customer.state || "--"}
+        </Descriptions.Item>
+        <Descriptions.Item label={t("customers.field.country", lang)}>
+          {customer.country || "--"}
+        </Descriptions.Item>
+        <Descriptions.Item label={t("customers.field.zip", lang)}>
+          {customer.zip || "--"}
+        </Descriptions.Item>
+      </Descriptions>
+    </Card>
+  );
+}
+
+// ── Accounting Tab ────────────────────────────────────────────────────────
+
+function AccountingTab({ customer, t, lang }: TabProps) {
+  return (
+    <Card size="small">
+      <Descriptions column={{ xs: 1, sm: 2, lg: 3 }} size="small" bordered>
+        <Descriptions.Item label={t("customers.field.creditLimit", lang)}>
+          <span className="font-mono">
+            {Number(customer.creditLimit).toLocaleString("en-SA", {
+              minimumFractionDigits: 2,
+            })}
+          </span>
+        </Descriptions.Item>
+        <Descriptions.Item label={t("customers.field.taxNumber", lang)}>
+          {customer.taxNumber || "--"}
+        </Descriptions.Item>
+        <Descriptions.Item label={t("customers.field.vatNumber", lang)}>
+          {customer.vatNumber || "--"}
+        </Descriptions.Item>
+        <Descriptions.Item label={t("customers.field.paymentTerm", lang)}>
+          {customer.paymentTermId || "--"}
+        </Descriptions.Item>
+        <Descriptions.Item label={t("customers.field.pricelist", lang)}>
+          {customer.pricelistId || "--"}
+        </Descriptions.Item>
+        <Descriptions.Item label={t("customers.field.fiscalPosition", lang)}>
+          {customer.fiscalPositionId || "--"}
+        </Descriptions.Item>
+        <Descriptions.Item label={t("customers.field.arAccount", lang)}>
+          {customer.arAccountId || "--"}
+        </Descriptions.Item>
+        <Descriptions.Item label={t("customers.field.apAccount", lang)}>
+          {customer.apAccountId || "--"}
+        </Descriptions.Item>
+        <Descriptions.Item label={t("customers.field.bankIban", lang)}>
+          {customer.bankIban || "--"}
+        </Descriptions.Item>
+        <Descriptions.Item label={t("customers.field.bankName", lang)}>
+          {customer.bankName || "--"}
+        </Descriptions.Item>
+      </Descriptions>
+    </Card>
+  );
+}
+
+// ── Contacts Tab ──────────────────────────────────────────────────────────
+
+function ContactsTab({ customer, t, lang }: TabProps) {
+  const createContact = useCreatePartnerContact();
+  const updateContact = useUpdatePartnerContact();
+  const deleteContact = useDeletePartnerContact();
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingContact, setEditingContact] = useState<PartnerContact | null>(
+    null
+  );
+  const [deleteContactId, setDeleteContactId] = useState<string | null>(null);
+  const [form] = Form.useForm();
+
+  const handleOpenCreate = useCallback(() => {
+    setEditingContact(null);
+    form.resetFields();
+    setIsModalOpen(true);
+  }, [form]);
+
+  const handleOpenEdit = useCallback(
+    (contact: PartnerContact) => {
+      setEditingContact(contact);
+      form.setFieldsValue({
+        firstName: contact.firstName,
+        lastName: contact.lastName,
+        email: contact.email,
+        phone: contact.phone,
+        mobile: contact.mobile,
+        position: contact.position,
+        isMain: contact.isMain,
+      });
+      setIsModalOpen(true);
+    },
+    [form]
+  );
+
+  const handleSubmit = useCallback(() => {
+    form.validateFields().then(values => {
+      if (editingContact) {
+        const dto: UpdatePartnerContactInput = {
+          version: editingContact.version,
+          ...values,
+        };
+        updateContact.mutate(
+          { id: editingContact.id, dto, partnerId: customer.id },
+          {
+            onSuccess: () => {
+              toast.success(t("customers.contacts.updateSuccess", lang));
+              setIsModalOpen(false);
+            },
+            onError: () => toast.error(t("common.error_occurred", lang)),
+          }
+        );
+      } else {
+        const dto: CreatePartnerContactInput = {
+          partnerId: customer.id,
+          ...values,
+        };
+        createContact.mutate(dto, {
+          onSuccess: () => {
+            toast.success(t("customers.contacts.createSuccess", lang));
+            setIsModalOpen(false);
+          },
+          onError: () => toast.error(t("common.error_occurred", lang)),
+        });
+      }
+    });
+  }, [
+    form,
+    editingContact,
+    customer.id,
+    createContact,
+    updateContact,
+    t,
+    lang,
+  ]);
+
+  const handleDeleteContact = useCallback(() => {
+    if (!deleteContactId) return;
+    deleteContact.mutate(
+      { id: deleteContactId, partnerId: customer.id },
+      {
+        onSuccess: () => {
+          toast.success(t("customers.contacts.deleteSuccess", lang));
+          setDeleteContactId(null);
+        },
+        onError: () => toast.error(t("common.error_occurred", lang)),
+      }
+    );
+  }, [deleteContactId, deleteContact, customer.id, t, lang]);
+
+  const columns: TableColumnsType<PartnerContact> = useMemo(
+    () => [
+      {
+        title: t("customers.contacts.firstName", lang),
+        dataIndex: "firstName",
+        width: 150,
+        sorter: false,
+      },
+      {
+        title: t("customers.contacts.lastName", lang),
+        dataIndex: "lastName",
+        width: 150,
+        sorter: false,
+        render: (v: string | null) => v || "--",
+      },
+      {
+        title: t("customers.contacts.email", lang),
+        dataIndex: "email",
+        width: 200,
+        sorter: false,
+        render: (v: string | null) => v || "--",
+      },
+      {
+        title: t("customers.contacts.phone", lang),
+        dataIndex: "phone",
+        width: 150,
+        sorter: false,
+        render: (v: string | null) => v || "--",
+      },
+      {
+        title: t("customers.contacts.position", lang),
+        dataIndex: "position",
+        width: 150,
+        sorter: false,
+        render: (v: string | null) => v || "--",
+      },
+      {
+        title: t("customers.contacts.isMain", lang),
+        dataIndex: "isMain",
+        width: 100,
+        sorter: false,
+        render: (v: boolean) =>
+          v ? (
+            <Tag color="blue">{t("customers.contacts.isMain", lang)}</Tag>
+          ) : null,
+      },
+      {
+        title: t("customers.column.actions", lang),
+        align: "center" as const,
+        width: 100,
+        render: (_: unknown, rec: PartnerContact) => (
+          <Space size="small">
+            <Button
+              type="text"
+              size="small"
+              icon={<EditOutlined />}
+              onClick={e => {
+                e.stopPropagation();
+                handleOpenEdit(rec);
+              }}
+            />
+            <Button
+              type="text"
+              size="small"
+              danger
+              icon={<DeleteOutlined />}
+              onClick={e => {
+                e.stopPropagation();
+                setDeleteContactId(rec.id);
+              }}
+            />
+          </Space>
+        ),
+      },
+    ],
+    [t, lang, handleOpenEdit]
+  );
+
+  return (
+    <>
+      <Card
+        size="small"
+        title={t("customers.contacts.title", lang)}
+        extra={
+          <Button
+            type="primary"
+            size="small"
+            icon={<PlusOutlined />}
+            onClick={handleOpenCreate}
+          >
+            {t("customers.contacts.addContact", lang)}
+          </Button>
+        }
+      >
+        {customer.contacts.length === 0 ? (
+          <div className="text-center py-8 text-gray-400">
+            {t("customers.noContacts", lang)}
+          </div>
+        ) : (
+          <Table
+            rowKey="id"
+            columns={columns}
+            dataSource={customer.contacts}
+            pagination={false}
+            size="small"
+            scroll={{ x: "max-content" }}
+          />
+        )}
+      </Card>
+
+      <Modal
+        open={isModalOpen}
+        title={
+          editingContact
+            ? t("customers.contacts.editContact", lang)
+            : t("customers.contacts.addContact", lang)
+        }
+        onCancel={() => setIsModalOpen(false)}
+        onOk={handleSubmit}
+        confirmLoading={createContact.isPending || updateContact.isPending}
+        okText={t("common.save", lang)}
+        cancelText={t("common.cancel", lang)}
+      >
+        <Form form={form} layout="vertical" className="mt-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4">
+            <Form.Item
+              name="firstName"
+              label={t("customers.contacts.firstName", lang)}
+              rules={[{ required: true }]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              name="lastName"
+              label={t("customers.contacts.lastName", lang)}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              name="email"
+              label={t("customers.contacts.email", lang)}
+              rules={[{ type: "email" }]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item name="phone" label={t("customers.contacts.phone", lang)}>
+              <Input />
+            </Form.Item>
+            <Form.Item
+              name="mobile"
+              label={t("customers.contacts.mobile", lang)}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              name="position"
+              label={t("customers.contacts.position", lang)}
+            >
+              <Input />
+            </Form.Item>
+          </div>
+          <Form.Item
+            name="isMain"
+            label={t("customers.contacts.isMain", lang)}
+            valuePropName="checked"
+          >
+            <Switch />
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      <ConfirmDialog
+        open={!!deleteContactId}
+        onOpenChange={v => !v && setDeleteContactId(null)}
+        title={t("customers.contacts.deleteContact", lang)}
+        description={t("customers.contacts.deleteConfirm", lang)}
+        confirmLabel={t("common.delete", lang)}
+        onConfirm={handleDeleteContact}
+        variant="danger"
+      />
+    </>
+  );
+}
+
+// ── Notes Tab ─────────────────────────────────────────────────────────────
+
+function NotesTab({ customer, t, lang }: TabProps) {
+  return (
+    <Card size="small">
+      <Descriptions column={1} size="small" bordered>
+        <Descriptions.Item label={t("customers.field.notes", lang)}>
+          {customer.notes || "--"}
+        </Descriptions.Item>
+      </Descriptions>
+    </Card>
   );
 }

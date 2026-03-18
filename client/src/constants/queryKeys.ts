@@ -40,6 +40,11 @@ export const QUERY_KEYS = {
   // Branches
   BRANCHES: "branches",
 
+  // Partners
+  PARTNERS: "partners",
+  CUSTOMERS: "partners-customers",
+  VENDORS: "partners-vendors",
+
   // Projects
   PROJECT_MEMBERS: "project-members",
 
