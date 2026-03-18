@@ -50,6 +50,19 @@ export function deletePricelist(id: string) {
     .then(r => r.data);
 }
 
+/** Fetch pricelist summary stats (total, active, inactive) */
+export function getPricelistSummary() {
+  return apiClient
+    .get<
+      ApiResponse<{
+        totalPricelists: number;
+        totalActive: number;
+        totalInactive: number;
+      }>
+    >("/pricelists/summary")
+    .then(r => r.data);
+}
+
 // ─── Pricelist Items ─────────────────────────────────────────────────────────
 
 /** Fetch all items for a pricelist */
@@ -108,4 +121,5 @@ export const pricelistsApi = {
   updateItem: updatePricelistItem,
   removeItem: deletePricelistItem,
   computePrice,
+  summary: getPricelistSummary,
 };

@@ -121,6 +121,7 @@ type SalesReportQueryParams = {
   dateFrom?: string;
   dateTo?: string;
   branchId?: string;
+  status?: string;
   format?: "pdf" | "xlsx";
 };
 

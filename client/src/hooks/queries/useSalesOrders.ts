@@ -75,10 +75,11 @@ export function useQuotation(id: string | undefined) {
 
 // ─── Sales Summary ──────────────────────────────────────────────────────────
 
-/** Summary report params (date range) */
+/** Summary report params (date range + optional status filter) */
 type SalesSummaryParams = {
   dateFrom?: string;
   dateTo?: string;
+  status?: string;
 };
 
 /** Sales summary/statistics report for the active branch */

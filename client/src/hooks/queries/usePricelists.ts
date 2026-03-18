@@ -5,6 +5,7 @@ import {
   getPricelist,
   getPricelistItems,
   computePrice,
+  getPricelistSummary,
 } from "@/api/endpoints/pricelists.api";
 import { queryKeys } from "@/shared/constants/query-keys";
 import { useBranchStore } from "@/stores/branch.store";
@@ -56,6 +57,19 @@ export function usePricelistItems(pricelistId: string | undefined) {
     queryFn: () => getPricelistItems(pricelistId!),
     select: res => res.data,
     enabled: !!pricelistId && !!branchId,
+  });
+}
+
+// ─── Pricelist Summary ──────────────────────────────────────────────────────
+
+/** Pricelist summary stats for KPI cards */
+export function usePricelistSummary() {
+  const branchId = useActiveBranchId();
+
+  return useQuery({
+    queryKey: ["pricelists", "summary", branchId],
+    queryFn: () => getPricelistSummary(),
+    enabled: !!branchId,
   });
 }
 

@@ -190,5 +190,7 @@ export type PartnerFilterParams = {
   isCustomer?: boolean;
   isSupplier?: boolean;
   isActive?: boolean;
+  dateFrom?: string;
+  dateTo?: string;
   sortOrder?: "ASC" | "DESC";
 };

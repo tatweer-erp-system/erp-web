@@ -8,6 +8,7 @@ import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 
 import { Table, Card, Row, Col, Grid, Tag, Typography } from "antd";
 import type { TableColumnsType } from "antd";
+import type { Dayjs } from "dayjs";
 import {
   EyeOutlined,
   EditOutlined,
@@ -25,8 +26,12 @@ import { ListPageToolbar } from "@/components/common/ListPageToolbar";
 import { StatsRow } from "@/components/common/StatsRow";
 import { ActionDropdown } from "@/components/common/ActionDropdown";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
+import { EmptyState } from "@/components/common/EmptyState";
 import { useTranslation } from "@/hooks/ui/useTranslation";
-import { usePricelists } from "@/hooks/queries/usePricelists";
+import {
+  usePricelists,
+  usePricelistSummary,
+} from "@/hooks/queries/usePricelists";
 import { useDeletePricelist } from "@/hooks/mutations/usePricelistMutations";
 import { ROUTES } from "@/shared/constants/routes";
 import { getName } from "@/shared/utils/getName.util";
@@ -61,6 +66,9 @@ export default function PricelistsPage() {
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [dateRange, setDateRange] = useState<
+    [Dayjs | null, Dayjs | null] | null
+  >(null);
 
   const queryParams = useMemo<PricelistFilterParams>(() => {
     const params: PricelistFilterParams = {
@@ -69,17 +77,24 @@ export default function PricelistsPage() {
       search: search || undefined,
       sortOrder: "DESC",
     };
+    if (dateRange?.[0]) params.dateFrom = dateRange[0].format("YYYY-MM-DD");
+    if (dateRange?.[1]) params.dateTo = dateRange[1].format("YYYY-MM-DD");
     return params;
-  }, [page, pageSize, search]);
+  }, [page, pageSize, search, dateRange]);
 
   const { data: res, isLoading, refetch } = usePricelists(queryParams);
   const deleteMut = useDeletePricelist();
 
   const pricelists = res?.data ?? [];
-  const totalRows = res?.total ?? 0;
+  const totalRows = res?.meta?.total ?? 0;
 
-  const activePricelists = pricelists.filter(p => p.isActive).length;
-  const inactivePricelists = pricelists.filter(p => !p.isActive).length;
+  const { data: summaryRes } = usePricelistSummary();
+  const summary = (summaryRes as Record<string, unknown>)?.data as
+    | { totalPricelists?: number; totalActive?: number; totalInactive?: number }
+    | undefined;
+
+  const activePricelists = summary?.totalActive ?? 0;
+  const inactivePricelists = summary?.totalInactive ?? 0;
 
   const handleRowClick = useCallback(
     (id: string) => navigate(ROUTES.pricelistDetail(id)),
@@ -115,19 +130,22 @@ export default function PricelistsPage() {
       title: t("pricelists.stats.total", lang),
       value: totalRows,
       icon: <UnorderedListOutlined />,
-      iconBg: "bg-blue-100 dark:bg-blue-900/30",
+      iconColor: "#8b5cf6",
+      iconBg: "#8b5cf615",
     },
     {
       title: t("pricelists.stats.active", lang),
       value: activePricelists,
       icon: <CheckCircleOutlined />,
-      iconBg: "bg-green-100 dark:bg-green-900/30",
+      iconColor: "#10b981",
+      iconBg: "#10b98115",
     },
     {
       title: t("pricelists.stats.inactive", lang),
       value: inactivePricelists,
       icon: <CloseCircleOutlined />,
-      iconBg: "bg-red-100 dark:bg-red-900/30",
+      iconColor: "#ef4444",
+      iconBg: "#ef444415",
     },
   ];
 
@@ -146,6 +164,12 @@ export default function PricelistsPage() {
             onReload={() => refetch()}
             viewMode={viewMode}
             onViewModeChange={setViewMode}
+            dateRange={dateRange}
+            onDateRangeChange={setDateRange}
+            dateRangePlaceholder={[
+              t("common.dateFrom", lang),
+              t("common.dateTo", lang),
+            ]}
             showExport={false}
           />
         </Card>
@@ -176,7 +200,7 @@ export default function PricelistsPage() {
                   setPageSize(ps);
                 },
               }}
-              locale={{ emptyText: t("common.no_data_title", lang) }}
+              locale={{ emptyText: <EmptyState /> }}
             />
           </Card>
         ) : (

@@ -17,6 +17,7 @@ import {
   Typography,
 } from "antd";
 import type { TableColumnsType, TableProps } from "antd";
+import type { Dayjs } from "dayjs";
 import {
   MoreOutlined,
   EyeOutlined,
@@ -40,6 +41,7 @@ import { SalesOrdersFilterPanel } from "@/components/sales/SalesOrdersFilterPane
 import { SalesOrdersBulkBar } from "@/components/sales/SalesOrdersBulkBar";
 import { SalesOrderFastCreate } from "@/components/sales/SalesOrderFastCreate";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
+import { EmptyState } from "@/components/common/EmptyState";
 import { useTranslation } from "@/hooks/ui/useTranslation";
 import {
   useSalesOrders,
@@ -90,6 +92,9 @@ export default function AllOrders() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [cancelId, setCancelId] = useState<string | null>(null);
   const [fastCreateOpen, setFastCreateOpen] = useState(false);
+  const [dateRange, setDateRange] = useState<
+    [Dayjs | null, Dayjs | null] | null
+  >(null);
 
   const queryParams = useMemo<SalesOrderFilterParams>(() => {
     const params: SalesOrderFilterParams = {
@@ -104,8 +109,18 @@ export default function AllOrders() {
       params.invoiceStatus = invoiceFilter as SalesOrderRow["invoiceStatus"];
     if (deliveryFilter !== "all")
       params.deliveryStatus = deliveryFilter as SalesOrderRow["deliveryStatus"];
+    if (dateRange?.[0]) params.dateFrom = dateRange[0].format("YYYY-MM-DD");
+    if (dateRange?.[1]) params.dateTo = dateRange[1].format("YYYY-MM-DD");
     return params;
-  }, [page, pageSize, search, statusFilter, invoiceFilter, deliveryFilter]);
+  }, [
+    page,
+    pageSize,
+    search,
+    statusFilter,
+    invoiceFilter,
+    deliveryFilter,
+    dateRange,
+  ]);
 
   const { data: res, isLoading, refetch } = useSalesOrders(queryParams);
   const { data: summaryRes } = useSalesSummary();
@@ -114,7 +129,7 @@ export default function AllOrders() {
   const cancelMut = useCancelSalesOrder();
 
   const orders = res?.data ?? [];
-  const totalRows = res?.total ?? 0;
+  const totalRows = res?.meta?.total ?? 0;
 
   const summary = (summaryRes as Record<string, unknown>)?.data as
     | {
@@ -210,6 +225,8 @@ export default function AllOrders() {
             onViewModeChange={setViewMode}
             onReload={() => refetch()}
             onCreateNew={() => navigate(ROUTES.ORDER_CREATE)}
+            dateRange={dateRange}
+            onDateRangeChange={setDateRange}
             t={t}
             lang={lang}
           />
@@ -266,7 +283,7 @@ export default function AllOrders() {
                   setPageSize(ps);
                 },
               }}
-              locale={{ emptyText: t("sales.line.noLines", lang) }}
+              locale={{ emptyText: <EmptyState /> }}
             />
           </Card>
         ) : (

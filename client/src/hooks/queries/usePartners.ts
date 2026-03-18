@@ -5,6 +5,7 @@ import {
   getPartner,
   getPartnersDropdown,
   getPartnerContacts,
+  getCustomerSummary,
 } from "@/api/endpoints/partners.api";
 import { queryKeys } from "@/shared/constants/query-keys";
 import { useBranchStore } from "@/stores/branch.store";
@@ -120,6 +121,19 @@ export function usePartnersDropdown(search?: string, type?: string) {
     queryKey: [...queryKeys.partners.customers, "dropdown", search, type],
     queryFn: () => getPartnersDropdown({ search, type, limit: 100 }),
     select: res => res.data,
+  });
+}
+
+// ─── Customer Summary ────────────────────────────────────────────────────────
+
+/** Customer summary stats for KPI cards */
+export function useCustomerSummary() {
+  const branchId = useActiveBranchId();
+
+  return useQuery({
+    queryKey: ["partners", "customers", "summary", branchId],
+    queryFn: () => getCustomerSummary(),
+    enabled: !!branchId,
   });
 }
 

@@ -190,5 +190,7 @@ export type PricelistFilterParams = {
   limit?: number;
   search?: string;
   sortBy?: string;
+  dateFrom?: string;
+  dateTo?: string;
   sortOrder?: "ASC" | "DESC";
 };

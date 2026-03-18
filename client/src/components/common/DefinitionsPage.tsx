@@ -99,9 +99,10 @@ export interface ColDef {
 
 /** Optional API service for server-backed CRUD. When provided, data is fetched from the API. */
 export interface TabService {
-  list: (
-    params?: Record<string, unknown>
-  ) => Promise<{ data: Record<string, unknown>[]; total: number }>;
+  list: (params?: Record<string, unknown>) => Promise<{
+    data: Record<string, unknown>[];
+    meta: { total: number; page: number; limit: number; totalPages: number };
+  }>;
   create: (data: Record<string, unknown>) => Promise<unknown>;
   update: (id: string, data: Record<string, unknown>) => Promise<unknown>;
   remove: (id: string) => Promise<unknown>;
@@ -1109,7 +1110,7 @@ function DefinitionsTab({
         search: search || undefined,
       });
       setApiData((res.data as EntityRecord[]) ?? []);
-      setApiTotal(res.total ?? 0);
+      setApiTotal(res.meta?.total ?? 0);
     } catch {
       message.error(t("common.failed_to_load", lang));
     } finally {

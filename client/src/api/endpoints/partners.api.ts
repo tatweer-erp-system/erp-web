@@ -112,6 +112,19 @@ export function deletePartnerContact(id: string) {
     .then(r => r.data);
 }
 
+/** Fetch customer summary stats (total, active, inactive) */
+export function getCustomerSummary() {
+  return apiClient
+    .get<
+      ApiResponse<{
+        totalCustomers: number;
+        totalActive: number;
+        totalInactive: number;
+      }>
+    >("/partners/summary")
+    .then(r => r.data);
+}
+
 // ─── Namespace for object-style access ─────────────────────────────────────
 
 export const partnersApi = {
@@ -121,6 +134,7 @@ export const partnersApi = {
   update: updatePartner,
   remove: deletePartner,
   dropdown: getPartnersDropdown,
+  summary: getCustomerSummary,
   contacts: {
     list: getPartnerContacts,
     get: getPartnerContact,

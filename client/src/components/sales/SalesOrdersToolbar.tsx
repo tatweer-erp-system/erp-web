@@ -1,4 +1,5 @@
-import { Button, Input, Tooltip, Dropdown, Segmented } from "antd";
+import { Button, Input, Tooltip, Dropdown, Segmented, DatePicker } from "antd";
+import type { Dayjs } from "dayjs";
 import {
   PlusOutlined,
   SearchOutlined,
@@ -10,6 +11,8 @@ import {
   ExportOutlined,
 } from "@ant-design/icons";
 
+const { RangePicker } = DatePicker;
+
 type SalesOrdersToolbarProps = {
   search: string;
   onSearchChange: (value: string) => void;
@@ -19,6 +22,8 @@ type SalesOrdersToolbarProps = {
   onViewModeChange: (v: "table" | "grid") => void;
   onReload: () => void;
   onCreateNew: () => void;
+  dateRange?: [Dayjs | null, Dayjs | null] | null;
+  onDateRangeChange?: (dates: [Dayjs | null, Dayjs | null] | null) => void;
   t: (key: string, lang: string) => string;
   lang: "ar" | "en";
 };
@@ -36,6 +41,8 @@ export function SalesOrdersToolbar({
   onViewModeChange,
   onReload,
   onCreateNew,
+  dateRange,
+  onDateRangeChange,
   t,
   lang,
 }: SalesOrdersToolbarProps) {
@@ -48,6 +55,15 @@ export function SalesOrdersToolbar({
       </div>
 
       <div className="flex flex-wrap gap-2 items-center">
+        {onDateRangeChange && (
+          <RangePicker
+            value={dateRange}
+            onChange={onDateRangeChange}
+            placeholder={[t("common.dateFrom", lang), t("common.dateTo", lang)]}
+            allowClear
+            style={{ borderRadius: 8 }}
+          />
+        )}
         <Input
           prefix={<SearchOutlined className="text-gray-400" />}
           placeholder={t("common.search", lang)}

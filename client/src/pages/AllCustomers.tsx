@@ -7,6 +7,7 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 
 import { Table, Card, Tag, Row, Col, Grid, Typography } from "antd";
+import type { Dayjs } from "dayjs";
 import type { TableColumnsType } from "antd";
 import {
   EyeOutlined,
@@ -25,8 +26,9 @@ import { ListPageToolbar } from "@/components/common/ListPageToolbar";
 import { StatsRow } from "@/components/common/StatsRow";
 import { ActionDropdown } from "@/components/common/ActionDropdown";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
+import { EmptyState } from "@/components/common/EmptyState";
 import { useTranslation } from "@/hooks/ui/useTranslation";
-import { useCustomers } from "@/hooks/queries/usePartners";
+import { useCustomers, useCustomerSummary } from "@/hooks/queries/usePartners";
 import { useDeletePartner } from "@/hooks/mutations/usePartnerMutations";
 import { ROUTES } from "@/shared/constants/routes";
 import { getName } from "@/shared/utils/getName.util";
@@ -61,6 +63,9 @@ export default function AllCustomers() {
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [dateRange, setDateRange] = useState<
+    [Dayjs | null, Dayjs | null] | null
+  >(null);
 
   const queryParams = useMemo<PartnerFilterParams>(() => {
     const params: PartnerFilterParams = {
@@ -73,8 +78,10 @@ export default function AllCustomers() {
     if (statusFilter === "active") params.isActive = true;
     if (statusFilter === "inactive") params.isActive = false;
     if (typeFilter !== "all") params.type = typeFilter as PartnerRow["type"];
+    if (dateRange?.[0]) params.dateFrom = dateRange[0].format("YYYY-MM-DD");
+    if (dateRange?.[1]) params.dateTo = dateRange[1].format("YYYY-MM-DD");
     return params;
-  }, [page, pageSize, search, statusFilter, typeFilter]);
+  }, [page, pageSize, search, statusFilter, typeFilter, dateRange]);
 
   const { data: res, isLoading, refetch } = useCustomers(queryParams);
   const deleteMut = useDeletePartner();
@@ -82,8 +89,13 @@ export default function AllCustomers() {
   const customers = res?.data ?? [];
   const totalRows = res?.meta?.total ?? 0;
 
-  const totalActive = customers.filter(c => c.isActive).length;
-  const totalInactive = customers.filter(c => !c.isActive).length;
+  const { data: summaryRes } = useCustomerSummary();
+  const summary = (summaryRes as Record<string, unknown>)?.data as
+    | { totalCustomers?: number; totalActive?: number; totalInactive?: number }
+    | undefined;
+
+  const totalActive = summary?.totalActive ?? 0;
+  const totalInactive = summary?.totalInactive ?? 0;
 
   const handleRowClick = useCallback(
     (id: string) => navigate(ROUTES.customerDetail(id)),
@@ -114,28 +126,23 @@ export default function AllCustomers() {
       {
         title: t("customers.stats.totalCustomers", lang),
         value: totalRows,
-        icon: (
-          <TeamOutlined
-            style={{ fontSize: 18, color: "var(--ant-color-primary)" }}
-          />
-        ),
-        iconBg: "bg-primary/10",
+        icon: <TeamOutlined />,
+        iconColor: "#8b5cf6",
+        iconBg: "#8b5cf615",
       },
       {
         title: t("customers.stats.activeCustomers", lang),
         value: totalActive,
-        icon: (
-          <CheckCircleOutlined style={{ fontSize: 18, color: "#52c41a" }} />
-        ),
-        iconBg: "bg-green-100 dark:bg-green-900/30",
+        icon: <CheckCircleOutlined />,
+        iconColor: "#10b981",
+        iconBg: "#10b98115",
       },
       {
         title: t("customers.status.inactive", lang),
         value: totalInactive,
-        icon: (
-          <CloseCircleOutlined style={{ fontSize: 18, color: "#ff4d4f" }} />
-        ),
-        iconBg: "bg-red-100 dark:bg-red-900/30",
+        icon: <CloseCircleOutlined />,
+        iconColor: "#ef4444",
+        iconBg: "#ef444415",
       },
     ],
     [t, lang, totalRows, totalActive, totalInactive]
@@ -164,6 +171,12 @@ export default function AllCustomers() {
             onViewModeChange={setViewMode}
             isFilterOpen={isFilterOpen}
             onToggleFilter={() => setIsFilterOpen(!isFilterOpen)}
+            dateRange={dateRange}
+            onDateRangeChange={setDateRange}
+            dateRangePlaceholder={[
+              t("common.dateFrom", lang),
+              t("common.dateTo", lang),
+            ]}
             showExport={false}
           />
           {isFilterOpen && (
@@ -210,7 +223,11 @@ export default function AllCustomers() {
                   setPageSize(ps);
                 },
               }}
-              locale={{ emptyText: t("customers.noCustomers", lang) }}
+              locale={{
+                emptyText: (
+                  <EmptyState description={t("customers.noCustomers", lang)} />
+                ),
+              }}
             />
           </Card>
         ) : (

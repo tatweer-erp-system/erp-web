@@ -1054,6 +1054,8 @@ export const en: Record<string, string> = {
   "common.close": "Close",
   "common.history": "Activity Log",
   "common.search": "Search...",
+  "common.dateFrom": "From date",
+  "common.dateTo": "To date",
   "common.name": "Name",
   "common.name_required": "Name is required",
   "common.fast_create_note":

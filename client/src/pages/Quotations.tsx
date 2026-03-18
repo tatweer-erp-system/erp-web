@@ -6,6 +6,7 @@
 
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 
+import type { Dayjs } from "dayjs";
 import {
   Table,
   Button,
@@ -15,6 +16,7 @@ import {
   Col,
   Grid,
   Tooltip,
+  DatePicker,
   Dropdown,
   Segmented,
   Typography,
@@ -45,9 +47,10 @@ import { CopyableCode } from "@/components/common/CopyableCode";
 import { SalesOrderCard } from "@/components/sales/SalesOrderCard";
 import { QuotationStats } from "@/components/sales/QuotationStats";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
+import { EmptyState } from "@/components/common/EmptyState";
 import { SalesOrderFastCreate } from "@/components/sales/SalesOrderFastCreate";
 import { useTranslation } from "@/hooks/ui/useTranslation";
-import { useQuotations } from "@/hooks/queries/useSalesOrders";
+import { useQuotations, useSalesSummary } from "@/hooks/queries/useSalesOrders";
 import {
   useConfirmSalesOrder,
   useDeleteSalesOrder,
@@ -86,23 +89,42 @@ export default function Quotations() {
   const [confirmAsOrderId, setConfirmAsOrderId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [fastCreateOpen, setFastCreateOpen] = useState(false);
+  const [dateRange, setDateRange] = useState<
+    [Dayjs | null, Dayjs | null] | null
+  >(null);
 
-  const queryParams = useMemo<Omit<SalesOrderFilterParams, "status">>(
-    () => ({
+  const queryParams = useMemo<Omit<SalesOrderFilterParams, "status">>(() => {
+    const params: Omit<SalesOrderFilterParams, "status"> = {
       page,
       limit: pageSize,
       search: search || undefined,
       sortOrder: "DESC",
-    }),
-    [page, pageSize, search]
-  );
+    };
+    if (dateRange?.[0]) params.dateFrom = dateRange[0].format("YYYY-MM-DD");
+    if (dateRange?.[1]) params.dateTo = dateRange[1].format("YYYY-MM-DD");
+    return params;
+  }, [page, pageSize, search, dateRange]);
 
   const { data: res, isLoading, refetch } = useQuotations(queryParams);
   const confirmMut = useConfirmSalesOrder();
   const deleteMut = useDeleteSalesOrder();
 
   const quotations = res?.data ?? [];
-  const totalRows = res?.total ?? 0;
+  const totalRows = res?.meta?.total ?? 0;
+
+  const { data: summaryRes } = useSalesSummary({ status: "draft" });
+  const summary = (summaryRes as unknown as Record<string, unknown>)?.data as
+    | {
+        totalOrders?: number;
+        totalAmount?: number;
+        avgOrderValue?: number;
+        byStatus?: {
+          status: string;
+          count: string | number;
+          total: string | number;
+        }[];
+      }
+    | undefined;
 
   const handleRowClick = useCallback(
     (orderNumber: string) => navigate(ROUTES.quotationDetail(orderNumber)),
@@ -155,7 +177,12 @@ export default function Quotations() {
   return (
     <DashboardLayout currentPage="Quotations" breadcrumbs={breadcrumbs}>
       <div className="flex flex-col gap-6">
-        <QuotationStats totalRows={totalRows} t={t} lang={lang} />
+        <QuotationStats
+          totalRows={totalRows}
+          summary={summary}
+          t={t}
+          lang={lang}
+        />
 
         <Card size="small" styles={{ body: { padding: "12px 16px" } }}>
           <QuotationsToolbar
@@ -165,6 +192,8 @@ export default function Quotations() {
             onViewModeChange={setViewMode}
             onReload={() => refetch()}
             onCreateNew={() => navigate(ROUTES.QUOTATION_CREATE)}
+            dateRange={dateRange}
+            onDateRangeChange={setDateRange}
             t={t}
             lang={lang}
           />
@@ -206,7 +235,7 @@ export default function Quotations() {
                   setPageSize(ps);
                 },
               }}
-              locale={{ emptyText: t("sales.line.noLines", lang) }}
+              locale={{ emptyText: <EmptyState /> }}
             />
           </Card>
         ) : (
@@ -371,6 +400,8 @@ function QuotationsToolbar({
   onViewModeChange,
   onReload,
   onCreateNew,
+  dateRange,
+  onDateRangeChange,
   t,
   lang,
 }: {
@@ -380,6 +411,8 @@ function QuotationsToolbar({
   onViewModeChange: (v: "table" | "grid") => void;
   onReload: () => void;
   onCreateNew: () => void;
+  dateRange?: [Dayjs | null, Dayjs | null] | null;
+  onDateRangeChange?: (dates: [Dayjs | null, Dayjs | null] | null) => void;
   t: (k: string, l: string) => string;
   lang: "ar" | "en";
 }) {
@@ -389,6 +422,15 @@ function QuotationsToolbar({
         {t("sales.quotation.newQuotation", lang)}
       </Button>
       <div className="flex flex-wrap gap-2 items-center">
+        {onDateRangeChange && (
+          <DatePicker.RangePicker
+            value={dateRange}
+            onChange={onDateRangeChange}
+            placeholder={[t("common.dateFrom", lang), t("common.dateTo", lang)]}
+            allowClear
+            style={{ borderRadius: 8 }}
+          />
+        )}
         <Input
           prefix={<SearchOutlined className="text-gray-400" />}
           placeholder={t("common.search", lang)}

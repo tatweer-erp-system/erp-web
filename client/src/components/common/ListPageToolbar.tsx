@@ -1,6 +1,7 @@
 import { type ReactNode } from "react";
 
-import { Button, Tooltip, Segmented, Space } from "antd";
+import { Button, Tooltip, Segmented, Space, DatePicker } from "antd";
+import type { Dayjs } from "dayjs";
 import {
   PlusOutlined,
   FilterOutlined,
@@ -11,6 +12,8 @@ import {
 } from "@ant-design/icons";
 
 import { SearchInput } from "@/components/common/SearchInput";
+
+const { RangePicker } = DatePicker;
 
 type ListPageToolbarProps = {
   /** Current search value */
@@ -39,6 +42,12 @@ type ListPageToolbarProps = {
   onExport?: () => void;
   /** Export button label */
   exportLabel?: string;
+  /** Current date range filter value */
+  dateRange?: [Dayjs | null, Dayjs | null] | null;
+  /** Called when date range changes */
+  onDateRangeChange?: (dates: [Dayjs | null, Dayjs | null] | null) => void;
+  /** Placeholders for date range picker */
+  dateRangePlaceholder?: [string, string];
   /** Extra actions rendered after the standard buttons */
   extra?: ReactNode;
 };
@@ -64,6 +73,9 @@ export function ListPageToolbar({
   showExport = true,
   onExport,
   exportLabel,
+  dateRange,
+  onDateRangeChange,
+  dateRangePlaceholder,
   extra,
 }: ListPageToolbarProps) {
   return (
@@ -73,6 +85,16 @@ export function ListPageToolbar({
       </Button>
 
       <Space wrap size="small">
+        {onDateRangeChange && (
+          <RangePicker
+            value={dateRange}
+            onChange={onDateRangeChange}
+            placeholder={dateRangePlaceholder}
+            allowClear
+            style={{ borderRadius: 8 }}
+          />
+        )}
+
         <SearchInput
           value={search}
           onChange={onSearchChange}

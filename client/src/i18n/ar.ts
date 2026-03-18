@@ -1031,6 +1031,8 @@ export const ar: Record<string, string> = {
   "common.close": "إغلاق",
   "common.history": "سجل النشاط",
   "common.search": "بحث...",
+  "common.dateFrom": "من تاريخ",
+  "common.dateTo": "إلى تاريخ",
   "common.name": "الاسم",
   "common.name_required": "الاسم مطلوب",
   "common.fast_create_note":
