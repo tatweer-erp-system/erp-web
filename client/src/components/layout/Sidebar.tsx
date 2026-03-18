@@ -100,29 +100,7 @@ const NAV_ITEMS: NavItem[] = [
   // ── Sales (Odoo: Sales > Orders, Customers, Invoicing) ──────────────────
   { name: "SALES", isHeader: true },
   { name: "Quotations", icon: <FileTextOutlined />, href: "/quotations" },
-  {
-    name: "Sales Orders",
-    icon: <ShoppingCartOutlined />,
-    submenu: [
-      { name: "All Orders", href: "/all-orders" },
-      { name: "Pending", href: "/pending-orders" },
-      { name: "Completed", href: "/completed-orders" },
-    ],
-  },
-  {
-    name: "Customers",
-    icon: <TeamOutlined />,
-    submenu: [
-      { name: "All Customers", href: "/all-customers" },
-      { name: "Customer Groups", href: "/customer-groups" },
-    ],
-  },
-  {
-    name: "Sales Invoices",
-    icon: <FileProtectOutlined />,
-    href: "/sales-invoices",
-  },
-  { name: "Sales Returns", icon: <RollbackOutlined />, href: "/sales-returns" },
+  { name: "Sales Orders", icon: <ShoppingCartOutlined />, href: "/all-orders" },
   {
     name: "Definitions",
     icon: <DatabaseOutlined />,

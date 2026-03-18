@@ -1029,6 +1029,7 @@ export const ar: Record<string, string> = {
   "common.save": "حفظ",
   "common.create": "إنشاء",
   "common.close": "إغلاق",
+  "common.history": "سجل النشاط",
   "common.search": "بحث...",
   "common.name": "الاسم",
   "common.name_required": "الاسم مطلوب",
@@ -1085,4 +1086,221 @@ export const ar: Record<string, string> = {
 
   // POS
   "pos.cache_refresh_failed": "فشل تحديث ذاكرة التخزين المؤقت",
+
+  // ── Sales Orders ─────────────────────────────────────────────────────────────
+
+  // Page titles & navigation
+  "sales.orders.title": "أوامر البيع",
+  "sales.orders.subtitle": "إدارة عروض الأسعار وأوامر البيع",
+  "sales.orders.breadcrumb": "أوامر البيع",
+  "sales.quotations.title": "عروض الأسعار",
+  "sales.quotations.subtitle": "إدارة عروض الأسعار قبل التأكيد",
+  "sales.quotations.breadcrumb": "عروض الأسعار",
+
+  // Table columns
+  "sales.column.orderNumber": "رقم الأمر",
+  "sales.column.customer": "العميل",
+  "sales.column.date": "التاريخ",
+  "sales.column.deliveryDate": "تاريخ التسليم",
+  "sales.column.salesperson": "مندوب المبيعات",
+  "sales.column.total": "الإجمالي",
+  "sales.column.untaxedAmount": "المبلغ قبل الضريبة",
+  "sales.column.taxAmount": "مبلغ الضريبة",
+  "sales.column.status": "الحالة",
+  "sales.column.invoiceStatus": "حالة الفاتورة",
+  "sales.column.deliveryStatus": "حالة التسليم",
+  "sales.column.currency": "العملة",
+  "sales.column.branch": "الفرع",
+  "sales.column.pricelist": "قائمة الأسعار",
+
+  // Order status labels
+  "sales.status.draft": "مسودة",
+  "sales.status.confirmed": "مؤكد",
+  "sales.status.done": "مكتمل",
+  "sales.status.cancelled": "ملغي",
+
+  // Invoice sub-status labels
+  "sales.invoiceStatus.nothing": "لا شيء للفوترة",
+  "sales.invoiceStatus.to_invoice": "جاهز للفوترة",
+  "sales.invoiceStatus.invoiced": "تمت الفوترة",
+
+  // Delivery sub-status labels
+  "sales.deliveryStatus.pending": "قيد الانتظار",
+  "sales.deliveryStatus.partial": "تسليم جزئي",
+  "sales.deliveryStatus.done": "تم التسليم",
+
+  // Form field labels
+  "sales.field.customer": "العميل",
+  "sales.field.orderDate": "تاريخ الأمر",
+  "sales.field.deliveryDate": "تاريخ التسليم المتوقع",
+  "sales.field.paymentTerms": "شروط الدفع",
+  "sales.field.salesperson": "مندوب المبيعات",
+  "sales.field.pricelist": "قائمة الأسعار",
+  "sales.field.currency": "العملة",
+  "sales.field.branch": "الفرع",
+  "sales.field.fiscalPosition": "الوضع الضريبي",
+  "sales.field.notes": "ملاحظات",
+  "sales.field.discountType": "نوع الخصم",
+  "sales.field.discountValue": "قيمة الخصم",
+  "sales.field.discountPercentage": "نسبة مئوية",
+  "sales.field.discountFixed": "مبلغ ثابت",
+  "sales.field.orderNumber": "رقم الأمر",
+  "sales.field.reference": "المرجع",
+
+  // Line item labels
+  "sales.line.product": "المنتج",
+  "sales.line.variant": "المتغير",
+  "sales.line.description": "الوصف",
+  "sales.line.quantity": "الكمية",
+  "sales.line.unitPrice": "سعر الوحدة",
+  "sales.line.discount": "الخصم (%)",
+  "sales.line.taxRate": "نسبة الضريبة (%)",
+  "sales.line.tax": "الضريبة",
+  "sales.line.subtotal": "المجموع الفرعي",
+  "sales.line.total": "الإجمالي",
+  "sales.line.qtyToInvoice": "الكمية للفوترة",
+  "sales.line.qtyInvoiced": "الكمية المفوترة",
+  "sales.line.qtyDelivered": "الكمية المسلّمة",
+  "sales.line.qtyToDeliver": "الكمية للتسليم",
+  "sales.line.addLine": "إضافة بند",
+  "sales.line.removeLine": "حذف البند",
+  "sales.line.noLines": "لم تتم إضافة بنود بعد",
+
+  // Totals section
+  "sales.totals.subtotal": "المجموع الفرعي",
+  "sales.totals.discount": "الخصم",
+  "sales.totals.taxableAmount": "المبلغ الخاضع للضريبة",
+  "sales.totals.tax": "الضريبة (القيمة المضافة)",
+  "sales.totals.total": "الإجمالي",
+
+  // Action buttons
+  "sales.action.create": "أمر بيع جديد",
+  "sales.action.edit": "تعديل",
+  "sales.action.save": "حفظ",
+  "sales.action.confirm": "تأكيد الأمر",
+  "sales.action.cancel": "إلغاء الأمر",
+  "sales.action.delete": "حذف",
+  "sales.action.print": "طباعة",
+  "sales.action.duplicate": "تكرار",
+  "sales.action.createInvoice": "إنشاء فاتورة",
+  "sales.action.createDelivery": "إنشاء أمر تسليم",
+  "sales.action.createDownPayment": "إنشاء دفعة مقدمة",
+  "sales.action.exportPdf": "تصدير PDF",
+  "sales.action.exportExcel": "تصدير إكسل",
+  "sales.action.sendByEmail": "إرسال بالبريد الإلكتروني",
+  "sales.action.backToList": "العودة لأوامر البيع",
+
+  // Messages — success
+  "sales.message.created": "تم إنشاء أمر البيع بنجاح",
+  "sales.message.updated": "تم تحديث أمر البيع بنجاح",
+  "sales.message.confirmed": "تم تأكيد أمر البيع بنجاح",
+  "sales.message.cancelled": "تم إلغاء أمر البيع بنجاح",
+  "sales.message.deleted": "تم حذف أمر البيع بنجاح",
+  "sales.message.invoiceCreated": "تم إنشاء الفاتورة بنجاح",
+  "sales.message.deliveryCreated": "تم إنشاء أمر التسليم بنجاح",
+  "sales.message.downPaymentCreated": "تم إنشاء فاتورة الدفعة المقدمة بنجاح",
+
+  // Messages — confirmation dialogs
+  "sales.message.confirmOrder": "هل أنت متأكد من تأكيد أمر البيع هذا؟",
+  "sales.message.confirmOrderNote":
+    "سيتم حجز المخزون للمنتجات القابلة للتخزين.",
+  "sales.message.cancelWarning": "هل أنت متأكد من إلغاء أمر البيع هذا؟",
+  "sales.message.cancelWarningNote": "سيتم إلغاء جميع حجوزات المخزون.",
+  "sales.message.deleteConfirm": "هل أنت متأكد من حذف أمر البيع هذا؟",
+  "sales.message.deleteConfirmNote":
+    "يمكن حذف الأوامر بحالة مسودة فقط. لا يمكن التراجع عن هذا الإجراء.",
+
+  // Messages — errors & validation
+  "sales.message.atLeastOneLine":
+    "يجب أن يحتوي أمر البيع على بند واحد على الأقل",
+  "sales.message.customerRequired": "يرجى اختيار عميل",
+  "sales.message.insufficientStock":
+    "مخزون غير كافٍ للمنتج {product}: المتاح {available}، المطلوب {ordered}",
+  "sales.message.creditLimitExceeded": "تم تجاوز الحد الائتماني",
+  "sales.message.creditLimitBlocked":
+    "تم تجاوز الحد الائتماني — لا يمكن تأكيد الأمر",
+  "sales.message.cannotCancelInvoices":
+    "لا يمكن الإلغاء: توجد فواتير مرتبطة. يرجى إلغاؤها أو حذفها أولاً.",
+  "sales.message.cannotCancelDeliveries":
+    "لا يمكن الإلغاء: توجد عمليات تسليم مرتبطة. يرجى إلغاؤها أو إرجاعها أولاً.",
+  "sales.message.positiveQtyRequired":
+    "يجب أن تكون الكميات موجبة في جميع البنود",
+  "sales.message.loadFailed": "فشل تحميل أمر البيع",
+
+  // Credit limit banner
+  "sales.credit.outstanding": "المستحقات",
+  "sales.credit.thisOrder": "هذا الأمر",
+  "sales.credit.limit": "الحد الائتماني",
+  "sales.credit.withinLimit": "ضمن الحد الائتماني",
+  "sales.credit.exceeded": "تم تجاوز الحد الائتماني",
+
+  // Pricelist
+  "sales.pricelist.recalculate":
+    "إعادة حساب جميع أسعار البنود من قائمة الأسعار الجديدة؟",
+  "sales.pricelist.listPrice": "سعر القائمة",
+  "sales.pricelist.pricelistPrice": "سعر قائمة الأسعار",
+  "sales.pricelist.manualOverride":
+    "تم تعديل السعر يدوياً. سعر قائمة الأسعار: {price} ر.س",
+
+  // Down payments
+  "sales.downPayment.title": "الدفعات المقدمة",
+  "sales.downPayment.type": "نوع الدفعة المقدمة",
+  "sales.downPayment.percentage": "نسبة مئوية",
+  "sales.downPayment.fixedAmount": "مبلغ ثابت",
+  "sales.downPayment.amount": "المبلغ",
+  "sales.downPayment.value": "القيمة",
+  "sales.downPayment.invoice": "الفاتورة",
+  "sales.downPayment.date": "التاريخ",
+  "sales.downPayment.noDownPayments": "لا توجد دفعات مقدمة بعد",
+  "sales.downPayment.deduction": "خصم دفعة مقدمة (فاتورة #{invoice})",
+
+  // Invoice creation dialog
+  "sales.invoice.type": "نوع الفاتورة",
+  "sales.invoice.regular": "فاتورة عادية",
+  "sales.invoice.downPaymentPercentage": "دفعة مقدمة (نسبة مئوية)",
+  "sales.invoice.downPaymentFixed": "دفعة مقدمة (مبلغ ثابت)",
+  "sales.invoice.percentageLabel": "النسبة (%)",
+  "sales.invoice.fixedAmountLabel": "المبلغ (ر.س)",
+
+  // Quotation-specific labels
+  "sales.quotation.title": "عرض سعر",
+  "sales.quotation.newQuotation": "عرض سعر جديد",
+  "sales.quotation.validUntil": "صالح حتى",
+  "sales.quotation.convertToOrder": "تحويل إلى أمر بيع",
+  "sales.quotation.send": "إرسال عرض السعر",
+  "sales.quotation.expired": "انتهت صلاحية عرض السعر",
+  "sales.quotation.convertConfirm": "تحويل عرض السعر هذا إلى أمر بيع؟",
+
+  // Summary / reports
+  "sales.summary.title": "ملخص المبيعات",
+  "sales.summary.totalOrders": "إجمالي الأوامر",
+  "sales.summary.totalRevenue": "إجمالي الإيرادات",
+  "sales.summary.averageOrderValue": "متوسط قيمة الأمر",
+  "sales.summary.pendingInvoices": "فواتير معلقة",
+  "sales.summary.pendingDeliveries": "عمليات تسليم معلقة",
+
+  // Combo product
+  "sales.combo.chooseOptions": "اختر الخيارات",
+  "sales.combo.required": "مطلوب",
+  "sales.combo.optional": "اختياري",
+  "sales.combo.basePrice": "السعر الأساسي",
+  "sales.combo.totalPrice": "السعر الإجمالي",
+  "sales.combo.editSelections": "تعديل الاختيارات",
+
+  // Filters
+  "sales.filter.allStatuses": "جميع الحالات",
+  "sales.filter.dateRange": "نطاق التاريخ",
+  "sales.filter.customer": "العميل",
+  "sales.filter.salesperson": "مندوب المبيعات",
+
+  // Fast-create drawer
+  "sales.fastCreate.subtitle": "إنشاء طلب بيع سريع",
+  "sales.fastCreate.quotationSubtitle": "إنشاء عرض سعر سريع",
+  "sales.fastCreate.saveAndOpen": "حفظ وفتح",
+  "sales.fastCreate.note": "يمكنك إضافة المزيد من التفاصيل من صفحة التفاصيل",
+  "sales.fastCreate.unsavedWarning":
+    "لديك تغييرات غير محفوظة. هل أنت متأكد من الإغلاق؟",
+  "common.view": "عرض",
+  "sales.error.customerRequired": "العميل مطلوب",
+  "sales.error.atLeastOneLine": "يجب إضافة بند واحد على الأقل",
 };

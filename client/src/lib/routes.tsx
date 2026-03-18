@@ -143,10 +143,34 @@ export const routes: RouteConfig[] = [
     breadcrumb: ["Sales", "Order Details"],
   },
   {
+    path: "/sales/orders/create",
+    component: lz(() => import("@/pages/sales/SalesOrderCreatePage")),
+    permissions: ["sales:manage"],
+    breadcrumb: ["Sales", "Orders", "Create"],
+  },
+  {
+    path: "/sales/orders/:id",
+    component: lz(() => import("@/pages/sales/SalesOrderDetailPage")),
+    permissions: ["sales:read"],
+    breadcrumb: ["Sales", "Orders", "Detail"],
+  },
+  {
     path: "/quotations",
     component: lz(() => import("@/pages/Quotations")),
     permissions: ["sales:read"],
     breadcrumb: ["Sales", "Quotations"],
+  },
+  {
+    path: "/sales/quotations/create",
+    component: lz(() => import("@/pages/sales/SalesOrderCreatePage")),
+    permissions: ["sales:manage"],
+    breadcrumb: ["Sales", "Quotations", "Create"],
+  },
+  {
+    path: "/sales/quotations/:id",
+    component: lz(() => import("@/pages/sales/QuotationDetailPage")),
+    permissions: ["sales:read"],
+    breadcrumb: ["Sales", "Quotations", "Detail"],
   },
   {
     path: "/sales-invoices",

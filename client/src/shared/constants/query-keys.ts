@@ -64,9 +64,18 @@ export const queryKeys = {
     all: ["sale-orders"],
     list: (params?: Record<string, unknown>) => ["sale-orders", "list", params],
     detail: (id: string) => ["sale-orders", "detail", id],
+    dropdown: ["sale-orders", "dropdown"],
     pending: ["sale-orders", "pending"],
     completed: ["sale-orders", "completed"],
     quotations: ["sale-orders", "quotations"],
+    quotationList: (params?: Record<string, unknown>) => [
+      "sale-orders",
+      "quotations",
+      "list",
+      params,
+    ],
+    quotationDetail: (id: string) => ["sale-orders", "quotations", id],
+    quotationDropdown: ["sale-orders", "quotations", "dropdown"],
   },
 
   purchaseOrders: {
@@ -223,3 +232,6 @@ export const queryKeys = {
     reconciliation: ["treasury", "reconciliation"],
   },
 } as const;
+
+/** @deprecated Use `queryKeys` instead — re-exported for backward compatibility */
+export { QUERY_KEYS } from "@/constants/queryKeys";

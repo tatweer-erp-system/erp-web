@@ -27,7 +27,7 @@ apiClient.interceptors.request.use(config => {
 
   const branchId = useBranchStore.getState().activeBranch?.id;
   if (branchId) {
-    config.headers["X-Branch-Id"] = String(branchId);
+    config.headers["x-branch-id"] = String(branchId);
   }
 
   return config;

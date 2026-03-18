@@ -1,832 +1,510 @@
-import { useState, useMemo } from "react";
-import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { CreateQuotationModal } from "@/pages/CreateQuotation";
-import { useLangStore } from "@/stores/lang.store";
-import { useThemeStore } from "@/stores/theme.store";
+/**
+ * Quotations list page.
+ * Quotations are draft sales orders -- uses useQuotations hook (status=draft filter).
+ * Default export for lazy loading via React.lazy().
+ */
+
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
+
 import {
   Table,
   Button,
   Input,
-  Tag,
-  Space,
   Card,
   Row,
   Col,
   Grid,
-  Statistic,
-  Modal,
-  Form,
-  InputNumber,
-  Select,
   Tooltip,
-  Popconfirm,
-  message,
-  Typography,
   Dropdown,
   Segmented,
-  Avatar,
+  Typography,
 } from "antd";
 import type { TableColumnsType, TableProps } from "antd";
 import {
   PlusOutlined,
   SearchOutlined,
   ReloadOutlined,
-  PrinterOutlined,
   DownloadOutlined,
-  FilterOutlined,
-  EditOutlined,
-  DeleteOutlined,
   AppstoreOutlined,
   UnorderedListOutlined,
   ExportOutlined,
   MoreOutlined,
   EyeOutlined,
+  EditOutlined,
+  DeleteOutlined,
   SwapOutlined,
-  FileTextOutlined,
-  ClockCircleOutlined,
-  CheckCircleOutlined,
-  DollarOutlined,
+  CopyOutlined,
 } from "@ant-design/icons";
-import { QuotationStatus } from "@/constants/enums";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import dayjs from "dayjs";
+
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
+import { SalesStatusBadge } from "@/components/sales/SalesStatusBadge";
+import { SalesOrderCard } from "@/components/sales/SalesOrderCard";
+import { QuotationStats } from "@/components/sales/QuotationStats";
+import { ConfirmDialog } from "@/components/common/ConfirmDialog";
+import { SalesOrderFastCreate } from "@/components/sales/SalesOrderFastCreate";
+import { useTranslation } from "@/hooks/ui/useTranslation";
+import { useQuotations } from "@/hooks/queries/useSalesOrders";
+import {
+  useConfirmSalesOrder,
+  useDeleteSalesOrder,
+} from "@/hooks/mutations/useSalesOrderMutations";
+import { ROUTES } from "@/shared/constants/routes";
+import { getName } from "@/shared/utils/getName.util";
+import type {
+  SalesOrderRow,
+  SalesOrderFilterParams,
+} from "@/types/modules/sales";
 
 const { Text } = Typography;
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface Quotation {
-  id: number;
-  quoteNo: string;
-  customer: string;
-  amount: number;
-  status: QuotationStatus;
-  date: string;
-  validUntil: string;
-  salesRep: string;
-}
-
-// ─── Mock data ─────────────────────────────────────────────────────────────────
-
-const quotationsData: Quotation[] = [
-  {
-    id: 1,
-    quoteNo: "QT-2024-001",
-    customer: "Tech Corp",
-    amount: 5000,
-    status: QuotationStatus.PENDING,
-    date: "2024-02-20",
-    validUntil: "2024-03-20",
-    salesRep: "Ahmed Al-Rashid",
-  },
-  {
-    id: 2,
-    quoteNo: "QT-2024-002",
-    customer: "Global Industries",
-    amount: 12500,
-    status: QuotationStatus.ACCEPTED,
-    date: "2024-02-19",
-    validUntil: "2024-03-19",
-    salesRep: "Sara Johnson",
-  },
-  {
-    id: 3,
-    quoteNo: "QT-2024-003",
-    customer: "Local Business",
-    amount: 3200,
-    status: QuotationStatus.REJECTED,
-    date: "2024-02-18",
-    validUntil: "2024-03-18",
-    salesRep: "Mohamed Ali",
-  },
-  {
-    id: 4,
-    quoteNo: "QT-2024-004",
-    customer: "Enterprise Ltd",
-    amount: 25000,
-    status: QuotationStatus.PENDING,
-    date: "2024-02-17",
-    validUntil: "2024-03-17",
-    salesRep: "Emily Chen",
-  },
-  {
-    id: 5,
-    quoteNo: "QT-2024-005",
-    customer: "Startup Inc",
-    amount: 8750,
-    status: QuotationStatus.ACCEPTED,
-    date: "2024-02-16",
-    validUntil: "2024-03-16",
-    salesRep: "Ahmed Al-Rashid",
-  },
-  {
-    id: 6,
-    quoteNo: "QT-2024-006",
-    customer: "Alpha Solutions",
-    amount: 15300,
-    status: QuotationStatus.EXPIRED,
-    date: "2024-01-10",
-    validUntil: "2024-02-10",
-    salesRep: "Bob Smith",
-  },
-  {
-    id: 7,
-    quoteNo: "QT-2024-007",
-    customer: "Beta Corp",
-    amount: 7400,
-    status: QuotationStatus.PENDING,
-    date: "2024-02-15",
-    validUntil: "2024-03-15",
-    salesRep: "Sara Johnson",
-  },
-];
-
-const STATUS_TAG: Record<QuotationStatus, { color: string; label: string }> = {
-  [QuotationStatus.PENDING]: { color: "orange", label: "Pending" },
-  [QuotationStatus.ACCEPTED]: { color: "success", label: "Accepted" },
-  [QuotationStatus.REJECTED]: { color: "error", label: "Rejected" },
-  [QuotationStatus.EXPIRED]: { color: "default", label: "Expired" },
-};
-
-// ─── Component ────────────────────────────────────────────────────────────────
+const DEFAULT_PAGE_SIZE = 20;
 
 export default function Quotations() {
-  const lang = useLangStore(s => s.lang);
-  const theme = useThemeStore(s => s.mode);
+  const { t, lang } = useTranslation();
+  const navigate = useNavigate();
   const screens = Grid.useBreakpoint();
   const isMobile = !screens.md;
-  const primary = theme === "dark" ? "#37D399" : "#3B82F6";
-  const borderSub = theme === "dark" ? "#232923" : "#EFF3F7";
-  const textMuted = theme === "dark" ? "#8a9a8a" : "#94a3b8";
-  const token = {
-    colorPrimary: primary,
-    colorBorderSecondary: borderSub,
-    colorTextQuaternary: textMuted,
-  };
-  const [viewMode, setViewMode] = useState<"table" | "grid">("table");
+
+  const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [selectedRows, setSelectedRows] = useState<number[]>([]);
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [isEditOpen, setIsEditOpen] = useState(false);
-  const [editRecord, setEditRecord] = useState<Quotation | null>(null);
-  const [editForm] = Form.useForm();
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
-  const filtered = useMemo(() => {
-    let d = quotationsData;
-    if (search) {
-      const q = search.toLowerCase();
-      d = d.filter(
-        i =>
-          i.quoteNo.toLowerCase().includes(q) ||
-          i.customer.toLowerCase().includes(q)
-      );
-    }
-    if (statusFilter !== "all") d = d.filter(i => i.status === statusFilter);
-    return d;
-  }, [search, statusFilter]);
+  useEffect(() => {
+    debounceRef.current = setTimeout(() => {
+      setSearch(searchInput);
+      setPage(1);
+    }, 400);
+    return () => clearTimeout(debounceRef.current);
+  }, [searchInput]);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const [viewMode, setViewMode] = useState<"table" | "grid">("table");
+  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const [confirmAsOrderId, setConfirmAsOrderId] = useState<string | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [fastCreateOpen, setFastCreateOpen] = useState(false);
 
-  const totalValue = quotationsData.reduce((s, i) => s + i.amount, 0);
+  const queryParams = useMemo<Omit<SalesOrderFilterParams, "status">>(
+    () => ({
+      page,
+      limit: pageSize,
+      search: search || undefined,
+      sortOrder: "DESC",
+    }),
+    [page, pageSize, search]
+  );
 
-  function handleExport() {
-    const csv = [
-      [
-        "Quote No",
-        "Customer",
-        "Amount",
-        "Status",
-        "Date",
-        "Valid Until",
-        "Sales Rep",
-      ],
-      ...filtered.map(i => [
-        i.quoteNo,
-        i.customer,
-        `$${i.amount}`,
-        i.status,
-        i.date,
-        i.validUntil,
-        i.salesRep,
-      ]),
-    ]
-      .map(r => r.join(","))
-      .join("\n");
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
-    a.download = "quotations.csv";
-    a.click();
-  }
+  const { data: res, isLoading, refetch } = useQuotations(queryParams);
+  const confirmMut = useConfirmSalesOrder();
+  const deleteMut = useDeleteSalesOrder();
 
-  function openEdit(record: Quotation) {
-    setEditRecord(record);
-    editForm.setFieldsValue(record);
-    setIsEditOpen(true);
-  }
+  const quotations = res?.data ?? [];
+  const totalRows = res?.total ?? 0;
 
-  const columns: TableColumnsType<Quotation> = [
-    {
-      title: "Quote No",
-      dataIndex: "quoteNo",
-      sorter: (a, b) => a.quoteNo.localeCompare(b.quoteNo),
-      render: v => (
-        <Text
-          strong
-          style={{ color: token.colorPrimary, fontFamily: "monospace" }}
-        >
-          {v}
-        </Text>
-      ),
-    },
-    {
-      title: "Customer",
-      dataIndex: "customer",
-      sorter: (a, b) => a.customer.localeCompare(b.customer),
-      render: v => (
-        <Space>
-          <Avatar
-            size={28}
-            style={{ background: token.colorPrimary, fontSize: 11 }}
-          >
-            {v.slice(0, 2).toUpperCase()}
-          </Avatar>
-          <Text>{v}</Text>
-        </Space>
-      ),
-    },
-    {
-      title: "Amount",
-      dataIndex: "amount",
-      sorter: (a, b) => a.amount - b.amount,
-      render: v => <Text strong>${v.toLocaleString()}</Text>,
-    },
-    {
-      title: "Status",
-      dataIndex: "status",
-      filters: (Object.keys(STATUS_TAG) as QuotationStatus[]).map(k => ({
-        text: STATUS_TAG[k].label,
-        value: k,
-      })),
-      onFilter: (val, rec) => rec.status === val,
-      render: (v: QuotationStatus) => {
-        const s = STATUS_TAG[v];
-        return (
-          <Tag
-            color={s.color}
-            style={{ borderRadius: 20, padding: "2px 10px" }}
-          >
-            {s.label}
-          </Tag>
-        );
+  const handleRowClick = useCallback(
+    (orderNumber: string) => navigate(ROUTES.quotationDetail(orderNumber)),
+    [navigate]
+  );
+
+  const handleConfirmAsOrder = useCallback(() => {
+    if (!confirmAsOrderId) return;
+    confirmMut.mutate(confirmAsOrderId, {
+      onSuccess: () => {
+        toast.success(t("sales.message.confirmed", lang));
+        setConfirmAsOrderId(null);
+        navigate(ROUTES.orderDetail(confirmAsOrderId));
       },
-    },
-    {
-      title: "Issue Date",
-      dataIndex: "date",
-      sorter: (a, b) => a.date.localeCompare(b.date),
-      render: v => <Text type="secondary">{v}</Text>,
-    },
-    {
-      title: "Valid Until",
-      dataIndex: "validUntil",
-      render: v => <Text type="secondary">{v}</Text>,
-    },
-    {
-      title: "Sales Rep",
-      dataIndex: "salesRep",
-      render: v => <Text type="secondary">{v}</Text>,
-    },
-    {
-      title: "Actions",
-      align: "center",
-      width: 60,
-      render: (_, rec) => (
-        <Dropdown
-          menu={{
-            items: [
-              {
-                key: "edit",
-                label: "Edit",
-                icon: <EditOutlined />,
-                onClick: () => openEdit(rec),
-              },
-              { key: "view", label: "View Details", icon: <EyeOutlined /> },
-              {
-                key: "convert",
-                label: "Convert to Order",
-                icon: <SwapOutlined />,
-              },
-              { type: "divider" },
-              {
-                key: "delete",
-                label: "Delete",
-                danger: true,
-                icon: <DeleteOutlined />,
-                onClick: () => message.success(`${rec.quoteNo} deleted`),
-              },
-            ],
-          }}
-          trigger={["click"]}
-        >
-          <Button type="text" icon={<MoreOutlined />} />
-        </Dropdown>
-      ),
-    },
+      onError: () => toast.error(t("sales.message.loadFailed", lang)),
+    });
+  }, [confirmAsOrderId, confirmMut, t, lang, navigate]);
+
+  const handleDelete = useCallback(() => {
+    if (!deleteId) return;
+    deleteMut.mutate(deleteId, {
+      onSuccess: () => {
+        toast.success(t("sales.message.deleted", lang));
+        setDeleteId(null);
+      },
+      onError: () => toast.error(t("sales.message.loadFailed", lang)),
+    });
+  }, [deleteId, deleteMut, t, lang]);
+
+  const columns = useQuotationColumns(
+    t,
+    lang,
+    handleRowClick,
+    navigate,
+    setConfirmAsOrderId,
+    setDeleteId
+  );
+
+  const rowSelection: TableProps<SalesOrderRow>["rowSelection"] = {
+    selectedRowKeys: selectedRows,
+    onChange: keys => setSelectedRows(keys as string[]),
+  };
+
+  const breadcrumbs = [
+    { label: t("Dashboard", lang), href: ROUTES.DASHBOARD },
+    { label: t("SALES", lang), href: "#" },
+    { label: t("sales.quotations.breadcrumb", lang) },
   ];
 
-  const rowSelection: TableProps<Quotation>["rowSelection"] = {
-    selectedRowKeys: selectedRows,
-    onChange: keys => setSelectedRows(keys as number[]),
-  };
-
   return (
-    <DashboardLayout
-      currentPage="Quotations"
-      breadcrumbs={[
-        { label: "Dashboard", href: "/" },
-        { label: "Sales", href: "#" },
-        { label: "Quotations" },
-      ]}
-    >
-      <Space orientation="vertical" size={20} style={{ width: "100%" }}>
-        {/* ── KPI Cards ──────────────────────────────────────────────────── */}
-        <Row gutter={[16, 16]}>
-          {[
-            {
-              title: "Total Quotations",
-              value: quotationsData.length,
-              suffix: "all time",
-              icon: <FileTextOutlined />,
-              iconColor: token.colorPrimary,
-              iconBg: `${token.colorPrimary}15`,
-              color: undefined,
-            },
-            {
-              title: "Pending",
-              value: quotationsData.filter(
-                i => i.status === QuotationStatus.PENDING
-              ).length,
-              suffix: "awaiting response",
-              icon: <ClockCircleOutlined />,
-              iconColor: "#f59e0b",
-              iconBg: "#f59e0b15",
-              color: "#f59e0b",
-            },
-            {
-              title: "Accepted",
-              value: quotationsData.filter(
-                i => i.status === QuotationStatus.ACCEPTED
-              ).length,
-              suffix: "converted to orders",
-              icon: <CheckCircleOutlined />,
-              iconColor: "#10b981",
-              iconBg: "#10b98115",
-              color: "#10b981",
-            },
-            {
-              title: "Pipeline Value",
-              value: `$${(totalValue / 1000).toFixed(0)}K`,
-              suffix: "total quoted",
-              icon: <DollarOutlined />,
-              iconColor: "#8b5cf6",
-              iconBg: "#8b5cf615",
-              color: undefined,
-              isStr: true,
-            },
-          ].map(s => (
-            <Col key={s.title} xs={24} sm={12} lg={6}>
-              <Card size="small" styles={{ body: { padding: "16px 20px" } }}>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "flex-start",
-                  }}
-                >
-                  <div>
-                    <Text
-                      type="secondary"
-                      style={{
-                        fontSize: 12,
-                        display: "block",
-                        marginBottom: 4,
-                      }}
-                    >
-                      {s.title}
-                    </Text>
-                    {s.isStr ? (
-                      <Text strong style={{ fontSize: 24, lineHeight: 1 }}>
-                        {s.value}
-                      </Text>
-                    ) : (
-                      <Statistic
-                        value={s.value as number}
-                        valueStyle={{
-                          fontSize: 24,
-                          lineHeight: 1,
-                          color: s.color ?? "inherit",
-                        }}
-                      />
-                    )}
-                    <Text type="secondary" style={{ fontSize: 12 }}>
-                      {s.suffix}
-                    </Text>
-                  </div>
-                  <div
-                    style={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: 10,
-                      background: s.iconBg,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: 18,
-                      color: s.iconColor,
-                    }}
-                  >
-                    {s.icon}
-                  </div>
-                </div>
-              </Card>
-            </Col>
-          ))}
-        </Row>
+    <DashboardLayout currentPage="Quotations" breadcrumbs={breadcrumbs}>
+      <div className="flex flex-col gap-6">
+        <QuotationStats totalRows={totalRows} t={t} lang={lang} />
 
-        {/* ── Toolbar Card ───────────────────────────────────────────────── */}
         <Card size="small" styles={{ body: { padding: "12px 16px" } }}>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: 8,
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Space wrap>
-              <Input
-                prefix={
-                  <SearchOutlined
-                    style={{ color: token.colorTextQuaternary }}
-                  />
-                }
-                placeholder="Search by quote number or customer…"
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                allowClear
-                style={{ width: 280 }}
-              />
-              <Select
-                value={statusFilter}
-                onChange={setStatusFilter}
-                style={{ width: 160 }}
-                suffixIcon={<FilterOutlined />}
-                options={[
-                  { value: "all", label: "All Statuses" },
-                  { value: "pending", label: "Pending" },
-                  { value: "accepted", label: "Accepted" },
-                  { value: "rejected", label: "Rejected" },
-                  { value: "expired", label: "Expired" },
-                ]}
-              />
-            </Space>
-
-            <Space>
-              <Tooltip title="Reload">
-                <Button
-                  icon={<ReloadOutlined />}
-                  onClick={() => message.info("Reloaded")}
-                />
-              </Tooltip>
-              <Tooltip title="Print">
-                <Button
-                  icon={<PrinterOutlined />}
-                  onClick={() => window.print()}
-                />
-              </Tooltip>
-              <Dropdown
-                menu={{
-                  items: [
-                    {
-                      key: "csv",
-                      label: "Export as CSV",
-                      icon: <ExportOutlined />,
-                      onClick: handleExport,
-                    },
-                    {
-                      key: "excel",
-                      label: "Export as Excel",
-                      icon: <ExportOutlined />,
-                    },
-                    {
-                      key: "pdf",
-                      label: "Export as PDF",
-                      icon: <ExportOutlined />,
-                    },
-                  ],
-                }}
-              >
-                <Button icon={<DownloadOutlined />}>Export</Button>
-              </Dropdown>
-              <Segmented
-                value={viewMode}
-                onChange={v => setViewMode(v as "table" | "grid")}
-                options={[
-                  { value: "table", icon: <UnorderedListOutlined /> },
-                  { value: "grid", icon: <AppstoreOutlined /> },
-                ]}
-              />
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={() => setIsCreateOpen(true)}
-              >
-                Create Quotation
-              </Button>
-            </Space>
-          </div>
+          <QuotationsToolbar
+            search={searchInput}
+            onSearchChange={setSearchInput}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+            onReload={() => refetch()}
+            onCreateNew={() => navigate(ROUTES.QUOTATION_CREATE)}
+            t={t}
+            lang={lang}
+          />
 
           {selectedRows.length > 0 && (
-            <div
-              style={{
-                marginTop: 10,
-                padding: "8px 12px",
-                background: `${token.colorPrimary}10`,
-                border: `1px solid ${token.colorPrimary}30`,
-                borderRadius: 6,
-                display: "flex",
-                gap: 12,
-                alignItems: "center",
-              }}
-            >
-              <Text strong style={{ color: token.colorPrimary }}>
-                {selectedRows.length} selected
-              </Text>
-              <Button
-                size="small"
-                danger
-                icon={<DeleteOutlined />}
-                onClick={() => {
-                  message.success("Deleted");
-                  setSelectedRows([]);
-                }}
-              >
-                Delete
-              </Button>
-              <Button size="small" icon={<SwapOutlined />}>
-                Convert to Orders
-              </Button>
-              <Button
-                size="small"
-                icon={<DownloadOutlined />}
-                onClick={handleExport}
-              >
-                Export
-              </Button>
-              <Button
-                size="small"
-                type="text"
-                onClick={() => setSelectedRows([])}
-              >
-                Clear
-              </Button>
-            </div>
+            <QuotationsBulkBar
+              count={selectedRows.length}
+              onClear={() => setSelectedRows([])}
+              t={t}
+              lang={lang}
+            />
           )}
         </Card>
 
-        {/* ── Table View ─────────────────────────────────────────────────── */}
-        {viewMode === "table" && (
+        {viewMode === "table" && !isMobile ? (
           <Card styles={{ body: { padding: 0 } }}>
             <Table
               rowKey="id"
               columns={columns}
-              dataSource={filtered}
+              dataSource={quotations}
               rowSelection={rowSelection}
+              loading={isLoading}
               size="middle"
               scroll={{ x: "max-content" }}
+              onRow={rec => ({
+                onClick: () => handleRowClick(rec.orderNumber),
+                style: { cursor: "pointer" },
+              })}
               pagination={{
-                pageSize: 10,
+                current: page,
+                pageSize,
+                total: totalRows,
                 showSizeChanger: true,
+                pageSizeOptions: ["10", "20", "50", "100"],
                 showTotal: (total, range) =>
-                  `${range[0]}–${range[1]} of ${total} quotations`,
-                pageSizeOptions: ["5", "10", "25", "50"],
+                  `${range[0]}--${range[1]} of ${total}`,
+                onChange: (p, ps) => {
+                  setPage(p);
+                  setPageSize(ps);
+                },
               }}
-              locale={{ emptyText: "No quotations found." }}
+              locale={{ emptyText: t("sales.line.noLines", lang) }}
             />
           </Card>
+        ) : (
+          <QuotationsMobileGrid
+            orders={quotations}
+            isLoading={isLoading}
+            onClick={handleRowClick}
+            t={t}
+            lang={lang}
+          />
         )}
+      </div>
 
-        {/* ── Grid View ──────────────────────────────────────────────────── */}
-        {viewMode === "grid" && (
-          <Row gutter={[16, 16]}>
-            {filtered.map(item => {
-              const s = STATUS_TAG[item.status];
-              return (
-                <Col key={item.id} xs={24} sm={12} xl={8}>
-                  <Card
-                    size="small"
-                    hoverable
-                    styles={{ body: { padding: 16 } }}
-                  >
-                    {/* Header */}
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "flex-start",
-                        marginBottom: 12,
-                      }}
-                    >
-                      <div>
-                        <Text
-                          strong
-                          style={{
-                            fontFamily: "monospace",
-                            color: token.colorPrimary,
-                            display: "block",
-                            marginBottom: 2,
-                          }}
-                        >
-                          {item.quoteNo}
-                        </Text>
-                        <Space size={4}>
-                          <Avatar
-                            size={20}
-                            style={{
-                              background: token.colorPrimary,
-                              fontSize: 10,
-                            }}
-                          >
-                            {item.customer.slice(0, 2).toUpperCase()}
-                          </Avatar>
-                          <Text style={{ fontSize: 13 }}>{item.customer}</Text>
-                        </Space>
-                      </div>
-                      <Tag color={s.color} style={{ borderRadius: 20 }}>
-                        {s.label}
-                      </Tag>
-                    </div>
-
-                    {/* Amount */}
-                    <Text
-                      strong
-                      style={{
-                        fontSize: 20,
-                        display: "block",
-                        marginBottom: 10,
-                      }}
-                    >
-                      ${item.amount.toLocaleString()}
-                    </Text>
-
-                    {/* Dates */}
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        padding: "8px 0",
-                        borderTop: `1px solid ${token.colorBorderSecondary}`,
-                        borderBottom: `1px solid ${token.colorBorderSecondary}`,
-                        marginBottom: 10,
-                      }}
-                    >
-                      <div>
-                        <Text
-                          type="secondary"
-                          style={{ fontSize: 11, display: "block" }}
-                        >
-                          Issue Date
-                        </Text>
-                        <Text style={{ fontSize: 12 }}>{item.date}</Text>
-                      </div>
-                      <div style={{ textAlign: "right" }}>
-                        <Text
-                          type="secondary"
-                          style={{ fontSize: 11, display: "block" }}
-                        >
-                          Valid Until
-                        </Text>
-                        <Text style={{ fontSize: 12 }}>{item.validUntil}</Text>
-                      </div>
-                    </div>
-
-                    {/* Actions */}
-                    <Space
-                      style={{ width: "100%", justifyContent: "space-between" }}
-                    >
-                      <Text type="secondary" style={{ fontSize: 12 }}>
-                        {item.salesRep}
-                      </Text>
-                      <Space size={4}>
-                        <Tooltip title="Edit">
-                          <Button
-                            size="small"
-                            type="text"
-                            icon={<EditOutlined />}
-                            onClick={() => openEdit(item)}
-                          />
-                        </Tooltip>
-                        <Tooltip title="Convert to Order">
-                          <Button
-                            size="small"
-                            type="text"
-                            icon={<SwapOutlined />}
-                          />
-                        </Tooltip>
-                        <Popconfirm
-                          title="Delete this quotation?"
-                          onConfirm={() => message.success("Deleted")}
-                          okButtonProps={{ danger: true }}
-                        >
-                          <Tooltip title="Delete">
-                            <Button
-                              size="small"
-                              type="text"
-                              danger
-                              icon={<DeleteOutlined />}
-                            />
-                          </Tooltip>
-                        </Popconfirm>
-                      </Space>
-                    </Space>
-                  </Card>
-                </Col>
-              );
-            })}
-          </Row>
-        )}
-      </Space>
-
-      {/* ── Create Modal ──────────────────────────────────────────────────── */}
-      {isCreateOpen && (
-        <CreateQuotationModal onClose={() => setIsCreateOpen(false)} />
-      )}
-
-      {/* ── Edit Modal ───────────────────────────────────────────────────── */}
-      <Modal
-        title={
-          <Space>
-            <EditOutlined />
-            <span>{editRecord?.quoteNo ?? ""}</span>
-          </Space>
-        }
-        open={isEditOpen}
-        onOk={() =>
-          editForm.validateFields().then(() => {
-            message.success("Quotation updated");
-            setIsEditOpen(false);
-          })
-        }
-        onCancel={() => setIsEditOpen(false)}
-        okText="Save Changes"
-        width={isMobile ? "95vw" : 480}
-        destroyOnHidden
-      >
-        <Form form={editForm} layout="vertical" style={{ marginTop: 16 }}>
-          <Form.Item label="Quote Number" name="quoteNo">
-            <Input disabled />
-          </Form.Item>
-          <Form.Item
-            label="Customer"
-            name="customer"
-            rules={[{ required: true }]}
-          >
-            <Input placeholder="Customer name" />
-          </Form.Item>
-          <Form.Item
-            label="Amount ($)"
-            name="amount"
-            rules={[{ required: true }]}
-          >
-            <InputNumber
-              min={0}
-              precision={2}
-              style={{ width: "100%" }}
-              placeholder="0.00"
-            />
-          </Form.Item>
-          <Form.Item label="Status" name="status">
-            <Select
-              options={[
-                { value: "pending", label: "Pending" },
-                { value: "accepted", label: "Accepted" },
-                { value: "rejected", label: "Rejected" },
-                { value: "expired", label: "Expired" },
-              ]}
-            />
-          </Form.Item>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item label="Issue Date" name="date">
-                <Input />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item label="Valid Until" name="validUntil">
-                <Input />
-              </Form.Item>
-            </Col>
-          </Row>
-        </Form>
-      </Modal>
+      <ConfirmDialog
+        open={!!confirmAsOrderId}
+        onOpenChange={v => !v && setConfirmAsOrderId(null)}
+        title={t("sales.quotation.convertToOrder", lang)}
+        description={t("sales.quotation.convertConfirm", lang)}
+        confirmLabel={t("sales.quotation.convertToOrder", lang)}
+        onConfirm={handleConfirmAsOrder}
+        variant="warning"
+      />
+      <ConfirmDialog
+        open={!!deleteId}
+        onOpenChange={v => !v && setDeleteId(null)}
+        title={t("sales.message.deleteConfirm", lang)}
+        description={t("sales.message.deleteConfirmNote", lang)}
+        confirmLabel={t("sales.action.delete", lang)}
+        onConfirm={handleDelete}
+        variant="danger"
+      />
+      <SalesOrderFastCreate
+        open={fastCreateOpen}
+        onClose={() => setFastCreateOpen(false)}
+        isQuotation
+      />
     </DashboardLayout>
+  );
+}
+
+// ── Columns ───────────────────────────────────────────────────────────────
+
+function useQuotationColumns(
+  t: (k: string, l: string) => string,
+  lang: "ar" | "en",
+  onView: (id: string) => void,
+  navigate: ReturnType<typeof useNavigate>,
+  setConfirmId: (id: string | null) => void,
+  setDeleteId: (id: string | null) => void
+): TableColumnsType<SalesOrderRow> {
+  return useMemo(
+    () => [
+      {
+        title: t("sales.column.orderNumber", lang),
+        dataIndex: "orderNumber",
+        width: 150,
+        render: (v: string) => (
+          <Text
+            strong
+            className="font-mono"
+            style={{ color: "var(--ant-color-primary)" }}
+          >
+            {v}
+          </Text>
+        ),
+      },
+      {
+        title: t("sales.column.customer", lang),
+        dataIndex: "partnerNameEn",
+        width: 200,
+        ellipsis: true,
+        render: (_: unknown, r: SalesOrderRow) => (
+          <Text>
+            {getName({ nameEn: r.partnerNameEn, nameAr: r.partnerNameAr }) ||
+              "--"}
+          </Text>
+        ),
+      },
+      {
+        title: t("sales.column.total", lang),
+        dataIndex: "totalAmount",
+        width: 140,
+        align: "end" as const,
+        render: (v: number | string, r: SalesOrderRow) => (
+          <Text strong className="font-mono">
+            {r.currencyCode ?? "SAR"}{" "}
+            {Number(v).toLocaleString("en-SA", { minimumFractionDigits: 2 })}
+          </Text>
+        ),
+      },
+      {
+        title: t("sales.column.date", lang),
+        dataIndex: "createdAt",
+        width: 120,
+        render: (v: string) => (
+          <Text type="secondary">{dayjs(v).format("DD MMM YYYY")}</Text>
+        ),
+      },
+      {
+        title: t("sales.column.salesperson", lang),
+        dataIndex: "salespersonNameEn",
+        width: 160,
+        responsive: ["lg"] as const,
+        render: (_: unknown, r: SalesOrderRow) => (
+          <Text type="secondary">
+            {getName({
+              nameEn: r.salespersonNameEn,
+              nameAr: r.salespersonNameAr,
+            }) || "--"}
+          </Text>
+        ),
+      },
+      {
+        title: t("seq.actions", lang),
+        align: "center" as const,
+        width: 60,
+        fixed: "right" as const,
+        render: (_: unknown, rec: SalesOrderRow) => (
+          <Dropdown
+            menu={{
+              items: [
+                {
+                  key: "view",
+                  label: t("common.view", lang),
+                  icon: <EyeOutlined />,
+                  onClick: () => onView(rec.orderNumber),
+                },
+                {
+                  key: "confirm",
+                  label: t("sales.quotation.convertToOrder", lang),
+                  icon: <SwapOutlined />,
+                  onClick: () => setConfirmId(rec.orderNumber),
+                },
+                {
+                  key: "dup",
+                  label: t("sales.action.duplicate", lang),
+                  icon: <CopyOutlined />,
+                },
+                { type: "divider" as const, key: "d" },
+                {
+                  key: "delete",
+                  label: t("sales.action.delete", lang),
+                  icon: <DeleteOutlined />,
+                  danger: true,
+                  onClick: () => setDeleteId(rec.orderNumber),
+                },
+              ],
+            }}
+            trigger={["click"]}
+          >
+            <Button
+              type="text"
+              icon={<MoreOutlined />}
+              onClick={e => e.stopPropagation()}
+            />
+          </Dropdown>
+        ),
+      },
+    ],
+    [t, lang, onView, navigate, setConfirmId, setDeleteId]
+  );
+}
+
+// ── Toolbar ───────────────────────────────────────────────────────────────
+
+function QuotationsToolbar({
+  search,
+  onSearchChange,
+  viewMode,
+  onViewModeChange,
+  onReload,
+  onCreateNew,
+  t,
+  lang,
+}: {
+  search: string;
+  onSearchChange: (v: string) => void;
+  viewMode: "table" | "grid";
+  onViewModeChange: (v: "table" | "grid") => void;
+  onReload: () => void;
+  onCreateNew: () => void;
+  t: (k: string, l: string) => string;
+  lang: "ar" | "en";
+}) {
+  return (
+    <div className="flex flex-wrap gap-2 justify-between items-center">
+      <Button type="primary" icon={<PlusOutlined />} onClick={onCreateNew}>
+        {t("sales.quotation.newQuotation", lang)}
+      </Button>
+      <div className="flex flex-wrap gap-2 items-center">
+        <Input
+          prefix={<SearchOutlined className="text-gray-400" />}
+          placeholder={t("common.search", lang)}
+          value={search}
+          onChange={e => onSearchChange(e.target.value)}
+          allowClear
+          style={{ width: 240 }}
+        />
+        <Tooltip title={t("seq.reload", lang)}>
+          <Button icon={<ReloadOutlined />} onClick={onReload} />
+        </Tooltip>
+        <Dropdown
+          menu={{
+            items: [
+              { key: "csv", label: "CSV", icon: <ExportOutlined /> },
+              { key: "excel", label: "Excel", icon: <ExportOutlined /> },
+              { key: "pdf", label: "PDF", icon: <ExportOutlined /> },
+            ],
+          }}
+        >
+          <Button icon={<DownloadOutlined />}>
+            {t("products.export", lang)}
+          </Button>
+        </Dropdown>
+        <Segmented
+          value={viewMode}
+          onChange={v => onViewModeChange(v as "table" | "grid")}
+          options={[
+            { value: "table", icon: <UnorderedListOutlined /> },
+            { value: "grid", icon: <AppstoreOutlined /> },
+          ]}
+        />
+      </div>
+    </div>
+  );
+}
+
+// ── Bulk Bar ──────────────────────────────────────────────────────────────
+
+function QuotationsBulkBar({
+  count,
+  onClear,
+  t,
+  lang,
+}: {
+  count: number;
+  onClear: () => void;
+  t: (k: string, l: string) => string;
+  lang: "ar" | "en";
+}) {
+  return (
+    <div
+      className="mt-3 py-2 px-3 rounded-md flex flex-wrap gap-3 items-center"
+      style={{
+        background: "var(--ant-color-primary-bg)",
+        border: "1px solid var(--ant-color-primary-border)",
+      }}
+    >
+      <Text strong style={{ color: "var(--ant-color-primary)" }}>
+        {count} {t("sales.column.status", lang)}
+      </Text>
+      <Button size="small" icon={<DownloadOutlined />}>
+        {t("products.export", lang)}
+      </Button>
+      <Button size="small" icon={<SwapOutlined />}>
+        {t("sales.quotation.convertToOrder", lang)}
+      </Button>
+      <Button size="small" danger icon={<DeleteOutlined />}>
+        {t("sales.action.delete", lang)}
+      </Button>
+      <Button size="small" type="text" onClick={onClear}>
+        {t("sales.filter.allStatuses", lang)}
+      </Button>
+    </div>
+  );
+}
+
+// ── Mobile Grid ───────────────────────────────────────────────────────────
+
+function QuotationsMobileGrid({
+  orders,
+  isLoading,
+  onClick,
+  t,
+  lang,
+}: {
+  orders: SalesOrderRow[];
+  isLoading: boolean;
+  onClick: (id: string) => void;
+  t: (k: string, l: string) => string;
+  lang: "ar" | "en";
+}) {
+  if (isLoading) return <Card loading />;
+  if (orders.length === 0) {
+    return (
+      <Card>
+        <div className="text-center py-8 text-gray-400">
+          {t("sales.line.noLines", lang)}
+        </div>
+      </Card>
+    );
+  }
+  return (
+    <Row gutter={[16, 16]}>
+      {orders.map(o => (
+        <Col key={o.id} xs={24} sm={12} xl={8}>
+          <SalesOrderCard order={o} onClick={onClick} />
+        </Col>
+      ))}
+    </Row>
   );
 }

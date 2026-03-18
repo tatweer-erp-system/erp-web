@@ -37,6 +37,42 @@ export const ReturnStatus = {
 } as const;
 export type ReturnStatus = (typeof ReturnStatus)[keyof typeof ReturnStatus];
 
+/** Sales order status (matches backend SalesOrderStatus) */
+export const SalesOrderStatus = {
+  DRAFT: "draft",
+  CONFIRMED: "confirmed",
+  DONE: "done",
+  CANCELLED: "cancelled",
+} as const;
+export type SalesOrderStatus =
+  (typeof SalesOrderStatus)[keyof typeof SalesOrderStatus];
+
+/** Sales order invoice status (matches backend SalesOrderInvoiceStatus) */
+export const SalesOrderInvoiceStatus = {
+  NOTHING: "nothing",
+  TO_INVOICE: "to_invoice",
+  INVOICED: "invoiced",
+} as const;
+export type SalesOrderInvoiceStatus =
+  (typeof SalesOrderInvoiceStatus)[keyof typeof SalesOrderInvoiceStatus];
+
+/** Sales order delivery status (matches backend SalesOrderDeliveryStatus) */
+export const SalesOrderDeliveryStatus = {
+  PENDING: "pending",
+  PARTIAL: "partial",
+  DONE: "done",
+} as const;
+export type SalesOrderDeliveryStatus =
+  (typeof SalesOrderDeliveryStatus)[keyof typeof SalesOrderDeliveryStatus];
+
+/** Sales discount type (matches backend SalesDiscountType) */
+export const SalesDiscountType = {
+  PERCENTAGE: "percentage",
+  FIXED: "fixed",
+} as const;
+export type SalesDiscountType =
+  (typeof SalesDiscountType)[keyof typeof SalesDiscountType];
+
 // ─── Purchase ─────────────────────────────────────────────────────────────────
 
 /** Purchase order fulfillment status */

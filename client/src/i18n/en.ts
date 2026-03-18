@@ -1052,6 +1052,7 @@ export const en: Record<string, string> = {
   "common.save": "Save",
   "common.create": "Create",
   "common.close": "Close",
+  "common.history": "Activity Log",
   "common.search": "Search...",
   "common.name": "Name",
   "common.name_required": "Name is required",
@@ -1108,4 +1109,224 @@ export const en: Record<string, string> = {
 
   // POS
   "pos.cache_refresh_failed": "Failed to refresh cache",
+
+  // ── Sales Orders ─────────────────────────────────────────────────────────────
+
+  // Page titles & navigation
+  "sales.orders.title": "Sales Orders",
+  "sales.orders.subtitle": "Manage quotations and sales orders",
+  "sales.orders.breadcrumb": "Sales Orders",
+  "sales.quotations.title": "Quotations",
+  "sales.quotations.subtitle": "Manage quotations before confirmation",
+  "sales.quotations.breadcrumb": "Quotations",
+
+  // Table columns
+  "sales.column.orderNumber": "Order #",
+  "sales.column.customer": "Customer",
+  "sales.column.date": "Date",
+  "sales.column.deliveryDate": "Delivery Date",
+  "sales.column.salesperson": "Salesperson",
+  "sales.column.total": "Total",
+  "sales.column.untaxedAmount": "Untaxed Amount",
+  "sales.column.taxAmount": "Tax Amount",
+  "sales.column.status": "Status",
+  "sales.column.invoiceStatus": "Invoice Status",
+  "sales.column.deliveryStatus": "Delivery Status",
+  "sales.column.currency": "Currency",
+  "sales.column.branch": "Branch",
+  "sales.column.pricelist": "Pricelist",
+
+  // Order status labels
+  "sales.status.draft": "Draft",
+  "sales.status.confirmed": "Confirmed",
+  "sales.status.done": "Done",
+  "sales.status.cancelled": "Cancelled",
+
+  // Invoice sub-status labels
+  "sales.invoiceStatus.nothing": "Nothing to Invoice",
+  "sales.invoiceStatus.to_invoice": "To Invoice",
+  "sales.invoiceStatus.invoiced": "Invoiced",
+
+  // Delivery sub-status labels
+  "sales.deliveryStatus.pending": "Pending",
+  "sales.deliveryStatus.partial": "Partially Delivered",
+  "sales.deliveryStatus.done": "Delivered",
+
+  // Form field labels
+  "sales.field.customer": "Customer",
+  "sales.field.orderDate": "Order Date",
+  "sales.field.deliveryDate": "Expected Delivery Date",
+  "sales.field.paymentTerms": "Payment Terms",
+  "sales.field.salesperson": "Salesperson",
+  "sales.field.pricelist": "Pricelist",
+  "sales.field.currency": "Currency",
+  "sales.field.branch": "Branch",
+  "sales.field.fiscalPosition": "Fiscal Position",
+  "sales.field.notes": "Notes",
+  "sales.field.discountType": "Discount Type",
+  "sales.field.discountValue": "Discount Value",
+  "sales.field.discountPercentage": "Percentage",
+  "sales.field.discountFixed": "Fixed Amount",
+  "sales.field.orderNumber": "Order Number",
+  "sales.field.reference": "Reference",
+
+  // Line item labels
+  "sales.line.product": "Product",
+  "sales.line.variant": "Variant",
+  "sales.line.description": "Description",
+  "sales.line.quantity": "Quantity",
+  "sales.line.unitPrice": "Unit Price",
+  "sales.line.discount": "Discount (%)",
+  "sales.line.taxRate": "Tax Rate (%)",
+  "sales.line.tax": "Tax",
+  "sales.line.subtotal": "Subtotal",
+  "sales.line.total": "Total",
+  "sales.line.qtyToInvoice": "Qty to Invoice",
+  "sales.line.qtyInvoiced": "Qty Invoiced",
+  "sales.line.qtyDelivered": "Qty Delivered",
+  "sales.line.qtyToDeliver": "Qty to Deliver",
+  "sales.line.addLine": "Add Line",
+  "sales.line.removeLine": "Remove Line",
+  "sales.line.noLines": "No order lines added yet",
+
+  // Totals section
+  "sales.totals.subtotal": "Subtotal",
+  "sales.totals.discount": "Discount",
+  "sales.totals.taxableAmount": "Taxable Amount",
+  "sales.totals.tax": "Tax (VAT)",
+  "sales.totals.total": "Total",
+
+  // Action buttons
+  "sales.action.create": "New Sales Order",
+  "sales.action.edit": "Edit",
+  "sales.action.save": "Save",
+  "sales.action.confirm": "Confirm Order",
+  "sales.action.cancel": "Cancel Order",
+  "sales.action.delete": "Delete",
+  "sales.action.print": "Print",
+  "sales.action.duplicate": "Duplicate",
+  "sales.action.createInvoice": "Create Invoice",
+  "sales.action.createDelivery": "Create Delivery",
+  "sales.action.createDownPayment": "Create Down Payment",
+  "sales.action.exportPdf": "Export PDF",
+  "sales.action.exportExcel": "Export Excel",
+  "sales.action.sendByEmail": "Send by Email",
+  "sales.action.backToList": "Back to Sales Orders",
+
+  // Messages — success
+  "sales.message.created": "Sales order created successfully",
+  "sales.message.updated": "Sales order updated successfully",
+  "sales.message.confirmed": "Sales order confirmed successfully",
+  "sales.message.cancelled": "Sales order cancelled successfully",
+  "sales.message.deleted": "Sales order deleted successfully",
+  "sales.message.invoiceCreated": "Invoice created successfully",
+  "sales.message.deliveryCreated": "Delivery order created successfully",
+  "sales.message.downPaymentCreated":
+    "Down payment invoice created successfully",
+
+  // Messages — confirmation dialogs
+  "sales.message.confirmOrder":
+    "Are you sure you want to confirm this sales order?",
+  "sales.message.confirmOrderNote":
+    "This will reserve stock for storable products.",
+  "sales.message.cancelWarning":
+    "Are you sure you want to cancel this sales order?",
+  "sales.message.cancelWarningNote": "This will void all stock reservations.",
+  "sales.message.deleteConfirm":
+    "Are you sure you want to delete this sales order?",
+  "sales.message.deleteConfirmNote":
+    "Only draft orders can be deleted. This action cannot be undone.",
+
+  // Messages — errors & validation
+  "sales.message.atLeastOneLine": "Sales order must have at least one line",
+  "sales.message.customerRequired": "Please select a customer",
+  "sales.message.insufficientStock":
+    "Insufficient stock for {product}: available {available}, ordered {ordered}",
+  "sales.message.creditLimitExceeded": "Credit limit exceeded",
+  "sales.message.creditLimitBlocked":
+    "Credit limit exceeded — order cannot be confirmed",
+  "sales.message.cannotCancelInvoices":
+    "Cannot cancel: linked invoices exist. Cancel or delete them first.",
+  "sales.message.cannotCancelDeliveries":
+    "Cannot cancel: linked deliveries exist. Cancel or return them first.",
+  "sales.message.positiveQtyRequired":
+    "All lines must have positive quantities",
+  "sales.message.loadFailed": "Failed to load sales order",
+
+  // Credit limit banner
+  "sales.credit.outstanding": "Outstanding",
+  "sales.credit.thisOrder": "This Order",
+  "sales.credit.limit": "Limit",
+  "sales.credit.withinLimit": "Within credit limit",
+  "sales.credit.exceeded": "Credit limit exceeded",
+
+  // Pricelist
+  "sales.pricelist.recalculate":
+    "Recalculate all line prices from the new pricelist?",
+  "sales.pricelist.listPrice": "List price",
+  "sales.pricelist.pricelistPrice": "Pricelist price",
+  "sales.pricelist.manualOverride":
+    "Price manually overridden. Pricelist price: {price} SAR",
+
+  // Down payments
+  "sales.downPayment.title": "Down Payments",
+  "sales.downPayment.type": "Down Payment Type",
+  "sales.downPayment.percentage": "Percentage",
+  "sales.downPayment.fixedAmount": "Fixed Amount",
+  "sales.downPayment.amount": "Amount",
+  "sales.downPayment.value": "Value",
+  "sales.downPayment.invoice": "Invoice",
+  "sales.downPayment.date": "Date",
+  "sales.downPayment.noDownPayments": "No down payments yet",
+  "sales.downPayment.deduction": "Down Payment deduction (Invoice #{invoice})",
+
+  // Invoice creation dialog
+  "sales.invoice.type": "Invoice Type",
+  "sales.invoice.regular": "Regular Invoice",
+  "sales.invoice.downPaymentPercentage": "Down Payment (Percentage)",
+  "sales.invoice.downPaymentFixed": "Down Payment (Fixed Amount)",
+  "sales.invoice.percentageLabel": "Percentage (%)",
+  "sales.invoice.fixedAmountLabel": "Amount (SAR)",
+
+  // Quotation-specific labels
+  "sales.quotation.title": "Quotation",
+  "sales.quotation.newQuotation": "New Quotation",
+  "sales.quotation.validUntil": "Valid Until",
+  "sales.quotation.convertToOrder": "Convert to Sales Order",
+  "sales.quotation.send": "Send Quotation",
+  "sales.quotation.expired": "This quotation has expired",
+  "sales.quotation.convertConfirm": "Convert this quotation to a sales order?",
+
+  // Summary / reports
+  "sales.summary.title": "Sales Summary",
+  "sales.summary.totalOrders": "Total Orders",
+  "sales.summary.totalRevenue": "Total Revenue",
+  "sales.summary.averageOrderValue": "Average Order Value",
+  "sales.summary.pendingInvoices": "Pending Invoices",
+  "sales.summary.pendingDeliveries": "Pending Deliveries",
+
+  // Combo product
+  "sales.combo.chooseOptions": "Choose Options",
+  "sales.combo.required": "Required",
+  "sales.combo.optional": "Optional",
+  "sales.combo.basePrice": "Base Price",
+  "sales.combo.totalPrice": "Total Price",
+  "sales.combo.editSelections": "Edit Selections",
+
+  // Filters
+  "sales.filter.allStatuses": "All Statuses",
+  "sales.filter.dateRange": "Date Range",
+  "sales.filter.customer": "Customer",
+  "sales.filter.salesperson": "Salesperson",
+
+  // Fast-create drawer
+  "sales.fastCreate.subtitle": "Create a quick sales order",
+  "sales.fastCreate.quotationSubtitle": "Create a quick quotation",
+  "sales.fastCreate.saveAndOpen": "Save & Open",
+  "sales.fastCreate.note": "You can add more details from the detail page",
+  "sales.fastCreate.unsavedWarning":
+    "You have unsaved changes. Are you sure you want to close?",
+  "common.view": "View",
+  "sales.error.customerRequired": "Customer is required",
+  "sales.error.atLeastOneLine": "At least one product line is required",
 };

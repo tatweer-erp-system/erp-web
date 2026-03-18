@@ -1912,9 +1912,11 @@ export default function Login() {
               <h1 className="text-lg font-bold text-slate-800 text-center mb-0.5">
                 {t("login.welcome", lang)}
               </h1>
-              <p className="text-slate-500 text-xs text-center mb-5">
-                {t("login.subtitle", lang)}
-              </p>
+              {!success && (
+                <p className="text-slate-500 text-xs text-center mb-5">
+                  {t("login.subtitle", lang)}
+                </p>
+              )}
 
               {success ? (
                 <div className="flex flex-col items-center gap-3 py-6">

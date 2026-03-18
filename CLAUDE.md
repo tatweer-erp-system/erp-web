@@ -1084,3 +1084,111 @@ Cycle 1 — IN PROGRESS
 ```
 
 Update this section as cycles are completed.
+
+---
+
+## No Raw UUIDs in the UI
+
+**Never display a raw UUID to the user.** Every FK reference must show a human-readable name, code, or title.
+
+### Rules
+
+1. **Use joined relation fields from the API** — the backend returns fields like `partnerNameEn`, `salespersonNameEn`, `currencyCode` alongside the FK UUIDs
+2. **Display names via `getName()`** — `getName({ nameEn: record.partnerNameEn, nameAr: record.partnerNameAr })` resolves the correct language
+3. **Use `currencyCode` not `currencyId`** — show "SAR" not the currency UUID
+4. **Use `orderNumber` for navigation** — route URLs should be `/sales/orders/SO-MAIN-00002`, not `/sales/orders/83000000-...`
+5. **Types must include relation fields** — add optional joined fields to types (e.g. `partnerNameEn?: string | null`)
+
+### DECIMAL Values from API
+
+PostgreSQL DECIMAL columns are returned as **strings** (e.g. `"4269.00"` not `4269.00`).
+
+- Always wrap with `Number(value)` before calling `.toFixed()`, `.toLocaleString()`, or doing arithmetic
+- Example: `Number(order.totalAmount).toLocaleString("en-SA", { minimumFractionDigits: 2 })`
+
+### Checklist for Every New Module Integration
+
+- [ ] Backend list query JOINs all FK tables and returns readable names
+- [ ] Backend detail query JOINs ALL FK tables (including user, branch, currency)
+- [ ] Backend line queries JOIN product names, variant, currency
+- [ ] Frontend types include all joined fields as optional properties
+- [ ] Frontend pages use `getName()` for all entity references — never raw IDs
+- [ ] Frontend navigation uses human-readable identifiers (orderNumber, invoiceNumber)
+- [ ] All numeric displays use `Number(value)` before formatting
+
+---
+
+## List Page Pattern (Mandatory)
+
+All list pages **must** follow the same structure and style as `AllOrders.tsx`. Do NOT create custom layouts — use the shared building blocks below.
+
+### Shared Components (mandatory for every list page)
+
+| Component         | Path                                  | Purpose                                                                                          |
+| ----------------- | ------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `ListPageToolbar` | `@/components/common/ListPageToolbar` | Standard toolbar: create button (left), search + filters + reload + export + view toggle (right) |
+| `StatsRow`        | `@/components/common/StatsRow`        | KPI stat cards row — pass array of `{ title, value, icon, iconBg }`                              |
+| `StatCard`        | `@/components/common/StatCard`        | Individual stat card (used by StatsRow)                                                          |
+| `SearchInput`     | `@/components/common/SearchInput`     | Debounced search input (300ms built-in)                                                          |
+| `ActionDropdown`  | `@/components/common/ActionDropdown`  | Row actions "..." menu                                                                           |
+| `ConfirmDialog`   | `@/components/common/ConfirmDialog`   | Confirmation dialogs for destructive actions                                                     |
+| `EmptyState`      | `@/components/common/EmptyState`      | Empty table state                                                                                |
+
+### Page Structure (copy this skeleton)
+
+```tsx
+<DashboardLayout currentPage="..." breadcrumbs={breadcrumbs}>
+  <div className="flex flex-col gap-6">
+
+    {/* 1. Stats row — wired to module summary API */}
+    <StatsRow items={[...]} />
+
+    {/* 2. Toolbar card — search, filters, create, reload */}
+    <Card size="small" styles={{ body: { padding: "12px 16px" } }}>
+      <ListPageToolbar
+        search={searchInput}
+        onSearchChange={setSearchInput}
+        onCreateNew={() => navigate(ROUTES.MODULE_CREATE)}
+        createLabel={t("module.action.create", lang)}
+        onReload={() => refetch()}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
+        isFilterOpen={isFilterOpen}
+        onToggleFilter={() => setIsFilterOpen(!isFilterOpen)}
+      />
+      {/* Module-specific filter panel (if any) */}
+    </Card>
+
+    {/* 3. Table or Mobile grid */}
+    {viewMode === "table" && !isMobile ? (
+      <Card styles={{ body: { padding: 0 } }}>
+        <Table
+          rowKey="id" columns={columns} dataSource={data}
+          size="middle" scroll={{ x: "max-content" }}
+          onRow={(rec) => ({
+            onClick: () => navigate(ROUTES.moduleDetail(rec.readableId)),
+            style: { cursor: "pointer" },
+          })}
+          pagination={{...}}
+        />
+      </Card>
+    ) : (
+      <MobileCardGrid ... />
+    )}
+
+  </div>
+  {/* Confirm dialogs */}
+</DashboardLayout>
+```
+
+### Styling Rules
+
+- **Layout**: `flex flex-col gap-6` — consistent spacing between sections
+- **Table**: `sorter: false` on all columns — no sort icons
+- **Columns**: fixed `width` on every column — no auto-stretch
+- **Search**: use `SearchInput` component — debounce built in (300ms)
+- **Actions**: use `ActionDropdown` — first item always "View" with `EyeOutlined`
+- **Navigation**: use `orderNumber`/`code` (readable ID) — never UUID
+- **Bilingual**: `getName()` for all entity name displays
+- **Numbers**: `Number(value)` before `.toLocaleString()` or `.toFixed()`
+- **"New" button**: from list page → navigate to full create page; from other pages → open drawer
