@@ -332,10 +332,7 @@ export function ThemeCustomizer() {
               return (
                 <Tooltip key={c.hex} title={c.label} placement="top">
                   <button
-                    onClick={() => {
-                      setAccentColor(c.hex);
-                      setPreset(null);
-                    }}
+                    onClick={() => setAccentColor(c.hex)}
                     style={{
                       width: "100%",
                       aspectRatio: "1",
@@ -387,10 +384,7 @@ export function ThemeCustomizer() {
               <input
                 type="color"
                 value={activeColor}
-                onChange={e => {
-                  setAccentColor(e.target.value);
-                  setPreset(null);
-                }}
+                onChange={e => setAccentColor(e.target.value)}
                 style={{
                   position: "absolute",
                   inset: 0,

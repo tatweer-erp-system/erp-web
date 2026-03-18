@@ -29,7 +29,7 @@ import { useLangStore } from "@/stores/lang.store";
 import { useThemeStore } from "@/stores/theme.store";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
 import { usePinLock } from "@/contexts/PinLockContext";
-import { useAuthContext , ROLE_DISPLAY } from "@/contexts/AuthContext";
+import { useAuthContext, ROLE_DISPLAY } from "@/contexts/AuthContext";
 import { deriveRole } from "@/types/auth";
 
 interface NavbarProps {

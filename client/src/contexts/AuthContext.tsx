@@ -13,7 +13,8 @@ import {
   type Branch,
   Role,
   deriveRole,
- LoginResponse } from "@/types/auth";
+  LoginResponse,
+} from "@/types/auth";
 import {
   login as authLogin,
   logout as authLogout,

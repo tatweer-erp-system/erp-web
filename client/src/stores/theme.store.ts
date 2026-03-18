@@ -106,8 +106,10 @@ export const useThemeStore = create<ThemeStore>()(
       },
 
       setAccentColor: accentColor => {
-        set({ accentColor });
-        applyAllEffects({ ...get(), accentColor });
+        const updates: Partial<ThemeConfig> = { accentColor };
+        if (accentColor) updates.presetId = "";
+        set(updates);
+        applyAllEffects({ ...get(), ...updates });
       },
 
       setPreset: presetId => {
