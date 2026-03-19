@@ -265,7 +265,7 @@ export default function AccountStatements() {
         { label: t("accounting.as.title", lang) },
       ]}
     >
-      <Space direction="vertical" size={20} style={{ width: "100%" }}>
+      <Space orientation="vertical" size={20} style={{ width: "100%" }}>
         {/* -- Toolbar Card -------------------------------------------------- */}
         <Card size="small" styles={{ body: { padding: "12px 16px" } }}>
           <div
@@ -384,14 +384,14 @@ export default function AccountStatements() {
                       </Text>
                       <Statistic
                         value={s.value}
-                        valueStyle={{
+                        styles={{ content: {
                           fontSize: 24,
                           lineHeight: 1,
                           color:
                             ((s as Record<string, unknown>).valueColor as
                               | string
                               | undefined) ?? "inherit",
-                        }}
+                        } }}
                       />
                     </div>
                     <div

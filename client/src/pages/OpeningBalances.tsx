@@ -324,7 +324,7 @@ function OpeningBalancesContent() {
 
       {/* Info alert */}
       <Alert
-        message={t("accounting.ob.info", lang)}
+        title={t("accounting.ob.info", lang)}
         type="info"
         showIcon
         style={{ marginBottom: 24 }}
@@ -343,7 +343,7 @@ function OpeningBalancesContent() {
                   DR
                 </span>
               }
-              valueStyle={{ color: token.colorPrimary }}
+              styles={{ content: { color: token.colorPrimary } }}
             />
           </Card>
         </Col>
@@ -356,7 +356,7 @@ function OpeningBalancesContent() {
               prefix={
                 <span style={{ color: "#F59E0B", fontSize: 16 }}>CR</span>
               }
-              valueStyle={{ color: "#F59E0B" }}
+              styles={{ content: { color: "#F59E0B" } }}
             />
           </Card>
         </Col>
@@ -381,9 +381,9 @@ function OpeningBalancesContent() {
                   />
                 )
               }
-              valueStyle={{
+              styles={{ content: {
                 color: isBalanced ? token.colorSuccess : token.colorError,
-              }}
+              } }}
             />
           </Card>
         </Col>
@@ -393,7 +393,7 @@ function OpeningBalancesContent() {
       <Card size="small" style={{ marginBottom: 16 }}>
         <Row gutter={[16, 12]} align="middle">
           <Col xs={24} sm={8} md={6}>
-            <Space direction="vertical" size={2} style={{ width: "100%" }}>
+            <Space orientation="vertical" size={2} style={{ width: "100%" }}>
               <Text type="secondary" style={{ fontSize: 12 }}>
                 <CalendarOutlined /> {t("accounting.ob.date", lang)}
               </Text>
@@ -406,7 +406,7 @@ function OpeningBalancesContent() {
             </Space>
           </Col>
           <Col xs={24} sm={8} md={6}>
-            <Space direction="vertical" size={2} style={{ width: "100%" }}>
+            <Space orientation="vertical" size={2} style={{ width: "100%" }}>
               <Text type="secondary" style={{ fontSize: 12 }}>
                 {t("accounting.ob.search", lang)}
               </Text>
@@ -420,7 +420,7 @@ function OpeningBalancesContent() {
             </Space>
           </Col>
           <Col xs={24} sm={8} md={4}>
-            <Space direction="vertical" size={2} style={{ width: "100%" }}>
+            <Space orientation="vertical" size={2} style={{ width: "100%" }}>
               <Text type="secondary" style={{ fontSize: 12 }}>
                 {t("accounting.ob.accountType", lang)}
               </Text>
@@ -480,7 +480,7 @@ function OpeningBalancesContent() {
       {/* Must-balance warning */}
       {!isBalanced && modifiedEntries.length > 0 && (
         <Alert
-          message={t("accounting.ob.mustBalance", lang)}
+          title={t("accounting.ob.mustBalance", lang)}
           type="warning"
           showIcon
           style={{ marginBottom: 16 }}
@@ -488,7 +488,7 @@ function OpeningBalancesContent() {
       )}
 
       {/* Accounts table */}
-      <Card size="small" bodyStyle={{ padding: 0 }}>
+      <Card size="small" styles={{ body: { padding: 0 } }}>
         <Table<Account>
           columns={columns}
           dataSource={filtered}

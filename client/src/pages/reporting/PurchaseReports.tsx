@@ -134,7 +134,7 @@ function KPICard({
             <Statistic
               value={value}
               suffix={suffix}
-              valueStyle={{ fontSize: 22, lineHeight: 1 }}
+              styles={{ content: { fontSize: 22, lineHeight: 1 } }}
             />
           )}
         </div>
@@ -174,7 +174,11 @@ export default function PurchaseReports() {
   const endDate = dateRange?.[1]?.format("YYYY-MM-DD");
 
   // ── Query ──────────────────────────────────────────────────────────────────
-  const { data: response, isLoading, refetch } = useQuery({
+  const {
+    data: response,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: [QUERY_KEYS.PURCHASE_REPORT, startDate, endDate, branchId],
     queryFn: () =>
       getPurchaseReport({
@@ -185,8 +189,15 @@ export default function PurchaseReports() {
     enabled: !!branchId,
   });
 
-  const report = (response as unknown as Record<string, unknown>)?.data as
-    | { data: PurchaseReportRow[]; summary: { totalOrders: number; totalRevenue: number; avgOrderValue: number } }
+  const report = response?.data as
+    | {
+        data: PurchaseReportRow[];
+        summary: {
+          totalOrders: number;
+          totalRevenue: number;
+          avgOrderValue: number;
+        };
+      }
     | undefined;
 
   const rows = report?.data ?? [];
@@ -202,7 +213,7 @@ export default function PurchaseReports() {
         amount: Number(row.totalAmount),
         orders: Number(row.orderCount),
       })),
-    [rows],
+    [rows]
   );
 
   // ── Export handler ─────────────────────────────────────────────────────────
@@ -261,7 +272,7 @@ export default function PurchaseReports() {
         ),
       },
     ],
-    [t, lang],
+    [t, lang]
   );
 
   return (
@@ -367,7 +378,10 @@ export default function PurchaseReports() {
 
         {/* ── Chart: Amount by Status ─────────────────────────────── */}
         <Card size="small" styles={{ body: { padding: "16px 20px" } }}>
-          <Text strong style={{ fontSize: 15, display: "block", marginBottom: 16 }}>
+          <Text
+            strong
+            style={{ fontSize: 15, display: "block", marginBottom: 16 }}
+          >
             {t("purchaseReports.statusBreakdown", lang)}
           </Text>
           {isLoading ? (
@@ -376,8 +390,14 @@ export default function PurchaseReports() {
             </div>
           ) : hasData ? (
             <ResponsiveContainer width="100%" height={320}>
-              <BarChart data={chartData} margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke={token.colorBorderSecondary} />
+              <BarChart
+                data={chartData}
+                margin={{ top: 8, right: 8, bottom: 8, left: 8 }}
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke={token.colorBorderSecondary}
+                />
                 <XAxis
                   dataKey="label"
                   tick={{ fontSize: 12 }}
@@ -389,17 +409,23 @@ export default function PurchaseReports() {
                   tickFormatter={(v: number) => `${(v / 1000).toFixed(0)}k`}
                 />
                 <Tooltip
-                  formatter={(value: number) => [`${fmtCurrency(value)} SAR`, t("purchaseReports.amount", lang)]}
+                  formatter={(value: number) => [
+                    `${fmtCurrency(value)} SAR`,
+                    t("purchaseReports.amount", lang),
+                  ]}
                   contentStyle={{
                     borderRadius: 8,
                     border: `1px solid ${token.colorBorderSecondary}`,
                   }}
                 />
                 <Bar dataKey="amount" radius={[4, 4, 0, 0]} maxBarSize={60}>
-                  {chartData.map((entry) => (
+                  {chartData.map(entry => (
                     <Cell
                       key={entry.status}
-                      fill={STATUS_COLORS[entry.status.toLowerCase()] ?? token.colorPrimary}
+                      fill={
+                        STATUS_COLORS[entry.status.toLowerCase()] ??
+                        token.colorPrimary
+                      }
                     />
                   ))}
                 </Bar>
@@ -408,7 +434,11 @@ export default function PurchaseReports() {
           ) : (
             <Empty
               image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description={<Text type="secondary">{t("purchaseReports.noData", lang)}</Text>}
+              description={
+                <Text type="secondary">
+                  {t("purchaseReports.noData", lang)}
+                </Text>
+              }
               style={{ padding: "40px 0" }}
             />
           )}
@@ -472,7 +502,11 @@ export default function PurchaseReports() {
           ) : (
             <Empty
               image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description={<Text type="secondary">{t("purchaseReports.noData", lang)}</Text>}
+              description={
+                <Text type="secondary">
+                  {t("purchaseReports.noData", lang)}
+                </Text>
+              }
               style={{ padding: "40px 0" }}
             />
           )}

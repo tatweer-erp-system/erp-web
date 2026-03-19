@@ -55,24 +55,24 @@ const MOVEMENT_TYPE_COLOR: Record<string, string> = {
   [StockMovementType.SCRAP]: "red",
 };
 
-const MOVEMENT_TYPE_LABEL: Record<string, string> = {
-  [StockMovementType.PURCHASE_RECEIPT]: "Purchase Receipt",
-  [StockMovementType.SALE_DELIVERY]: "Sale Delivery",
-  [StockMovementType.POS_SALE]: "POS Sale",
-  [StockMovementType.INTERNAL]: "Internal Transfer",
-  [StockMovementType.ADJUSTMENT]: "Adjustment",
-  [StockMovementType.OPENING]: "Opening",
-  [StockMovementType.RETURN]: "Return",
-  [StockMovementType.SCRAP]: "Scrap",
+const MOVEMENT_TYPE_LABEL_KEY: Record<string, string> = {
+  [StockMovementType.PURCHASE_RECEIPT]: "stockMovement.type.purchaseReceipt",
+  [StockMovementType.SALE_DELIVERY]: "stockMovement.type.saleDelivery",
+  [StockMovementType.POS_SALE]: "stockMovement.type.posSale",
+  [StockMovementType.INTERNAL]: "stockMovement.type.internal",
+  [StockMovementType.ADJUSTMENT]: "stockMovement.type.adjustment",
+  [StockMovementType.OPENING]: "stockMovement.type.opening",
+  [StockMovementType.RETURN]: "stockMovement.type.return",
+  [StockMovementType.SCRAP]: "stockMovement.type.scrap",
 };
 
-const REFERENCE_TYPE_LABEL: Record<string, string> = {
-  [StockReferenceType.PURCHASE_ORDER]: "Purchase Order",
-  [StockReferenceType.SALES_ORDER]: "Sales Order",
-  [StockReferenceType.MANUAL]: "Manual",
-  [StockReferenceType.TRANSFER]: "Transfer",
-  [StockReferenceType.POS_ORDER]: "POS Order",
-  [StockReferenceType.ADJUSTMENT]: "Adjustment",
+const REFERENCE_TYPE_LABEL_KEY: Record<string, string> = {
+  [StockReferenceType.PURCHASE_ORDER]: "stockMovement.ref.purchaseOrder",
+  [StockReferenceType.SALES_ORDER]: "stockMovement.ref.salesOrder",
+  [StockReferenceType.MANUAL]: "stockMovement.ref.manual",
+  [StockReferenceType.TRANSFER]: "stockMovement.ref.transfer",
+  [StockReferenceType.POS_ORDER]: "stockMovement.ref.posOrder",
+  [StockReferenceType.ADJUSTMENT]: "stockMovement.ref.adjustment",
 };
 
 // Inbound types — positive movement
@@ -228,7 +228,7 @@ export default function StockMovement() {
       dataIndex: "movementType",
       width: 160,
       filters: Object.entries(StockMovementType).map(([, value]) => ({
-        text: MOVEMENT_TYPE_LABEL[value] ?? value,
+        text: t(MOVEMENT_TYPE_LABEL_KEY[value] ?? value, lang),
         value,
       })),
       onFilter: (value, record) => record.movementType === value,
@@ -237,7 +237,7 @@ export default function StockMovement() {
           color={MOVEMENT_TYPE_COLOR[v] ?? "default"}
           style={{ borderRadius: 20, padding: "2px 10px" }}
         >
-          {MOVEMENT_TYPE_LABEL[v] ?? v}
+          {t(MOVEMENT_TYPE_LABEL_KEY[v] ?? v, lang)}
         </Tag>
       ),
     },
@@ -346,7 +346,7 @@ export default function StockMovement() {
           <div>
             {rec.referenceType && (
               <Tag style={{ borderRadius: 4 }}>
-                {REFERENCE_TYPE_LABEL[rec.referenceType] ?? rec.referenceType}
+                {t(REFERENCE_TYPE_LABEL_KEY[rec.referenceType] ?? rec.referenceType, lang)}
               </Tag>
             )}
             {rec.referenceId && (
@@ -368,7 +368,7 @@ export default function StockMovement() {
   const movementTypeOptions = Object.entries(StockMovementType).map(
     ([, value]) => ({
       value,
-      label: MOVEMENT_TYPE_LABEL[value] ?? value,
+      label: t(MOVEMENT_TYPE_LABEL_KEY[value] ?? value, lang),
     })
   );
 
@@ -376,12 +376,12 @@ export default function StockMovement() {
     <DashboardLayout
       currentPage="StockMovement"
       breadcrumbs={[
-        { label: "Dashboard", href: "/" },
-        { label: t("INVENTORY", lang), href: "#" },
+        { label: t("common.dashboard", lang), href: "/" },
+        { label: t("inventory.title", lang), href: "#" },
         { label: t("stockMovement.title", lang) },
       ]}
     >
-      <Space direction="vertical" size={20} style={{ width: "100%" }}>
+      <Space orientation="vertical" size={20} style={{ width: "100%" }}>
         {/* ── KPI Cards ──────────────────────────────────────────────────── */}
         <Row gutter={[16, 16]}>
           {[
@@ -445,11 +445,11 @@ export default function StockMovement() {
                     <Statistic
                       value={s.value}
                       precision={0}
-                      valueStyle={{
+                      styles={{ content: {
                         fontSize: 24,
                         lineHeight: 1,
                         color: s.color ?? "inherit",
-                      }}
+                      } }}
                     />
                     <Text type="secondary" style={{ fontSize: 12 }}>
                       {s.suffix}

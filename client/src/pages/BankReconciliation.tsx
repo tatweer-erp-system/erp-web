@@ -102,7 +102,7 @@ export default function BankReconciliationPage() {
   // ── Search with 400ms debounce ──────────────────────────────────────────
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
     debounceRef.current = setTimeout(() => {
@@ -377,11 +377,11 @@ export default function BankReconciliationPage() {
                     </Text>
                     <Statistic
                       value={s.value}
-                      valueStyle={{
+                      styles={{ content: {
                         fontSize: 24,
                         lineHeight: 1,
                         color: s.color ?? "inherit",
-                      }}
+                      } }}
                     />
                   </div>
                   <div
@@ -701,7 +701,7 @@ export default function BankReconciliationPage() {
           setDrawerOpen(false);
           setViewItem(null);
         }}
-        width={isMobile ? "100%" : 640}
+        size={isMobile ? "100%" : 640}
         title={
           viewItem
             ? `${t("treasury.recon.details", lang)} -- ${getAccountName(viewItem.accountId)}`
@@ -709,7 +709,7 @@ export default function BankReconciliationPage() {
         }
       >
         {viewItem && (
-          <Space direction="vertical" size={16} style={{ width: "100%" }}>
+          <Space orientation="vertical" size={16} style={{ width: "100%" }}>
             <Row gutter={[16, 12]}>
               <Col span={12}>
                 <Text type="secondary">

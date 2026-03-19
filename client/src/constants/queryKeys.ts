@@ -9,6 +9,7 @@ export const QUERY_KEYS = {
   ROLES: "roles",
 
   // Accounting — Chart of Accounts
+  CHART_OF_ACCOUNTS: "chart-of-accounts",
   ACCOUNTS_TREE: "accounts-tree",
   ACCOUNTS_LIST_AS: "accounts-list-as",
   ACCOUNTS_LIST_GL: "accounts-list-gl",
@@ -34,6 +35,7 @@ export const QUERY_KEYS = {
   FISCAL_PERIODS: "fiscal-periods",
 
   // Accounting — Journals
+  JOURNALS: "journals",
   JOURNALS_LIST: "journals-list",
 
   // Accounting — Taxes
@@ -49,6 +51,7 @@ export const QUERY_KEYS = {
   ACCOUNTING_CONFIG: "accounting-config",
 
   // Settings
+  SETTINGS: "settings",
   PROFILE: "profile",
   SESSIONS: "sessions",
   GENERAL_SETTINGS: "generalSettings",
@@ -80,6 +83,7 @@ export const QUERY_KEYS = {
   BANK_STATEMENT_LINES: "bank-statement-lines",
 
   // Invoices
+  INVOICES: "invoices",
   INVOICES_LIST: "invoices-list",
   INVOICES_SUMMARY: "invoices-summary",
   INVOICE_DETAIL: "invoice-detail",
@@ -144,6 +148,7 @@ export const QUERY_KEYS = {
   WAREHOUSES: "warehouses",
   WAREHOUSES_DROPDOWN: "warehouses-dropdown",
   STOCK_LEVELS: "stock-levels",
+  STOCK_MOVES: "stock-moves",
   LOW_STOCK_ALERTS: "low-stock-alerts",
   STOCK_MOVEMENTS: "stock-movements",
   STOCK_ADJUSTMENTS: "stock-adjustments",

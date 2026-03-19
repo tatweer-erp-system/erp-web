@@ -91,7 +91,7 @@ export default function Receipts() {
   // ── Search with 400ms debounce ──────────────────────────────────────────
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
     debounceRef.current = setTimeout(() => {
@@ -132,10 +132,7 @@ export default function Receipts() {
   });
 
   const allAccounts: TreasuryAccount[] = useMemo(() => {
-    return (
-      ((accountsRaw as Record<string, unknown>)?.data as TreasuryAccount[]) ??
-      []
-    );
+    return accountsRaw?.data ?? [];
   }, [accountsRaw]);
 
   const accountOptions = useMemo(
@@ -169,9 +166,7 @@ export default function Receipts() {
   });
 
   const allTransactions: TreasuryTransaction[] = useMemo(() => {
-    const list =
-      ((transactionsRaw as Record<string, unknown>)
-        ?.data as TreasuryTransaction[]) ?? [];
+    const list: TreasuryTransaction[] = transactionsRaw?.data ?? [];
     return list.filter(tx => RECEIPT_TYPES.includes(tx.type));
   }, [transactionsRaw]);
 
@@ -183,9 +178,7 @@ export default function Receipts() {
   });
 
   const partnerOptions = useMemo(() => {
-    const list =
-      ((partnersRaw as Record<string, unknown>)
-        ?.data as PartnerDropdownItem[]) ?? [];
+    const list: PartnerDropdownItem[] = partnersRaw?.data ?? [];
     return list.map(p => ({
       value: p.id,
       label: getName(p),
@@ -435,11 +428,11 @@ export default function Receipts() {
                           ? ` ${selectedAccount?.currency ?? "SAR"}`
                           : ""
                       }
-                      valueStyle={{
+                      styles={{ content: {
                         fontSize: 24,
                         lineHeight: 1,
                         color: s.color ?? "inherit",
-                      }}
+                      } }}
                     />
                   </div>
                   <div
@@ -812,7 +805,7 @@ export default function Receipts() {
           setDrawerOpen(false);
           setViewTransaction(null);
         }}
-        width={isMobile ? "100%" : 520}
+        size={isMobile ? "100%" : 520}
         title={
           viewTransaction
             ? `${t("treasury.receipts.details", lang)} -- ${viewTransaction.reference ?? viewTransaction.id.slice(0, 8)}`
@@ -820,7 +813,7 @@ export default function Receipts() {
         }
       >
         {viewTransaction && (
-          <Space direction="vertical" size={16} style={{ width: "100%" }}>
+          <Space orientation="vertical" size={16} style={{ width: "100%" }}>
             {/* Amount highlight */}
             <Card
               size="small"

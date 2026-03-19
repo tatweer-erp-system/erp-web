@@ -83,7 +83,7 @@ export default function Payments() {
   // ── Search with 400ms debounce ──────────────────────────────────────────
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
     debounceRef.current = setTimeout(() => {
@@ -124,10 +124,7 @@ export default function Payments() {
   });
 
   const allAccounts: TreasuryAccount[] = useMemo(() => {
-    return (
-      ((accountsRaw as Record<string, unknown>)?.data as TreasuryAccount[]) ??
-      []
-    );
+    return accountsRaw?.data ?? [];
   }, [accountsRaw]);
 
   const accountOptions = useMemo(
@@ -161,9 +158,7 @@ export default function Payments() {
   });
 
   const allTransactions: TreasuryTransaction[] = useMemo(() => {
-    const list =
-      ((transactionsRaw as Record<string, unknown>)
-        ?.data as TreasuryTransaction[]) ?? [];
+    const list: TreasuryTransaction[] = transactionsRaw?.data ?? [];
     return list.filter(
       tx =>
         tx.type === TreasuryTransactionType.PAYMENT ||
@@ -396,11 +391,11 @@ export default function Payments() {
                           ? ` ${selectedAccount?.currency ?? "SAR"}`
                           : ""
                       }
-                      valueStyle={{
+                      styles={{ content: {
                         fontSize: 24,
                         lineHeight: 1,
                         color: s.color ?? "inherit",
-                      }}
+                      } }}
                     />
                   </div>
                   <div
@@ -772,7 +767,7 @@ export default function Payments() {
           setDrawerOpen(false);
           setViewTransaction(null);
         }}
-        width={isMobile ? "100%" : 640}
+        size={isMobile ? "100%" : 640}
         title={
           viewTransaction
             ? `${t("treasury.payments.details", lang)} -- ${viewTransaction.reference ?? viewTransaction.id.slice(0, 8)}`
@@ -780,7 +775,7 @@ export default function Payments() {
         }
       >
         {viewTransaction && (
-          <Space direction="vertical" size={16} style={{ width: "100%" }}>
+          <Space orientation="vertical" size={16} style={{ width: "100%" }}>
             {/* Amount highlight */}
             <Card
               size="small"

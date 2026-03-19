@@ -54,7 +54,7 @@ export function CreditLimitBanner({
       showIcon
       closable={!isBlocking}
       onClose={onClose}
-      message={statusMessage}
+      title={statusMessage}
       description={details}
       className="mb-4"
     />

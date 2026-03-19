@@ -48,7 +48,7 @@ export function StatsRow({ items }: StatsRowProps) {
                       : undefined
                   }
                   suffix={item.suffix}
-                  valueStyle={{ fontSize: 24, lineHeight: 1 }}
+                  styles={{ content: { fontSize: 24, lineHeight: 1 } }}
                 />
               </div>
               {item.icon && (

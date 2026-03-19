@@ -111,7 +111,7 @@ export default function SalesOrderCreatePage() {
                 ...l,
                 productId,
                 description: getName(product) ?? "",
-                unitPrice: Number(product?.salePrice ?? 0),
+                unitPrice: Number(product?.unitPrice ?? 0),
               }
             : l
         )

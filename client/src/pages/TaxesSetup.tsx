@@ -201,7 +201,7 @@ function TaxesTab({
   });
 
   const allTaxes: Tax[] = useMemo(
-    () => ((taxesRaw as Record<string, unknown>)?.data as Tax[]) ?? [],
+    () => taxesRaw?.data ?? [],
     [taxesRaw]
   );
 
@@ -213,8 +213,7 @@ function TaxesTab({
   });
 
   const taxGroupOptions = useMemo(() => {
-    const list =
-      ((taxGroupsRaw as Record<string, unknown>)?.data as TaxGroup[]) ?? [];
+    const list: TaxGroup[] = taxGroupsRaw?.data ?? [];
     return list.map(g => ({
       value: g.id,
       label: getName(g),
@@ -229,13 +228,12 @@ function TaxesTab({
   });
 
   const accountOptions = useMemo(() => {
-    const list =
-      ((accountsList as Record<string, unknown>)?.data as {
-        id: string;
-        code: string;
-        nameEn: string;
-        nameAr: string;
-      }[]) ?? [];
+    const list = (accountsList?.data ?? []) as {
+      id: string;
+      code: string;
+      nameEn: string;
+      nameAr: string;
+    }[];
     return list.map(a => ({
       value: a.id,
       label: `${a.code} — ${getName(a)}`,
@@ -521,7 +519,7 @@ function TaxesTab({
   ];
 
   return (
-    <Space direction="vertical" size={20} style={{ width: "100%" }}>
+    <Space orientation="vertical" size={20} style={{ width: "100%" }}>
       {/* ── KPI Cards ──────────────────────────────────────────────────── */}
       <Row gutter={[16, 16]}>
         {[
@@ -575,11 +573,11 @@ function TaxesTab({
                   </Text>
                   <Statistic
                     value={s.value}
-                    valueStyle={{
+                    styles={{ content: {
                       fontSize: 24,
                       lineHeight: 1,
                       color: s.color ?? "inherit",
-                    }}
+                    } }}
                   />
                   <Text type="secondary" style={{ fontSize: 12 }}>
                     {s.suffix}
@@ -890,7 +888,7 @@ function TaxesTab({
         }
       >
         {viewTax && (
-          <Space direction="vertical" size={16} style={{ width: "100%" }}>
+          <Space orientation="vertical" size={16} style={{ width: "100%" }}>
             <Row gutter={[16, 12]}>
               <Col span={12}>
                 <Text type="secondary">{t("accounting.tax.nameEn", lang)}</Text>
@@ -1040,7 +1038,7 @@ function TaxGroupsTab({
   });
 
   const allGroups: TaxGroup[] = useMemo(
-    () => ((groupsRaw as Record<string, unknown>)?.data as TaxGroup[]) ?? [],
+    () => groupsRaw?.data ?? [],
     [groupsRaw]
   );
 
@@ -1202,7 +1200,7 @@ function TaxGroupsTab({
   ];
 
   return (
-    <Space direction="vertical" size={20} style={{ width: "100%" }}>
+    <Space orientation="vertical" size={20} style={{ width: "100%" }}>
       {/* ── KPI Card ───────────────────────────────────────────────────── */}
       <Row gutter={[16, 16]}>
         <Col xs={24} sm={12} lg={8}>
@@ -1227,10 +1225,10 @@ function TaxGroupsTab({
                 </Text>
                 <Statistic
                   value={kpiTotal}
-                  valueStyle={{
+                  styles={{ content: {
                     fontSize: 24,
                     lineHeight: 1,
-                  }}
+                  } }}
                 />
                 <Text type="secondary" style={{ fontSize: 12 }}>
                   {t("accounting.tg.title", lang)}

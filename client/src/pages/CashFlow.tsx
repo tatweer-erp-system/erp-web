@@ -204,7 +204,7 @@ export default function CashFlow() {
         { label: t("accounting.cf.title", lang) },
       ]}
     >
-      <Space direction="vertical" size={20} style={{ width: "100%" }}>
+      <Space orientation="vertical" size={20} style={{ width: "100%" }}>
         {/* ── Toolbar Card ───────────────────────────────────────────────── */}
         <Card size="small" styles={{ body: { padding: "12px 16px" } }}>
           <div
@@ -289,7 +289,7 @@ export default function CashFlow() {
         {/* ── Info Banner ────────────────────────────────────────────────── */}
         {hasData && (
           <Alert
-            message={t("accounting.cf.simplifiedNote", lang)}
+            title={t("accounting.cf.simplifiedNote", lang)}
             type="info"
             showIcon
             icon={<InfoCircleOutlined />}
@@ -360,11 +360,11 @@ export default function CashFlow() {
                       <Statistic
                         value={Number(s.value)}
                         precision={2}
-                        valueStyle={{
+                        styles={{ content: {
                           fontSize: 22,
                           lineHeight: 1,
                           color: s.color,
-                        }}
+                        } }}
                       />
                     </div>
                     <div

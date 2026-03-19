@@ -84,8 +84,7 @@ export default function InventoryValuation() {
   });
 
   const allRows: ValuationRow[] = useMemo(() => {
-    const raw = valuationRaw as Record<string, unknown> | undefined;
-    return (raw?.data as ValuationRow[]) ?? [];
+    return valuationRaw?.data ?? [];
   }, [valuationRaw]);
 
   const { data: warehousesList } = useQuery({
@@ -162,7 +161,7 @@ export default function InventoryValuation() {
     try {
       window.open(`/api/v1/inventory/valuation?${params.toString()}`, "_blank");
     } catch {
-      notification.error({ message: "Export failed" });
+      notification.error({ message: t("valuation.exportFailed", lang) });
     }
   };
 
@@ -173,7 +172,7 @@ export default function InventoryValuation() {
     try {
       window.open(`/api/v1/inventory/valuation?${params.toString()}`, "_blank");
     } catch {
-      notification.error({ message: "Export failed" });
+      notification.error({ message: t("valuation.exportFailed", lang) });
     }
   };
 
@@ -285,12 +284,12 @@ export default function InventoryValuation() {
     <DashboardLayout
       currentPage="InventoryValuation"
       breadcrumbs={[
-        { label: "Dashboard", href: "/" },
-        { label: "Inventory", href: "#" },
+        { label: t("common.dashboard", lang), href: "/" },
+        { label: t("inventory.title", lang), href: "#" },
         { label: t("valuation.title", lang) },
       ]}
     >
-      <Space direction="vertical" size={20} style={{ width: "100%" }}>
+      <Space orientation="vertical" size={20} style={{ width: "100%" }}>
         {/* ── KPI Cards ──────────────────────────────────────────────────── */}
         <Row gutter={[16, 16]}>
           {[
@@ -371,11 +370,11 @@ export default function InventoryValuation() {
                       <Statistic
                         value={s.value}
                         precision={s.isCurrency ? 2 : 0}
-                        valueStyle={{
+                        styles={{ content: {
                           fontSize: 24,
                           lineHeight: 1,
                           color: s.color ?? "inherit",
-                        }}
+                        } }}
                       />
                     )}
                     {s.suffix && (
@@ -447,7 +446,7 @@ export default function InventoryValuation() {
                   {!isMobile && t("valuation.exportExcel", lang)}
                 </Button>
               </Tooltip>
-              <Tooltip title="Reload">
+              <Tooltip title={t("valuation.reload", lang)}>
                 <Button icon={<ReloadOutlined />} onClick={() => refetch()} />
               </Tooltip>
             </Space>
@@ -466,7 +465,7 @@ export default function InventoryValuation() {
             pagination={{
               showSizeChanger: true,
               showTotal: (total, range) =>
-                `${range[0]}–${range[1]} of ${total}`,
+                `${range[0]}–${range[1]} ${t("common.of", lang)} ${total}`,
               pageSizeOptions: ["10", "25", "50", "100"],
             }}
             locale={{

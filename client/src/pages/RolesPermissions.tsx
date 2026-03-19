@@ -79,7 +79,7 @@ export default function RolesPermissions() {
   // ── Search with 400ms debounce ──────────────────────────────────────────
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
     debounceRef.current = setTimeout(() => {
@@ -118,21 +118,18 @@ export default function RolesPermissions() {
   });
 
   const allRoles: RoleDetail[] = useMemo(() => {
-    return ((rolesRaw as Record<string, unknown>)?.data as RoleDetail[]) ?? [];
+    return rolesRaw?.data ?? [];
   }, [rolesRaw]);
 
   // All available permissions
   const { data: permissionsRaw } = useQuery({
     queryKey: [QUERY_KEYS.ROLES, "permissions"],
-    queryFn: () => rolesService.listAllPermissions({ limit: 500 }),
+    queryFn: () => rolesService.listAllPermissions({ limit: 100 }),
     staleTime: 60_000,
   });
 
   const allPermissions: PermissionItem[] = useMemo(() => {
-    return (
-      ((permissionsRaw as Record<string, unknown>)?.data as PermissionItem[]) ??
-      []
-    );
+    return permissionsRaw?.data ?? [];
   }, [permissionsRaw]);
 
   // Group permissions by module
@@ -230,8 +227,7 @@ export default function RolesPermissions() {
     setLoadingPerms(true);
     try {
       const res = await rolesService.getPermissions(roleId);
-      const perms =
-        ((res as Record<string, unknown>)?.data as PermissionItem[]) ?? [];
+      const perms: PermissionItem[] = res?.data ?? [];
       setDrawerPermissions(perms);
     } catch {
       setDrawerPermissions([]);
@@ -266,8 +262,7 @@ export default function RolesPermissions() {
       // Load existing permissions
       try {
         const res = await rolesService.getPermissions(role.id);
-        const perms =
-          ((res as Record<string, unknown>)?.data as PermissionItem[]) ?? [];
+        const perms: PermissionItem[] = res?.data ?? [];
         setSelectedPermissions(perms.map(p => p.id));
       } catch {
         setSelectedPermissions([]);
@@ -446,7 +441,7 @@ export default function RolesPermissions() {
                     </Text>
                     <Statistic
                       value={s.value}
-                      valueStyle={{ fontSize: 24, lineHeight: 1 }}
+                      styles={{ content: { fontSize: 24, lineHeight: 1 } }}
                     />
                   </div>
                   <div
@@ -765,7 +760,7 @@ export default function RolesPermissions() {
         }
       >
         {viewRole && (
-          <Space direction="vertical" size={16} style={{ width: "100%" }}>
+          <Space orientation="vertical" size={16} style={{ width: "100%" }}>
             <Row gutter={[16, 12]}>
               <Col span={12}>
                 <Text type="secondary">{t("roles.nameEn", lang)}</Text>

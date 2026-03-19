@@ -193,7 +193,7 @@ export default function JournalEntries() {
   });
 
   const entries = entriesData?.data ?? [];
-  const totalRecords = entriesData?.total ?? 0;
+  const totalRecords = entriesData?.meta?.total ?? 0;
 
   const { data: accountsList } = useQuery({
     queryKey: [QUERY_KEYS.ACCOUNTS_FOR_JE],
@@ -783,11 +783,11 @@ export default function JournalEntries() {
                     </Text>
                     <Statistic
                       value={s.value}
-                      valueStyle={{
+                      styles={{ content: {
                         fontSize: 24,
                         lineHeight: 1,
                         color: s.color ?? "inherit",
-                      }}
+                      } }}
                     />
                     <Text type="secondary" style={{ fontSize: 12 }}>
                       {s.suffix}

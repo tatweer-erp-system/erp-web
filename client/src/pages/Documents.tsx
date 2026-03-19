@@ -335,7 +335,7 @@ export default function Documents() {
                     <Statistic
                       value={s.value}
                       suffix={s.suffix}
-                      valueStyle={{ fontSize: 24, lineHeight: 1 }}
+                      styles={{ content: { fontSize: 24, lineHeight: 1 } }}
                     />
                   </div>
                   <div
@@ -408,7 +408,7 @@ export default function Documents() {
         <Alert
           type="info"
           showIcon
-          message={t("documents.comingSoonTitle", lang)}
+          title={t("documents.comingSoonTitle", lang)}
           description={t("documents.comingSoonDesc", lang)}
         />
 

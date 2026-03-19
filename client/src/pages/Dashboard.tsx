@@ -148,7 +148,7 @@ function KPICard({
               value={value}
               prefix={prefix}
               suffix={suffix}
-              valueStyle={{ fontSize: 22, lineHeight: 1 }}
+              styles={{ content: { fontSize: 22, lineHeight: 1 } }}
             />
           )}
         </div>

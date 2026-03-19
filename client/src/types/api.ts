@@ -22,6 +22,7 @@ export interface TableParams {
   sortOrder?: "asc" | "desc";
   search?: string;
   filters?: Record<string, string | number | boolean>;
+  warehouseId?: string;
 }
 
 export interface ApiError {

@@ -119,7 +119,7 @@ export default function Journals() {
   });
 
   const allJournals: Journal[] = useMemo(
-    () => ((journalsRaw as Record<string, unknown>)?.data as Journal[]) ?? [],
+    () => journalsRaw?.data ?? [],
     [journalsRaw]
   );
 
@@ -130,13 +130,12 @@ export default function Journals() {
   });
 
   const accountOptions = useMemo(() => {
-    const list =
-      ((accountsList as Record<string, unknown>)?.data as {
-        id: string;
-        code: string;
-        nameEn: string;
-        nameAr: string;
-      }[]) ?? [];
+    const list = (accountsList?.data ?? []) as {
+      id: string;
+      code: string;
+      nameEn: string;
+      nameAr: string;
+    }[];
     return list.map(a => ({
       value: a.id,
       label: `${a.code} — ${getName(a)}`,
@@ -403,7 +402,7 @@ export default function Journals() {
         { label: t("accounting.jn.title", lang) },
       ]}
     >
-      <Space direction="vertical" size={20} style={{ width: "100%" }}>
+      <Space orientation="vertical" size={20} style={{ width: "100%" }}>
         {/* ── KPI Cards ──────────────────────────────────────────────────── */}
         <Row gutter={[16, 16]}>
           {[
@@ -457,11 +456,11 @@ export default function Journals() {
                     </Text>
                     <Statistic
                       value={s.value}
-                      valueStyle={{
+                      styles={{ content: {
                         fontSize: 24,
                         lineHeight: 1,
                         color: s.color ?? "inherit",
-                      }}
+                      } }}
                     />
                     <Text type="secondary" style={{ fontSize: 12 }}>
                       {s.suffix}
@@ -760,7 +759,7 @@ export default function Journals() {
         }
       >
         {viewJournal && (
-          <Space direction="vertical" size={16} style={{ width: "100%" }}>
+          <Space orientation="vertical" size={16} style={{ width: "100%" }}>
             <Row gutter={[16, 12]}>
               <Col span={12}>
                 <Text type="secondary">{t("accounting.jn.code", lang)}</Text>

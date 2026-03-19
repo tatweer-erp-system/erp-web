@@ -80,8 +80,7 @@ export default function IncomeStatement() {
     staleTime: 300_000,
   });
 
-  const costCenters: CostCenter[] =
-    ((costCentersRes as Record<string, unknown>)?.data as CostCenter[]) ?? [];
+  const costCenters: CostCenter[] = costCentersRes?.data ?? [];
 
   // ── Query ──────────────────────────────────────────────────────────────────
   const {
@@ -243,7 +242,7 @@ export default function IncomeStatement() {
         { label: t("accounting.is.title", lang) },
       ]}
     >
-      <Space direction="vertical" size={20} style={{ width: "100%" }}>
+      <Space orientation="vertical" size={20} style={{ width: "100%" }}>
         {/* ── Toolbar Card ───────────────────────────────────────────────── */}
         <Card size="small" styles={{ body: { padding: "12px 16px" } }}>
           <div
@@ -417,11 +416,11 @@ export default function IncomeStatement() {
                       <Statistic
                         value={Number(s.value)}
                         precision={2}
-                        valueStyle={{
+                        styles={{ content: {
                           fontSize: 22,
                           lineHeight: 1,
                           color: s.color,
-                        }}
+                        } }}
                       />
                       {s.suffix && (
                         <Text

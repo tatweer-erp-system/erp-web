@@ -81,14 +81,12 @@ export default function StockTransfers() {
   });
 
   const allTransfers: StockTransfer[] = useMemo(() => {
-    return (
-      ((transfersRaw as Record<string, unknown>)?.data as StockTransfer[]) ?? []
-    );
+    return transfersRaw?.data ?? [];
   }, [transfersRaw]);
 
   const { data: productsDropdown } = useQuery({
     queryKey: [QUERY_KEYS.PRODUCTS, "dropdown"],
-    queryFn: () => productsService.dropdown({ limit: 500 }),
+    queryFn: () => productsService.dropdown({ limit: 100 }),
     staleTime: 60_000,
   });
 
@@ -102,7 +100,7 @@ export default function StockTransfers() {
 
   const { data: warehousesDropdown } = useQuery({
     queryKey: [QUERY_KEYS.WAREHOUSES_DROPDOWN],
-    queryFn: () => warehousesService.dropdown({ limit: 500 }),
+    queryFn: () => warehousesService.dropdown({ limit: 100 }),
     staleTime: 60_000,
   });
 
@@ -321,12 +319,12 @@ export default function StockTransfers() {
     <DashboardLayout
       currentPage="StockTransfers"
       breadcrumbs={[
-        { label: "Dashboard", href: "/" },
-        { label: "Inventory", href: "#" },
+        { label: t("common.dashboard", lang), href: "/" },
+        { label: t("inventory.title", lang), href: "#" },
         { label: t("inventory.transfers.title", lang) },
       ]}
     >
-      <Space direction="vertical" size={20} style={{ width: "100%" }}>
+      <Space orientation="vertical" size={20} style={{ width: "100%" }}>
         {/* ── KPI Cards ──────────────────────────────────────────────────── */}
         <Row gutter={[16, 16]}>
           {[
@@ -381,11 +379,11 @@ export default function StockTransfers() {
                     <Statistic
                       value={s.value}
                       precision={0}
-                      valueStyle={{
+                      styles={{ content: {
                         fontSize: 24,
                         lineHeight: 1,
                         color: s.color ?? "inherit",
-                      }}
+                      } }}
                     />
                     <Text type="secondary" style={{ fontSize: 12 }}>
                       {s.suffix}
@@ -434,7 +432,7 @@ export default function StockTransfers() {
             </Space>
 
             <Space>
-              <Tooltip title="Reload">
+              <Tooltip title={t("common.reload", lang)}>
                 <Button icon={<ReloadOutlined />} onClick={() => refetch()} />
               </Tooltip>
               <Button
@@ -460,7 +458,7 @@ export default function StockTransfers() {
             pagination={{
               showSizeChanger: true,
               showTotal: (total, range) =>
-                `${range[0]}–${range[1]} of ${total}`,
+                `${range[0]}–${range[1]} ${t("common.of", lang)} ${total}`,
               pageSizeOptions: ["10", "25", "50", "100"],
             }}
             locale={{
@@ -474,7 +472,7 @@ export default function StockTransfers() {
       <Drawer
         open={drawerOpen}
         onClose={closeDrawer}
-        width={isMobile ? "100%" : 520}
+        size={isMobile ? "100%" : 520}
         title={null}
         footer={
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>

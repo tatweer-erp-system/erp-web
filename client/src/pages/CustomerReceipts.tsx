@@ -82,7 +82,7 @@ export default function CustomerReceipts() {
   // ── Search with 400ms debounce ──────────────────────────────────────────
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
     debounceRef.current = setTimeout(() => {
@@ -135,9 +135,7 @@ export default function CustomerReceipts() {
   });
 
   const partnerOptions = useMemo(() => {
-    const list =
-      ((partnersRaw as Record<string, unknown>)
-        ?.data as PartnerDropdownItem[]) ?? [];
+    const list: PartnerDropdownItem[] = partnersRaw?.data ?? [];
     return list.map(p => ({
       value: p.id,
       label: getName(p),
@@ -152,9 +150,7 @@ export default function CustomerReceipts() {
   });
 
   const treasuryOptions = useMemo(() => {
-    const list =
-      ((accountsRaw as Record<string, unknown>)?.data as TreasuryAccount[]) ??
-      [];
+    const list: TreasuryAccount[] = accountsRaw?.data ?? [];
     return list
       .filter(a => a.isActive)
       .map(a => ({
@@ -414,11 +410,11 @@ export default function CustomerReceipts() {
                     <Statistic
                       value={s.value}
                       precision={s.isCurrency ? 2 : 0}
-                      valueStyle={{
+                      styles={{ content: {
                         fontSize: 24,
                         lineHeight: 1,
                         color: s.color ?? "inherit",
-                      }}
+                      } }}
                     />
                     {s.suffix && (
                       <Text type="secondary" style={{ fontSize: 12 }}>
@@ -739,7 +735,7 @@ export default function CustomerReceipts() {
           setDrawerOpen(false);
           setViewPayment(null);
         }}
-        width={isMobile ? "100%" : 520}
+        size={isMobile ? "100%" : 520}
         title={
           viewPayment
             ? `${t("payments.receipts.details", lang)} -- ${viewPayment.paymentNumber ?? viewPayment.id.slice(0, 8)}`
@@ -747,7 +743,7 @@ export default function CustomerReceipts() {
         }
       >
         {viewPayment && (
-          <Space direction="vertical" size={16} style={{ width: "100%" }}>
+          <Space orientation="vertical" size={16} style={{ width: "100%" }}>
             {/* Amount highlight */}
             <Card
               size="small"

@@ -620,7 +620,7 @@ export default function Chat() {
     >
       {/* Connection notice */}
       <Alert
-        message={t("chat.connectionNotice", lang)}
+        title={t("chat.connectionNotice", lang)}
         type="info"
         showIcon
         closable

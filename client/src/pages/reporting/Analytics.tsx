@@ -55,7 +55,13 @@ interface InventoryData {
   lowStock: number;
   outOfStock: number;
   inventoryValue: number;
-  stockHealth: { category: string; total: number; lowStock: number; outOfStock: number; value: number }[];
+  stockHealth: {
+    category: string;
+    total: number;
+    lowStock: number;
+    outOfStock: number;
+    value: number;
+  }[];
 }
 
 interface HRData {
@@ -63,7 +69,13 @@ interface HRData {
   activeEmployees: number;
   onLeave: number;
   attendanceRate: number;
-  byDepartment: { department: string; total: number; active: number; onLeave: number; attendanceRate: number }[];
+  byDepartment: {
+    department: string;
+    total: number;
+    active: number;
+    onLeave: number;
+    attendanceRate: number;
+  }[];
 }
 
 interface CRMData {
@@ -71,7 +83,12 @@ interface CRMData {
   winRate: number;
   pipelineValue: number;
   avgDealSize: number;
-  byStage: { stage: string; count: number; value: number; conversionRate: number }[];
+  byStage: {
+    stage: string;
+    count: number;
+    value: number;
+    conversionRate: number;
+  }[];
 }
 
 // ─── API ─────────────────────────────────────────────────────────────────────
@@ -80,11 +97,11 @@ const analyticsApi = {
   sales: () =>
     apiClient.get("/reporting/sales").then(r => r.data.data as SalesData),
   inventory: () =>
-    apiClient.get("/reporting/inventory").then(r => r.data.data as InventoryData),
-  hr: () =>
-    apiClient.get("/reporting/hr").then(r => r.data.data as HRData),
-  crm: () =>
-    apiClient.get("/reporting/crm").then(r => r.data.data as CRMData),
+    apiClient
+      .get("/reporting/inventory")
+      .then(r => r.data.data as InventoryData),
+  hr: () => apiClient.get("/reporting/hr").then(r => r.data.data as HRData),
+  crm: () => apiClient.get("/reporting/crm").then(r => r.data.data as CRMData),
 };
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -122,7 +139,15 @@ const STATUS_COLORS: Record<string, string> = {
   lost: "#EF4444",
 };
 
-const PIE_COLORS = ["#3B82F6", "#10B981", "#F59E0B", "#8B5CF6", "#EF4444", "#14B8A6", "#F97316"];
+const PIE_COLORS = [
+  "#3B82F6",
+  "#10B981",
+  "#F59E0B",
+  "#8B5CF6",
+  "#EF4444",
+  "#14B8A6",
+  "#F97316",
+];
 
 // ─── KPI Card ────────────────────────────────────────────────────────────────
 
@@ -159,7 +184,7 @@ function KPICard({
           <Statistic
             value={value}
             suffix={suffix}
-            valueStyle={{ fontSize: 20, lineHeight: 1, color: valueColor }}
+            styles={{ content: { fontSize: 20, lineHeight: 1, color: valueColor } }}
           />
         )}
       </div>
@@ -181,44 +206,85 @@ function SalesTab({ branchId }: { branchId: string | null }) {
   });
 
   const chartData = useMemo(
-    () => (data?.byStatus ?? []).map(s => ({
-      status: s.status,
-      label: s.status.charAt(0).toUpperCase() + s.status.slice(1),
-      amount: Number(s.amount),
-      count: Number(s.count),
-    })),
-    [data],
+    () =>
+      (data?.byStatus ?? []).map(s => ({
+        status: s.status,
+        label: s.status.charAt(0).toUpperCase() + s.status.slice(1),
+        amount: Number(s.amount),
+        count: Number(s.count),
+      })),
+    [data]
   );
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       <Row gutter={[12, 12]}>
         <Col xs={24} sm={8}>
-          <KPICard title={t("salesReports.totalOrders", lang)} value={fmtNumber(data?.orderCount)} loading={isLoading} />
+          <KPICard
+            title={t("salesReports.totalOrders", lang)}
+            value={fmtNumber(data?.orderCount)}
+            loading={isLoading}
+          />
         </Col>
         <Col xs={24} sm={8}>
-          <KPICard title={t("salesReports.totalRevenue", lang)} value={fmtCurrency(data?.totalRevenue)} suffix=" SAR" loading={isLoading} />
+          <KPICard
+            title={t("salesReports.totalRevenue", lang)}
+            value={fmtCurrency(data?.totalRevenue)}
+            suffix=" SAR"
+            loading={isLoading}
+          />
         </Col>
         <Col xs={24} sm={8}>
-          <KPICard title={t("salesReports.avgOrderValue", lang)} value={fmtCurrency(data?.avgOrderValue)} suffix=" SAR" loading={isLoading} />
+          <KPICard
+            title={t("salesReports.avgOrderValue", lang)}
+            value={fmtCurrency(data?.avgOrderValue)}
+            suffix=" SAR"
+            loading={isLoading}
+          />
         </Col>
       </Row>
       {isLoading ? (
-        <div style={{ textAlign: "center", padding: 40 }}><Spin /></div>
+        <div style={{ textAlign: "center", padding: 40 }}>
+          <Spin />
+        </div>
       ) : chartData.length > 0 ? (
         <ResponsiveContainer width="100%" height={280}>
           <BarChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" stroke={token.colorBorderSecondary} />
-            <XAxis dataKey="label" tick={{ fontSize: 12 }} stroke={token.colorTextTertiary} />
-            <YAxis tick={{ fontSize: 12 }} stroke={token.colorTextTertiary} tickFormatter={(v: number) => `${(v / 1000).toFixed(0)}k`} />
-            <Tooltip formatter={(value: number) => [`${fmtCurrency(value)} SAR`]} contentStyle={{ borderRadius: 8 }} />
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke={token.colorBorderSecondary}
+            />
+            <XAxis
+              dataKey="label"
+              tick={{ fontSize: 12 }}
+              stroke={token.colorTextTertiary}
+            />
+            <YAxis
+              tick={{ fontSize: 12 }}
+              stroke={token.colorTextTertiary}
+              tickFormatter={(v: number) => `${(v / 1000).toFixed(0)}k`}
+            />
+            <Tooltip
+              formatter={(value: number) => [`${fmtCurrency(value)} SAR`]}
+              contentStyle={{ borderRadius: 8 }}
+            />
             <Bar dataKey="amount" radius={[4, 4, 0, 0]} maxBarSize={50}>
-              {chartData.map(e => <Cell key={e.status} fill={STATUS_COLORS[e.status.toLowerCase()] ?? token.colorPrimary} />)}
+              {chartData.map(e => (
+                <Cell
+                  key={e.status}
+                  fill={
+                    STATUS_COLORS[e.status.toLowerCase()] ?? token.colorPrimary
+                  }
+                />
+              ))}
             </Bar>
           </BarChart>
         </ResponsiveContainer>
       ) : (
-        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={<Text type="secondary">{t("common.noData", lang)}</Text>} />
+        <Empty
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+          description={<Text type="secondary">{t("common.noData", lang)}</Text>}
+        />
       )}
     </div>
   );
@@ -237,27 +303,103 @@ function InventoryTab({ branchId }: { branchId: string | null }) {
     enabled: !!branchId,
   });
 
-  const columns: TableColumnsType<InventoryData["stockHealth"][0]> = useMemo(() => [
-    { title: t("common.category", lang), dataIndex: "category", key: "category", width: 180 },
-    { title: t("inventoryReports.totalProducts", lang), dataIndex: "total", key: "total", width: 100, align: "end" as const, render: (v: number) => fmtNumber(v) },
-    { title: t("inventoryReports.lowStock", lang), dataIndex: "lowStock", key: "lowStock", width: 100, align: "end" as const, render: (v: number) => <Text style={{ color: Number(v) > 0 ? "#F59E0B" : undefined }}>{fmtNumber(v)}</Text> },
-    { title: t("inventoryReports.outOfStock", lang), dataIndex: "outOfStock", key: "outOfStock", width: 100, align: "end" as const, render: (v: number) => <Text style={{ color: Number(v) > 0 ? "#EF4444" : undefined }}>{fmtNumber(v)}</Text> },
-  ], [t, lang]);
+  const columns: TableColumnsType<InventoryData["stockHealth"][0]> = useMemo(
+    () => [
+      {
+        title: t("common.category", lang),
+        dataIndex: "category",
+        key: "category",
+        width: 180,
+      },
+      {
+        title: t("inventoryReports.totalProducts", lang),
+        dataIndex: "total",
+        key: "total",
+        width: 100,
+        align: "end" as const,
+        render: (v: number) => fmtNumber(v),
+      },
+      {
+        title: t("inventoryReports.lowStock", lang),
+        dataIndex: "lowStock",
+        key: "lowStock",
+        width: 100,
+        align: "end" as const,
+        render: (v: number) => (
+          <Text style={{ color: Number(v) > 0 ? "#F59E0B" : undefined }}>
+            {fmtNumber(v)}
+          </Text>
+        ),
+      },
+      {
+        title: t("inventoryReports.outOfStock", lang),
+        dataIndex: "outOfStock",
+        key: "outOfStock",
+        width: 100,
+        align: "end" as const,
+        render: (v: number) => (
+          <Text style={{ color: Number(v) > 0 ? "#EF4444" : undefined }}>
+            {fmtNumber(v)}
+          </Text>
+        ),
+      },
+    ],
+    [t, lang]
+  );
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       <Row gutter={[12, 12]}>
-        <Col xs={12} sm={6}><KPICard title={t("inventoryReports.totalProducts", lang)} value={fmtNumber(data?.totalSKUs)} loading={isLoading} /></Col>
-        <Col xs={12} sm={6}><KPICard title={t("inventoryReports.lowStock", lang)} value={fmtNumber(data?.lowStock)} loading={isLoading} valueColor="#F59E0B" /></Col>
-        <Col xs={12} sm={6}><KPICard title={t("inventoryReports.outOfStock", lang)} value={fmtNumber(data?.outOfStock)} loading={isLoading} valueColor="#EF4444" /></Col>
-        <Col xs={12} sm={6}><KPICard title="Value" value={fmtCurrency(data?.inventoryValue)} suffix=" SAR" loading={isLoading} /></Col>
+        <Col xs={12} sm={6}>
+          <KPICard
+            title={t("inventoryReports.totalProducts", lang)}
+            value={fmtNumber(data?.totalSKUs)}
+            loading={isLoading}
+          />
+        </Col>
+        <Col xs={12} sm={6}>
+          <KPICard
+            title={t("inventoryReports.lowStock", lang)}
+            value={fmtNumber(data?.lowStock)}
+            loading={isLoading}
+            valueColor="#F59E0B"
+          />
+        </Col>
+        <Col xs={12} sm={6}>
+          <KPICard
+            title={t("inventoryReports.outOfStock", lang)}
+            value={fmtNumber(data?.outOfStock)}
+            loading={isLoading}
+            valueColor="#EF4444"
+          />
+        </Col>
+        <Col xs={12} sm={6}>
+          <KPICard
+            title={t("analytics.kpi.value", lang)}
+            value={fmtCurrency(data?.inventoryValue)}
+            suffix=" SAR"
+            loading={isLoading}
+          />
+        </Col>
       </Row>
       {isLoading ? (
-        <div style={{ textAlign: "center", padding: 40 }}><Spin /></div>
+        <div style={{ textAlign: "center", padding: 40 }}>
+          <Spin />
+        </div>
       ) : (data?.stockHealth ?? []).length > 0 ? (
-        <Table rowKey="category" size="small" dataSource={data?.stockHealth} columns={columns} pagination={false} scroll={{ x: "max-content" }} />
+        <Table
+          rowKey="category"
+          size="small"
+          dataSource={data?.stockHealth}
+          columns={columns}
+          pagination={false}
+          scroll={{ x: "max-content" }}
+        />
       ) : (
-        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={<Text type="secondary">{t("common.noData", lang)}</Text>} />
+        <Empty
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+          description={<Text type="secondary">{t("common.noData", lang)}</Text>}
+        />
       )}
     </div>
   );
@@ -276,32 +418,76 @@ function HRTab({ branchId }: { branchId: string | null }) {
   });
 
   const pieData = useMemo(
-    () => (data?.byDepartment ?? []).map(d => ({ name: d.department, value: d.total })),
-    [data],
+    () =>
+      (data?.byDepartment ?? []).map(d => ({
+        name: d.department,
+        value: d.total,
+      })),
+    [data]
   );
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       <Row gutter={[12, 12]}>
-        <Col xs={12} sm={6}><KPICard title="Total Employees" value={fmtNumber(data?.totalEmployees)} loading={isLoading} /></Col>
-        <Col xs={12} sm={6}><KPICard title="Active" value={fmtNumber(data?.activeEmployees)} loading={isLoading} /></Col>
-        <Col xs={12} sm={6}><KPICard title="On Leave" value={fmtNumber(data?.onLeave)} loading={isLoading} valueColor="#F59E0B" /></Col>
-        <Col xs={12} sm={6}><KPICard title="Attendance Rate" value={fmtPercent(data?.attendanceRate)} loading={isLoading} /></Col>
+        <Col xs={12} sm={6}>
+          <KPICard
+            title={t("analytics.kpi.totalEmployees", lang)}
+            value={fmtNumber(data?.totalEmployees)}
+            loading={isLoading}
+          />
+        </Col>
+        <Col xs={12} sm={6}>
+          <KPICard
+            title={t("analytics.kpi.active", lang)}
+            value={fmtNumber(data?.activeEmployees)}
+            loading={isLoading}
+          />
+        </Col>
+        <Col xs={12} sm={6}>
+          <KPICard
+            title={t("analytics.kpi.onLeave", lang)}
+            value={fmtNumber(data?.onLeave)}
+            loading={isLoading}
+            valueColor="#F59E0B"
+          />
+        </Col>
+        <Col xs={12} sm={6}>
+          <KPICard
+            title={t("analytics.kpi.attendanceRate", lang)}
+            value={fmtPercent(data?.attendanceRate)}
+            loading={isLoading}
+          />
+        </Col>
       </Row>
       {isLoading ? (
-        <div style={{ textAlign: "center", padding: 40 }}><Spin /></div>
+        <div style={{ textAlign: "center", padding: 40 }}>
+          <Spin />
+        </div>
       ) : pieData.length > 0 ? (
         <ResponsiveContainer width="100%" height={300}>
           <PieChart>
-            <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
-              {pieData.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
+            <Pie
+              data={pieData}
+              dataKey="value"
+              nameKey="name"
+              cx="50%"
+              cy="50%"
+              outerRadius={100}
+              label
+            >
+              {pieData.map((entry, i) => (
+                <Cell key={entry.name} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+              ))}
             </Pie>
             <Tooltip />
             <Legend />
           </PieChart>
         </ResponsiveContainer>
       ) : (
-        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={<Text type="secondary">{t("common.noData", lang)}</Text>} />
+        <Empty
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+          description={<Text type="secondary">{t("common.noData", lang)}</Text>}
+        />
       )}
     </div>
   );
@@ -321,39 +507,93 @@ function CRMTab({ branchId }: { branchId: string | null }) {
   });
 
   const chartData = useMemo(
-    () => (data?.byStage ?? []).map(s => ({
-      stage: s.stage,
-      label: s.stage.charAt(0).toUpperCase() + s.stage.slice(1),
-      value: Number(s.value),
-      count: Number(s.count),
-    })),
-    [data],
+    () =>
+      (data?.byStage ?? []).map(s => ({
+        stage: s.stage,
+        label: s.stage.charAt(0).toUpperCase() + s.stage.slice(1),
+        value: Number(s.value),
+        count: Number(s.count),
+      })),
+    [data]
   );
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       <Row gutter={[12, 12]}>
-        <Col xs={12} sm={6}><KPICard title="Total Leads" value={fmtNumber(data?.totalLeads)} loading={isLoading} /></Col>
-        <Col xs={12} sm={6}><KPICard title="Win Rate" value={fmtPercent(data?.winRate)} loading={isLoading} valueColor="#10B981" /></Col>
-        <Col xs={12} sm={6}><KPICard title="Pipeline Value" value={fmtCurrency(data?.pipelineValue)} suffix=" SAR" loading={isLoading} /></Col>
-        <Col xs={12} sm={6}><KPICard title="Avg Deal Size" value={fmtCurrency(data?.avgDealSize)} suffix=" SAR" loading={isLoading} /></Col>
+        <Col xs={12} sm={6}>
+          <KPICard
+            title={t("analytics.kpi.totalLeads", lang)}
+            value={fmtNumber(data?.totalLeads)}
+            loading={isLoading}
+          />
+        </Col>
+        <Col xs={12} sm={6}>
+          <KPICard
+            title={t("analytics.kpi.winRate", lang)}
+            value={fmtPercent(data?.winRate)}
+            loading={isLoading}
+            valueColor="#10B981"
+          />
+        </Col>
+        <Col xs={12} sm={6}>
+          <KPICard
+            title={t("analytics.kpi.pipelineValue", lang)}
+            value={fmtCurrency(data?.pipelineValue)}
+            suffix=" SAR"
+            loading={isLoading}
+          />
+        </Col>
+        <Col xs={12} sm={6}>
+          <KPICard
+            title={t("analytics.kpi.avgDealSize", lang)}
+            value={fmtCurrency(data?.avgDealSize)}
+            suffix=" SAR"
+            loading={isLoading}
+          />
+        </Col>
       </Row>
       {isLoading ? (
-        <div style={{ textAlign: "center", padding: 40 }}><Spin /></div>
+        <div style={{ textAlign: "center", padding: 40 }}>
+          <Spin />
+        </div>
       ) : chartData.length > 0 ? (
         <ResponsiveContainer width="100%" height={280}>
           <BarChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" stroke={token.colorBorderSecondary} />
-            <XAxis dataKey="label" tick={{ fontSize: 12 }} stroke={token.colorTextTertiary} />
-            <YAxis tick={{ fontSize: 12 }} stroke={token.colorTextTertiary} tickFormatter={(v: number) => `${(v / 1000).toFixed(0)}k`} />
-            <Tooltip formatter={(value: number) => [`${fmtCurrency(value)} SAR`]} contentStyle={{ borderRadius: 8 }} />
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke={token.colorBorderSecondary}
+            />
+            <XAxis
+              dataKey="label"
+              tick={{ fontSize: 12 }}
+              stroke={token.colorTextTertiary}
+            />
+            <YAxis
+              tick={{ fontSize: 12 }}
+              stroke={token.colorTextTertiary}
+              tickFormatter={(v: number) => `${(v / 1000).toFixed(0)}k`}
+            />
+            <Tooltip
+              formatter={(value: number) => [`${fmtCurrency(value)} SAR`]}
+              contentStyle={{ borderRadius: 8 }}
+            />
             <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={50}>
-              {chartData.map(e => <Cell key={e.stage} fill={STATUS_COLORS[e.stage.toLowerCase()] ?? token.colorPrimary} />)}
+              {chartData.map(e => (
+                <Cell
+                  key={e.stage}
+                  fill={
+                    STATUS_COLORS[e.stage.toLowerCase()] ?? token.colorPrimary
+                  }
+                />
+              ))}
             </Bar>
           </BarChart>
         </ResponsiveContainer>
       ) : (
-        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={<Text type="secondary">{t("common.noData", lang)}</Text>} />
+        <Empty
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+          description={<Text type="secondary">{t("common.noData", lang)}</Text>}
+        />
       )}
     </div>
   );
@@ -384,10 +624,26 @@ export default function Analytics() {
             activeKey={activeTab}
             onChange={setActiveTab}
             items={[
-              { key: "sales", label: t("SALES", lang), children: <SalesTab branchId={branchId} /> },
-              { key: "inventory", label: t("INVENTORY", lang), children: <InventoryTab branchId={branchId} /> },
-              { key: "hr", label: t("HR", lang), children: <HRTab branchId={branchId} /> },
-              { key: "crm", label: t("CRM", lang), children: <CRMTab branchId={branchId} /> },
+              {
+                key: "sales",
+                label: t("analytics.tabs.sales", lang),
+                children: <SalesTab branchId={branchId} />,
+              },
+              {
+                key: "inventory",
+                label: t("analytics.tabs.inventory", lang),
+                children: <InventoryTab branchId={branchId} />,
+              },
+              {
+                key: "hr",
+                label: t("analytics.tabs.hr", lang),
+                children: <HRTab branchId={branchId} />,
+              },
+              {
+                key: "crm",
+                label: t("analytics.tabs.crm", lang),
+                children: <CRMTab branchId={branchId} />,
+              },
             ]}
           />
         </Card>

@@ -29,6 +29,8 @@ export interface Branch {
 export interface UserRole {
   id: string;
   name: string;
+  nameEn?: string;
+  nameAr?: string;
 }
 
 export interface User {

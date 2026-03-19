@@ -255,3 +255,11 @@ export type SalesOrderFilterParams = {
   sortBy?: string;
   sortOrder?: "ASC" | "DESC";
 };
+
+// ─── SalesInvoice alias ───────────────────────────────────────────────────────
+// Backward-compat alias — prefer importing Invoice directly from @/types/modules/invoices
+export type { Invoice as SalesInvoice } from "@/types/modules/invoices";
+
+// ─── ProjectMember ────────────────────────────────────────────────────────────
+// Backward-compat alias — prefer importing ProjectMember directly from @/types/modules/projects
+export type { ProjectMember } from "@/types/modules/projects";

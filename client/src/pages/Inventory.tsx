@@ -143,13 +143,11 @@ export default function Inventory() {
   // ── Derived data ──────────────────────────────────────────────────────────
 
   const allItems: StockLevel[] = useMemo(() => {
-    return ((stockRaw as Record<string, unknown>)?.data as StockLevel[]) ?? [];
+    return stockRaw?.data ?? [];
   }, [stockRaw]);
 
   const meta = useMemo(() => {
-    return (stockRaw as Record<string, unknown>)?.meta as
-      | { page: number; limit: number; total: number; totalPages: number }
-      | undefined;
+    return stockRaw?.meta;
   }, [stockRaw]);
 
   const lowStockAlerts: LowStockAlert[] = useMemo(() => {
@@ -373,14 +371,14 @@ export default function Inventory() {
         { label: t("inventory.title", lang) },
       ]}
     >
-      <Space direction="vertical" size={20} style={{ width: "100%" }}>
+      <Space orientation="vertical" size={20} style={{ width: "100%" }}>
         {/* ── Low Stock Alert Banner ──────────────────────────────────── */}
         {alertCount > 0 && (
           <Alert
             type="warning"
             showIcon
             icon={<AlertOutlined />}
-            message={t("inventory.lowStockBanner", lang).replace(
+            title={t("inventory.lowStockBanner", lang).replace(
               "{count}",
               String(alertCount)
             )}
@@ -450,11 +448,11 @@ export default function Inventory() {
                     </Text>
                     <Statistic
                       value={s.value}
-                      valueStyle={{
+                      styles={{ content: {
                         fontSize: 24,
                         lineHeight: 1,
                         color: s.color ?? "inherit",
-                      }}
+                      } }}
                     />
                     <Text type="secondary" style={{ fontSize: 12 }}>
                       {s.suffix}
@@ -576,7 +574,7 @@ export default function Inventory() {
               total: meta?.total ?? 0,
               showSizeChanger: true,
               showTotal: (total, range) =>
-                `${range[0]}--${range[1]} of ${total}`,
+                `${range[0]}--${range[1]} ${t("common.of", lang)} ${total}`,
               pageSizeOptions: ["10", "20", "50", "100"],
               onChange: (page, pageSize) =>
                 setPagination({ page, limit: pageSize }),

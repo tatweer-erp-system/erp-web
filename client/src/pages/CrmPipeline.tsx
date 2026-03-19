@@ -148,16 +148,13 @@ export default function CrmPipeline() {
   });
 
   const stages: CrmStage[] = useMemo(
-    () =>
-      ((stagesRes as unknown as Record<string, unknown>)?.data as CrmStage[]) ??
-      [],
+    () => (stagesRes?.data as CrmStage[]) ?? [],
     [stagesRes]
   );
 
   const partners = useMemo(
     () =>
-      ((partnersDropdown as unknown as Record<string, unknown>)
-        ?.data as {
+      (partnersDropdown?.data as {
         id: string;
         nameEn?: string;
         nameAr?: string;
@@ -298,7 +295,7 @@ export default function CrmPipeline() {
     return (
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
         <Col xs={24} sm={12} md={6}>
-          <Card size="small" bordered>
+          <Card size="small" variant="outlined">
             <Statistic
               title={t("crm.totalLeads", lang)}
               value={totalLeads}
@@ -307,7 +304,7 @@ export default function CrmPipeline() {
           </Card>
         </Col>
         <Col xs={24} sm={12} md={6}>
-          <Card size="small" bordered>
+          <Card size="small" variant="outlined">
             <Statistic
               title={t("crm.pipelineValue", lang)}
               value={totalValue}
@@ -317,7 +314,7 @@ export default function CrmPipeline() {
           </Card>
         </Col>
         <Col xs={24} sm={12} md={6}>
-          <Card size="small" bordered>
+          <Card size="small" variant="outlined">
             <Statistic
               title={t("crm.winRate", lang)}
               value={report?.winRate ?? 0}
@@ -328,7 +325,7 @@ export default function CrmPipeline() {
           </Card>
         </Col>
         <Col xs={24} sm={12} md={6}>
-          <Card size="small" bordered>
+          <Card size="small" variant="outlined">
             <Statistic
               title={t("crm.avgDealSize", lang)}
               value={report?.avgDealSize ?? 0}
@@ -361,7 +358,7 @@ export default function CrmPipeline() {
           cursor: "pointer",
           borderInlineStart: `3px solid ${getStageHeaderColor(Number(lead.probability ?? 0), lead.isWon)}`,
         }}
-        bodyStyle={{ padding: "12px 14px" }}
+        styles={{ body: { padding: "12px 14px" } }}
       >
         <div style={{ marginBottom: 6 }}>
           <Text strong style={{ fontSize: 14 }}>
@@ -583,7 +580,7 @@ export default function CrmPipeline() {
         setDetailDrawerOpen(false);
         setSelectedLead(null);
       }}
-      width={520}
+      size={520}
       extra={
         <Space>
           {detail &&
@@ -809,7 +806,7 @@ export default function CrmPipeline() {
         setCreateDrawerOpen(false);
         form.resetFields();
       }}
-      width={480}
+      size={480}
       extra={
         <Space>
           <Button onClick={() => setCreateDrawerOpen(false)}>
@@ -1033,27 +1030,27 @@ export default function CrmPipeline() {
       {conversionReport && (
         <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
           <Col xs={12} sm={6}>
-            <Card size="small" bordered>
+            <Card size="small" variant="outlined">
               <Statistic
                 title={t("crm.wonDeals", lang)}
                 value={conversionReport.wonCount}
                 prefix={<TrophyOutlined style={{ color: "#52c41a" }} />}
-                valueStyle={{ color: "#52c41a" }}
+                styles={{ content: { color: "#52c41a" } }}
               />
             </Card>
           </Col>
           <Col xs={12} sm={6}>
-            <Card size="small" bordered>
+            <Card size="small" variant="outlined">
               <Statistic
                 title={t("crm.lostDeals", lang)}
                 value={conversionReport.lostCount}
                 prefix={<CloseCircleOutlined style={{ color: "#ff4d4f" }} />}
-                valueStyle={{ color: "#ff4d4f" }}
+                styles={{ content: { color: "#ff4d4f" } }}
               />
             </Card>
           </Col>
           <Col xs={12} sm={6}>
-            <Card size="small" bordered>
+            <Card size="small" variant="outlined">
               <Statistic
                 title={t("crm.avgDaysToClose", lang)}
                 value={conversionReport.avgDaysToClose}
@@ -1063,14 +1060,14 @@ export default function CrmPipeline() {
             </Card>
           </Col>
           <Col xs={12} sm={6}>
-            <Card size="small" bordered>
+            <Card size="small" variant="outlined">
               <Statistic
                 title={t("crm.winRate", lang)}
                 value={conversionReport.winRate}
                 suffix="%"
                 prefix={<StarOutlined style={{ color: "#faad14" }} />}
                 precision={1}
-                valueStyle={{ color: "#faad14" }}
+                styles={{ content: { color: "#faad14" } }}
               />
             </Card>
           </Col>

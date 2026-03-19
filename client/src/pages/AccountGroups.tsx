@@ -810,11 +810,11 @@ function AccountGroupsContent() {
                   </Text>
                 }
                 value={kpi.value}
-                valueStyle={{
+                styles={{ content: {
                   fontSize: 24,
                   fontWeight: 700,
                   color: kpi.color,
-                }}
+                } }}
               />
             </Card>
           </Col>
@@ -1055,7 +1055,7 @@ function AccountGroupsContent() {
             <div
               style={{ flex: 1, overflowY: "auto", padding: "4px 20px 20px" }}
             >
-              <Space direction="vertical" size={14} style={{ width: "100%" }}>
+              <Space orientation="vertical" size={14} style={{ width: "100%" }}>
                 {/* Details card */}
                 <div
                   style={{
@@ -1178,7 +1178,7 @@ function AccountGroupsContent() {
                       </Button>
                     </div>
                     <Space
-                      direction="vertical"
+                      orientation="vertical"
                       size={6}
                       style={{ width: "100%" }}
                     >

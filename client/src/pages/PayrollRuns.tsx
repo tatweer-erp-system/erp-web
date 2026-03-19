@@ -117,7 +117,7 @@ export default function PayrollRuns() {
   });
 
   const allRuns: PayrollRun[] = useMemo(() => {
-    return ((runsRaw as Record<string, unknown>)?.data as PayrollRun[]) ?? [];
+    return runsRaw?.data ?? [];
   }, [runsRaw]);
 
   // ── Detail query for selected run ──────────────────────────────────────
@@ -666,7 +666,7 @@ export default function PayrollRuns() {
         { label: t("hr.payroll.title", lang) },
       ]}
     >
-      <Space direction="vertical" size={20} style={{ width: "100%" }}>
+      <Space orientation="vertical" size={20} style={{ width: "100%" }}>
         {/* ── KPI Cards ──────────────────────────────────────────────── */}
         <Row gutter={[16, 16]}>
           {[
@@ -730,11 +730,11 @@ export default function PayrollRuns() {
                     <Statistic
                       value={s.value}
                       precision={0}
-                      valueStyle={{
+                      styles={{ content: {
                         fontSize: 24,
                         lineHeight: 1,
                         color: s.color ?? "inherit",
-                      }}
+                      } }}
                     />
                     <Text type="secondary" style={{ fontSize: 12 }}>
                       {s.suffix}
@@ -880,7 +880,7 @@ export default function PayrollRuns() {
       <Drawer
         open={drawerOpen}
         onClose={closeDetail}
-        width={isMobile ? "100%" : "85%"}
+        size={isMobile ? "100%" : "85%"}
         title={
           detailRun
             ? `${t("hr.payroll.runDetail", lang)} — ${formatPeriod(detailRun.periodStart, detailRun.periodEnd)}`
@@ -930,7 +930,7 @@ export default function PayrollRuns() {
         }
       >
         {detailRun && (
-          <Space direction="vertical" size={20} style={{ width: "100%" }}>
+          <Space orientation="vertical" size={20} style={{ width: "100%" }}>
             {/* ── Summary Cards ───────────────────────────────────── */}
             <Row gutter={[16, 16]}>
               {[
@@ -1006,11 +1006,11 @@ export default function PayrollRuns() {
                         <Statistic
                           value={s.value}
                           precision={s.precision}
-                          valueStyle={{
+                          styles={{ content: {
                             fontSize: 20,
                             lineHeight: 1,
                             color: s.color ?? "inherit",
-                          }}
+                          } }}
                         />
                       </div>
                       <div

@@ -219,9 +219,8 @@ export function exportReport(dto: {
   endDate?: string;
 }) {
   return apiClient
-    .post<ApiResponse<{ jobId: number; status: string }>>(
-      "/reporting/export",
-      dto,
-    )
+    .post<
+      ApiResponse<{ jobId: number; status: string }>
+    >("/reporting/export", dto)
     .then(r => r.data);
 }

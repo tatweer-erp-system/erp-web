@@ -440,7 +440,7 @@ export default function AuditLogs() {
                     </Text>
                     <Statistic
                       value={s.value}
-                      valueStyle={{ fontSize: 24, lineHeight: 1 }}
+                      styles={{ content: { fontSize: 24, lineHeight: 1 } }}
                     />
                   </div>
                   <div

@@ -71,7 +71,7 @@ export default function AllOrders() {
 
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
     debounceRef.current = setTimeout(() => {
@@ -131,7 +131,7 @@ export default function AllOrders() {
   const orders = res?.data ?? [];
   const totalRows = res?.meta?.total ?? 0;
 
-  const summary = (summaryRes as Record<string, unknown>)?.data as
+  const summary = summaryRes?.data as
     | {
         totalOrders?: number;
         totalAmount?: number;

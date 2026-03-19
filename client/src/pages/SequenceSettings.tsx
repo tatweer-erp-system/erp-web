@@ -354,7 +354,7 @@ export default function SequenceSettings() {
                     </Text>
                     <Statistic
                       value={s.value}
-                      valueStyle={{ fontSize: 24, lineHeight: 1 }}
+                      styles={{ content: { fontSize: 24, lineHeight: 1 } }}
                     />
                   </div>
                   <div
@@ -426,7 +426,7 @@ export default function SequenceSettings() {
       <Drawer
         open={drawerOpen}
         onClose={closeDrawer}
-        width={isMobile ? "100%" : 420}
+        size={isMobile ? "100%" : 420}
         title={
           <Space>
             <SettingOutlined style={{ color: "var(--ant-color-primary)" }} />

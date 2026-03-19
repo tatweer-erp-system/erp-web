@@ -123,7 +123,7 @@ export default function PurchaseInvoices() {
   const [pageSize, setPageSize] = useState(20);
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [paymentStatusFilter, setPaymentStatusFilter] = useState<string>("all");
   const [dateRange, setDateRange] = useState<
@@ -157,13 +157,13 @@ export default function PurchaseInvoices() {
     limit: pageSize,
     invoiceType: InvoiceTypeNew.IN_INVOICE,
     ...(search ? { search } : {}),
-    ...(statusFilter !== "all" ? { status: statusFilter } : {}),
+    ...(statusFilter !== "all"
+      ? { status: statusFilter as InvoiceStatusNew }
+      : {}),
     ...(paymentStatusFilter !== "all"
-      ? { paymentStatus: paymentStatusFilter }
+      ? { paymentStatus: paymentStatusFilter as InvoicePaymentStatus }
       : {}),
-    ...(dateRange?.[0]
-      ? { dateFrom: dateRange[0].format("YYYY-MM-DD") }
-      : {}),
+    ...(dateRange?.[0] ? { dateFrom: dateRange[0].format("YYYY-MM-DD") } : {}),
     ...(dateRange?.[1] ? { dateTo: dateRange[1].format("YYYY-MM-DD") } : {}),
     sortBy: "createdAt",
     sortOrder: "DESC" as const,
@@ -188,9 +188,7 @@ export default function PurchaseInvoices() {
       invoicesService.summary({ invoiceType: InvoiceTypeNew.IN_INVOICE }),
     enabled: !!branchId,
   });
-  const summary = (summaryRes as Record<string, unknown>)?.data as
-    | InvoiceSummary
-    | undefined;
+  const summary = summaryRes?.data as InvoiceSummary | undefined;
 
   // Vendor dropdown
   const { data: vendorsData } = useQuery({
@@ -582,7 +580,7 @@ export default function PurchaseInvoices() {
         { label: t("purchasing.bills.title", lang) },
       ]}
     >
-      <Space direction="vertical" size={20} style={{ width: "100%" }}>
+      <Space orientation="vertical" size={20} style={{ width: "100%" }}>
         {/* ── KPI Cards ────────────────────────────────────────────────── */}
         <Row gutter={[16, 16]}>
           {[
@@ -647,11 +645,11 @@ export default function PurchaseInvoices() {
                     <Statistic
                       value={s.value}
                       precision={"isCurrency" in s && s.isCurrency ? 2 : 0}
-                      valueStyle={{
+                      styles={{ content: {
                         fontSize: 24,
                         lineHeight: 1,
                         color: s.color ?? "inherit",
-                      }}
+                      } }}
                     />
                     <Text type="secondary" style={{ fontSize: 12 }}>
                       {s.suffix}
@@ -897,7 +895,7 @@ export default function PurchaseInvoices() {
       <Drawer
         open={createDrawerOpen}
         onClose={closeCreateModal}
-        width={isMobile ? "100%" : 680}
+        size={isMobile ? "100%" : 680}
         title={t("purchasing.bills.new", lang)}
         destroyOnClose
         footer={
@@ -1149,7 +1147,7 @@ export default function PurchaseInvoices() {
           setDrawerOpen(false);
           setViewInvoice(null);
         }}
-        width={isMobile ? "100%" : 560}
+        size={isMobile ? "100%" : 560}
         title={
           viewInvoice
             ? `${t("purchasing.bills.view", lang)} \u2014 ${viewInvoice.invoiceNumber}`
@@ -1157,7 +1155,7 @@ export default function PurchaseInvoices() {
         }
       >
         {viewInvoice && (
-          <Space direction="vertical" size={16} style={{ width: "100%" }}>
+          <Space orientation="vertical" size={16} style={{ width: "100%" }}>
             <Row gutter={[16, 12]}>
               <Col span={12}>
                 <Text type="secondary">

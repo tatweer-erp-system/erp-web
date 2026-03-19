@@ -1944,10 +1944,12 @@ export const ar: Record<string, string> = {
   "accounting.settings.subtitle": "إعداد المحاسبة والضرائب وربط الحسابات",
   "accounting.settings.taxVat": "الضريبة / ض.ق.م",
   "accounting.settings.generalConfig": "الإعدادات العامة",
-  "accounting.settings.generalConfigDesc": "الإعدادات الأساسية للمحاسبة في مؤسستك",
+  "accounting.settings.generalConfigDesc":
+    "الإعدادات الأساسية للمحاسبة في مؤسستك",
   "accounting.settings.glMappingsDesc": "ربط دليل الحسابات بوظائف النظام",
   "accounting.settings.defaultJournals": "اليوميات الافتراضية",
-  "accounting.settings.defaultJournalsDesc": "تكوين اليوميات الافتراضية للقيود التلقائية",
+  "accounting.settings.defaultJournalsDesc":
+    "تكوين اليوميات الافتراضية للقيود التلقائية",
   "accounting.settings.defaultSalesJournal": "يومية المبيعات الافتراضية",
   "accounting.settings.defaultPurchaseJournal": "يومية المشتريات الافتراضية",
   "accounting.settings.defaultCashJournal": "يومية النقد الافتراضية",
@@ -1960,11 +1962,14 @@ export const ar: Record<string, string> = {
   "accounting.settings.actualDays": "الأيام الفعلية في الشهر",
   "accounting.settings.fixed30Days": "30 يوم ثابت",
   "accounting.settings.allowNegativeStock": "السماح بالمخزون السالب",
-  "accounting.settings.fiscalPeriodsNote": "تُدار الفترات المالية من صفحة الفترات المالية. تغيير شهر البداية هنا يؤثر على السنوات المالية الجديدة فقط.",
+  "accounting.settings.fiscalPeriodsNote":
+    "تُدار الفترات المالية من صفحة الفترات المالية. تغيير شهر البداية هنا يؤثر على السنوات المالية الجديدة فقط.",
   "accounting.settings.taxVatConfig": "إعدادات الضريبة / ض.ق.م",
-  "accounting.settings.taxVatConfigDesc": "تكوين نسب الضريبة وإعدادات ضريبة القيمة المضافة",
+  "accounting.settings.taxVatConfigDesc":
+    "تكوين نسب الضريبة وإعدادات ضريبة القيمة المضافة",
   "accounting.settings.vatPayableAccount": "حساب ضريبة القيمة المضافة المستحقة",
-  "accounting.settings.taxSetupNote": "يتم تكوين فئات الضريبة (المعفاة، الصفرية) ونسب الضريبة لكل منتج من صفحة إعداد الضرائب.",
+  "accounting.settings.taxSetupNote":
+    "يتم تكوين فئات الضريبة (المعفاة، الصفرية) ونسب الضريبة لكل منتج من صفحة إعداد الضرائب.",
 
   // ─── Treasury — Bank Accounts ───────────────────────────────────────────────
   "treasury.bank.title": "الحسابات البنكية",
@@ -2550,6 +2555,8 @@ export const ar: Record<string, string> = {
   "warehouses.allowNegativeStock": "السماح بمخزون سالب",
   "warehouses.yes": "نعم",
   "warehouses.no": "لا",
+  "warehouses.cancel": "إلغاء",
+  "warehouses.view": "عرض",
 
   // ── Product Categories Page ────────────────────────────────────────────────
   "categories.title": "فئات المنتجات",
@@ -2574,6 +2581,7 @@ export const ar: Record<string, string> = {
   "categories.search": "بحث في الفئات...",
   "categories.total": "إجمالي الفئات",
   "categories.rootCategories": "الفئات الجذرية",
+  "categories.noData": "لا توجد فئات",
 
   // ── Inventory Valuation Page ───────────────────────────────────────────────
   "valuation.title": "تقييم المخزون",
@@ -2595,6 +2603,8 @@ export const ar: Record<string, string> = {
   "valuation.totalValue2": "القيمة الإجمالية",
   "valuation.grandTotal": "المجموع الكلي",
   "valuation.noData": "لا توجد بيانات تقييم",
+  "valuation.reload": "تحديث",
+  "valuation.exportFailed": "فشل التصدير",
 
   // Stock Movements
   "stockMovement.title": "حركات المخزون",
@@ -2649,6 +2659,90 @@ export const ar: Record<string, string> = {
   "openingStock.succeeded": "نجحت",
   "openingStock.failed": "فشلت",
 
+  // ── Stock Adjustments Page ──────────────────────────────────────────────────
+  "inventory.adjustments.title": "تعديلات المخزون",
+  "inventory.adjustments.totalAdjustments": "إجمالي التعديلات",
+  "inventory.adjustments.increases": "زيادات",
+  "inventory.adjustments.decreases": "نقصان",
+  "inventory.adjustments.date": "التاريخ",
+  "inventory.adjustments.product": "المنتج",
+  "inventory.adjustments.warehouse": "المستودع",
+  "inventory.adjustments.quantity": "الكمية",
+  "inventory.adjustments.reason": "السبب",
+  "inventory.adjustments.unitCost": "تكلفة الوحدة",
+  "inventory.adjustments.beforeAfter": "قبل ← بعد",
+  "inventory.adjustments.search": "بحث بالمنتج، رمز المنتج، المستودع...",
+  "inventory.adjustments.new": "تعديل جديد",
+  "inventory.adjustments.create": "إنشاء تعديل",
+  "inventory.adjustments.cancel": "إلغاء",
+  "inventory.adjustments.created": "تم إنشاء التعديل بنجاح",
+  "inventory.adjustments.createError": "فشل في إنشاء التعديل",
+  "inventory.adjustments.selectProduct": "اختر منتجًا",
+  "inventory.adjustments.selectWarehouse": "اختر مستودعًا",
+  "inventory.adjustments.productRequired": "المنتج مطلوب",
+  "inventory.adjustments.warehouseRequired": "المستودع مطلوب",
+  "inventory.adjustments.quantityRequired": "الكمية مطلوبة",
+  "inventory.adjustments.quantityNonZero": "الكمية لا يمكن أن تكون صفرًا",
+  "inventory.adjustments.quantityHint": "استخدم موجب للزيادة وسالب للنقص",
+  "inventory.adjustments.reasonRequired": "السبب مطلوب",
+  "inventory.adjustments.reasonPlaceholder": "مثال: بضائع تالفة، تصحيح جرد",
+  "inventory.adjustments.unitCostPlaceholder": "اختياري",
+
+  // ── Stock Transfers Page ────────────────────────────────────────────────────
+  "inventory.transfers.title": "تحويلات المخزون",
+  "inventory.transfers.totalTransfers": "إجمالي التحويلات",
+  "inventory.transfers.thisMonth": "هذا الشهر",
+  "inventory.transfers.totalUnits": "إجمالي الوحدات",
+  "inventory.transfers.transfers": "تحويلات",
+  "inventory.transfers.units": "وحدات",
+  "inventory.transfers.date": "التاريخ",
+  "inventory.transfers.product": "المنتج",
+  "inventory.transfers.route": "المسار",
+  "inventory.transfers.quantity": "الكمية",
+  "inventory.transfers.notes": "ملاحظات",
+  "inventory.transfers.search": "بحث بالمنتج، رمز المنتج، المستودع...",
+  "inventory.transfers.new": "تحويل جديد",
+  "inventory.transfers.create": "إنشاء تحويل",
+  "inventory.transfers.cancel": "إلغاء",
+  "inventory.transfers.created": "تم إنشاء التحويل بنجاح",
+  "inventory.transfers.createError": "فشل في إنشاء التحويل",
+  "inventory.transfers.selectProduct": "اختر منتجًا",
+  "inventory.transfers.sourceWarehouse": "مستودع المصدر",
+  "inventory.transfers.destinationWarehouse": "مستودع الوجهة",
+  "inventory.transfers.selectSource": "اختر مستودع المصدر",
+  "inventory.transfers.selectDestination": "اختر مستودع الوجهة",
+  "inventory.transfers.productRequired": "المنتج مطلوب",
+  "inventory.transfers.sourceRequired": "مستودع المصدر مطلوب",
+  "inventory.transfers.destinationRequired": "مستودع الوجهة مطلوب",
+  "inventory.transfers.quantityRequired": "الكمية مطلوبة",
+  "inventory.transfers.sameWarehouseError": "المصدر والوجهة يجب أن يكونا مختلفين",
+  "inventory.transfers.notesPlaceholder": "ملاحظات اختيارية...",
+
+  // ── Stock Movement Type Labels ──────────────────────────────────────────────
+  "stockMovement.type.purchaseReceipt": "إيصال شراء",
+  "stockMovement.type.saleDelivery": "تسليم بيع",
+  "stockMovement.type.posSale": "بيع نقطة بيع",
+  "stockMovement.type.internal": "تحويل داخلي",
+  "stockMovement.type.adjustment": "تعديل",
+  "stockMovement.type.opening": "افتتاحي",
+  "stockMovement.type.return": "مرتجع",
+  "stockMovement.type.scrap": "تالف",
+
+  // ── Stock Movement Reference Type Labels ────────────────────────────────────
+  "stockMovement.ref.purchaseOrder": "أمر شراء",
+  "stockMovement.ref.salesOrder": "أمر بيع",
+  "stockMovement.ref.manual": "يدوي",
+  "stockMovement.ref.transfer": "تحويل",
+  "stockMovement.ref.posOrder": "أمر نقطة بيع",
+  "stockMovement.ref.adjustment": "تعديل",
+
+  // ── Missing Common Keys ─────────────────────────────────────────────────────
+  "common.dashboard": "لوحة التحكم",
+  "common.yes": "نعم",
+  "common.no": "لا",
+  "common.of": "من",
+  "common.exportFailed": "فشل التصدير",
+
   // ─── CRM ──────────────────────────────────────────────────────────────────
   "crm.pipeline": "خط أنابيب المبيعات",
   "crm.leads": "العملاء المحتملون",
@@ -2693,7 +2787,8 @@ export const ar: Record<string, string> = {
   "crm.leads.lostReasonLabel": "سبب الخسارة",
   "crm.leads.lostReasonPlaceholder": "أدخل سبب خسارة هذا العميل...",
   "crm.leads.convert": "تحويل إلى فرصة",
-  "crm.leads.convertConfirm": "هل أنت متأكد من تحويل هذا العميل المحتمل إلى فرصة؟",
+  "crm.leads.convertConfirm":
+    "هل أنت متأكد من تحويل هذا العميل المحتمل إلى فرصة؟",
   "crm.leads.totalLeads": "إجمالي العملاء المحتملين",
   "crm.leads.opportunities": "الفرص",
   "crm.leads.won": "مكسب",
@@ -2941,7 +3036,8 @@ export const ar: Record<string, string> = {
 
   // ─── Inventory Reports ─────────────────────────────────────────────────────
   "inventoryReports.title": "تقارير المخزون",
-  "inventoryReports.subtitle": "مستويات المخزون وتنبيهات النقص ونظرة عامة على المستودعات",
+  "inventoryReports.subtitle":
+    "مستويات المخزون وتنبيهات النقص ونظرة عامة على المستودعات",
   "inventoryReports.totalProducts": "إجمالي المنتجات",
   "inventoryReports.totalWarehouses": "المستودعات",
   "inventoryReports.lowStock": "مخزون منخفض",

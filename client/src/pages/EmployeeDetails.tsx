@@ -760,11 +760,11 @@ export default function EmployeeDetails() {
           <Statistic
             value={value}
             precision={0}
-            valueStyle={{
+            styles={{ content: {
               fontSize: 22,
               lineHeight: 1,
               color: color ?? "inherit",
-            }}
+            } }}
           />
         </div>
         {iconNode && (
@@ -934,7 +934,7 @@ export default function EmployeeDetails() {
         </span>
       ),
       children: (
-        <Space direction="vertical" size={16} style={{ width: "100%" }}>
+        <Space orientation="vertical" size={16} style={{ width: "100%" }}>
           <Row gutter={[16, 16]}>
             <Col xs={24} sm={8}>
               {renderStatCard(
@@ -987,7 +987,7 @@ export default function EmployeeDetails() {
         </span>
       ),
       children: (
-        <Space direction="vertical" size={16} style={{ width: "100%" }}>
+        <Space orientation="vertical" size={16} style={{ width: "100%" }}>
           {balances.length > 0 && (
             <Row gutter={[16, 16]}>
               {balances.map(b => {
@@ -1085,7 +1085,7 @@ export default function EmployeeDetails() {
         </span>
       ),
       children: (
-        <Space direction="vertical" size={16} style={{ width: "100%" }}>
+        <Space orientation="vertical" size={16} style={{ width: "100%" }}>
           <Row gutter={[16, 16]}>
             <Col xs={24} sm={12} md={6}>
               {renderStatCard(
@@ -1151,7 +1151,7 @@ export default function EmployeeDetails() {
         </span>
       ),
       children: (
-        <Space direction="vertical" size={16} style={{ width: "100%" }}>
+        <Space orientation="vertical" size={16} style={{ width: "100%" }}>
           <Row gutter={[16, 16]}>
             <Col xs={24} sm={8}>
               {renderStatCard(
@@ -1207,7 +1207,7 @@ export default function EmployeeDetails() {
         { label: getName(employee) },
       ]}
     >
-      <Space direction="vertical" size={20} style={{ width: "100%" }}>
+      <Space orientation="vertical" size={20} style={{ width: "100%" }}>
         {/* ── Header Section ─────────────────────────────────────────────── */}
         <Card styles={{ body: { padding: isMobile ? "16px" : "24px" } }}>
           <div
@@ -1325,7 +1325,7 @@ export default function EmployeeDetails() {
       <Drawer
         open={drawerOpen}
         onClose={closeDrawer}
-        width={isMobile ? "100%" : 640}
+        size={isMobile ? "100%" : 640}
         title={null}
         footer={
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>

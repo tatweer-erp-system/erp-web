@@ -31,7 +31,7 @@ export function SalesOrderStatusBar({
       ? `${t("sales.status.cancelled", lang)} - ${new Date(cancelledAt).toLocaleDateString(lang === "ar" ? "ar-SA" : "en-SA")}`
       : t("sales.status.cancelled", lang);
 
-    return <Alert type="error" showIcon message={message} className="mb-4" />;
+    return <Alert type="error" showIcon title={message} className="mb-4" />;
   }
 
   const currentIndex = STEP_ORDER.indexOf(

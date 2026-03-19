@@ -147,7 +147,7 @@ export default function PurchaseOrders() {
   const [pageSize, setPageSize] = useState(20);
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [dateRange, setDateRange] = useState<
     [Dayjs | null, Dayjs | null] | null
@@ -176,7 +176,9 @@ export default function PurchaseOrders() {
     page,
     limit: pageSize,
     ...(search ? { search } : {}),
-    ...(statusFilter !== "all" ? { status: statusFilter } : {}),
+    ...(statusFilter !== "all"
+      ? { status: statusFilter as PurchaseOrderStatusNew }
+      : {}),
     ...(dateRange?.[0] ? { dateFrom: dateRange[0].format("YYYY-MM-DD") } : {}),
     ...(dateRange?.[1] ? { dateTo: dateRange[1].format("YYYY-MM-DD") } : {}),
     sortBy: "createdAt",
@@ -201,9 +203,7 @@ export default function PurchaseOrders() {
     queryFn: () => purchaseOrdersService.summary(),
     enabled: !!branchId,
   });
-  const summary = (summaryRes as Record<string, unknown>)?.data as
-    | PurchaseOrderSummary
-    | undefined;
+  const summary = summaryRes?.data as PurchaseOrderSummary | undefined;
 
   // Partners dropdown for create form
   const { data: partnersData } = useQuery({
@@ -561,7 +561,7 @@ export default function PurchaseOrders() {
         { label: t("purchasing.po.title", lang) },
       ]}
     >
-      <Space direction="vertical" size={20} style={{ width: "100%" }}>
+      <Space orientation="vertical" size={20} style={{ width: "100%" }}>
         {/* ── KPI Cards ────────────────────────────────────────────────── */}
         <Row gutter={[16, 16]}>
           {[
@@ -635,11 +635,11 @@ export default function PurchaseOrders() {
                     <Statistic
                       value={s.value}
                       precision={"isCurrency" in s && s.isCurrency ? 2 : 0}
-                      valueStyle={{
+                      styles={{ content: {
                         fontSize: 24,
                         lineHeight: 1,
                         color: s.color ?? "inherit",
-                      }}
+                      } }}
                     />
                     {s.suffix && (
                       <Text type="secondary" style={{ fontSize: 12 }}>
@@ -853,7 +853,7 @@ export default function PurchaseOrders() {
       <Drawer
         open={createDrawerOpen}
         onClose={closeCreateModal}
-        width={isMobile ? "100%" : 680}
+        size={isMobile ? "100%" : 680}
         title={t("purchasing.po.new", lang)}
         destroyOnClose
         footer={
@@ -1025,7 +1025,7 @@ export default function PurchaseOrders() {
           setDrawerOpen(false);
           setViewRecord(null);
         }}
-        width={isMobile ? "100%" : 560}
+        size={isMobile ? "100%" : 560}
         title={
           viewRecord
             ? `${t("purchasing.po.detail.title", lang)} \u2014 ${viewRecord.orderNumber}`
@@ -1033,7 +1033,7 @@ export default function PurchaseOrders() {
         }
       >
         {viewRecord && (
-          <Space direction="vertical" size={16} style={{ width: "100%" }}>
+          <Space orientation="vertical" size={16} style={{ width: "100%" }}>
             <Row gutter={[16, 12]}>
               <Col span={12}>
                 <Text type="secondary">

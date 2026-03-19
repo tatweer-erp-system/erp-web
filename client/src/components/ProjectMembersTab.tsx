@@ -8,7 +8,7 @@ import { usersService } from "@/services/users.service";
 import { useSettings } from "@/contexts/SettingsContext";
 import { t } from "@/i18n";
 import { Plus, Trash2, UserPlus, Shield, Eye, User } from "lucide-react";
-import type { ProjectMember } from "@/types/modules/sales";
+import type { ProjectMember } from "@/types/modules/projects";
 import { MemberRole } from "@/constants/enums";
 
 type ProjectMembersTabProps = {
@@ -161,10 +161,10 @@ export function ProjectMembersTab({ projectId }: ProjectMembersTabProps) {
                 </div>
                 <div>
                   <p className="text-sm font-semibold">
-                    {memberItem.user.name}
+                    {memberItem.user?.name ?? "—"}
                   </p>
                   <p className="text-xs text-gray-400">
-                    {memberItem.user.email}
+                    {memberItem.user?.email ?? "—"}
                   </p>
                 </div>
               </div>
@@ -287,8 +287,8 @@ export function ProjectMembersTab({ projectId }: ProjectMembersTabProps) {
         </p>
         {memberToRemove && (
           <div className="mt-3 p-3 rounded-lg bg-gray-50 border">
-            <p className="text-sm font-medium">{memberToRemove.user.name}</p>
-            <p className="text-xs text-gray-400">{memberToRemove.user.email}</p>
+            <p className="text-sm font-medium">{memberToRemove.user?.name}</p>
+            <p className="text-xs text-gray-400">{memberToRemove.user?.email}</p>
           </div>
         )}
       </AnimatedModal>

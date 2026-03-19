@@ -89,7 +89,7 @@ export function QuotationStats({
                 <Statistic
                   value={s.value}
                   suffix={"suffix" in s ? s.suffix : undefined}
-                  valueStyle={{ fontSize: 24, lineHeight: 1 }}
+                  styles={{ content: { fontSize: 24, lineHeight: 1 } }}
                 />
               </div>
               <div

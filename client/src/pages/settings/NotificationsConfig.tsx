@@ -231,7 +231,7 @@ function PreferencesTab() {
       <Alert
         type="info"
         showIcon
-        message="Changes apply to all users. Individual users can further customize their preferences from their profile."
+        title="Changes apply to all users. Individual users can further customize their preferences from their profile."
         style={{ marginBottom: 16, fontSize: 12 }}
       />
       {NOTIF_CATEGORIES.map(cat => (
@@ -809,7 +809,7 @@ export default function NotificationsConfig() {
             }
           >
             {tabContent[activeTab] ?? (
-              <Alert type="info" message="Content coming soon" />
+              <Alert type="info" title="Content coming soon" />
             )}
           </Card>
         </div>

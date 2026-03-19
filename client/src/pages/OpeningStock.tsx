@@ -106,7 +106,7 @@ export default function OpeningStock() {
 
   const { data: productsList } = useQuery({
     queryKey: [QUERY_KEYS.PRODUCTS, "dropdown"],
-    queryFn: () => productsService.dropdown({ limit: 500 }),
+    queryFn: () => productsService.dropdown({ limit: 100 }),
     staleTime: 60_000,
   });
 
@@ -315,15 +315,15 @@ export default function OpeningStock() {
     <DashboardLayout
       currentPage="OpeningStock"
       breadcrumbs={[
-        { label: "Dashboard", href: "/" },
-        { label: t("INVENTORY", lang), href: "#" },
+        { label: t("common.dashboard", lang), href: "/" },
+        { label: t("inventory.title", lang), href: "#" },
         { label: t("openingStock.title", lang) },
       ]}
     >
-      <Space direction="vertical" size={20} style={{ width: "100%" }}>
+      <Space orientation="vertical" size={20} style={{ width: "100%" }}>
         {/* ── Header info ─────────────────────────────────────────────────── */}
         <Alert
-          message={t("openingStock.title", lang)}
+          title={t("openingStock.title", lang)}
           description={t("openingStock.description", lang)}
           type="info"
           showIcon
@@ -391,7 +391,7 @@ export default function OpeningStock() {
         {/* ── Progress bar (visible during submit) ────────────────────────── */}
         {submitting && (
           <Card size="small" styles={{ body: { padding: "16px 20px" } }}>
-            <Space direction="vertical" style={{ width: "100%" }}>
+            <Space orientation="vertical" style={{ width: "100%" }}>
               <Text>
                 {t("openingStock.processing", lang)} {progress.current}{" "}
                 {t("openingStock.of", lang)} {progress.total}

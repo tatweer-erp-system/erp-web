@@ -465,7 +465,7 @@ export default function LeaveManagement() {
         { label: t("hr.leaves.title", lang) },
       ]}
     >
-      <Space direction="vertical" size={20} style={{ width: "100%" }}>
+      <Space orientation="vertical" size={20} style={{ width: "100%" }}>
         {/* ── KPI Cards ──────────────────────────────────────────────────── */}
         <Row gutter={[16, 16]}>
           {[
@@ -529,11 +529,11 @@ export default function LeaveManagement() {
                     <Statistic
                       value={s.value}
                       precision={0}
-                      valueStyle={{
+                      styles={{ content: {
                         fontSize: 24,
                         lineHeight: 1,
                         color: s.color ?? "inherit",
-                      }}
+                      } }}
                     />
                     <Text type="secondary" style={{ fontSize: 12 }}>
                       {s.suffix}
@@ -655,7 +655,7 @@ export default function LeaveManagement() {
       <Drawer
         open={drawerOpen}
         onClose={closeDrawer}
-        width={isMobile ? "100%" : 520}
+        size={isMobile ? "100%" : 520}
         title={null}
         footer={
           <div style={{ textAlign: "end" }}>
@@ -777,7 +777,7 @@ export default function LeaveManagement() {
           setViewDrawerOpen(false);
           setViewLeave(null);
         }}
-        width={isMobile ? "100%" : 520}
+        size={isMobile ? "100%" : 520}
         title={
           viewLeave
             ? `${t("hr.leaves.details", lang)} — ${lang === "ar" ? (viewLeave.employeeNameAr ?? viewLeave.employeeNameEn ?? "") : (viewLeave.employeeNameEn ?? viewLeave.employeeNameAr ?? "")}`
@@ -785,7 +785,7 @@ export default function LeaveManagement() {
         }
       >
         {viewLeave && (
-          <Space direction="vertical" size={16} style={{ width: "100%" }}>
+          <Space orientation="vertical" size={16} style={{ width: "100%" }}>
             {/* Status highlight */}
             <Card
               size="small"

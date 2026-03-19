@@ -97,7 +97,7 @@ export default function PurchaseReturns() {
   const [pageSize, setPageSize] = useState(20);
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [dateRange, setDateRange] = useState<
     [Dayjs | null, Dayjs | null] | null
@@ -127,10 +127,10 @@ export default function PurchaseReturns() {
     limit: pageSize,
     invoiceType: InvoiceTypeNew.IN_REFUND,
     ...(search ? { search } : {}),
-    ...(statusFilter !== "all" ? { status: statusFilter } : {}),
-    ...(dateRange?.[0]
-      ? { dateFrom: dateRange[0].format("YYYY-MM-DD") }
+    ...(statusFilter !== "all"
+      ? { status: statusFilter as InvoiceStatusNew }
       : {}),
+    ...(dateRange?.[0] ? { dateFrom: dateRange[0].format("YYYY-MM-DD") } : {}),
     ...(dateRange?.[1] ? { dateTo: dateRange[1].format("YYYY-MM-DD") } : {}),
     sortBy: "createdAt",
     sortOrder: "DESC" as const,
@@ -155,9 +155,7 @@ export default function PurchaseReturns() {
       invoicesService.summary({ invoiceType: InvoiceTypeNew.IN_REFUND }),
     enabled: !!branchId,
   });
-  const summary = (summaryRes as Record<string, unknown>)?.data as
-    | InvoiceSummary
-    | undefined;
+  const summary = summaryRes?.data as InvoiceSummary | undefined;
 
   // Vendor dropdown
   const { data: vendorsData } = useQuery({
@@ -461,7 +459,7 @@ export default function PurchaseReturns() {
         { label: t("purchasing.returns.title", lang) },
       ]}
     >
-      <Space direction="vertical" size={20} style={{ width: "100%" }}>
+      <Space orientation="vertical" size={20} style={{ width: "100%" }}>
         {/* ── KPI Cards ────────────────────────────────────────────────── */}
         <Row gutter={[16, 16]}>
           {[
@@ -526,11 +524,11 @@ export default function PurchaseReturns() {
                     <Statistic
                       value={s.value}
                       precision={"isCurrency" in s && s.isCurrency ? 2 : 0}
-                      valueStyle={{
+                      styles={{ content: {
                         fontSize: 24,
                         lineHeight: 1,
                         color: s.color ?? "inherit",
-                      }}
+                      } }}
                     />
                     <Text type="secondary" style={{ fontSize: 12 }}>
                       {s.suffix}
@@ -738,7 +736,7 @@ export default function PurchaseReturns() {
       <Drawer
         open={createDrawerOpen}
         onClose={closeCreateModal}
-        width={isMobile ? "100%" : 680}
+        size={isMobile ? "100%" : 680}
         title={t("purchasing.returns.new", lang)}
         destroyOnClose
         footer={
@@ -936,7 +934,7 @@ export default function PurchaseReturns() {
           setDrawerOpen(false);
           setViewInvoice(null);
         }}
-        width={isMobile ? "100%" : 560}
+        size={isMobile ? "100%" : 560}
         title={
           viewInvoice
             ? `${t("purchasing.returns.view", lang)} \u2014 ${viewInvoice.invoiceNumber}`
@@ -944,7 +942,7 @@ export default function PurchaseReturns() {
         }
       >
         {viewInvoice && (
-          <Space direction="vertical" size={16} style={{ width: "100%" }}>
+          <Space orientation="vertical" size={16} style={{ width: "100%" }}>
             <Row gutter={[16, 12]}>
               <Col span={12}>
                 <Text type="secondary">

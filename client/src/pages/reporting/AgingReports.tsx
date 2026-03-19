@@ -126,7 +126,7 @@ function KPICard({
             <Statistic
               value={value}
               suffix={suffix}
-              valueStyle={{ fontSize: 22, lineHeight: 1, color: valueColor }}
+              styles={{ content: { fontSize: 22, lineHeight: 1, color: valueColor } }}
             />
           )}
         </div>
@@ -153,7 +153,10 @@ function KPICard({
 
 // ─── Aging Table Builder ─────────────────────────────────────────────────────
 
-function useAgingColumns(t: (key: string, lang: "en" | "ar") => string, lang: "en" | "ar"): TableColumnsType<AgingBucket> {
+function useAgingColumns(
+  t: (key: string, lang: "en" | "ar") => string,
+  lang: "en" | "ar"
+): TableColumnsType<AgingBucket> {
   return useMemo(
     () => [
       {
@@ -170,7 +173,9 @@ function useAgingColumns(t: (key: string, lang: "en" | "ar") => string, lang: "e
         width: 120,
         align: "end" as const,
         render: (v: number) => (
-          <Text style={{ fontFamily: "monospace", color: BUCKET_COLORS.current }}>
+          <Text
+            style={{ fontFamily: "monospace", color: BUCKET_COLORS.current }}
+          >
             {fmtCurrency(v)}
           </Text>
         ),
@@ -182,7 +187,12 @@ function useAgingColumns(t: (key: string, lang: "en" | "ar") => string, lang: "e
         width: 120,
         align: "end" as const,
         render: (v: number) => (
-          <Text style={{ fontFamily: "monospace", color: Number(v) > 0 ? BUCKET_COLORS.days31to60 : undefined }}>
+          <Text
+            style={{
+              fontFamily: "monospace",
+              color: Number(v) > 0 ? BUCKET_COLORS.days31to60 : undefined,
+            }}
+          >
             {fmtCurrency(v)}
           </Text>
         ),
@@ -194,7 +204,12 @@ function useAgingColumns(t: (key: string, lang: "en" | "ar") => string, lang: "e
         width: 120,
         align: "end" as const,
         render: (v: number) => (
-          <Text style={{ fontFamily: "monospace", color: Number(v) > 0 ? BUCKET_COLORS.days61to90 : undefined }}>
+          <Text
+            style={{
+              fontFamily: "monospace",
+              color: Number(v) > 0 ? BUCKET_COLORS.days61to90 : undefined,
+            }}
+          >
             {fmtCurrency(v)}
           </Text>
         ),
@@ -206,7 +221,12 @@ function useAgingColumns(t: (key: string, lang: "en" | "ar") => string, lang: "e
         width: 120,
         align: "end" as const,
         render: (v: number) => (
-          <Text style={{ fontFamily: "monospace", color: Number(v) > 0 ? BUCKET_COLORS.over90 : undefined }}>
+          <Text
+            style={{
+              fontFamily: "monospace",
+              color: Number(v) > 0 ? BUCKET_COLORS.over90 : undefined,
+            }}
+          >
             {fmtCurrency(v)}
           </Text>
         ),
@@ -234,13 +254,17 @@ function useAgingColumns(t: (key: string, lang: "en" | "ar") => string, lang: "e
           const total = Number(record.total);
           if (total === 0) return <Tag color="default">-</Tag>;
           const ratio = over60 / total;
-          if (ratio > 0.5) return <Tag color="error">{t("agingReports.highRisk", lang)}</Tag>;
-          if (ratio > 0.2) return <Tag color="warning">{t("agingReports.mediumRisk", lang)}</Tag>;
+          if (ratio > 0.5)
+            return <Tag color="error">{t("agingReports.highRisk", lang)}</Tag>;
+          if (ratio > 0.2)
+            return (
+              <Tag color="warning">{t("agingReports.mediumRisk", lang)}</Tag>
+            );
           return <Tag color="success">{t("agingReports.lowRisk", lang)}</Tag>;
         },
       },
     ],
-    [t, lang],
+    [t, lang]
   );
 }
 
@@ -260,7 +284,11 @@ export default function AgingReports() {
   const endDate = dateRange?.[1]?.format("YYYY-MM-DD");
 
   // ── Query ──────────────────────────────────────────────────────────────────
-  const { data: response, isLoading, refetch } = useQuery({
+  const {
+    data: response,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: [QUERY_KEYS.AGING_REPORT, startDate, endDate, branchId],
     queryFn: () =>
       getAgingReport({
@@ -275,7 +303,12 @@ export default function AgingReports() {
     | {
         receivables: AgingBucket[];
         payables: AgingBucket[];
-        summary: { totalReceivables: number; totalPayables: number; overdueReceivables: number; overduePayables: number };
+        summary: {
+          totalReceivables: number;
+          totalPayables: number;
+          overdueReceivables: number;
+          overduePayables: number;
+        };
       }
     | undefined;
 
@@ -290,13 +323,22 @@ export default function AgingReports() {
   const chartData = useMemo(() => {
     const buckets = [
       { label: t("agingReports.current", lang), key: "current" as const },
-      { label: t("agingReports.overdue31_60", lang), key: "days31to60" as const },
-      { label: t("agingReports.overdue61_90", lang), key: "days61to90" as const },
+      {
+        label: t("agingReports.overdue31_60", lang),
+        key: "days31to60" as const,
+      },
+      {
+        label: t("agingReports.overdue61_90", lang),
+        key: "days61to90" as const,
+      },
       { label: t("agingReports.overdue90plus", lang), key: "over90" as const },
     ];
     return buckets.map(b => ({
       label: b.label,
-      receivables: receivables.reduce((sum, r) => sum + Number(r[b.key] ?? 0), 0),
+      receivables: receivables.reduce(
+        (sum, r) => sum + Number(r[b.key] ?? 0),
+        0
+      ),
       payables: payables.reduce((sum, r) => sum + Number(r[b.key] ?? 0), 0),
     }));
   }, [receivables, payables, t, lang]);
@@ -423,8 +465,12 @@ export default function AgingReports() {
 
         {/* ── Chart: Aging Buckets ────────────────────────────────── */}
         <Card size="small" styles={{ body: { padding: "16px 20px" } }}>
-          <Text strong style={{ fontSize: 15, display: "block", marginBottom: 16 }}>
-            {t("agingReports.arAging", lang)} vs {t("agingReports.apAging", lang)}
+          <Text
+            strong
+            style={{ fontSize: 15, display: "block", marginBottom: 16 }}
+          >
+            {t("agingReports.arAging", lang)} vs{" "}
+            {t("agingReports.apAging", lang)}
           </Text>
           {isLoading ? (
             <div style={{ textAlign: "center", padding: 40 }}>
@@ -432,23 +478,54 @@ export default function AgingReports() {
             </div>
           ) : hasData ? (
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={chartData} margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke={token.colorBorderSecondary} />
-                <XAxis dataKey="label" tick={{ fontSize: 12 }} stroke={token.colorTextTertiary} />
-                <YAxis tick={{ fontSize: 12 }} stroke={token.colorTextTertiary} tickFormatter={(v: number) => `${(v / 1000).toFixed(0)}k`} />
+              <BarChart
+                data={chartData}
+                margin={{ top: 8, right: 8, bottom: 8, left: 8 }}
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke={token.colorBorderSecondary}
+                />
+                <XAxis
+                  dataKey="label"
+                  tick={{ fontSize: 12 }}
+                  stroke={token.colorTextTertiary}
+                />
+                <YAxis
+                  tick={{ fontSize: 12 }}
+                  stroke={token.colorTextTertiary}
+                  tickFormatter={(v: number) => `${(v / 1000).toFixed(0)}k`}
+                />
                 <Tooltip
                   formatter={(value: number) => [`${fmtCurrency(value)} SAR`]}
-                  contentStyle={{ borderRadius: 8, border: `1px solid ${token.colorBorderSecondary}` }}
+                  contentStyle={{
+                    borderRadius: 8,
+                    border: `1px solid ${token.colorBorderSecondary}`,
+                  }}
                 />
                 <Legend />
-                <Bar dataKey="receivables" name={t("agingReports.receivable", lang)} fill="#3B82F6" radius={[4, 4, 0, 0]} maxBarSize={40} />
-                <Bar dataKey="payables" name={t("agingReports.payable", lang)} fill="#8B5CF6" radius={[4, 4, 0, 0]} maxBarSize={40} />
+                <Bar
+                  dataKey="receivables"
+                  name={t("agingReports.receivable", lang)}
+                  fill="#3B82F6"
+                  radius={[4, 4, 0, 0]}
+                  maxBarSize={40}
+                />
+                <Bar
+                  dataKey="payables"
+                  name={t("agingReports.payable", lang)}
+                  fill="#8B5CF6"
+                  radius={[4, 4, 0, 0]}
+                  maxBarSize={40}
+                />
               </BarChart>
             </ResponsiveContainer>
           ) : (
             <Empty
               image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description={<Text type="secondary">{t("agingReports.noData", lang)}</Text>}
+              description={
+                <Text type="secondary">{t("agingReports.noData", lang)}</Text>
+              }
               style={{ padding: "40px 0" }}
             />
           )}
@@ -472,7 +549,9 @@ export default function AgingReports() {
                 key: "receivables",
                 label: t("agingReports.arAging", lang),
                 children: isLoading ? (
-                  <div style={{ textAlign: "center", padding: 40 }}><Spin /></div>
+                  <div style={{ textAlign: "center", padding: 40 }}>
+                    <Spin />
+                  </div>
                 ) : receivables.length > 0 ? (
                   <Table
                     rowKey="partnerId"
@@ -485,7 +564,11 @@ export default function AgingReports() {
                 ) : (
                   <Empty
                     image={Empty.PRESENTED_IMAGE_SIMPLE}
-                    description={<Text type="secondary">{t("agingReports.noData", lang)}</Text>}
+                    description={
+                      <Text type="secondary">
+                        {t("agingReports.noData", lang)}
+                      </Text>
+                    }
                     style={{ padding: "40px 0" }}
                   />
                 ),
@@ -494,7 +577,9 @@ export default function AgingReports() {
                 key: "payables",
                 label: t("agingReports.apAging", lang),
                 children: isLoading ? (
-                  <div style={{ textAlign: "center", padding: 40 }}><Spin /></div>
+                  <div style={{ textAlign: "center", padding: 40 }}>
+                    <Spin />
+                  </div>
                 ) : payables.length > 0 ? (
                   <Table
                     rowKey="partnerId"
@@ -507,7 +592,11 @@ export default function AgingReports() {
                 ) : (
                   <Empty
                     image={Empty.PRESENTED_IMAGE_SIMPLE}
-                    description={<Text type="secondary">{t("agingReports.noData", lang)}</Text>}
+                    description={
+                      <Text type="secondary">
+                        {t("agingReports.noData", lang)}
+                      </Text>
+                    }
                     style={{ padding: "40px 0" }}
                   />
                 ),

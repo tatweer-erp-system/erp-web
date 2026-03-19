@@ -95,7 +95,7 @@ export function SalesOrdersStats({
                 <Statistic
                   value={s.value}
                   suffix={s.suffix}
-                  valueStyle={{ fontSize: 24, lineHeight: 1 }}
+                  styles={{ content: { fontSize: 24, lineHeight: 1 } }}
                 />
               </div>
               <div

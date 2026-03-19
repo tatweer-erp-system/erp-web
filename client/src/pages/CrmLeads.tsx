@@ -73,7 +73,7 @@ export default function CrmLeads() {
   // ── Search with 400ms debounce ──────────────────────────────────────────
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
     debounceRef.current = setTimeout(() => {
@@ -119,8 +119,7 @@ export default function CrmLeads() {
   });
 
   const allLeads: Lead[] = useMemo(() => {
-    const list = ((leadsRaw as Record<string, unknown>)?.data as Lead[]) ?? [];
-    return list;
+    return leadsRaw?.data ?? [];
   }, [leadsRaw]);
 
   // ── Filtered + paginated data ────────────────────────────────────────
@@ -438,7 +437,7 @@ export default function CrmLeads() {
                     <Statistic
                       value={s.value}
                       suffix={s.suffix}
-                      valueStyle={{ fontSize: 24, lineHeight: 1 }}
+                      styles={{ content: { fontSize: 24, lineHeight: 1 } }}
                     />
                   </div>
                   <div
@@ -883,7 +882,7 @@ export default function CrmLeads() {
         }
       >
         {viewLead && (
-          <Space direction="vertical" size={16} style={{ width: "100%" }}>
+          <Space orientation="vertical" size={16} style={{ width: "100%" }}>
             {/* Revenue highlight */}
             {viewLead.expectedRevenue != null && (
               <Card

@@ -565,7 +565,7 @@ export default function ProductDetails() {
 
   // ── Client-side filtering ──
   const allProducts = productsData?.data ?? [];
-  const total = productsData?.total ?? 0;
+  const total = productsData?.meta?.total ?? 0;
   const products = allProducts.filter(p => {
     if (filterType && p.productType !== filterType) return false;
     if (filterStatus === "active" && !p.isActive) return false;
@@ -609,14 +609,14 @@ export default function ProductDetails() {
   // ── Export / Print ──
   const handleExport = () => {
     const header = [
-      "Name (EN)",
-      "Name (AR)",
-      "SKU",
-      "Type",
-      "Unit Price",
-      "Cost Price",
-      "Tax Rate",
-      "Active",
+      t("products.nameEn", lang),
+      t("products.nameAr", lang),
+      t("products.sku", lang),
+      t("products.productType", lang),
+      t("products.unitPrice", lang),
+      t("products.costPrice", lang),
+      t("products.taxRate", lang),
+      t("products.isActive", lang),
     ];
     const rows = products.map(p => [
       p.nameEn,
@@ -626,7 +626,7 @@ export default function ProductDetails() {
       p.unitPrice,
       p.costPrice ?? "",
       p.taxRate ?? "",
-      p.isActive ? "Yes" : "No",
+      p.isActive ? t("common.yes", lang) : t("common.no", lang),
     ]);
     const csv = [header, ...rows].map(r => r.join(",")).join("\n");
     const blob = new Blob(["\uFEFF" + csv], {
@@ -717,9 +717,7 @@ export default function ProductDetails() {
         <Tag color={active ? "green" : "red"}>
           {active
             ? t("products.isActive", lang)
-            : lang === "ar"
-              ? "غير نشط"
-              : "Inactive"}
+            : t("products.inactive", lang)}
         </Tag>
       ),
       align: "center" as const,
@@ -739,8 +737,8 @@ export default function ProductDetails() {
           <Popconfirm
             title={t("products.deleteConfirm", lang)}
             onConfirm={() => deleteMutation.mutate(record.id)}
-            okText={lang === "ar" ? "نعم" : "Yes"}
-            cancelText={lang === "ar" ? "لا" : "No"}
+            okText={t("common.yes", lang)}
+            cancelText={t("common.no", lang)}
           >
             <Button type="text" danger icon={<DeleteOutlined />} />
           </Popconfirm>
@@ -750,17 +748,17 @@ export default function ProductDetails() {
   ];
 
   const breadcrumbs = [
-    { label: t("Dashboard", lang), href: "/" },
-    { label: t("INVENTORY", lang), href: "#" },
-    { label: t("Products", lang) },
+    { label: t("common.dashboard", lang), href: "/" },
+    { label: t("inventory.title", lang), href: "#" },
+    { label: t("products.title", lang) },
   ];
 
   return (
     <DashboardLayout
-      currentPage={t("Products", lang)}
+      currentPage={t("products.title", lang)}
       breadcrumbs={breadcrumbs}
     >
-      <Space direction="vertical" size={20} style={{ width: "100%" }}>
+      <Space orientation="vertical" size={20} style={{ width: "100%" }}>
         {/* Summary Cards */}
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={12} md={6}>
@@ -792,7 +790,7 @@ export default function ProductDetails() {
                 prefix={
                   <WarningOutlined style={{ fontSize: 20, color: "#F59E0B" }} />
                 }
-                valueStyle={{ color: "#F59E0B" }}
+                styles={{ content: { color: "#F59E0B" } }}
               />
               <div className="text-xs text-muted-foreground mt-1">
                 {t("products.needReordering", lang)}
@@ -807,7 +805,7 @@ export default function ProductDetails() {
                 prefix={
                   <StopOutlined style={{ fontSize: 20, color: "#EF4444" }} />
                 }
-                valueStyle={{ color: "#EF4444" }}
+                styles={{ content: { color: "#EF4444" } }}
               />
               <div className="text-xs text-muted-foreground mt-1">
                 {t("products.urgentAction", lang)}
@@ -827,7 +825,7 @@ export default function ProductDetails() {
                 prefix={
                   <DollarOutlined style={{ fontSize: 20, color: "#10B981" }} />
                 }
-                valueStyle={{ color: "#10B981", fontSize: 24 }}
+                styles={{ content: { color: "#10B981", fontSize: 24 } }}
               />
               <div className="text-xs text-muted-foreground mt-1">
                 {t("products.inventoryValue", lang)}

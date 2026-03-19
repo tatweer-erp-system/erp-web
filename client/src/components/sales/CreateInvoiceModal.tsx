@@ -92,7 +92,7 @@ export function CreateInvoiceModal({
         </div>
       }
     >
-      <Space direction="vertical" size="large" className="w-full">
+      <Space orientation="vertical" size="large" className="w-full">
         <div>
           <p className="text-sm font-medium mb-2">
             {t("sales.invoice.type", lang)}

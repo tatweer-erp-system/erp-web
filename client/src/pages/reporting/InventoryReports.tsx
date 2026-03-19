@@ -95,7 +95,7 @@ function KPICard({
           ) : (
             <Statistic
               value={value}
-              valueStyle={{ fontSize: 22, lineHeight: 1, color: valueColor }}
+              styles={{ content: { fontSize: 22, lineHeight: 1, color: valueColor } }}
             />
           )}
         </div>
@@ -135,7 +135,11 @@ export default function InventoryReports() {
   const endDate = dateRange?.[1]?.format("YYYY-MM-DD");
 
   // ── Query ──────────────────────────────────────────────────────────────────
-  const { data: response, isLoading, refetch } = useQuery({
+  const {
+    data: response,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: [QUERY_KEYS.INVENTORY_REPORT, startDate, endDate, branchId],
     queryFn: () =>
       getInventoryReport({
@@ -146,8 +150,15 @@ export default function InventoryReports() {
     enabled: !!branchId,
   });
 
-  const report = (response as unknown as Record<string, unknown>)?.data as
-    | { data: InventoryReportRow[]; summary: { totalProductsInStock: number; totalWarehouses: number; totalQuantity: number } }
+  const report = response?.data as
+    | {
+        data: InventoryReportRow[];
+        summary: {
+          totalProductsInStock: number;
+          totalWarehouses: number;
+          totalQuantity: number;
+        };
+      }
     | undefined;
 
   const rows = report?.data ?? [];
@@ -190,7 +201,8 @@ export default function InventoryReports() {
         sorter: (a: InventoryReportRow, b: InventoryReportRow) =>
           Number(a.quantity) - Number(b.quantity),
         render: (v: number, record: InventoryReportRow) => {
-          const isLow = Number(v) <= Number(record.reorderPoint) && Number(v) > 0;
+          const isLow =
+            Number(v) <= Number(record.reorderPoint) && Number(v) > 0;
           const isOut = Number(v) === 0;
           return (
             <Text
@@ -225,21 +237,27 @@ export default function InventoryReports() {
           const qty = Number(record.quantity);
           const reorder = Number(record.reorderPoint);
           if (qty === 0) {
-            return <Tag color="error">{t("inventoryReports.outOfStock", lang)}</Tag>;
+            return (
+              <Tag color="error">{t("inventoryReports.outOfStock", lang)}</Tag>
+            );
           }
           if (qty <= reorder) {
-            return <Tag color="warning">{t("inventoryReports.lowStock", lang)}</Tag>;
+            return (
+              <Tag color="warning">{t("inventoryReports.lowStock", lang)}</Tag>
+            );
           }
-          return <Tag color="success">{t("inventoryReports.inStock", lang)}</Tag>;
+          return (
+            <Tag color="success">{t("inventoryReports.inStock", lang)}</Tag>
+          );
         },
       },
     ],
-    [t, lang],
+    [t, lang]
   );
 
   // Count low stock and out of stock
   const lowStockCount = rows.filter(
-    r => Number(r.quantity) <= Number(r.reorderPoint) && Number(r.quantity) > 0,
+    r => Number(r.quantity) <= Number(r.reorderPoint) && Number(r.quantity) > 0
   ).length;
   const outOfStockCount = rows.filter(r => Number(r.quantity) === 0).length;
 
@@ -380,7 +398,7 @@ export default function InventoryReports() {
             </div>
           ) : hasData ? (
             <Table
-              rowKey={(r) => `${r.name}-${r.warehouse}`}
+              rowKey={r => `${r.name}-${r.warehouse}`}
               size="small"
               dataSource={rows}
               columns={columns}
@@ -410,7 +428,9 @@ export default function InventoryReports() {
           ) : (
             <Empty
               image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description={<Text type="secondary">{t("common.noData", lang)}</Text>}
+              description={
+                <Text type="secondary">{t("common.noData", lang)}</Text>
+              }
               style={{ padding: "40px 0" }}
             />
           )}

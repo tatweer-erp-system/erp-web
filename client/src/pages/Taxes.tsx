@@ -411,7 +411,7 @@ function TaxesTab() {
                   <Statistic
                     value={s.value}
                     suffix={s.suffix}
-                    valueStyle={{ fontSize: 24, lineHeight: 1 }}
+                    styles={{ content: { fontSize: 24, lineHeight: 1 } }}
                   />
                 </div>
                 <div
@@ -769,7 +769,7 @@ function TaxesTab() {
         }
       >
         {viewTax && (
-          <Space direction="vertical" size={16} style={{ width: "100%" }}>
+          <Space orientation="vertical" size={16} style={{ width: "100%" }}>
             {/* Rate highlight */}
             <Card
               size="small"
@@ -1229,7 +1229,7 @@ function TaxGroupsTab() {
                   </Text>
                   <Statistic
                     value={s.value}
-                    valueStyle={{ fontSize: 24, lineHeight: 1 }}
+                    styles={{ content: { fontSize: 24, lineHeight: 1 } }}
                   />
                 </div>
                 <div

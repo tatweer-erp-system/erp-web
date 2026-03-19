@@ -299,7 +299,7 @@ export default function SecurityTab() {
           <Alert
             type="success"
             showIcon
-            message={t("mySettings.security.twoFactorEnabled", lang)}
+            title={t("mySettings.security.twoFactorEnabled", lang)}
             description={t("mySettings.security.twoFactorEnabledDesc", lang)}
             style={{ marginBottom: 16 }}
           />
@@ -307,7 +307,7 @@ export default function SecurityTab() {
           <Alert
             type="warning"
             showIcon
-            message={t("mySettings.security.twoFactorNotEnabled", lang)}
+            title={t("mySettings.security.twoFactorNotEnabled", lang)}
             description={t("mySettings.security.twoFactorNotEnabledDesc", lang)}
             style={{ marginBottom: 16 }}
           />
@@ -676,7 +676,7 @@ export default function SecurityTab() {
           <Alert
             type="warning"
             showIcon
-            message={t("mySettings.security.disable2faWarning", lang)}
+            title={t("mySettings.security.disable2faWarning", lang)}
             style={{ marginBottom: 20 }}
           />
 

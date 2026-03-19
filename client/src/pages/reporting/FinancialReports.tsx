@@ -125,7 +125,7 @@ function KPICard({
             <Statistic
               value={value}
               suffix={suffix}
-              valueStyle={{ fontSize: 22, lineHeight: 1, color: valueColor }}
+              styles={{ content: { fontSize: 22, lineHeight: 1, color: valueColor } }}
             />
           )}
         </div>
@@ -165,7 +165,11 @@ export default function FinancialReports() {
   const endDate = dateRange?.[1]?.format("YYYY-MM-DD");
 
   // ── Query ──────────────────────────────────────────────────────────────────
-  const { data: response, isLoading, refetch } = useQuery({
+  const {
+    data: response,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: [QUERY_KEYS.FINANCIAL_REPORT, startDate, endDate, branchId],
     queryFn: () =>
       getFinancialReport({
@@ -176,8 +180,15 @@ export default function FinancialReports() {
     enabled: !!branchId,
   });
 
-  const report = (response as unknown as Record<string, unknown>)?.data as
-    | { data: FinancialReportRow[]; summary: { totalRevenue: number; cancelledAmount: number; totalTransactions: number } }
+  const report = response?.data as
+    | {
+        data: FinancialReportRow[];
+        summary: {
+          totalRevenue: number;
+          cancelledAmount: number;
+          totalTransactions: number;
+        };
+      }
     | undefined;
 
   const rows = report?.data ?? [];
@@ -192,7 +203,7 @@ export default function FinancialReports() {
         amount: Number(row.amount),
         orders: Number(row.orderCount),
       })),
-    [rows],
+    [rows]
   );
 
   // ── Export handler ─────────────────────────────────────────────────────────
@@ -206,8 +217,9 @@ export default function FinancialReports() {
   };
 
   // Net revenue (total - cancelled)
-  const netRevenue =
-    summary ? Number(summary.totalRevenue) - Number(summary.cancelledAmount) : undefined;
+  const netRevenue = summary
+    ? Number(summary.totalRevenue) - Number(summary.cancelledAmount)
+    : undefined;
 
   // ── Table columns ──────────────────────────────────────────────────────────
   const columns: TableColumnsType<FinancialReportRow> = useMemo(
@@ -217,9 +229,7 @@ export default function FinancialReports() {
         dataIndex: "month",
         key: "month",
         width: 160,
-        render: (v: string) => (
-          <Text strong>{fmtMonth(v)}</Text>
-        ),
+        render: (v: string) => <Text strong>{fmtMonth(v)}</Text>,
       },
       {
         title: t("financialReports.transactions", lang),
@@ -250,7 +260,7 @@ export default function FinancialReports() {
         ),
       },
     ],
-    [t, lang],
+    [t, lang]
   );
 
   return (
@@ -358,7 +368,10 @@ export default function FinancialReports() {
 
         {/* ── Chart: Monthly Revenue Trend ────────────────────────── */}
         <Card size="small" styles={{ body: { padding: "16px 20px" } }}>
-          <Text strong style={{ fontSize: 15, display: "block", marginBottom: 16 }}>
+          <Text
+            strong
+            style={{ fontSize: 15, display: "block", marginBottom: 16 }}
+          >
             {t("financialReports.monthlyTrend", lang)}
           </Text>
           {isLoading ? (
@@ -367,8 +380,14 @@ export default function FinancialReports() {
             </div>
           ) : hasData ? (
             <ResponsiveContainer width="100%" height={320}>
-              <LineChart data={chartData} margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke={token.colorBorderSecondary} />
+              <LineChart
+                data={chartData}
+                margin={{ top: 8, right: 8, bottom: 8, left: 8 }}
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke={token.colorBorderSecondary}
+                />
                 <XAxis
                   dataKey="month"
                   tick={{ fontSize: 12 }}
@@ -380,7 +399,10 @@ export default function FinancialReports() {
                   tickFormatter={(v: number) => `${(v / 1000).toFixed(0)}k`}
                 />
                 <Tooltip
-                  formatter={(value: number) => [`${fmtCurrency(value)} SAR`, t("financialReports.amount", lang)]}
+                  formatter={(value: number) => [
+                    `${fmtCurrency(value)} SAR`,
+                    t("financialReports.amount", lang),
+                  ]}
                   contentStyle={{
                     borderRadius: 8,
                     border: `1px solid ${token.colorBorderSecondary}`,
@@ -399,7 +421,9 @@ export default function FinancialReports() {
           ) : (
             <Empty
               image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description={<Text type="secondary">{t("common.noData", lang)}</Text>}
+              description={
+                <Text type="secondary">{t("common.noData", lang)}</Text>
+              }
               style={{ padding: "40px 0" }}
             />
           )}
@@ -463,7 +487,9 @@ export default function FinancialReports() {
           ) : (
             <Empty
               image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description={<Text type="secondary">{t("common.noData", lang)}</Text>}
+              description={
+                <Text type="secondary">{t("common.noData", lang)}</Text>
+              }
               style={{ padding: "40px 0" }}
             />
           )}

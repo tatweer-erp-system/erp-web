@@ -309,10 +309,7 @@ export default function Warehouses() {
         const items = [
           {
             key: "view",
-            label: t("warehouses.edit", lang).replace(
-              t("warehouses.edit", lang),
-              t("warehouses.title", lang)
-            ),
+            label: t("warehouses.view", lang),
             icon: <EyeOutlined />,
             onClick: () => openView(rec),
           },
@@ -362,12 +359,12 @@ export default function Warehouses() {
     <DashboardLayout
       currentPage="Warehouses"
       breadcrumbs={[
-        { label: "Dashboard", href: "/" },
-        { label: "Inventory", href: "#" },
+        { label: t("common.dashboard", lang), href: "/" },
+        { label: t("inventory.title", lang), href: "#" },
         { label: t("warehouses.title", lang) },
       ]}
     >
-      <Space direction="vertical" size={20} style={{ width: "100%" }}>
+      <Space orientation="vertical" size={20} style={{ width: "100%" }}>
         {/* ── KPI Cards ──────────────────────────────────────────────────── */}
         <Row gutter={[16, 16]}>
           {[
@@ -422,11 +419,11 @@ export default function Warehouses() {
                     <Statistic
                       value={s.value}
                       precision={0}
-                      valueStyle={{
+                      styles={{ content: {
                         fontSize: 24,
                         lineHeight: 1,
                         color: s.color ?? "inherit",
-                      }}
+                      } }}
                     />
                     <Text type="secondary" style={{ fontSize: 12 }}>
                       {s.suffix}
@@ -495,7 +492,7 @@ export default function Warehouses() {
             </Space>
 
             <Space>
-              <Tooltip title="Reload">
+              <Tooltip title={t("common.reload", lang)}>
                 <Button icon={<ReloadOutlined />} onClick={() => refetch()} />
               </Tooltip>
               <Button
@@ -521,7 +518,7 @@ export default function Warehouses() {
             pagination={{
               showSizeChanger: true,
               showTotal: (total, range) =>
-                `${range[0]}–${range[1]} of ${total}`,
+                `${range[0]}–${range[1]} ${t("common.of", lang)} ${total}`,
               pageSizeOptions: ["5", "10", "25", "50"],
             }}
             locale={{
@@ -535,16 +532,13 @@ export default function Warehouses() {
       <Drawer
         open={drawerOpen}
         onClose={closeDrawer}
-        width={isMobile ? "100%" : 560}
+        size={isMobile ? "100%" : 560}
         destroyOnClose
         title={null}
         footer={
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
             <Button onClick={closeDrawer}>
-              {t("warehouses.delete", lang).replace(
-                t("warehouses.delete", lang),
-                "Cancel"
-              )}
+              {t("warehouses.cancel", lang)}
             </Button>
             <Button
               type="primary"
@@ -649,7 +643,7 @@ export default function Warehouses() {
           setViewDrawerOpen(false);
           setViewWarehouse(null);
         }}
-        width={isMobile ? "100%" : 560}
+        size={isMobile ? "100%" : 560}
         title={
           viewWarehouse
             ? `${t("warehouses.title", lang)} — ${getName(viewWarehouse)}`
@@ -657,7 +651,7 @@ export default function Warehouses() {
         }
       >
         {viewWarehouse && (
-          <Space direction="vertical" size={16} style={{ width: "100%" }}>
+          <Space orientation="vertical" size={16} style={{ width: "100%" }}>
             <Row gutter={[16, 12]}>
               <Col span={12}>
                 <Text type="secondary">{t("warehouses.nameEn", lang)}</Text>

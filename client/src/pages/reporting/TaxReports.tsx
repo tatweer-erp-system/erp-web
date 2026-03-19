@@ -118,12 +118,15 @@ function KPICard({
             <Statistic
               value={value}
               suffix={suffix}
-              valueStyle={{ fontSize: 22, lineHeight: 1, color: valueColor }}
+              styles={{ content: { fontSize: 22, lineHeight: 1, color: valueColor } }}
             />
           )}
         </div>
         {description && (
-          <Text type="secondary" style={{ fontSize: 11, marginTop: 4, display: "block" }}>
+          <Text
+            type="secondary"
+            style={{ fontSize: 11, marginTop: 4, display: "block" }}
+          >
             {description}
           </Text>
         )}
@@ -163,7 +166,11 @@ export default function TaxReports() {
   const endDate = dateRange?.[1]?.format("YYYY-MM-DD");
 
   // ── Query ──────────────────────────────────────────────────────────────────
-  const { data: response, isLoading, refetch } = useQuery({
+  const {
+    data: response,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: [QUERY_KEYS.TAX_REPORT, startDate, endDate, branchId],
     queryFn: () =>
       getTaxReport({
@@ -174,10 +181,14 @@ export default function TaxReports() {
     enabled: !!branchId,
   });
 
-  const report = (response as unknown as Record<string, unknown>)?.data as
+  const report = response?.data as
     | {
         periods: TaxPeriod[];
-        summary: { totalSalesTax: number; totalPurchaseTax: number; netPayable: number };
+        summary: {
+          totalSalesTax: number;
+          totalPurchaseTax: number;
+          netPayable: number;
+        };
       }
     | undefined;
 
@@ -194,7 +205,7 @@ export default function TaxReports() {
         inputVat: Number(p.purchaseTax),
         netVat: Number(p.netTax),
       })),
-    [periods],
+    [periods]
   );
 
   // ── Export handler ─────────────────────────────────────────────────────────
@@ -270,7 +281,7 @@ export default function TaxReports() {
         ),
       },
     ],
-    [t, lang],
+    [t, lang]
   );
 
   return (
@@ -381,7 +392,10 @@ export default function TaxReports() {
 
         {/* ── Chart: VAT by Period ────────────────────────────────── */}
         <Card size="small" styles={{ body: { padding: "16px 20px" } }}>
-          <Text strong style={{ fontSize: 15, display: "block", marginBottom: 16 }}>
+          <Text
+            strong
+            style={{ fontSize: 15, display: "block", marginBottom: 16 }}
+          >
             {t("taxReports.filingDetails", lang)}
           </Text>
           {isLoading ? (
@@ -390,23 +404,54 @@ export default function TaxReports() {
             </div>
           ) : hasData ? (
             <ResponsiveContainer width="100%" height={320}>
-              <BarChart data={chartData} margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke={token.colorBorderSecondary} />
-                <XAxis dataKey="period" tick={{ fontSize: 12 }} stroke={token.colorTextTertiary} />
-                <YAxis tick={{ fontSize: 12 }} stroke={token.colorTextTertiary} tickFormatter={(v: number) => `${(v / 1000).toFixed(0)}k`} />
+              <BarChart
+                data={chartData}
+                margin={{ top: 8, right: 8, bottom: 8, left: 8 }}
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke={token.colorBorderSecondary}
+                />
+                <XAxis
+                  dataKey="period"
+                  tick={{ fontSize: 12 }}
+                  stroke={token.colorTextTertiary}
+                />
+                <YAxis
+                  tick={{ fontSize: 12 }}
+                  stroke={token.colorTextTertiary}
+                  tickFormatter={(v: number) => `${(v / 1000).toFixed(0)}k`}
+                />
                 <Tooltip
                   formatter={(value: number) => [`${fmtCurrency(value)} SAR`]}
-                  contentStyle={{ borderRadius: 8, border: `1px solid ${token.colorBorderSecondary}` }}
+                  contentStyle={{
+                    borderRadius: 8,
+                    border: `1px solid ${token.colorBorderSecondary}`,
+                  }}
                 />
                 <Legend />
-                <Bar dataKey="outputVat" name={t("taxReports.outputVat", lang)} fill="#10B981" radius={[4, 4, 0, 0]} maxBarSize={40} />
-                <Bar dataKey="inputVat" name={t("taxReports.inputVat", lang)} fill="#EF4444" radius={[4, 4, 0, 0]} maxBarSize={40} />
+                <Bar
+                  dataKey="outputVat"
+                  name={t("taxReports.outputVat", lang)}
+                  fill="#10B981"
+                  radius={[4, 4, 0, 0]}
+                  maxBarSize={40}
+                />
+                <Bar
+                  dataKey="inputVat"
+                  name={t("taxReports.inputVat", lang)}
+                  fill="#EF4444"
+                  radius={[4, 4, 0, 0]}
+                  maxBarSize={40}
+                />
               </BarChart>
             </ResponsiveContainer>
           ) : (
             <Empty
               image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description={<Text type="secondary">{t("taxReports.noData", lang)}</Text>}
+              description={
+                <Text type="secondary">{t("taxReports.noData", lang)}</Text>
+              }
               style={{ padding: "40px 0" }}
             />
           )}
@@ -453,12 +498,16 @@ export default function TaxReports() {
                         <Text strong>{t("agingReports.total", lang)}</Text>
                       </Table.Summary.Cell>
                       <Table.Summary.Cell index={1} align="end">
-                        <Text style={{ fontFamily: "monospace", color: "#10B981" }}>
+                        <Text
+                          style={{ fontFamily: "monospace", color: "#10B981" }}
+                        >
                           {fmtCurrency(summary.totalSalesTax)}
                         </Text>
                       </Table.Summary.Cell>
                       <Table.Summary.Cell index={2} align="end">
-                        <Text style={{ fontFamily: "monospace", color: "#EF4444" }}>
+                        <Text
+                          style={{ fontFamily: "monospace", color: "#EF4444" }}
+                        >
                           {fmtCurrency(summary.totalPurchaseTax)}
                         </Text>
                       </Table.Summary.Cell>
@@ -476,7 +525,9 @@ export default function TaxReports() {
           ) : (
             <Empty
               image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description={<Text type="secondary">{t("taxReports.noData", lang)}</Text>}
+              description={
+                <Text type="secondary">{t("taxReports.noData", lang)}</Text>
+              }
               style={{ padding: "40px 0" }}
             />
           )}

@@ -15,7 +15,7 @@ type BilingualRecord = {
   id: string;
   nameEn?: string | null;
   nameAr?: string | null;
-  salePrice?: number | null;
+  unitPrice?: number | null;
 };
 
 type SalesOrderFastCreateFieldsProps = {

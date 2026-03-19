@@ -233,7 +233,7 @@ export default function TrialBalance() {
         { label: t("accounting.tb.title", lang) },
       ]}
     >
-      <Space direction="vertical" size={20} style={{ width: "100%" }}>
+      <Space orientation="vertical" size={20} style={{ width: "100%" }}>
         {/* ── Toolbar Card ───────────────────────────────────────────────── */}
         <Card size="small" styles={{ body: { padding: "12px 16px" } }}>
           <div
@@ -367,11 +367,11 @@ export default function TrialBalance() {
                       <Statistic
                         value={Number(s.value)}
                         precision={2}
-                        valueStyle={{
+                        styles={{ content: {
                           fontSize: 24,
                           lineHeight: 1,
                           color: s.color,
-                        }}
+                        } }}
                       />
                     </div>
                     <div

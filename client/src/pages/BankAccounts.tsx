@@ -81,7 +81,7 @@ export default function BankAccounts() {
   // ── Search with 400ms debounce ──────────────────────────────────────────
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
     debounceRef.current = setTimeout(() => {
@@ -131,11 +131,7 @@ export default function BankAccounts() {
   });
 
   const allAccounts: TreasuryAccount[] = useMemo(
-    () =>
-      (
-        ((accountsRaw as Record<string, unknown>)?.data as TreasuryAccount[]) ??
-        []
-      ).filter(a => a.type === TreasuryAccountType.BANK),
+    () => (accountsRaw?.data ?? []).filter(a => a.type === TreasuryAccountType.BANK),
     [accountsRaw]
   );
 
@@ -146,13 +142,12 @@ export default function BankAccounts() {
   });
 
   const coaAccountOptions = useMemo(() => {
-    const list =
-      ((coaAccountsList as Record<string, unknown>)?.data as {
-        id: string;
-        code: string;
-        nameEn: string;
-        nameAr: string;
-      }[]) ?? [];
+    const list = (coaAccountsList?.data ?? []) as {
+      id: string;
+      code: string;
+      nameEn: string;
+      nameAr: string;
+    }[];
     return list.map(a => ({
       value: a.id,
       label: `${a.code} — ${getName(a)}`,
@@ -410,7 +405,7 @@ export default function BankAccounts() {
                       value={s.value}
                       suffix={s.suffix}
                       precision={s.precision ?? 0}
-                      valueStyle={{ fontSize: 24, lineHeight: 1 }}
+                      styles={{ content: { fontSize: 24, lineHeight: 1 } }}
                     />
                   </div>
                   <div

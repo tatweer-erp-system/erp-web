@@ -114,7 +114,7 @@ export default function Attendance() {
 
   const { data: employeesDropdown } = useQuery({
     queryKey: [QUERY_KEYS.EMPLOYEES_DROPDOWN],
-    queryFn: () => employeesService.dropdown({ limit: 500 }),
+    queryFn: () => employeesService.dropdown({ limit: 100 }),
     staleTime: 60_000,
   });
 
@@ -483,7 +483,7 @@ export default function Attendance() {
         { label: t("hr.attendance.title", lang) },
       ]}
     >
-      <Space direction="vertical" size={20} style={{ width: "100%" }}>
+      <Space orientation="vertical" size={20} style={{ width: "100%" }}>
         {/* ── KPI Cards ──────────────────────────────────────────────────── */}
         <Row gutter={[16, 16]}>
           {[
@@ -547,11 +547,11 @@ export default function Attendance() {
                     <Statistic
                       value={s.value}
                       precision={0}
-                      valueStyle={{
+                      styles={{ content: {
                         fontSize: 24,
                         lineHeight: 1,
                         color: s.color ?? "inherit",
-                      }}
+                      } }}
                     />
                     <Text type="secondary" style={{ fontSize: 12 }}>
                       {s.suffix}
@@ -687,7 +687,7 @@ export default function Attendance() {
       <Drawer
         open={drawerOpen}
         onClose={closeDrawer}
-        width={isMobile ? "100%" : 520}
+        size={isMobile ? "100%" : 520}
         destroyOnClose
         title={null}
         styles={{ body: { paddingTop: 20 } }}
@@ -829,7 +829,7 @@ export default function Attendance() {
         width={isMobile ? "95vw" : 480}
         destroyOnHidden
       >
-        <Space direction="vertical" size={16} style={{ width: "100%" }}>
+        <Space orientation="vertical" size={16} style={{ width: "100%" }}>
           <Text type="secondary">
             {t("hr.attendance.importInstructions", lang)}
           </Text>

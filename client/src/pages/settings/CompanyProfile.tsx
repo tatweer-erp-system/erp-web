@@ -914,7 +914,7 @@ export default function CompanyProfile() {
             }
           >
             {tabContent[activeTab] ?? (
-              <Alert type="info" message="Content coming soon" />
+              <Alert type="info" title="Content coming soon" />
             )}
           </Card>
         </div>

@@ -1988,10 +1988,13 @@ export const en: Record<string, string> = {
   "accounting.settings.subtitle": "Configure accounting, tax, and GL mappings",
   "accounting.settings.taxVat": "Tax / VAT",
   "accounting.settings.generalConfig": "General Configuration",
-  "accounting.settings.generalConfigDesc": "Basic accounting settings for your organization",
-  "accounting.settings.glMappingsDesc": "Map chart of accounts to system functions",
+  "accounting.settings.generalConfigDesc":
+    "Basic accounting settings for your organization",
+  "accounting.settings.glMappingsDesc":
+    "Map chart of accounts to system functions",
   "accounting.settings.defaultJournals": "Default Journals",
-  "accounting.settings.defaultJournalsDesc": "Configure default journals for automatic posting",
+  "accounting.settings.defaultJournalsDesc":
+    "Configure default journals for automatic posting",
   "accounting.settings.defaultSalesJournal": "Default Sales Journal",
   "accounting.settings.defaultPurchaseJournal": "Default Purchase Journal",
   "accounting.settings.defaultCashJournal": "Default Cash Journal",
@@ -2004,11 +2007,14 @@ export const en: Record<string, string> = {
   "accounting.settings.actualDays": "Actual Days in Month",
   "accounting.settings.fixed30Days": "Fixed 30 Days",
   "accounting.settings.allowNegativeStock": "Allow Negative Stock",
-  "accounting.settings.fiscalPeriodsNote": "Fiscal periods are managed in the Fiscal Periods page. Changing the start month here affects new fiscal years only.",
+  "accounting.settings.fiscalPeriodsNote":
+    "Fiscal periods are managed in the Fiscal Periods page. Changing the start month here affects new fiscal years only.",
   "accounting.settings.taxVatConfig": "Tax / VAT Configuration",
-  "accounting.settings.taxVatConfigDesc": "Configure tax rates and VAT settings",
+  "accounting.settings.taxVatConfigDesc":
+    "Configure tax rates and VAT settings",
   "accounting.settings.vatPayableAccount": "VAT Payable Account",
-  "accounting.settings.taxSetupNote": "Tax categories (zero-rated, exempt) and per-product tax rates are configured in the Taxes Setup page.",
+  "accounting.settings.taxSetupNote":
+    "Tax categories (zero-rated, exempt) and per-product tax rates are configured in the Taxes Setup page.",
 
   // ─── Treasury — Bank Accounts ───────────────────────────────────────────────
   "treasury.bank.title": "Bank Accounts",
@@ -2604,6 +2610,8 @@ export const en: Record<string, string> = {
   "warehouses.allowNegativeStock": "Allow Negative Stock",
   "warehouses.yes": "Yes",
   "warehouses.no": "No",
+  "warehouses.cancel": "Cancel",
+  "warehouses.view": "View",
 
   // ── Product Categories Page ────────────────────────────────────────────────
   "categories.title": "Product Categories",
@@ -2628,6 +2636,7 @@ export const en: Record<string, string> = {
   "categories.search": "Search categories...",
   "categories.total": "Total Categories",
   "categories.rootCategories": "Root Categories",
+  "categories.noData": "No categories found",
 
   // ── Inventory Valuation Page ───────────────────────────────────────────────
   "valuation.title": "Inventory Valuation",
@@ -2649,6 +2658,8 @@ export const en: Record<string, string> = {
   "valuation.totalValue2": "Total Value",
   "valuation.grandTotal": "Grand Total",
   "valuation.noData": "No valuation data available",
+  "valuation.reload": "Reload",
+  "valuation.exportFailed": "Export failed",
 
   // Stock Movements
   "stockMovement.title": "Stock Movements",
@@ -2703,6 +2714,90 @@ export const en: Record<string, string> = {
   "openingStock.succeeded": "succeeded",
   "openingStock.failed": "failed",
 
+  // ── Stock Adjustments Page ──────────────────────────────────────────────────
+  "inventory.adjustments.title": "Stock Adjustments",
+  "inventory.adjustments.totalAdjustments": "Total Adjustments",
+  "inventory.adjustments.increases": "Increases",
+  "inventory.adjustments.decreases": "Decreases",
+  "inventory.adjustments.date": "Date",
+  "inventory.adjustments.product": "Product",
+  "inventory.adjustments.warehouse": "Warehouse",
+  "inventory.adjustments.quantity": "Quantity",
+  "inventory.adjustments.reason": "Reason",
+  "inventory.adjustments.unitCost": "Unit Cost",
+  "inventory.adjustments.beforeAfter": "Before → After",
+  "inventory.adjustments.search": "Search by product, SKU, warehouse...",
+  "inventory.adjustments.new": "New Adjustment",
+  "inventory.adjustments.create": "Create Adjustment",
+  "inventory.adjustments.cancel": "Cancel",
+  "inventory.adjustments.created": "Adjustment created successfully",
+  "inventory.adjustments.createError": "Failed to create adjustment",
+  "inventory.adjustments.selectProduct": "Select a product",
+  "inventory.adjustments.selectWarehouse": "Select a warehouse",
+  "inventory.adjustments.productRequired": "Product is required",
+  "inventory.adjustments.warehouseRequired": "Warehouse is required",
+  "inventory.adjustments.quantityRequired": "Quantity is required",
+  "inventory.adjustments.quantityNonZero": "Quantity cannot be zero",
+  "inventory.adjustments.quantityHint": "Use positive for increase, negative for decrease",
+  "inventory.adjustments.reasonRequired": "Reason is required",
+  "inventory.adjustments.reasonPlaceholder": "e.g. Damaged goods, Stock count correction",
+  "inventory.adjustments.unitCostPlaceholder": "Optional",
+
+  // ── Stock Transfers Page ────────────────────────────────────────────────────
+  "inventory.transfers.title": "Stock Transfers",
+  "inventory.transfers.totalTransfers": "Total Transfers",
+  "inventory.transfers.thisMonth": "This Month",
+  "inventory.transfers.totalUnits": "Total Units",
+  "inventory.transfers.transfers": "transfers",
+  "inventory.transfers.units": "units",
+  "inventory.transfers.date": "Date",
+  "inventory.transfers.product": "Product",
+  "inventory.transfers.route": "Route",
+  "inventory.transfers.quantity": "Quantity",
+  "inventory.transfers.notes": "Notes",
+  "inventory.transfers.search": "Search by product, SKU, warehouse...",
+  "inventory.transfers.new": "New Transfer",
+  "inventory.transfers.create": "Create Transfer",
+  "inventory.transfers.cancel": "Cancel",
+  "inventory.transfers.created": "Transfer created successfully",
+  "inventory.transfers.createError": "Failed to create transfer",
+  "inventory.transfers.selectProduct": "Select a product",
+  "inventory.transfers.sourceWarehouse": "Source Warehouse",
+  "inventory.transfers.destinationWarehouse": "Destination Warehouse",
+  "inventory.transfers.selectSource": "Select source warehouse",
+  "inventory.transfers.selectDestination": "Select destination warehouse",
+  "inventory.transfers.productRequired": "Product is required",
+  "inventory.transfers.sourceRequired": "Source warehouse is required",
+  "inventory.transfers.destinationRequired": "Destination warehouse is required",
+  "inventory.transfers.quantityRequired": "Quantity is required",
+  "inventory.transfers.sameWarehouseError": "Source and destination must be different",
+  "inventory.transfers.notesPlaceholder": "Optional notes...",
+
+  // ── Stock Movement Type Labels ──────────────────────────────────────────────
+  "stockMovement.type.purchaseReceipt": "Purchase Receipt",
+  "stockMovement.type.saleDelivery": "Sale Delivery",
+  "stockMovement.type.posSale": "POS Sale",
+  "stockMovement.type.internal": "Internal Transfer",
+  "stockMovement.type.adjustment": "Adjustment",
+  "stockMovement.type.opening": "Opening",
+  "stockMovement.type.return": "Return",
+  "stockMovement.type.scrap": "Scrap",
+
+  // ── Stock Movement Reference Type Labels ────────────────────────────────────
+  "stockMovement.ref.purchaseOrder": "Purchase Order",
+  "stockMovement.ref.salesOrder": "Sales Order",
+  "stockMovement.ref.manual": "Manual",
+  "stockMovement.ref.transfer": "Transfer",
+  "stockMovement.ref.posOrder": "POS Order",
+  "stockMovement.ref.adjustment": "Adjustment",
+
+  // ── Missing Common Keys ─────────────────────────────────────────────────────
+  "common.dashboard": "Dashboard",
+  "common.yes": "Yes",
+  "common.no": "No",
+  "common.of": "of",
+  "common.exportFailed": "Export failed",
+
   // ─── CRM ──────────────────────────────────────────────────────────────────
   "crm.pipeline": "CRM Pipeline",
   "crm.leads": "Leads",
@@ -2747,7 +2842,8 @@ export const en: Record<string, string> = {
   "crm.leads.lostReasonLabel": "Lost Reason",
   "crm.leads.lostReasonPlaceholder": "Enter reason for losing this lead...",
   "crm.leads.convert": "Convert to Opportunity",
-  "crm.leads.convertConfirm": "Are you sure you want to convert this lead to an opportunity?",
+  "crm.leads.convertConfirm":
+    "Are you sure you want to convert this lead to an opportunity?",
   "crm.leads.totalLeads": "Total Leads",
   "crm.leads.opportunities": "Opportunities",
   "crm.leads.won": "Won",
@@ -2996,7 +3092,8 @@ export const en: Record<string, string> = {
 
   // ─── Inventory Reports ─────────────────────────────────────────────────────
   "inventoryReports.title": "Inventory Reports",
-  "inventoryReports.subtitle": "Stock levels, low stock alerts, and warehouse overview",
+  "inventoryReports.subtitle":
+    "Stock levels, low stock alerts, and warehouse overview",
   "inventoryReports.totalProducts": "Total Products",
   "inventoryReports.totalWarehouses": "Warehouses",
   "inventoryReports.lowStock": "Low Stock",
@@ -3224,4 +3321,21 @@ export const en: Record<string, string> = {
   "documents.goReceipts": "Receipts",
   "documents.goPayments": "Payments",
   "documents.goBankReconciliation": "Reconciliation",
+
+  // Analytics KPI cards
+  "analytics.kpi.value": "Value",
+  "analytics.kpi.totalEmployees": "Total Employees",
+  "analytics.kpi.active": "Active",
+  "analytics.kpi.onLeave": "On Leave",
+  "analytics.kpi.attendanceRate": "Attendance Rate",
+  "analytics.kpi.totalLeads": "Total Leads",
+  "analytics.kpi.winRate": "Win Rate",
+  "analytics.kpi.pipelineValue": "Pipeline Value",
+  "analytics.kpi.avgDealSize": "Avg Deal Size",
+
+  // Analytics tabs
+  "analytics.tabs.sales": "Sales",
+  "analytics.tabs.inventory": "Inventory",
+  "analytics.tabs.hr": "HR",
+  "analytics.tabs.crm": "CRM",
 };

@@ -412,7 +412,7 @@ export default function Deliveries() {
                     </Text>
                     <Statistic
                       value={s.value}
-                      valueStyle={{ fontSize: 24, lineHeight: 1 }}
+                      styles={{ content: { fontSize: 24, lineHeight: 1 } }}
                     />
                   </div>
                   <div
@@ -629,7 +629,7 @@ export default function Deliveries() {
           setDrawerOpen(false);
           setViewDelivery(null);
         }}
-        width={isMobile ? "100%" : 720}
+        size={isMobile ? "100%" : 720}
         title={
           detailDelivery
             ? `${t("deliveries.detail", lang)} — ${detailDelivery.deliveryNumber ?? detailDelivery.id.slice(0, 8)}`
@@ -637,7 +637,7 @@ export default function Deliveries() {
         }
       >
         {detailDelivery && (
-          <Space direction="vertical" size={16} style={{ width: "100%" }}>
+          <Space orientation="vertical" size={16} style={{ width: "100%" }}>
             {/* Status badge + actions */}
             <div className="flex items-center justify-between flex-wrap gap-2">
               <Tag
@@ -800,7 +800,7 @@ export default function Deliveries() {
       <Drawer
         open={createOpen}
         onClose={closeCreate}
-        width={isMobile ? "100%" : 640}
+        size={isMobile ? "100%" : 640}
         title={t("deliveries.new", lang)}
         extra={
           <Button

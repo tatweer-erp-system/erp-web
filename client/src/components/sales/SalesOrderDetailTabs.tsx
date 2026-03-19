@@ -254,13 +254,20 @@ export function DownPaymentsTabContent() {
 export function HistoryTabContent({ order }: InfoCardProps) {
   const { t, lang } = useTranslation();
 
+  type TimelineEvent = {
+    key: string;
+    date: string;
+    label: string;
+    color: "blue" | "green" | "red" | "default";
+  };
+
   const events = useMemo(() => {
-    const items = [
+    const items: TimelineEvent[] = [
       {
         key: "created",
         date: order.createdAt,
         label: t("sales.message.created", lang),
-        color: "blue" as const,
+        color: "blue",
       },
     ];
     if (order.confirmedAt) {
@@ -268,7 +275,7 @@ export function HistoryTabContent({ order }: InfoCardProps) {
         key: "confirmed",
         date: order.confirmedAt,
         label: t("sales.message.confirmed", lang),
-        color: "green" as const,
+        color: "green",
       });
     }
     if (order.status === SalesOrderStatus.CANCELLED) {
@@ -276,7 +283,7 @@ export function HistoryTabContent({ order }: InfoCardProps) {
         key: "cancelled",
         date: order.updatedAt,
         label: t("sales.message.cancelled", lang),
-        color: "red" as const,
+        color: "red",
       });
     }
     return items.sort(

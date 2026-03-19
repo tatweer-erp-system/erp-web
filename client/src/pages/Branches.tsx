@@ -75,7 +75,7 @@ export default function Branches() {
   // ── Search with 400ms debounce ──────────────────────────────────────────
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
     debounceRef.current = setTimeout(() => {
@@ -113,9 +113,7 @@ export default function Branches() {
   });
 
   const allBranches: BranchDetail[] = useMemo(() => {
-    return (
-      ((branchesRaw as Record<string, unknown>)?.data as BranchDetail[]) ?? []
-    );
+    return branchesRaw?.data ?? [];
   }, [branchesRaw]);
 
   // ── Filtered + paginated data ────────────────────────────────────────
@@ -330,7 +328,7 @@ export default function Branches() {
                     </Text>
                     <Statistic
                       value={s.value}
-                      valueStyle={{ fontSize: 24, lineHeight: 1 }}
+                      styles={{ content: { fontSize: 24, lineHeight: 1 } }}
                     />
                   </div>
                   <div
@@ -644,7 +642,7 @@ export default function Branches() {
         }
       >
         {viewBranch && (
-          <Space direction="vertical" size={16} style={{ width: "100%" }}>
+          <Space orientation="vertical" size={16} style={{ width: "100%" }}>
             <Row gutter={[16, 12]}>
               <Col span={12}>
                 <Text type="secondary">{t("branches.nameEn", lang)}</Text>

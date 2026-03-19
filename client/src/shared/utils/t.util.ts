@@ -14,9 +14,10 @@ const dictionaries: Record<SupportedLang, Record<string, string>> = { ar, en };
  * 3. Raw key (if no translation found)
  *
  * @param key - The i18n translation key (flat dot-notation).
- * @param lang - The target language (`"ar"` or `"en"`).
+ * @param lang - The target language (`"ar"` or `"en"`). Accepts any string and falls back to English.
  * @returns The translated string.
  */
-export function t(key: string, lang: SupportedLang): string {
-  return dictionaries[lang]?.[key] ?? dictionaries.en[key] ?? key;
+export function t(key: string, lang: string): string {
+  const resolvedLang: SupportedLang = lang === "ar" ? "ar" : "en";
+  return dictionaries[resolvedLang]?.[key] ?? dictionaries.en[key] ?? key;
 }

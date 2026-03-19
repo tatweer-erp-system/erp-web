@@ -41,9 +41,21 @@ const { Title, Text } = Typography;
 
 // ─── Tab definitions (3 tabs) ───────────────────────────────────────────────
 const TABS = [
-  { key: "general", labelKey: "accounting.settings.general", icon: <SettingOutlined /> },
-  { key: "gl-mappings", labelKey: "accounting.settings.glMappings", icon: <BankOutlined /> },
-  { key: "tax", labelKey: "accounting.settings.taxVat", icon: <PercentageOutlined /> },
+  {
+    key: "general",
+    labelKey: "accounting.settings.general",
+    icon: <SettingOutlined />,
+  },
+  {
+    key: "gl-mappings",
+    labelKey: "accounting.settings.glMappings",
+    icon: <BankOutlined />,
+  },
+  {
+    key: "tax",
+    labelKey: "accounting.settings.taxVat",
+    icon: <PercentageOutlined />,
+  },
 ];
 
 const MONTHS = [
@@ -66,17 +78,38 @@ const COA_FIELDS: { key: keyof AccountingConfig; i18nKey: string }[] = [
   { key: "coaSalesRevenue", i18nKey: "accounting.settings.coaSalesRevenue" },
   { key: "coaCogs", i18nKey: "accounting.settings.coaCogs" },
   { key: "coaVatPayable", i18nKey: "accounting.settings.coaVatPayable" },
-  { key: "coaAccountsReceivable", i18nKey: "accounting.settings.coaAccountsReceivable" },
-  { key: "coaAccountsPayable", i18nKey: "accounting.settings.coaAccountsPayable" },
-  { key: "coaSalariesPayable", i18nKey: "accounting.settings.coaSalariesPayable" },
+  {
+    key: "coaAccountsReceivable",
+    i18nKey: "accounting.settings.coaAccountsReceivable",
+  },
+  {
+    key: "coaAccountsPayable",
+    i18nKey: "accounting.settings.coaAccountsPayable",
+  },
+  {
+    key: "coaSalariesPayable",
+    i18nKey: "accounting.settings.coaSalariesPayable",
+  },
   { key: "coaGosiPayable", i18nKey: "accounting.settings.coaGosiPayable" },
-  { key: "coaSalariesExpense", i18nKey: "accounting.settings.coaSalariesExpense" },
+  {
+    key: "coaSalariesExpense",
+    i18nKey: "accounting.settings.coaSalariesExpense",
+  },
   { key: "coaGosiExpense", i18nKey: "accounting.settings.coaGosiExpense" },
   { key: "coaInventory", i18nKey: "accounting.settings.coaInventory" },
-  { key: "coaInventoryAdjustment", i18nKey: "accounting.settings.coaInventoryAdjustment" },
+  {
+    key: "coaInventoryAdjustment",
+    i18nKey: "accounting.settings.coaInventoryAdjustment",
+  },
   { key: "coaFxGainLoss", i18nKey: "accounting.settings.coaFxGainLoss" },
-  { key: "coaLoyaltyLiability", i18nKey: "accounting.settings.coaLoyaltyLiability" },
-  { key: "coaGiftCardLiability", i18nKey: "accounting.settings.coaGiftCardLiability" },
+  {
+    key: "coaLoyaltyLiability",
+    i18nKey: "accounting.settings.coaLoyaltyLiability",
+  },
+  {
+    key: "coaGiftCardLiability",
+    i18nKey: "accounting.settings.coaGiftCardLiability",
+  },
 ];
 
 // ─── Section wrapper ────────────────────────────────────────────────────────
@@ -140,7 +173,10 @@ function GeneralTab({ lang }: { lang: string }) {
               label={t("accounting.settings.fiscalYearStart", lang)}
               style={{ marginBottom: 16 }}
             >
-              <Select options={MONTHS} placeholder={t("accounting.settings.selectMonth", lang)} />
+              <Select
+                options={MONTHS}
+                placeholder={t("accounting.settings.selectMonth", lang)}
+              />
             </Form.Item>
           </Col>
           <Col xs={24} sm={12}>
@@ -156,11 +192,19 @@ function GeneralTab({ lang }: { lang: string }) {
                   { value: "Asia/Riyadh", label: "Asia/Riyadh (AST UTC+3)" },
                   { value: "Asia/Dubai", label: "Asia/Dubai (GST UTC+4)" },
                   { value: "Africa/Cairo", label: "Africa/Cairo (EET UTC+2)" },
-                  { value: "Europe/London", label: "Europe/London (GMT UTC+0)" },
-                  { value: "America/New_York", label: "America/New_York (EST UTC-5)" },
+                  {
+                    value: "Europe/London",
+                    label: "Europe/London (GMT UTC+0)",
+                  },
+                  {
+                    value: "America/New_York",
+                    label: "America/New_York (EST UTC-5)",
+                  },
                 ]}
                 filterOption={(input, option) =>
-                  (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+                  (option?.label ?? "")
+                    .toLowerCase()
+                    .includes(input.toLowerCase())
                 }
               />
             </Form.Item>
@@ -191,8 +235,14 @@ function GeneralTab({ lang }: { lang: string }) {
             >
               <Select
                 options={[
-                  { value: "actual_days", label: t("accounting.settings.actualDays", lang) },
-                  { value: "fixed_30", label: t("accounting.settings.fixed30Days", lang) },
+                  {
+                    value: "actual_days",
+                    label: t("accounting.settings.actualDays", lang),
+                  },
+                  {
+                    value: "fixed_30",
+                    label: t("accounting.settings.fixed30Days", lang),
+                  },
                 ]}
               />
             </Form.Item>
@@ -211,7 +261,7 @@ function GeneralTab({ lang }: { lang: string }) {
         <Alert
           type="info"
           showIcon
-          message={t("accounting.settings.fiscalPeriodsNote", lang)}
+          title={t("accounting.settings.fiscalPeriodsNote", lang)}
           style={{ marginTop: 4 }}
         />
       </Section>
@@ -242,14 +292,20 @@ function GlMappingsTab({
         <Row gutter={[16, 0]}>
           {COA_FIELDS.map(({ key, i18nKey }) => (
             <Col xs={24} sm={12} key={key}>
-              <Form.Item name={key} label={t(i18nKey, lang)} style={{ marginBottom: 16 }}>
+              <Form.Item
+                name={key}
+                label={t(i18nKey, lang)}
+                style={{ marginBottom: 16 }}
+              >
                 <Select
                   showSearch
                   allowClear
                   placeholder={t("accounting.settings.selectAccount", lang)}
                   options={accountOptions}
                   filterOption={(input, option) =>
-                    (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+                    (option?.label ?? "")
+                      .toLowerCase()
+                      .includes(input.toLowerCase())
                   }
                   loading={accountsLoading}
                 />
@@ -276,7 +332,9 @@ function GlMappingsTab({
                 placeholder={t("accounting.settings.selectJournal", lang)}
                 options={journalOptions}
                 filterOption={(input, option) =>
-                  (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+                  (option?.label ?? "")
+                    .toLowerCase()
+                    .includes(input.toLowerCase())
                 }
                 loading={journalsLoading}
               />
@@ -294,7 +352,9 @@ function GlMappingsTab({
                 placeholder={t("accounting.settings.selectJournal", lang)}
                 options={journalOptions}
                 filterOption={(input, option) =>
-                  (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+                  (option?.label ?? "")
+                    .toLowerCase()
+                    .includes(input.toLowerCase())
                 }
                 loading={journalsLoading}
               />
@@ -312,7 +372,9 @@ function GlMappingsTab({
                 placeholder={t("accounting.settings.selectJournal", lang)}
                 options={journalOptions}
                 filterOption={(input, option) =>
-                  (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+                  (option?.label ?? "")
+                    .toLowerCase()
+                    .includes(input.toLowerCase())
                 }
                 loading={journalsLoading}
               />
@@ -330,7 +392,9 @@ function GlMappingsTab({
                 placeholder={t("accounting.settings.selectJournal", lang)}
                 options={journalOptions}
                 filterOption={(input, option) =>
-                  (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+                  (option?.label ?? "")
+                    .toLowerCase()
+                    .includes(input.toLowerCase())
                 }
                 loading={journalsLoading}
               />
@@ -385,7 +449,9 @@ function TaxTab({
               placeholder={t("accounting.settings.selectAccount", lang)}
               options={accountOptions}
               filterOption={(input, option) =>
-                (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+                (option?.label ?? "")
+                  .toLowerCase()
+                  .includes(input.toLowerCase())
               }
               loading={accountsLoading}
             />
@@ -396,7 +462,7 @@ function TaxTab({
       <Alert
         type="info"
         showIcon
-        message={t("accounting.settings.taxSetupNote", lang)}
+        title={t("accounting.settings.taxSetupNote", lang)}
         style={{ marginTop: 0 }}
       />
     </Section>
@@ -408,13 +474,15 @@ export default function AccountingSettings() {
   const params = useParams<{ tab?: string }>();
   const navigate = useNavigate();
   const { token } = antTheme.useToken();
-  const lang = useLangStore((s) => s.lang);
+  const lang = useLangStore(s => s.lang);
   const queryClient = useQueryClient();
   const [form] = Form.useForm();
   const [saving, setSaving] = useState(false);
 
   const activeTab = params.tab ?? "general";
-  const activeLabel = TABS.find((tb) => tb.key === activeTab)?.labelKey ?? "accounting.settings.title";
+  const activeLabel =
+    TABS.find(tb => tb.key === activeTab)?.labelKey ??
+    "accounting.settings.title";
 
   // ─── Fetch config ───────────────────────────────────────────────────────
   const { data: configRes, isLoading: configLoading } = useQuery({
@@ -433,29 +501,28 @@ export default function AccountingSettings() {
   });
 
   const accounts: Account[] = useMemo(() => {
-    if (!accountsRes) return [];
-    const raw = (accountsRes as Record<string, unknown>)?.data;
-    if (Array.isArray(raw)) return raw as Account[];
-    if (Array.isArray(accountsRes)) return accountsRes as Account[];
-    return [];
+    return accountsRes?.data ?? [];
   }, [accountsRes]);
 
   const accountOptions = useMemo(
     () =>
-      accounts.map((a) => ({
+      accounts.map(a => ({
         value: a.id,
         label: `${a.code} - ${getName(a)}`,
       })),
-    [accounts],
+    [accounts]
   );
 
   const journalOptions = useMemo(() => {
-    if (!journalsRes) return [];
-    const raw = (journalsRes as Record<string, unknown>)?.data;
-    const list = Array.isArray(raw) ? raw : Array.isArray(journalsRes) ? journalsRes : [];
-    return (list as { id: string; nameEn?: string; nameAr?: string; code?: string }[]).map((j) => ({
+    const list = (journalsRes?.data ?? []) as {
+      id: string;
+      nameEn?: string;
+      nameAr?: string;
+      code?: string;
+    }[];
+    return list.map(j => ({
       value: j.id,
-      label: j.code ? `${j.code} - ${getName(j)}` : getName(j) ?? j.id,
+      label: j.code ? `${j.code} - ${getName(j)}` : (getName(j) ?? j.id),
     }));
   }, [journalsRes]);
 
@@ -470,7 +537,8 @@ export default function AccountingSettings() {
 
   // ─── Save ──────────────────────────────────────────────────────────────
   const updateMutation = useMutation({
-    mutationFn: (dto: Partial<AccountingConfig>) => accountingConfigService.update(dto),
+    mutationFn: (dto: Partial<AccountingConfig>) =>
+      accountingConfigService.update(dto),
     onSuccess: () => {
       message.success(t("accounting.settings.saved", lang));
       queryClient.invalidateQueries({
@@ -508,7 +576,11 @@ export default function AccountingSettings() {
       />
     ),
     tax: (
-      <TaxTab lang={lang} accountOptions={accountOptions} accountsLoading={accountsLoading} />
+      <TaxTab
+        lang={lang}
+        accountOptions={accountOptions}
+        accountsLoading={accountsLoading}
+      />
     ),
   };
 
@@ -517,7 +589,10 @@ export default function AccountingSettings() {
       currentPage={t("accounting.settings.title", lang)}
       breadcrumbs={[
         { label: t("common.dashboard", lang), href: "/" },
-        { label: t("sidebar.accounting", lang), href: "/accounting/chart-of-accounts" },
+        {
+          label: t("sidebar.accounting", lang),
+          href: "/accounting/chart-of-accounts",
+        },
         { label: t("accounting.settings.title", lang) },
       ]}
     >
@@ -562,7 +637,7 @@ export default function AccountingSettings() {
                 }}
                 styles={{ body: { padding: "8px 0" } }}
               >
-                {TABS.map((tab) => (
+                {TABS.map(tab => (
                   <button
                     key={tab.key}
                     onClick={() => navigate(`/accounting/settings/${tab.key}`)}
@@ -573,23 +648,31 @@ export default function AccountingSettings() {
                       gap: 10,
                       padding: "10px 16px",
                       background:
-                        activeTab === tab.key ? token.colorPrimaryBg : "transparent",
-                      color: activeTab === tab.key ? token.colorPrimary : token.colorText,
+                        activeTab === tab.key
+                          ? token.colorPrimaryBg
+                          : "transparent",
+                      color:
+                        activeTab === tab.key
+                          ? token.colorPrimary
+                          : token.colorText,
                       border: "none",
                       cursor: "pointer",
                       fontSize: 13,
                       fontWeight: activeTab === tab.key ? 600 : 400,
                       transition: "background 0.15s, color 0.15s",
-                      textAlign: "left",
+                      textAlign: "start",
                     }}
-                    onMouseEnter={(e) => {
+                    onMouseEnter={e => {
                       if (activeTab !== tab.key)
-                        (e.currentTarget as HTMLButtonElement).style.background =
-                          token.colorFillAlter;
+                        (
+                          e.currentTarget as HTMLButtonElement
+                        ).style.background = token.colorFillAlter;
                     }}
-                    onMouseLeave={(e) => {
+                    onMouseLeave={e => {
                       if (activeTab !== tab.key)
-                        (e.currentTarget as HTMLButtonElement).style.background = "transparent";
+                        (
+                          e.currentTarget as HTMLButtonElement
+                        ).style.background = "transparent";
                     }}
                   >
                     <span
@@ -616,7 +699,7 @@ export default function AccountingSettings() {
                 styles={{ body: { padding: 24 } }}
                 title={
                   <Space>
-                    {TABS.find((tb) => tb.key === activeTab)?.icon}
+                    {TABS.find(tb => tb.key === activeTab)?.icon}
                     <Text strong>{t(activeLabel, lang)}</Text>
                   </Space>
                 }
@@ -633,7 +716,7 @@ export default function AccountingSettings() {
                 }
               >
                 {tabContent[activeTab] ?? (
-                  <Alert type="info" message="Select a tab to configure" />
+                  <Alert type="info" title="Select a tab to configure" />
                 )}
               </Card>
             </div>

@@ -154,10 +154,14 @@ export default function SalesInvoices() {
     page,
     limit: pageSize,
     ...(search ? { search } : {}),
-    ...(typeFilter !== "all" ? { invoiceType: typeFilter } : {}),
-    ...(statusFilter !== "all" ? { status: statusFilter } : {}),
+    ...(typeFilter !== "all"
+      ? { invoiceType: typeFilter as InvoiceTypeNew }
+      : {}),
+    ...(statusFilter !== "all"
+      ? { status: statusFilter as InvoiceStatusNew }
+      : {}),
     ...(paymentStatusFilter !== "all"
-      ? { paymentStatus: paymentStatusFilter }
+      ? { paymentStatus: paymentStatusFilter as InvoicePaymentStatus }
       : {}),
     sortBy: "createdAt",
     sortOrder: "DESC" as const,
@@ -181,9 +185,7 @@ export default function SalesInvoices() {
     queryFn: () => invoicesService.summary(),
     enabled: !!branchId,
   });
-  const summary = (summaryRes as Record<string, unknown>)?.data as
-    | InvoiceSummary
-    | undefined;
+  const summary = summaryRes?.data as InvoiceSummary | undefined;
 
   // Partners dropdown for create form
   const { data: partnersData } = useQuery({
@@ -583,7 +585,7 @@ export default function SalesInvoices() {
         { label: t("invoices.salesInvoices", lang) },
       ]}
     >
-      <Space direction="vertical" size={20} style={{ width: "100%" }}>
+      <Space orientation="vertical" size={20} style={{ width: "100%" }}>
         {/* ── KPI Cards ────────────────────────────────────────────────── */}
         <Row gutter={[16, 16]}>
           {[
@@ -650,11 +652,11 @@ export default function SalesInvoices() {
                     <Statistic
                       value={s.value}
                       precision={"isCurrency" in s && s.isCurrency ? 2 : 0}
-                      valueStyle={{
+                      styles={{ content: {
                         fontSize: 24,
                         lineHeight: 1,
                         color: s.color ?? "inherit",
-                      }}
+                      } }}
                     />
                     <Text type="secondary" style={{ fontSize: 12 }}>
                       {s.suffix}
@@ -1122,7 +1124,7 @@ export default function SalesInvoices() {
           setDrawerOpen(false);
           setViewInvoice(null);
         }}
-        width={isMobile ? "100%" : 560}
+        size={isMobile ? "100%" : 560}
         title={
           viewInvoice
             ? `${t("invoices.view", lang)} — ${viewInvoice.invoiceNumber}`
@@ -1130,7 +1132,7 @@ export default function SalesInvoices() {
         }
       >
         {viewInvoice && (
-          <Space direction="vertical" size={16} style={{ width: "100%" }}>
+          <Space orientation="vertical" size={16} style={{ width: "100%" }}>
             <Row gutter={[16, 12]}>
               <Col span={12}>
                 <Text type="secondary">

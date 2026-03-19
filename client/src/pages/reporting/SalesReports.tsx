@@ -134,7 +134,7 @@ function KPICard({
             <Statistic
               value={value}
               suffix={suffix}
-              valueStyle={{ fontSize: 22, lineHeight: 1 }}
+              styles={{ content: { fontSize: 22, lineHeight: 1 } }}
             />
           )}
         </div>
@@ -174,7 +174,11 @@ export default function SalesReports() {
   const endDate = dateRange?.[1]?.format("YYYY-MM-DD");
 
   // ── Query ──────────────────────────────────────────────────────────────────
-  const { data: response, isLoading, refetch } = useQuery({
+  const {
+    data: response,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: [QUERY_KEYS.SALES_REPORT, startDate, endDate, branchId],
     queryFn: () =>
       getSalesReport({
@@ -185,8 +189,15 @@ export default function SalesReports() {
     enabled: !!branchId,
   });
 
-  const report = (response as unknown as Record<string, unknown>)?.data as
-    | { data: SalesReportRow[]; summary: { totalOrders: number; totalRevenue: number; avgOrderValue: number } }
+  const report = response?.data as
+    | {
+        data: SalesReportRow[];
+        summary: {
+          totalOrders: number;
+          totalRevenue: number;
+          avgOrderValue: number;
+        };
+      }
     | undefined;
 
   const rows = report?.data ?? [];
@@ -202,7 +213,7 @@ export default function SalesReports() {
         revenue: Number(row.totalAmount),
         orders: Number(row.orderCount),
       })),
-    [rows],
+    [rows]
   );
 
   // ── Export handler ─────────────────────────────────────────────────────────
@@ -261,7 +272,7 @@ export default function SalesReports() {
         ),
       },
     ],
-    [t, lang],
+    [t, lang]
   );
 
   return (
@@ -361,11 +372,11 @@ export default function SalesReports() {
         </Row>
 
         {/* ── Chart: Revenue by Status ────────────────────────────── */}
-        <Card
-          size="small"
-          styles={{ body: { padding: "16px 20px" } }}
-        >
-          <Text strong style={{ fontSize: 15, display: "block", marginBottom: 16 }}>
+        <Card size="small" styles={{ body: { padding: "16px 20px" } }}>
+          <Text
+            strong
+            style={{ fontSize: 15, display: "block", marginBottom: 16 }}
+          >
             {t("salesReports.ordersByStatus", lang)}
           </Text>
           {isLoading ? (
@@ -374,8 +385,14 @@ export default function SalesReports() {
             </div>
           ) : hasData ? (
             <ResponsiveContainer width="100%" height={320}>
-              <BarChart data={chartData} margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke={token.colorBorderSecondary} />
+              <BarChart
+                data={chartData}
+                margin={{ top: 8, right: 8, bottom: 8, left: 8 }}
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke={token.colorBorderSecondary}
+                />
                 <XAxis
                   dataKey="label"
                   tick={{ fontSize: 12 }}
@@ -387,17 +404,23 @@ export default function SalesReports() {
                   tickFormatter={(v: number) => `${(v / 1000).toFixed(0)}k`}
                 />
                 <Tooltip
-                  formatter={(value: number) => [`${fmtCurrency(value)} SAR`, t("salesReports.totalAmount", lang)]}
+                  formatter={(value: number) => [
+                    `${fmtCurrency(value)} SAR`,
+                    t("salesReports.totalAmount", lang),
+                  ]}
                   contentStyle={{
                     borderRadius: 8,
                     border: `1px solid ${token.colorBorderSecondary}`,
                   }}
                 />
                 <Bar dataKey="revenue" radius={[4, 4, 0, 0]} maxBarSize={60}>
-                  {chartData.map((entry) => (
+                  {chartData.map(entry => (
                     <Cell
                       key={entry.status}
-                      fill={STATUS_COLORS[entry.status.toLowerCase()] ?? token.colorPrimary}
+                      fill={
+                        STATUS_COLORS[entry.status.toLowerCase()] ??
+                        token.colorPrimary
+                      }
                     />
                   ))}
                 </Bar>
@@ -406,7 +429,9 @@ export default function SalesReports() {
           ) : (
             <Empty
               image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description={<Text type="secondary">{t("common.noData", lang)}</Text>}
+              description={
+                <Text type="secondary">{t("common.noData", lang)}</Text>
+              }
               style={{ padding: "40px 0" }}
             />
           )}
@@ -470,7 +495,9 @@ export default function SalesReports() {
           ) : (
             <Empty
               image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description={<Text type="secondary">{t("common.noData", lang)}</Text>}
+              description={
+                <Text type="secondary">{t("common.noData", lang)}</Text>
+              }
               style={{ padding: "40px 0" }}
             />
           )}

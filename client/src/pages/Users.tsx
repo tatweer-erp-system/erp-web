@@ -18,6 +18,7 @@ import { useLangStore } from "@/stores/lang.store";
 import { usersService } from "@/services/users.service";
 import { rolesService } from "@/services/roles.service";
 import { t } from "@/i18n";
+import { getName } from "@/shared/utils/getName.util";
 import {
   Plus,
   Edit,
@@ -77,8 +78,8 @@ export default function Users() {
   });
 
   const users = usersData?.data ?? [];
-  const totalUsers = usersData?.total ?? 0;
-  const totalPages = usersData?.totalPages ?? 1;
+  const totalUsers = usersData?.meta?.total ?? 0;
+  const totalPages = usersData?.meta?.totalPages ?? 1;
   const availableRoles = rolesData?.data ?? [];
 
   const handlePrint = () => window.print();
@@ -344,7 +345,7 @@ export default function Users() {
                               key={role.id}
                               className="px-2 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary"
                             >
-                              {role.name}
+                              {getName(role) || role.name}
                             </span>
                           ))}
                           {(!user.roles || user.roles.length === 0) && (
@@ -468,7 +469,7 @@ export default function Users() {
                           key={role.id}
                           className="px-2 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary"
                         >
-                          {role.name}
+                          {getName(role) || role.name}
                         </span>
                       ))}
                     </div>
@@ -553,7 +554,7 @@ export default function Users() {
                       className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary"
                     >
                       <Shield size={12} />
-                      {role.name}
+                      {getName(role)}
                       <button
                         type="button"
                         onClick={() => toggleRole(roleId)}
@@ -580,7 +581,7 @@ export default function Users() {
                           : "bg-card text-foreground border border-border hover:bg-secondary"
                       }`}
                     >
-                      {role.name}
+                      {getName(role)}
                     </button>
                   );
                 })}

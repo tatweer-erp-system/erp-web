@@ -52,7 +52,7 @@ export default function PricelistsPage() {
 
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
     debounceRef.current = setTimeout(() => {
@@ -89,7 +89,7 @@ export default function PricelistsPage() {
   const totalRows = res?.meta?.total ?? 0;
 
   const { data: summaryRes } = usePricelistSummary();
-  const summary = (summaryRes as Record<string, unknown>)?.data as
+  const summary = summaryRes?.data as
     | { totalPricelists?: number; totalActive?: number; totalInactive?: number }
     | undefined;
 

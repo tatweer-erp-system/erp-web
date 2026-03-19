@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 
 import { useForm } from "react-hook-form";
+import type { Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Drawer, Button, Modal } from "antd";
@@ -58,6 +59,9 @@ export function SalesOrderFastCreate({
   const { data: productsData } = useProducts();
   const { mutate: createOrder, isPending } = useCreateSalesOrder();
 
+  const resolver = zodResolver(
+    salesOrderFastCreateSchema
+  ) as Resolver<FastCreateFormValues>;
   const {
     control,
     handleSubmit,
@@ -65,7 +69,7 @@ export function SalesOrderFastCreate({
     reset,
     formState: { errors, isDirty },
   } = useForm<FastCreateFormValues>({
-    resolver: zodResolver(salesOrderFastCreateSchema),
+    resolver,
     defaultValues: { quantity: 1 },
   });
 
@@ -138,8 +142,8 @@ export function SalesOrderFastCreate({
 
   function handleProductSelect(productId: string) {
     const selected = (productsData?.data ?? []).find(p => p.id === productId);
-    if (selected?.salePrice != null) {
-      setValue("unitPrice", selected.salePrice);
+    if (selected?.unitPrice != null) {
+      setValue("unitPrice", selected.unitPrice);
     }
   }
 
@@ -162,8 +166,7 @@ export function SalesOrderFastCreate({
         </div>
       }
       placement={isMobile ? "bottom" : direction === "rtl" ? "left" : "right"}
-      width={isMobile ? "100%" : 420}
-      height={isMobile ? "90%" : undefined}
+      size={isMobile ? "90%" : 420}
       open={open}
       onClose={handleClose}
       destroyOnClose

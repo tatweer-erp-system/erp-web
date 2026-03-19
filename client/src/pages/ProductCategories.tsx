@@ -332,12 +332,12 @@ export default function ProductCategories() {
     <DashboardLayout
       currentPage="ProductCategories"
       breadcrumbs={[
-        { label: "Dashboard", href: "/" },
-        { label: "Inventory", href: "#" },
+        { label: t("common.dashboard", lang), href: "/" },
+        { label: t("inventory.title", lang), href: "#" },
         { label: t("categories.title", lang) },
       ]}
     >
-      <Space direction="vertical" size={20} style={{ width: "100%" }}>
+      <Space orientation="vertical" size={20} style={{ width: "100%" }}>
         {/* ── KPI Cards ──────────────────────────────────────────────────── */}
         <Row gutter={[16, 16]}>
           {[
@@ -378,10 +378,10 @@ export default function ProductCategories() {
                     </Text>
                     <Statistic
                       value={s.value}
-                      valueStyle={{
+                      styles={{ content: {
                         fontSize: 24,
                         lineHeight: 1,
-                      }}
+                      } }}
                     />
                   </div>
                   <div
@@ -413,7 +413,7 @@ export default function ProductCategories() {
               title={t("categories.title", lang)}
               extra={
                 <Space>
-                  <Tooltip title="Reload">
+                  <Tooltip title={t("common.reload", lang)}>
                     <Button
                       size="small"
                       icon={<ReloadOutlined />}
@@ -446,7 +446,7 @@ export default function ProductCategories() {
                 </div>
               ) : filteredTreeData.length === 0 ? (
                 <Empty
-                  description={t("categories.noData", lang) || "No categories"}
+                  description={t("categories.noData", lang)}
                   style={{ padding: "40px 0" }}
                 />
               ) : (
@@ -490,7 +490,7 @@ export default function ProductCategories() {
                   style={{ padding: "60px 0" }}
                 />
               ) : (
-                <Space direction="vertical" size={20} style={{ width: "100%" }}>
+                <Space orientation="vertical" size={20} style={{ width: "100%" }}>
                   {/* Header */}
                   <div
                     style={{

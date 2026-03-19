@@ -113,7 +113,7 @@ export default function PaymentTerms() {
   });
 
   const allTerms: PaymentTerm[] = useMemo(
-    () => ((termsRaw as Record<string, unknown>)?.data as PaymentTerm[]) ?? [],
+    () => termsRaw?.data ?? [],
     [termsRaw]
   );
 
@@ -549,7 +549,7 @@ export default function PaymentTerms() {
         { label: t("accounting.pt.title", lang) },
       ]}
     >
-      <Space direction="vertical" size={20} style={{ width: "100%" }}>
+      <Space orientation="vertical" size={20} style={{ width: "100%" }}>
         {/* ── KPI Cards ──────────────────────────────────────────────────── */}
         <Row gutter={[16, 16]}>
           {[
@@ -603,11 +603,11 @@ export default function PaymentTerms() {
                     </Text>
                     <Statistic
                       value={s.value}
-                      valueStyle={{
+                      styles={{ content: {
                         fontSize: 24,
                         lineHeight: 1,
                         color: s.color ?? "inherit",
-                      }}
+                      } }}
                     />
                     <Text type="secondary" style={{ fontSize: 12 }}>
                       {s.suffix}
@@ -822,7 +822,7 @@ export default function PaymentTerms() {
         }
       >
         {viewTerm && (
-          <Space direction="vertical" size={16} style={{ width: "100%" }}>
+          <Space orientation="vertical" size={16} style={{ width: "100%" }}>
             <Row gutter={[16, 12]}>
               <Col span={12}>
                 <Text type="secondary">{t("accounting.pt.nameEn", lang)}</Text>

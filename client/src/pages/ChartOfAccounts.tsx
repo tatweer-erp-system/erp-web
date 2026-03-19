@@ -81,12 +81,15 @@ interface Account {
 
 // ─── Shared helpers ────────────────────────────────────────────────────────────
 
-const TYPE_META: Record<string, { color: string; label: string }> = {
-  asset: { color: "#3B82F6", label: "Asset" },
-  liability: { color: "#F59E0B", label: "Liability" },
-  equity: { color: "#10B981", label: "Equity" },
-  revenue: { color: "#8B5CF6", label: "Revenue" },
-  expense: { color: "#EF4444", label: "Expense" },
+const TYPE_META: Record<
+  string,
+  { color: string; label: string; icon: typeof BankOutlined }
+> = {
+  asset: { color: "#3B82F6", label: "Asset", icon: BankOutlined },
+  liability: { color: "#F59E0B", label: "Liability", icon: DollarOutlined },
+  equity: { color: "#10B981", label: "Equity", icon: PercentageOutlined },
+  revenue: { color: "#8B5CF6", label: "Revenue", icon: LineChartOutlined },
+  expense: { color: "#EF4444", label: "Expense", icon: SettingOutlined },
 };
 
 const SUBTYPE_OPTIONS: Record<string, string[]> = {
@@ -965,42 +968,70 @@ function ChartOfAccountsContent() {
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              paddingRight: 12,
+              paddingInlineEnd: 12,
+              paddingBlock: 2,
               width: "100%",
+              borderRadius: 6,
+              transition: "background 0.15s",
             }}
             onClick={() => openAccount(a, false)}
           >
-            <Space size={6}>
-              {isHeader ? (
-                <FolderOutlined style={{ color: TYPE_META[a.type]?.color }} />
-              ) : (
-                <FileTextOutlined
-                  style={{ color: token.colorTextTertiary, fontSize: 12 }}
-                />
-              )}
-              <Text
+            <Space size={8}>
+              <div
+                style={{
+                  width: 24,
+                  height: 24,
+                  borderRadius: 6,
+                  background: isHeader
+                    ? `${TYPE_META[a.type]?.color}14`
+                    : `${token.colorTextQuaternary}10`,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                {isHeader ? (
+                  <FolderOutlined
+                    style={{ color: TYPE_META[a.type]?.color, fontSize: 12 }}
+                  />
+                ) : (
+                  <FileTextOutlined
+                    style={{ color: token.colorTextTertiary, fontSize: 11 }}
+                  />
+                )}
+              </div>
+              <Tag
                 style={{
                   fontFamily: "monospace",
                   fontSize: 11,
-                  color: token.colorTextTertiary,
+                  borderRadius: 4,
+                  margin: 0,
+                  background: `${token.colorTextQuaternary}0a`,
+                  border: `1px solid ${token.colorBorderSecondary}`,
+                  color: token.colorTextSecondary,
+                  fontWeight: 600,
                 }}
               >
                 {a.code}
-              </Text>
-              <Text style={{ fontWeight: isHeader ? 600 : 400 }}>
+              </Tag>
+              <Text style={{ fontWeight: isHeader ? 600 : 400, fontSize: 13 }}>
                 {acctName(a)}
               </Text>
               {!a.isActive && (
-                <Tag style={{ borderRadius: 20, fontSize: 10, marginLeft: 4 }}>
+                <Tag
+                  color="default"
+                  style={{ borderRadius: 20, fontSize: 10, margin: 0 }}
+                >
                   {t("accounting.coa.off", lang)}
                 </Tag>
               )}
             </Space>
-            <Space size={8}>
+            <Space size={10}>
               <Text
                 style={{
                   fontFamily: "monospace",
                   fontSize: 12,
+                  fontWeight: 600,
                   color:
                     (a.balance ?? 0) < 0
                       ? token.colorError
@@ -1011,7 +1042,11 @@ function ChartOfAccountsContent() {
               </Text>
               <Tooltip title={t("accounting.coa.viewDetails", lang)}>
                 <EyeOutlined
-                  style={{ color: token.colorTextQuaternary, fontSize: 12 }}
+                  style={{
+                    color: token.colorTextQuaternary,
+                    fontSize: 13,
+                    cursor: "pointer",
+                  }}
                 />
               </Tooltip>
             </Space>
@@ -1085,87 +1120,166 @@ function ChartOfAccountsContent() {
   return (
     <>
       {/* ── KPI cards ────────────────────────────────────────────────────── */}
-      <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
-        {ACCOUNTS.map(a => (
-          <Col xs={24} sm={12} lg={4} key={a.code} style={{ flex: 1 }}>
-            <Card
-              size="small"
-              styles={{ body: { padding: "14px 16px" } }}
-              style={{
-                borderLeft: `4px solid ${TYPE_META[a.type]?.color}`,
-                cursor: "pointer",
-              }}
-              onClick={() => setActiveTab(a.type)}
+      <div
+        style={{
+          display: "flex",
+          gap: 12,
+          marginBottom: 20,
+          flexWrap: "wrap",
+        }}
+      >
+        {ACCOUNTS.map(a => {
+          const meta = TYPE_META[a.type];
+          const color = meta?.color ?? token.colorPrimary;
+          const IconComp = meta?.icon ?? BankOutlined;
+          const isActive = activeTab === a.type;
+          return (
+            <div
+              key={a.code}
+              style={{ flex: "1 1 0", minWidth: isMobile ? "100%" : 150 }}
             >
-              <Text
-                type="secondary"
-                style={{
-                  fontSize: 11,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.06em",
+              <Card
+                size="small"
+                hoverable
+                styles={{
+                  body: { padding: "16px 18px", position: "relative", overflow: "hidden" },
                 }}
-              >
-                {acctName(a)}
-              </Text>
-              <div
                 style={{
-                  fontSize: 20,
-                  fontWeight: 700,
-                  color: TYPE_META[a.type]?.color,
-                  marginTop: 6,
+                  cursor: "pointer",
+                  height: "100%",
+                  borderRadius: 12,
+                  border: isActive
+                    ? `2px solid ${color}`
+                    : `1px solid ${token.colorBorderSecondary}`,
+                  boxShadow: isActive
+                    ? `0 4px 16px ${color}22`
+                    : "0 1px 4px rgba(0,0,0,0.04)",
+                  transition: "all 0.2s ease",
                 }}
+                onClick={() => setActiveTab(a.type)}
               >
-                {fmtAmt(a.balance ?? 0)}
-              </div>
-              <Text type="secondary" style={{ fontSize: 11 }}>
-                {a.children?.length ?? 0}{" "}
-                {t("accounting.coa.subAccounts", lang)}
-              </Text>
-            </Card>
-          </Col>
-        ))}
-      </Row>
+                {/* Top accent bar */}
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: 3,
+                    background: `linear-gradient(90deg, ${color}, ${color}88)`,
+                    borderRadius: "12px 12px 0 0",
+                  }}
+                />
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <Text
+                      type="secondary"
+                      style={{
+                        fontSize: 11,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.06em",
+                        fontWeight: 600,
+                        display: "block",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {acctName(a)}
+                    </Text>
+                    <div
+                      style={{
+                        fontSize: 22,
+                        fontWeight: 800,
+                        color,
+                        marginTop: 8,
+                        fontFamily: "monospace",
+                        lineHeight: 1,
+                      }}
+                    >
+                      {fmtAmt(a.balance ?? 0)}
+                    </div>
+                    <Text
+                      type="secondary"
+                      style={{ fontSize: 11, marginTop: 6, display: "block" }}
+                    >
+                      {a.children?.length ?? 0}{" "}
+                      {t("accounting.coa.subAccounts", lang)}
+                    </Text>
+                  </div>
+                  <div
+                    style={{
+                      width: 36,
+                      height: 36,
+                      borderRadius: 10,
+                      background: `${color}12`,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                      marginInlineStart: 8,
+                    }}
+                  >
+                    <IconComp style={{ fontSize: 16, color }} />
+                  </div>
+                </div>
+              </Card>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* ── Actions row ──────────────────────────────────────────────────── */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={() => setNewAccountModalOpen(true)}
+          style={{ borderRadius: 8 }}
+        >
+          {t("accounting.coa.newAccount", lang)}
+        </Button>
+        <Space size={8}>
+          <Input
+            prefix={
+              <SearchOutlined style={{ color: token.colorTextQuaternary }} />
+            }
+            placeholder={t("accounting.coa.searchPlaceholder", lang)}
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            allowClear
+            style={{ width: 200, borderRadius: 8 }}
+          />
+          <Button
+            icon={<DownloadOutlined />}
+            style={{ borderRadius: 8 }}
+          >
+            {t("accounting.coa.export", lang)}
+          </Button>
+        </Space>
+      </div>
 
       {/* ── Main tree card ───────────────────────────────────────────────── */}
       <Card
-        styles={{ body: { padding: 0 } }}
+        styles={{
+          body: { padding: 0 },
+          header: { borderBottom: "none", paddingBottom: 0 },
+        }}
+        style={{ borderRadius: 12, overflow: "hidden" }}
         title={
-          <Tabs
-            activeKey={activeTab}
-            onChange={setActiveTab}
-            items={tabItems}
-            style={{ marginBottom: -1 }}
-            size="small"
-          />
-        }
-        extra={
-          <Space>
-            <Input
-              prefix={
-                <SearchOutlined style={{ color: token.colorTextQuaternary }} />
-              }
-              placeholder={t("accounting.coa.searchPlaceholder", lang)}
+          <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+            <Tabs
+              activeKey={activeTab}
+              onChange={setActiveTab}
+              items={tabItems}
+              style={{ marginBottom: 0 }}
               size="small"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              allowClear
-              style={{ width: 180 }}
             />
-            <Button size="small" icon={<DownloadOutlined />}>
-              {t("accounting.coa.export", lang)}
-            </Button>
-            <Button
-              size="small"
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={() => setNewAccountModalOpen(true)}
-            >
-              {t("accounting.coa.newAccount", lang)}
-            </Button>
-          </Space>
+          </div>
         }
       >
-        <div style={{ padding: "8px 12px" }}>
+        <Divider style={{ margin: 0 }} />
+        <div style={{ padding: "12px 16px" }}>
           <Tree
             treeData={buildTree(visibleRoots)}
             expandedKeys={expandedKeys}
@@ -1556,7 +1670,7 @@ function ChartOfAccountsContent() {
                       </Button>
                     </div>
                     <Space
-                      direction="vertical"
+                      orientation="vertical"
                       size={6}
                       style={{ width: "100%" }}
                     >

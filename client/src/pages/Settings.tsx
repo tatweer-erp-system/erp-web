@@ -966,14 +966,14 @@ export default function Settings() {
             type="success"
             showIcon
             icon={<CheckCircleOutlined />}
-            message="Two-factor authentication is active"
+            title="Two-factor authentication is active"
             description="Your account is protected by an authenticator app. Every login requires a one-time code."
           />
         ) : (
           <Alert
             type="warning"
             showIcon
-            message="Two-factor authentication is not enabled"
+            title="Two-factor authentication is not enabled"
             description="Enable 2FA to add an extra layer of security to your account. Requires an authenticator app."
           />
         )}
@@ -1210,7 +1210,7 @@ export default function Settings() {
       <Alert
         type="info"
         showIcon
-        message="Connect third-party services to extend the platform's capabilities."
+        title="Connect third-party services to extend the platform's capabilities."
         style={{ fontSize: 12 }}
       />
       <Row gutter={[12, 12]}>

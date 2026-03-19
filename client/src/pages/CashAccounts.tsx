@@ -81,7 +81,7 @@ export default function CashAccounts() {
   // ── Search with 400ms debounce ──────────────────────────────────────────
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
     debounceRef.current = setTimeout(() => {
@@ -125,9 +125,7 @@ export default function CashAccounts() {
   });
 
   const allAccounts: TreasuryAccount[] = useMemo(() => {
-    const list =
-      ((accountsRaw as Record<string, unknown>)?.data as TreasuryAccount[]) ??
-      [];
+    const list: TreasuryAccount[] = accountsRaw?.data ?? [];
     return list.filter(a => a.type === TreasuryAccountType.CASH);
   }, [accountsRaw]);
 
@@ -138,13 +136,12 @@ export default function CashAccounts() {
   });
 
   const coaAccountOptions = useMemo(() => {
-    const list =
-      ((coaAccountsList as Record<string, unknown>)?.data as {
-        id: string;
-        code: string;
-        nameEn: string;
-        nameAr: string;
-      }[]) ?? [];
+    const list = (coaAccountsList?.data ?? []) as {
+      id: string;
+      code: string;
+      nameEn: string;
+      nameAr: string;
+    }[];
     return list.map(a => ({
       value: a.id,
       label: `${a.code} — ${getName(a)}`,
@@ -389,7 +386,7 @@ export default function CashAccounts() {
                     <Statistic
                       value={s.value}
                       suffix={s.suffix}
-                      valueStyle={{ fontSize: 24, lineHeight: 1 }}
+                      styles={{ content: { fontSize: 24, lineHeight: 1 } }}
                     />
                   </div>
                   <div
@@ -731,7 +728,7 @@ export default function CashAccounts() {
         }
       >
         {viewAccount && (
-          <Space direction="vertical" size={16} style={{ width: "100%" }}>
+          <Space orientation="vertical" size={16} style={{ width: "100%" }}>
             {/* Balance highlight */}
             <Card
               size="small"

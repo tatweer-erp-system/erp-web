@@ -479,7 +479,7 @@ function RenewalTab() {
           type="success"
           showIcon
           icon={<CheckCircleOutlined />}
-          message="Auto-renewal is enabled"
+          title="Auto-renewal is enabled"
           description="Your subscription will automatically renew on Jan 15, 2026. You will be notified 30 days before renewal."
           style={{ marginBottom: 16 }}
         />
@@ -612,7 +612,7 @@ function SpendingLimitsTab() {
         type="warning"
         showIcon
         icon={<WarningOutlined />}
-        message="Sales & Marketing is at 89% of monthly spending limit"
+        title="Sales & Marketing is at 89% of monthly spending limit"
         style={{ marginBottom: 12, fontSize: 12 }}
       />
       <Table
@@ -875,7 +875,7 @@ export default function BillingSubscription() {
             }
           >
             {tabContent[activeTab] ?? (
-              <Alert type="info" message="Content coming soon" />
+              <Alert type="info" title="Content coming soon" />
             )}
           </Card>
         </div>

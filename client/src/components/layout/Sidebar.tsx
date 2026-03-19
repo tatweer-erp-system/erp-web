@@ -136,13 +136,21 @@ const NAV_ITEMS: NavItem[] = [
   { name: "INVENTORY", isHeader: true },
   { name: "Products", icon: <AppstoreOutlined />, href: "/inventory/products" },
   { name: "Warehouses", icon: <HomeOutlined />, href: "/inventory/warehouses" },
-  { name: "Opening Stock", icon: <InboxOutlined />, href: "/inventory/opening-stock" },
+  {
+    name: "Opening Stock",
+    icon: <InboxOutlined />,
+    href: "/inventory/opening-stock",
+  },
   {
     name: "Stock Adjustments",
     icon: <ControlOutlined />,
     href: "/inventory/stock-adjustments",
   },
-  { name: "Stock Transfers", icon: <SwapOutlined />, href: "/inventory/stock-transfers" },
+  {
+    name: "Stock Transfers",
+    icon: <SwapOutlined />,
+    href: "/inventory/stock-transfers",
+  },
   { name: "Deliveries", icon: <CarOutlined />, href: "/inventory/deliveries" },
 
   // ── Accounting (Odoo: Accounting > Journal, Reports, Config) ────────────
@@ -152,7 +160,11 @@ const NAV_ITEMS: NavItem[] = [
     icon: <UnorderedListOutlined />,
     href: "/accounting/chart-of-accounts",
   },
-  { name: "Journal Entries", icon: <BookOutlined />, href: "/accounting/journal-entries" },
+  {
+    name: "Journal Entries",
+    icon: <BookOutlined />,
+    href: "/accounting/journal-entries",
+  },
   {
     name: "Opening Balances",
     icon: <UnorderedListOutlined />,
@@ -266,7 +278,11 @@ const NAV_ITEMS: NavItem[] = [
   // ── HR (Odoo: Employees > Employees, Attendance, Leaves, Payroll) ───────
   { name: "HR", isHeader: true },
   { name: "Employees", icon: <UsergroupAddOutlined />, href: "/hr/employees" },
-  { name: "Job Positions", icon: <SolutionOutlined />, href: "/hr/job-positions" },
+  {
+    name: "Job Positions",
+    icon: <SolutionOutlined />,
+    href: "/hr/job-positions",
+  },
   { name: "Attendance", icon: <ClockCircleOutlined />, href: "/hr/attendance" },
   {
     name: "Leave Management",
@@ -299,7 +315,11 @@ const NAV_ITEMS: NavItem[] = [
     icon: <AreaChartOutlined />,
     href: "/reporting/financial",
   },
-  { name: "Aging Reports", icon: <BarChartOutlined />, href: "/reporting/aging" },
+  {
+    name: "Aging Reports",
+    icon: <BarChartOutlined />,
+    href: "/reporting/aging",
+  },
   { name: "Tax Reports", icon: <PercentageOutlined />, href: "/reporting/tax" },
   {
     name: "Loyalty Report",
