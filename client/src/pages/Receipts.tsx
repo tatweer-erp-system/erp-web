@@ -178,7 +178,7 @@ export default function Receipts() {
   // ── Partners dropdown ──────────────────────────────────────────────────
   const { data: partnersRaw } = useQuery({
     queryKey: [QUERY_KEYS.PARTNERS, "dropdown"],
-    queryFn: () => getPartnersDropdown({ limit: 200 }),
+    queryFn: () => getPartnersDropdown({ limit: 100 }),
     staleTime: 60_000,
   });
 

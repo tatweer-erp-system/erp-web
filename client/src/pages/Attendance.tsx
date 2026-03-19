@@ -128,7 +128,7 @@ export default function Attendance() {
 
   const { data: departmentsDropdown } = useQuery({
     queryKey: [QUERY_KEYS.DEPARTMENTS_DROPDOWN],
-    queryFn: () => departmentsService.dropdown({ limit: 200 }),
+    queryFn: () => departmentsService.dropdown({ limit: 100 }),
     staleTime: 60_000,
   });
 

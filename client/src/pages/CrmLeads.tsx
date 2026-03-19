@@ -114,7 +114,7 @@ export default function CrmLeads() {
     refetch,
   } = useQuery({
     queryKey: [QUERY_KEYS.CRM_LEADS],
-    queryFn: () => leadsService.list({ limit: 200 }),
+    queryFn: () => leadsService.list({ limit: 100 }),
     staleTime: 30_000,
   });
 

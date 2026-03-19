@@ -169,7 +169,7 @@ export default function PurchaseInvoices() {
   // Vendor dropdown
   const { data: vendorsData } = useQuery({
     queryKey: ["partners-dropdown-vendors"],
-    queryFn: () => getPartnersDropdown({ limit: 200, type: "supplier" }),
+    queryFn: () => getPartnersDropdown({ limit: 100, type: "supplier" }),
     staleTime: 60_000,
   });
   const vendors = vendorsData?.data ?? [];

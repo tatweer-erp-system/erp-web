@@ -1149,7 +1149,7 @@ export default function ProductDetails() {
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <button
-              onClick={() => navigate("/warehouses")}
+              onClick={() => navigate("/inventory/warehouses")}
               className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-secondary/50 transition-colors text-left group"
             >
               <div className="w-9 h-9 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
@@ -1189,7 +1189,7 @@ export default function ProductDetails() {
               />
             </button>
             <button
-              onClick={() => navigate("/stock-movement")}
+              onClick={() => navigate("/inventory/stock-movement")}
               className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-secondary/50 transition-colors text-left group"
             >
               <div className="w-9 h-9 rounded-lg bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center shrink-0">

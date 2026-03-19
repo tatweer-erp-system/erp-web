@@ -108,7 +108,7 @@ export default function Branches() {
     refetch,
   } = useQuery({
     queryKey: [QUERY_KEYS.BRANCHES],
-    queryFn: () => branchesService.list({ limit: 200 }),
+    queryFn: () => branchesService.list({ limit: 100 }),
     staleTime: 30_000,
   });
 

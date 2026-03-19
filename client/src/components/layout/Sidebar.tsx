@@ -114,114 +114,114 @@ const NAV_ITEMS: NavItem[] = [
   {
     name: "Purchase Orders",
     icon: <ShoppingOutlined />,
-    href: "/purchase-orders",
+    href: "/purchases/orders",
   },
   {
     name: "Vendor Payments",
     icon: <DollarOutlined />,
-    href: "/vendor-payments",
+    href: "/purchases/vendor-payments",
   },
   {
     name: "Purchase Invoices",
     icon: <SnippetsOutlined />,
-    href: "/purchase-invoices",
+    href: "/purchases/invoices",
   },
   {
     name: "Purchase Returns",
     icon: <UndoOutlined />,
-    href: "/purchase-returns",
+    href: "/purchases/returns",
   },
 
   // ── Inventory (Odoo: Inventory > Products, Operations, Reporting) ───────
   { name: "INVENTORY", isHeader: true },
-  { name: "Products", icon: <AppstoreOutlined />, href: "/products" },
-  { name: "Warehouses", icon: <HomeOutlined />, href: "/warehouses" },
-  { name: "Opening Stock", icon: <InboxOutlined />, href: "/opening-stock" },
+  { name: "Products", icon: <AppstoreOutlined />, href: "/inventory/products" },
+  { name: "Warehouses", icon: <HomeOutlined />, href: "/inventory/warehouses" },
+  { name: "Opening Stock", icon: <InboxOutlined />, href: "/inventory/opening-stock" },
   {
     name: "Stock Adjustments",
     icon: <ControlOutlined />,
-    href: "/stock-adjustments",
+    href: "/inventory/stock-adjustments",
   },
-  { name: "Stock Transfers", icon: <SwapOutlined />, href: "/stock-transfers" },
-  { name: "Deliveries", icon: <CarOutlined />, href: "/deliveries" },
+  { name: "Stock Transfers", icon: <SwapOutlined />, href: "/inventory/stock-transfers" },
+  { name: "Deliveries", icon: <CarOutlined />, href: "/inventory/deliveries" },
 
   // ── Accounting (Odoo: Accounting > Journal, Reports, Config) ────────────
   { name: "ACCOUNTING", isHeader: true },
   {
     name: "Chart of Accounts",
     icon: <UnorderedListOutlined />,
-    href: "/chart-of-accounts",
+    href: "/accounting/chart-of-accounts",
   },
-  { name: "Journal Entries", icon: <BookOutlined />, href: "/journal-entries" },
+  { name: "Journal Entries", icon: <BookOutlined />, href: "/accounting/journal-entries" },
   {
     name: "Opening Balances",
     icon: <UnorderedListOutlined />,
-    href: "/opening-balances",
+    href: "/accounting/opening-balances",
   },
   {
     name: "Cost Centers",
     icon: <ApartmentOutlined />,
-    href: "/cost-centers",
+    href: "/accounting/cost-centers",
   },
   {
     name: "Fiscal Periods",
     icon: <CalendarOutlined />,
-    href: "/fiscal-periods",
+    href: "/accounting/fiscal-periods",
   },
   {
     name: "Journals",
     icon: <BookOutlined />,
-    href: "/journals",
+    href: "/accounting/journals",
   },
   {
     name: "Account Groups",
     icon: <ApartmentOutlined />,
-    href: "/account-groups",
+    href: "/accounting/account-groups",
   },
   {
     name: "Taxes",
     icon: <FileTextOutlined />,
-    href: "/taxes-setup",
+    href: "/accounting/taxes-setup",
   },
   {
     name: "Payment Terms",
     icon: <UnorderedListOutlined />,
-    href: "/payment-terms",
+    href: "/accounting/payment-terms",
   },
   {
     name: "Trial Balance",
     icon: <UnorderedListOutlined />,
-    href: "/trial-balance",
+    href: "/accounting/trial-balance",
   },
   {
     name: "General Ledger",
     icon: <BookOutlined />,
-    href: "/general-ledger",
+    href: "/accounting/general-ledger",
   },
   {
     name: "Income Statement",
     icon: <BookOutlined />,
-    href: "/income-statement",
+    href: "/accounting/income-statement",
   },
   {
     name: "Balance Sheet",
     icon: <BookOutlined />,
-    href: "/balance-sheet",
+    href: "/accounting/balance-sheet",
   },
   {
     name: "Account Statements",
     icon: <FileTextOutlined />,
-    href: "/account-statements",
+    href: "/accounting/account-statements",
   },
   {
     name: "Cash Flow Statement",
     icon: <BookOutlined />,
-    href: "/cash-flow",
+    href: "/accounting/cash-flow",
   },
   {
     name: "Accounting Settings",
     icon: <SettingOutlined />,
-    href: "/settings/accounting",
+    href: "/accounting/settings",
   },
 
   // ── Treasury (Odoo: Accounting > Bank & Cash) ───────────────────────────
@@ -265,17 +265,17 @@ const NAV_ITEMS: NavItem[] = [
 
   // ── HR (Odoo: Employees > Employees, Attendance, Leaves, Payroll) ───────
   { name: "HR", isHeader: true },
-  { name: "Employees", icon: <UsergroupAddOutlined />, href: "/employees" },
-  { name: "Job Positions", icon: <SolutionOutlined />, href: "/job-positions" },
-  { name: "Attendance", icon: <ClockCircleOutlined />, href: "/attendance" },
+  { name: "Employees", icon: <UsergroupAddOutlined />, href: "/hr/employees" },
+  { name: "Job Positions", icon: <SolutionOutlined />, href: "/hr/job-positions" },
+  { name: "Attendance", icon: <ClockCircleOutlined />, href: "/hr/attendance" },
   {
     name: "Leave Management",
     icon: <CalendarOutlined />,
-    href: "/leave-management",
+    href: "/hr/leave-management",
   },
-  { name: "Payroll", icon: <DollarOutlined />, href: "/payroll" },
-  { name: "Training", icon: <IdcardOutlined />, href: "/training" },
-  { name: "Contracts", icon: <FileTextOutlined />, href: "/contracts" },
+  { name: "Payroll", icon: <DollarOutlined />, href: "/hr/payroll" },
+  { name: "Training", icon: <IdcardOutlined />, href: "/hr/training" },
+  { name: "Contracts", icon: <FileTextOutlined />, href: "/hr/contracts" },
 
   // ── Reports ─────────────────────────────────────────────────────────────
   { name: "REPORTS", isHeader: true },
@@ -319,12 +319,12 @@ const NAV_ITEMS: NavItem[] = [
   {
     name: "Inventory Valuation",
     icon: <StockOutlined />,
-    href: "/inventory-valuation",
+    href: "/inventory/valuation",
   },
   {
     name: "Stock Movement",
     icon: <SwapOutlined />,
-    href: "/stock-movement",
+    href: "/inventory/stock-movement",
   },
 
   // ── Settings ────────────────────────────────────────────────────────────

@@ -142,7 +142,7 @@ export default function PayrollRuns() {
 
   const { data: employeeDropdown } = useQuery({
     queryKey: [QUERY_KEYS.PAYROLL_RUNS, "employee-dropdown"],
-    queryFn: () => employeesService.dropdown({ limit: 200 }),
+    queryFn: () => employeesService.dropdown({ limit: 100 }),
     staleTime: 60_000,
     enabled: addItemModalOpen,
   });

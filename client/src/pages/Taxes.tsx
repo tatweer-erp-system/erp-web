@@ -168,7 +168,7 @@ function TaxesTab() {
     refetch,
   } = useQuery({
     queryKey: [QUERY_KEYS.TAXES_LIST],
-    queryFn: () => taxesService.list({ limit: 200 }),
+    queryFn: () => taxesService.list({ limit: 100 }),
     staleTime: 30_000,
   });
 
@@ -1074,7 +1074,7 @@ function TaxGroupsTab() {
     refetch,
   } = useQuery({
     queryKey: [QUERY_KEYS.TAX_GROUPS_LIST],
-    queryFn: () => taxGroupsService.list({ limit: 200 }),
+    queryFn: () => taxGroupsService.list({ limit: 100 }),
     staleTime: 30_000,
   });
 

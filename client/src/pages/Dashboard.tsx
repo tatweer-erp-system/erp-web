@@ -95,7 +95,7 @@ interface RecentActivityItem {
 }
 
 const dashboardApi = {
-  get: (params?: { dateFrom?: string; dateTo?: string; branchId?: string }) =>
+  get: (params?: { from?: string; to?: string }) =>
     apiClient
       .get("/reporting/dashboard", { params })
       .then(r => r.data.data as DashboardData),
@@ -279,9 +279,8 @@ export default function Dashboard() {
     queryKey: [QUERY_KEYS.DASHBOARD, dateFrom, dateTo, branchId],
     queryFn: () =>
       dashboardApi.get({
-        dateFrom: dateFrom ?? undefined,
-        dateTo: dateTo ?? undefined,
-        branchId: branchId ?? undefined,
+        from: dateFrom ?? undefined,
+        to: dateTo ?? undefined,
       }),
     staleTime: 60_000,
     enabled: !!branchId,

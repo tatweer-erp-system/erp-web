@@ -114,7 +114,7 @@ export default function LeaveManagement() {
 
   const { data: employeesDropdown } = useQuery({
     queryKey: [QUERY_KEYS.EMPLOYEES_DROPDOWN],
-    queryFn: () => employeesService.dropdown({ limit: 200 }),
+    queryFn: () => employeesService.dropdown({ limit: 100 }),
     staleTime: 60_000,
   });
 

@@ -315,7 +315,7 @@ export default function EmployeeDetails() {
       notification.success({
         message: t("Employee deleted successfully", lang),
       });
-      navigate("/employees");
+      navigate("/hr/employees");
     },
     onError: () => {
       notification.error({ message: t("Failed to delete employee", lang) });
@@ -797,7 +797,7 @@ export default function EmployeeDetails() {
         breadcrumbs={[
           { label: t("Dashboard", lang), href: "/" },
           { label: t("HR", lang), href: "#" },
-          { label: t("Employees", lang), href: "/employees" },
+          { label: t("Employees", lang), href: "/hr/employees" },
           { label: t("Details", lang) },
         ]}
       >
@@ -1203,7 +1203,7 @@ export default function EmployeeDetails() {
       breadcrumbs={[
         { label: t("Dashboard", lang), href: "/" },
         { label: t("HR", lang), href: "#" },
-        { label: t("Employees", lang), href: "/employees" },
+        { label: t("Employees", lang), href: "/hr/employees" },
         { label: getName(employee) },
       ]}
     >
@@ -1230,7 +1230,7 @@ export default function EmployeeDetails() {
               <Button
                 type="text"
                 icon={<ArrowLeftOutlined />}
-                onClick={() => navigate("/employees")}
+                onClick={() => navigate("/hr/employees")}
               />
 
               {/* Avatar */}

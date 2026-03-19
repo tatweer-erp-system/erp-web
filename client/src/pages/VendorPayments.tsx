@@ -133,7 +133,7 @@ export default function VendorPayments() {
   // ── Partners dropdown (vendors) ─────────────────────────────────────────
   const { data: partnersRaw } = useQuery({
     queryKey: [QUERY_KEYS.PARTNERS, "dropdown", "supplier"],
-    queryFn: () => getPartnersDropdown({ limit: 200, type: "supplier" }),
+    queryFn: () => getPartnersDropdown({ limit: 100, type: "supplier" }),
     staleTime: 60_000,
   });
 

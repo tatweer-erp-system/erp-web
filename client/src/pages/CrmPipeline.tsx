@@ -143,7 +143,7 @@ export default function CrmPipeline() {
 
   const { data: partnersDropdown } = useQuery({
     queryKey: ["partners-dropdown-crm", branchId],
-    queryFn: () => getPartnersDropdown({ limit: 200 }),
+    queryFn: () => getPartnersDropdown({ limit: 100 }),
     enabled: !!branchId,
   });
 

@@ -45,7 +45,7 @@ const INITIAL: Notification[] = [
       "Wireless Headphones (SKU-001) has only 3 units remaining (reorder point: 15).",
     timestamp: new Date(now - 18 * 60000),
     read: false,
-    href: "/products?id=2",
+    href: "/inventory/products?id=2",
     meta: {
       notifKind: "inventory.low_stock",
       productName: "Wireless Headphones",
@@ -72,7 +72,7 @@ const INITIAL: Notification[] = [
       "Ahmed Al-Rashid submitted a leave request for 3 days (Mar 15–17).",
     timestamp: new Date(now - 2 * 3600000),
     read: false,
-    href: "/leave",
+    href: "/hr/leave-management",
   },
   {
     id: "5",
@@ -114,7 +114,7 @@ const INITIAL: Notification[] = [
       "Purchase order PO-2091 received — 200 units of USB-C Hub added to warehouse.",
     timestamp: new Date(now - 28 * 3600000),
     read: true,
-    href: "/products",
+    href: "/inventory/products",
   },
   {
     id: "9",
@@ -135,7 +135,7 @@ const INITIAL: Notification[] = [
       "Sara Ali has been added to the Finance department and is ready for system access.",
     timestamp: new Date(now - 3 * 86400000),
     read: true,
-    href: "/employees",
+    href: "/hr/employees",
   },
 ];
 

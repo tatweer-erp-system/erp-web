@@ -113,7 +113,7 @@ export default function RolesPermissions() {
     refetch,
   } = useQuery({
     queryKey: [QUERY_KEYS.ROLES],
-    queryFn: () => rolesService.list({ limit: 200 }),
+    queryFn: () => rolesService.list({ limit: 100 }),
     staleTime: 30_000,
   });
 

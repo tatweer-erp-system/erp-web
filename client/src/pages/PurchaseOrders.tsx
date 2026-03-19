@@ -188,7 +188,7 @@ export default function PurchaseOrders() {
   // Partners dropdown for create form
   const { data: partnersData } = useQuery({
     queryKey: ["partners-dropdown-po"],
-    queryFn: () => getPartnersDropdown({ limit: 200, type: "supplier" }),
+    queryFn: () => getPartnersDropdown({ limit: 100, type: "supplier" }),
     staleTime: 60_000,
   });
   const partners = partnersData?.data ?? [];

@@ -130,7 +130,7 @@ export default function CustomerReceipts() {
   // ── Partners dropdown (customers) ───────────────────────────────────────
   const { data: partnersRaw } = useQuery({
     queryKey: [QUERY_KEYS.PARTNERS, "dropdown", "customer"],
-    queryFn: () => getPartnersDropdown({ limit: 200, type: "customer" }),
+    queryFn: () => getPartnersDropdown({ limit: 100, type: "customer" }),
     staleTime: 60_000,
   });
 

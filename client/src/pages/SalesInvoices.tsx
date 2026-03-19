@@ -188,7 +188,7 @@ export default function SalesInvoices() {
   // Partners dropdown for create form
   const { data: partnersData } = useQuery({
     queryKey: ["partners-dropdown-invoices"],
-    queryFn: () => getPartnersDropdown({ limit: 200 }),
+    queryFn: () => getPartnersDropdown({ limit: 100 }),
     staleTime: 60_000,
   });
   const partners = partnersData?.data ?? [];
