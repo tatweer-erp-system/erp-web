@@ -159,8 +159,12 @@ export const QUERY_KEYS = {
   SALES_SUMMARY: "sales-summary",
 
   // Reports
+  SALES_REPORT: "sales-report",
   PURCHASE_REPORT: "purchase-report",
+  INVENTORY_REPORT: "inventory-report",
   FINANCIAL_REPORT: "financial-report",
+  HR_REPORT: "hr-report",
+  CRM_REPORT: "crm-report",
   AGING_REPORT: "aging-report",
   TAX_REPORT: "tax-report",
 

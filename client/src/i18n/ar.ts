@@ -1684,6 +1684,7 @@ export const ar: Record<string, string> = {
   "common.stockSummary": "ملخص المخزون",
   "common.pageTotal": "إجمالي الصفحة",
   "common.reload": "إعادة تحميل",
+  "common.noData": "لا توجد بيانات",
   "common.allStatuses": "جميع الحالات",
   "common.reports": "التقارير",
   "common.inventory": "المخزون",
@@ -2878,6 +2879,14 @@ export const ar: Record<string, string> = {
   "financialReports.incomeStatement": "قائمة الدخل",
   "financialReports.balanceSheet": "الميزانية العمومية",
   "financialReports.viewDetailedReports": "عرض التقارير التفصيلية",
+  "financialReports.cancelledAmount": "المبلغ الملغي",
+  "financialReports.netRevenue": "صافي الإيرادات",
+  "financialReports.monthlyTrend": "اتجاه الإيرادات الشهرية",
+  "financialReports.monthlyBreakdown": "التفصيل الشهري",
+  "financialReports.month": "الشهر",
+  "financialReports.transactions": "المعاملات",
+  "financialReports.amount": "المبلغ",
+  "financialReports.total": "الإجمالي",
   "financialReports.noData":
     "ستتوفر البيانات المالية بعد ترحيل القيود المحاسبية.",
   "financialReports.disclaimer":

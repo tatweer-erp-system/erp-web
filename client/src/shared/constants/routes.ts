@@ -12,7 +12,7 @@ export const ROUTES = {
   NOTIFICATIONS: "/notifications",
   CHAT: "/chat",
   DOCUMENTS: "/documents",
-  ANALYTICS: "/analytics",
+  ANALYTICS: "/reporting/analytics",
   SHOWCASE: "/showcase",
 
   // ── Sales ───────────────────────────────────────────────────────────────────
@@ -89,13 +89,13 @@ export const ROUTES = {
   VENDOR_PAYMENTS_TREASURY: "/treasury/vendor-payments",
 
   // ── Reports ─────────────────────────────────────────────────────────────────
-  SALES_REPORTS: "/sales-reports",
-  PURCHASE_REPORTS: "/purchase-reports",
-  INVENTORY_REPORTS: "/inventory-reports",
-  FINANCIAL_REPORTS: "/financial-reports",
-  AGING_REPORTS: "/aging-reports",
-  TAX_REPORTS: "/tax-reports",
-  REPORTS_GENERATOR: "/reports",
+  SALES_REPORTS: "/reporting/sales",
+  PURCHASE_REPORTS: "/reporting/purchases",
+  INVENTORY_REPORTS: "/reporting/inventory",
+  FINANCIAL_REPORTS: "/reporting/financial",
+  AGING_REPORTS: "/reporting/aging",
+  TAX_REPORTS: "/reporting/tax",
+  REPORTS_GENERATOR: "/reporting",
 
   // ── HR ──────────────────────────────────────────────────────────────────────
   EMPLOYEES: "/hr/employees",

@@ -282,25 +282,25 @@ const NAV_ITEMS: NavItem[] = [
   {
     name: "Sales Reports",
     icon: <BarChartOutlined />,
-    href: "/sales-reports",
+    href: "/reporting/sales",
   },
   {
     name: "Purchase Reports",
     icon: <ShoppingOutlined />,
-    href: "/purchase-reports",
+    href: "/reporting/purchases",
   },
   {
     name: "Inventory Reports",
     icon: <AppstoreOutlined />,
-    href: "/inventory-reports",
+    href: "/reporting/inventory",
   },
   {
     name: "Financial Reports",
     icon: <AreaChartOutlined />,
-    href: "/financial-reports",
+    href: "/reporting/financial",
   },
-  { name: "Aging Reports", icon: <BarChartOutlined />, href: "/aging-reports" },
-  { name: "Tax Reports", icon: <PercentageOutlined />, href: "/tax-reports" },
+  { name: "Aging Reports", icon: <BarChartOutlined />, href: "/reporting/aging" },
+  { name: "Tax Reports", icon: <PercentageOutlined />, href: "/reporting/tax" },
   {
     name: "Loyalty Report",
     icon: <TrophyOutlined />,

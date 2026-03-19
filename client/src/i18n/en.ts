@@ -1727,6 +1727,7 @@ export const en: Record<string, string> = {
   "common.stockSummary": "Stock Summary",
   "common.pageTotal": "Page Total",
   "common.reload": "Reload",
+  "common.noData": "No data available",
   "common.allStatuses": "All Statuses",
   "common.reports": "Reports",
   "common.inventory": "Inventory",
@@ -2933,6 +2934,14 @@ export const en: Record<string, string> = {
   "financialReports.incomeStatement": "Income Statement",
   "financialReports.balanceSheet": "Balance Sheet",
   "financialReports.viewDetailedReports": "View Detailed Reports",
+  "financialReports.cancelledAmount": "Cancelled Amount",
+  "financialReports.netRevenue": "Net Revenue",
+  "financialReports.monthlyTrend": "Monthly Revenue Trend",
+  "financialReports.monthlyBreakdown": "Monthly Breakdown",
+  "financialReports.month": "Month",
+  "financialReports.transactions": "Transactions",
+  "financialReports.amount": "Amount",
+  "financialReports.total": "Total",
   "financialReports.noData":
     "Financial data will be available once journal entries are posted.",
   "financialReports.disclaimer":

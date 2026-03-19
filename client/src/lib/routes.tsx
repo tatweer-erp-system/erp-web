@@ -84,11 +84,6 @@ export const routes: RouteConfig[] = [
     breadcrumb: ["Inventory"],
   },
   {
-    path: "/analytics",
-    component: lz(() => import("@/pages/Analytics")),
-    breadcrumb: ["Analytics"],
-  },
-  {
     path: "/settings",
     component: lz(() => import("@/pages/Settings")),
     breadcrumb: ["Settings"],
@@ -419,40 +414,22 @@ export const routes: RouteConfig[] = [
 
   // ── Reports ─────────────────────────────────────────────────────────────────
   {
-    path: "/sales-reports",
-    component: lz(() => import("@/pages/SalesReports")),
-    permissions: ["reports:read"],
+    path: "/reporting/sales",
+    component: lz(() => import("@/pages/reporting/SalesReports")),
+    permissions: ["reporting:view"],
     breadcrumb: ["Reports", "Sales"],
   },
   {
-    path: "/purchase-reports",
-    component: lz(() => import("@/pages/PurchaseReports")),
-    permissions: ["reports:read"],
-    breadcrumb: ["Reports", "Purchase"],
+    path: "/reporting/purchases",
+    component: lz(() => import("@/pages/reporting/PurchaseReports")),
+    permissions: ["reporting:view"],
+    breadcrumb: ["Reports", "Purchases"],
   },
   {
-    path: "/inventory-reports",
-    component: lz(() => import("@/pages/InventoryReports")),
-    permissions: ["reports:read"],
-    breadcrumb: ["Reports", "Inventory"],
-  },
-  {
-    path: "/financial-reports",
-    component: lz(() => import("@/pages/FinancialReports")),
-    permissions: ["reports:read"],
+    path: "/reporting/financial",
+    component: lz(() => import("@/pages/reporting/FinancialReports")),
+    permissions: ["reporting:view"],
     breadcrumb: ["Reports", "Financial"],
-  },
-  {
-    path: "/aging-reports",
-    component: lz(() => import("@/pages/AgingReports")),
-    permissions: ["reports:read"],
-    breadcrumb: ["Reports", "Aging"],
-  },
-  {
-    path: "/tax-reports",
-    component: lz(() => import("@/pages/TaxReports")),
-    permissions: ["reports:read"],
-    breadcrumb: ["Reports", "Tax"],
   },
 
   // ── System Settings ─────────────────────────────────────────────────────────
