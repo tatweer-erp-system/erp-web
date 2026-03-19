@@ -221,18 +221,33 @@
     border-radius: 5px;
   }
 
-  /* Form Controls - Independent of theme (exclude antd components) */
-  :not(.antd-scope *) > input[type="text"],
-  :not(.antd-scope *) > input[type="email"],
-  :not(.antd-scope *) > input[type="password"],
-  :not(.antd-scope *) > input[type="number"],
-  :not(.antd-scope *) > input[type="date"],
-  :not(.antd-scope *) > input[type="time"],
-  :not(.antd-scope *) > input[type="search"],
-  :not(.antd-scope *) > input[type="url"],
-  :not(.antd-scope *) > input[type="tel"],
-  :not(.antd-scope *) > textarea,
-  :not(.antd-scope *) > select {
+  /* Form Controls - Independent of theme (exclude antd components).
+
+     WHY :not([class*="ant-"] *) is needed alongside :not(.antd-scope *):
+     Ant Design Drawer, Modal, Select dropdown, and similar popup components
+     render their content via a React portal directly into document.body —
+     outside the .antd-scope wrapper div. This means the original
+     :not(.antd-scope *) guard was not enough: Ant Design's internal inputs
+     (e.g. <input type="search"> inside .ant-select-selection-search) were
+     matching and receiving height:38px, background-color, border, etc.
+     That caused the Select's .ant-select-selector (32px, overflow:hidden)
+     to clip its content, making placeholder/selected text appear at the top
+     of the field instead of centered.
+
+     Adding :not([class*="ant-"] *) excludes any input whose parent is a
+     descendant of an element with an "ant-" class, covering all Ant Design
+     component internals regardless of where they are in the DOM. */
+  :not(.antd-scope *):not([class*="ant-"] *) > input[type="text"],
+  :not(.antd-scope *):not([class*="ant-"] *) > input[type="email"],
+  :not(.antd-scope *):not([class*="ant-"] *) > input[type="password"],
+  :not(.antd-scope *):not([class*="ant-"] *) > input[type="number"],
+  :not(.antd-scope *):not([class*="ant-"] *) > input[type="date"],
+  :not(.antd-scope *):not([class*="ant-"] *) > input[type="time"],
+  :not(.antd-scope *):not([class*="ant-"] *) > input[type="search"],
+  :not(.antd-scope *):not([class*="ant-"] *) > input[type="url"],
+  :not(.antd-scope *):not([class*="ant-"] *) > input[type="tel"],
+  :not(.antd-scope *):not([class*="ant-"] *) > textarea,
+  :not(.antd-scope *):not([class*="ant-"] *) > select {
     border-color: var(--form-border, #e9edf4);
     color: var(--form-text, #202c4b);
     background-color: var(--form-bg, #cccccc);
@@ -246,38 +261,38 @@
     border: 1px solid var(--form-border, #e9edf4);
   }
 
-  :not(.antd-scope *) > textarea {
+  :not(.antd-scope *):not([class*="ant-"] *) > textarea {
     height: auto;
     min-height: 100px;
   }
 
-  :not(.antd-scope *) > input[type="text"]:focus,
-  :not(.antd-scope *) > input[type="email"]:focus,
-  :not(.antd-scope *) > input[type="password"]:focus,
-  :not(.antd-scope *) > input[type="number"]:focus,
-  :not(.antd-scope *) > input[type="date"]:focus,
-  :not(.antd-scope *) > input[type="time"]:focus,
-  :not(.antd-scope *) > input[type="search"]:focus,
-  :not(.antd-scope *) > input[type="url"]:focus,
-  :not(.antd-scope *) > input[type="tel"]:focus,
-  :not(.antd-scope *) > textarea:focus,
-  :not(.antd-scope *) > select:focus {
+  :not(.antd-scope *):not([class*="ant-"] *) > input[type="text"]:focus,
+  :not(.antd-scope *):not([class*="ant-"] *) > input[type="email"]:focus,
+  :not(.antd-scope *):not([class*="ant-"] *) > input[type="password"]:focus,
+  :not(.antd-scope *):not([class*="ant-"] *) > input[type="number"]:focus,
+  :not(.antd-scope *):not([class*="ant-"] *) > input[type="date"]:focus,
+  :not(.antd-scope *):not([class*="ant-"] *) > input[type="time"]:focus,
+  :not(.antd-scope *):not([class*="ant-"] *) > input[type="search"]:focus,
+  :not(.antd-scope *):not([class*="ant-"] *) > input[type="url"]:focus,
+  :not(.antd-scope *):not([class*="ant-"] *) > input[type="tel"]:focus,
+  :not(.antd-scope *):not([class*="ant-"] *) > textarea:focus,
+  :not(.antd-scope *):not([class*="ant-"] *) > select:focus {
     outline: none;
     border-color: var(--ring);
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 20%, transparent);
   }
 
-  .dark :not(.antd-scope *) > input[type="text"],
-  .dark :not(.antd-scope *) > input[type="email"],
-  .dark :not(.antd-scope *) > input[type="password"],
-  .dark :not(.antd-scope *) > input[type="number"],
-  .dark :not(.antd-scope *) > input[type="date"],
-  .dark :not(.antd-scope *) > input[type="time"],
-  .dark :not(.antd-scope *) > input[type="search"],
-  .dark :not(.antd-scope *) > input[type="url"],
-  .dark :not(.antd-scope *) > input[type="tel"],
-  .dark :not(.antd-scope *) > textarea,
-  .dark :not(.antd-scope *) > select {
+  .dark :not(.antd-scope *):not([class*="ant-"] *) > input[type="text"],
+  .dark :not(.antd-scope *):not([class*="ant-"] *) > input[type="email"],
+  .dark :not(.antd-scope *):not([class*="ant-"] *) > input[type="password"],
+  .dark :not(.antd-scope *):not([class*="ant-"] *) > input[type="number"],
+  .dark :not(.antd-scope *):not([class*="ant-"] *) > input[type="date"],
+  .dark :not(.antd-scope *):not([class*="ant-"] *) > input[type="time"],
+  .dark :not(.antd-scope *):not([class*="ant-"] *) > input[type="search"],
+  .dark :not(.antd-scope *):not([class*="ant-"] *) > input[type="url"],
+  .dark :not(.antd-scope *):not([class*="ant-"] *) > input[type="tel"],
+  .dark :not(.antd-scope *):not([class*="ant-"] *) > textarea,
+  .dark :not(.antd-scope *):not([class*="ant-"] *) > select {
     background-color: var(--form-bg);
     border-color: var(--form-border);
     color: var(--form-text);
