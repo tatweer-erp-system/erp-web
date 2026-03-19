@@ -485,19 +485,19 @@ function AnnouncementsTab() {
           <Space orientation="vertical" size={10}>
             <div>
               <Switch defaultChecked size="small" />{" "}
-              <Text style={{ fontSize: 13, marginLeft: 8 }}>
+              <Text style={{ fontSize: 13, marginInlineStart: 8 }}>
                 Require acknowledgment for critical announcements
               </Text>
             </div>
             <div>
               <Switch size="small" />{" "}
-              <Text style={{ fontSize: 13, marginLeft: 8 }}>
+              <Text style={{ fontSize: 13, marginInlineStart: 8 }}>
                 Auto-archive announcements after retention period
               </Text>
             </div>
             <div>
               <Switch defaultChecked size="small" />{" "}
-              <Text style={{ fontSize: 13, marginLeft: 8 }}>
+              <Text style={{ fontSize: 13, marginInlineStart: 8 }}>
                 Send email digest of missed announcements
               </Text>
             </div>
@@ -657,13 +657,13 @@ function QuietHoursTab() {
           <Space orientation="vertical" size={10}>
             <div>
               <Switch defaultChecked size="small" />{" "}
-              <Text style={{ fontSize: 13, marginLeft: 8 }}>
+              <Text style={{ fontSize: 13, marginInlineStart: 8 }}>
                 Critical alerts bypass quiet hours
               </Text>
             </div>
             <div>
               <Switch size="small" />{" "}
-              <Text style={{ fontSize: 13, marginLeft: 8 }}>
+              <Text style={{ fontSize: 13, marginInlineStart: 8 }}>
                 Deliver queued notifications at end of quiet period
               </Text>
             </div>
@@ -767,7 +767,7 @@ export default function NotificationsConfig() {
                   fontSize: 13,
                   fontWeight: activeTab === tab.key ? 600 : 400,
                   transition: "background 0.15s, color 0.15s",
-                  textAlign: "left",
+                  textAlign: "start",
                 }}
                 onMouseEnter={e => {
                   if (activeTab !== tab.key)

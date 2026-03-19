@@ -25,6 +25,7 @@ import {
 } from "@ant-design/icons";
 import { Moon, Sun } from "lucide-react";
 import { NotificationCenter } from "@/components/NotificationCenter";
+import { t } from "@/i18n";
 import { useLangStore } from "@/stores/lang.store";
 import { useThemeStore } from "@/stores/theme.store";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
@@ -145,7 +146,7 @@ function NavbarInner({ sidebarOpen, setSidebarOpen, isRTL }: NavbarProps) {
       {/* Left */}
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
         <Tooltip
-          title={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+          title={sidebarOpen ? t("Collapse sidebar", language) : t("Expand sidebar", language)}
           placement={isRTL ? "right" : "left"}
         >
           <Button
@@ -174,7 +175,7 @@ function NavbarInner({ sidebarOpen, setSidebarOpen, isRTL }: NavbarProps) {
             prefix={
               <SearchOutlined style={{ color: token.colorTextQuaternary }} />
             }
-            placeholder="Search anything..."
+            placeholder={t("Search anything...", language)}
             variant="filled"
             style={{ width: 240 }}
             allowClear
@@ -193,7 +194,7 @@ function NavbarInner({ sidebarOpen, setSidebarOpen, isRTL }: NavbarProps) {
           placement="bottomRight"
           trigger={["click"]}
         >
-          <Tooltip title="Financial Year">
+          <Tooltip title={t("Financial Year", language)}>
             <Button
               type="text"
               style={{
@@ -213,7 +214,7 @@ function NavbarInner({ sidebarOpen, setSidebarOpen, isRTL }: NavbarProps) {
 
         {/* Fullscreen — desktop only */}
         {!isMobile && (
-          <Tooltip title="Toggle fullscreen">
+          <Tooltip title={t("Toggle fullscreen", language)}>
             <Button
               type="text"
               icon={<FullscreenOutlined style={{ fontSize: 16 }} />}
@@ -224,7 +225,7 @@ function NavbarInner({ sidebarOpen, setSidebarOpen, isRTL }: NavbarProps) {
         )}
 
         {/* Theme toggle */}
-        <Tooltip title={isDark ? "Light mode" : "Dark mode"}>
+        <Tooltip title={isDark ? t("Light mode", language) : t("Dark mode", language)}>
           <Button
             type="text"
             icon={isDark ? <Sun size={16} /> : <Moon size={16} />}
@@ -234,7 +235,7 @@ function NavbarInner({ sidebarOpen, setSidebarOpen, isRTL }: NavbarProps) {
         </Tooltip>
 
         {/* Lock screen */}
-        <Tooltip title="Lock screen">
+        <Tooltip title={t("Lock screen", language)}>
           <Button
             type="text"
             icon={<LockOutlined style={{ fontSize: 16 }} />}

@@ -583,7 +583,7 @@ function CreateChildModal({
                       <Select.Option key={k} value={k}>
                         <Tag
                           color={v.color}
-                          style={{ borderRadius: 20, marginRight: 4 }}
+                          style={{ borderRadius: 20, marginInlineEnd: 4 }}
                         >
                           {t(
                             `accounting.coa.type${k.charAt(0).toUpperCase() + k.slice(1)}`,

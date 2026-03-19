@@ -712,7 +712,7 @@ function AccountGroupsContent() {
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              paddingRight: 12,
+              paddingInlineEnd: 12,
               width: "100%",
             }}
             onClick={() => openAccountGroup(ag, false)}

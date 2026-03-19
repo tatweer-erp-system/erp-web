@@ -270,7 +270,7 @@ function AttachUploadModal({
                         </Text>
                         <Text
                           type="secondary"
-                          style={{ fontSize: 12, marginLeft: 8 }}
+                          style={{ fontSize: 12, marginInlineStart: 8 }}
                         >
                           {formatBytes(file.size)}
                         </Text>

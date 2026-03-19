@@ -359,7 +359,7 @@ export default function SecurityTab() {
                   {session.device} · {session.browser}
                 </Text>
                 {session.isCurrent && (
-                  <Tag color="green" style={{ marginLeft: 8, fontSize: 11 }}>
+                  <Tag color="green" style={{ marginInlineStart: 8, fontSize: 11 }}>
                     {t("mySettings.security.thisDevice", lang)}
                   </Tag>
                 )}

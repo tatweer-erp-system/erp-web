@@ -1,6 +1,8 @@
 import { ReactNode, useState } from "react";
 import { Search, Download, Columns } from "lucide-react";
 import { Button, Input, Dropdown, Checkbox } from "antd";
+import { t } from "@/i18n";
+import { useLangStore } from "@/stores/lang.store";
 import type { MenuProps } from "antd";
 import { useDebounce } from "@/hooks/useDebounce";
 import type { Table } from "@tanstack/react-table";
@@ -18,6 +20,7 @@ export function DataTableToolbar<T>({
   onExportCSV,
   extra,
 }: DataTableToolbarProps<T>) {
+  const lang = useLangStore(s => s.lang);
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 300);
 
@@ -53,7 +56,7 @@ export function DataTableToolbar<T>({
         <Input
           value={search}
           onChange={e => handleSearch(e.target.value)}
-          placeholder="Search..."
+          placeholder={t("Search...", lang)}
           prefix={<Search size={14} className="text-muted-foreground" />}
           size="small"
         />

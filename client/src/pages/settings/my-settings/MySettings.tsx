@@ -146,7 +146,7 @@ export default function MySettings() {
                   fontSize: 13,
                   fontWeight: activeTab === tab.key ? 600 : 400,
                   transition: "background 0.15s, color 0.15s",
-                  textAlign: "left",
+                  textAlign: "start",
                 }}
                 onMouseEnter={e => {
                   if (activeTab !== tab.key)
@@ -175,7 +175,7 @@ export default function MySettings() {
                       fontSize: 9,
                       lineHeight: "16px",
                       padding: "0 4px",
-                      marginRight: 0,
+                      marginInlineEnd: 0,
                     }}
                   >
                     {t("mySettings.comingSoon", lang)}

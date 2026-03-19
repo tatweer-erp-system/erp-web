@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { t } from "@/i18n";
+import { useLangStore } from "@/stores/lang.store";
 import { Badge, Button, Popover, Tooltip, theme as antTheme } from "antd";
 import {
   BellOutlined,
@@ -49,15 +51,15 @@ const MODULE_CFG: Record<
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function formatTime(date: Date): string {
+function formatTime(date: Date, lang: string): string {
   const diff = Date.now() - date.getTime();
   const m = Math.floor(diff / 60000);
   const h = Math.floor(diff / 3600000);
   const d = Math.floor(diff / 86400000);
-  if (m < 1) return "Just now";
+  if (m < 1) return t("Just now", lang);
   if (m < 60) return `${m}m ago`;
   if (h < 24) return `${h}h ago`;
-  if (d === 1) return "Yesterday";
+  if (d === 1) return t("Yesterday", lang);
   return `${d}d ago`;
 }
 
@@ -106,6 +108,7 @@ const bellKeyframes = `
 export function NotificationCenter() {
   const { token } = antTheme.useToken();
   const navigate = useNavigate();
+  const lang = useLangStore(s => s.lang);
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"all" | "unread" | "read">("all");
   const [bellAnimating, setBellAnimating] = useState(false);
@@ -258,7 +261,7 @@ export function NotificationCenter() {
               {n.module}
             </span>
             <span style={{ fontSize: 11, color: token.colorTextTertiary }}>
-              {formatTime(n.timestamp)}
+              {formatTime(n.timestamp, lang)}
             </span>
             {n.href && (
               <span
@@ -374,7 +377,7 @@ export function NotificationCenter() {
 
           <div style={{ display: "flex", gap: 4 }}>
             {unread > 0 && (
-              <Tooltip title="Mark all as read">
+              <Tooltip title={t("Mark all as read", lang)}>
                 <button
                   onClick={markAllRead}
                   style={{
@@ -396,7 +399,7 @@ export function NotificationCenter() {
               </Tooltip>
             )}
             {items.length > 0 && (
-              <Tooltip title="Clear all">
+              <Tooltip title={t("Clear all", lang)}>
                 <button
                   onClick={clearAll}
                   style={{
@@ -502,7 +505,7 @@ export function NotificationCenter() {
             >
               {activeTab === "unread"
                 ? "You're all caught up!"
-                : "No notifications"}
+                : t("No notifications", lang)}
             </div>
             <div style={{ fontSize: 12, color: token.colorTextTertiary }}>
               {activeTab === "unread"

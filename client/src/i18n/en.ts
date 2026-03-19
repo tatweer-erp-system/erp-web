@@ -2738,9 +2738,11 @@ export const en: Record<string, string> = {
   "inventory.adjustments.warehouseRequired": "Warehouse is required",
   "inventory.adjustments.quantityRequired": "Quantity is required",
   "inventory.adjustments.quantityNonZero": "Quantity cannot be zero",
-  "inventory.adjustments.quantityHint": "Use positive for increase, negative for decrease",
+  "inventory.adjustments.quantityHint":
+    "Use positive for increase, negative for decrease",
   "inventory.adjustments.reasonRequired": "Reason is required",
-  "inventory.adjustments.reasonPlaceholder": "e.g. Damaged goods, Stock count correction",
+  "inventory.adjustments.reasonPlaceholder":
+    "e.g. Damaged goods, Stock count correction",
   "inventory.adjustments.unitCostPlaceholder": "Optional",
 
   // ── Stock Transfers Page ────────────────────────────────────────────────────
@@ -2768,9 +2770,11 @@ export const en: Record<string, string> = {
   "inventory.transfers.selectDestination": "Select destination warehouse",
   "inventory.transfers.productRequired": "Product is required",
   "inventory.transfers.sourceRequired": "Source warehouse is required",
-  "inventory.transfers.destinationRequired": "Destination warehouse is required",
+  "inventory.transfers.destinationRequired":
+    "Destination warehouse is required",
   "inventory.transfers.quantityRequired": "Quantity is required",
-  "inventory.transfers.sameWarehouseError": "Source and destination must be different",
+  "inventory.transfers.sameWarehouseError":
+    "Source and destination must be different",
   "inventory.transfers.notesPlaceholder": "Optional notes...",
 
   // ── Stock Movement Type Labels ──────────────────────────────────────────────
@@ -3338,4 +3342,39 @@ export const en: Record<string, string> = {
   "analytics.tabs.inventory": "Inventory",
   "analytics.tabs.hr": "HR",
   "analytics.tabs.crm": "CRM",
+
+  // Common UI strings
+  "Just now": "Just now",
+  Yesterday: "Yesterday",
+  "Clear all": "Clear all",
+  "Mark all as read": "Mark all as read",
+  "No notifications": "No notifications",
+  "Search anything...": "Search anything...",
+  "Financial Year": "Financial Year",
+  "Toggle fullscreen": "Toggle fullscreen",
+  "Lock screen": "Lock screen",
+  "Collapse sidebar": "Collapse sidebar",
+  "Expand sidebar": "Expand sidebar",
+  "Light mode": "Light mode",
+  "Dark mode": "Dark mode",
+  "Search...": "Search...",
+  "Select date": "Select date",
+  "From date": "From date",
+  "To date": "To date",
+  Any: "Any",
+  "Save current filters as preset...": "Save current filters as preset...",
+  "Description (optional)": "Description (optional)",
+  Tags: "Tags",
+  "Customize Theme": "Customize Theme",
+  "Reset to default theme": "Reset to default theme",
+  Filters: "Filters",
+  Reload: "Reload",
+  "First name": "First name",
+  "Last name": "Last name",
+  "Manual only": "Manual only",
+  "No rounding": "No rounding",
+  "No data": "No data",
+  "Search code or recipient…": "Search code or recipient…",
+  "Search code, customer, order ref…": "Search code, customer, order ref…",
+  "Search customer or phone…": "Search customer or phone…",
 };

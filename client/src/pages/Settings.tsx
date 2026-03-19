@@ -1172,19 +1172,19 @@ export default function Settings() {
           <Space orientation="vertical" size={10}>
             <Radio value="compact">
               <Text style={{ fontSize: 13 }}>Compact</Text>
-              <Text type="secondary" style={{ fontSize: 12, marginLeft: 8 }}>
+              <Text type="secondary" style={{ fontSize: 12, marginInlineStart: 8 }}>
                 Tighter spacing, more content per screen
               </Text>
             </Radio>
             <Radio value="default">
               <Text style={{ fontSize: 13 }}>Default</Text>
-              <Text type="secondary" style={{ fontSize: 12, marginLeft: 8 }}>
+              <Text type="secondary" style={{ fontSize: 12, marginInlineStart: 8 }}>
                 Balanced spacing for everyday use
               </Text>
             </Radio>
             <Radio value="comfortable">
               <Text style={{ fontSize: 13 }}>Comfortable</Text>
-              <Text type="secondary" style={{ fontSize: 12, marginLeft: 8 }}>
+              <Text type="secondary" style={{ fontSize: 12, marginInlineStart: 8 }}>
                 Relaxed spacing, easier to scan
               </Text>
             </Radio>
@@ -2034,7 +2034,7 @@ export default function Settings() {
                                   ? `3px solid ${token.colorPrimary}`
                                   : "3px solid transparent",
                               transition: "background 0.15s, color 0.15s",
-                              textAlign: "left",
+                              textAlign: "start",
                             }
                       }
                       onMouseEnter={e => {

@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Button, Input, Dropdown } from "antd";
+import { t } from "@/i18n";
+import { useLangStore } from "@/stores/lang.store";
 import type { MenuProps } from "antd";
 import { DateRangePicker } from "@/components/DateRangePicker";
 import {
@@ -45,6 +47,8 @@ export function TableControls({
     onSearch?.(query);
   };
 
+  const lang = useLangStore(s => s.lang);
+
   const handleDateRangeChange = (_startDate: Date, _endDate: Date) => {
     // Date range filtering handled by parent via callback
   };
@@ -74,7 +78,7 @@ export function TableControls({
         {/* Search Input */}
         <div className="relative flex-1 w-full sm:w-auto">
           <Input
-            placeholder="Search..."
+            placeholder={t("Search...", lang)}
             value={searchQuery}
             onChange={e => handleSearch(e.target.value)}
             prefix={<Search size={18} className="text-gray-400" />}

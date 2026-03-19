@@ -54,7 +54,7 @@ function Section({
           </Text>
           {badge}
           {description && (
-            <Text type="secondary" style={{ fontSize: 12, marginLeft: "auto" }}>
+            <Text type="secondary" style={{ fontSize: 12, marginInlineStart: "auto" }}>
               {description}
             </Text>
           )}
