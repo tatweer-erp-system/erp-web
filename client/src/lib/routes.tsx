@@ -443,6 +443,18 @@ export const routes: RouteConfig[] = [
     permissions: ["reporting:view"],
     breadcrumb: ["Reports", "Aging"],
   },
+  {
+    path: "/reporting/tax",
+    component: lz(() => import("@/pages/reporting/TaxReports")),
+    permissions: ["reporting:view"],
+    breadcrumb: ["Reports", "Tax"],
+  },
+  {
+    path: "/reporting/analytics",
+    component: lz(() => import("@/pages/reporting/Analytics")),
+    permissions: ["reporting:view"],
+    breadcrumb: ["Reports", "Analytics"],
+  },
 
   // ── System Settings ─────────────────────────────────────────────────────────
   {
