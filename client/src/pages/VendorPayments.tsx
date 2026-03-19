@@ -20,7 +20,6 @@ import {
   Typography,
   Input,
   Tooltip,
-  Modal,
   Form,
   Select,
   InputNumber,
@@ -664,17 +663,25 @@ export default function VendorPayments() {
         variant="warning"
       />
 
-      {/* ── 5. Fast Create Modal ────────────────────────────────────────── */}
-      <Modal
+      {/* ── 5. Fast Create Drawer ───────────────────────────────────────── */}
+      <Drawer
         open={fastCreateOpen}
-        onCancel={closeModal}
-        onOk={handleSubmit}
-        okText={t("payments.vendor.new", lang)}
-        confirmLoading={createMutation.isPending}
-        width={isMobile ? "95vw" : 560}
-        destroyOnHidden
+        onClose={closeModal}
+        width={isMobile ? "100%" : 520}
         title={t("payments.vendor.new", lang)}
-        styles={{ body: { paddingTop: 20 } }}
+        destroyOnClose
+        footer={
+          <Space style={{ justifyContent: "flex-end", display: "flex" }}>
+            <Button onClick={closeModal}>{t("common.cancel", lang)}</Button>
+            <Button
+              type="primary"
+              loading={createMutation.isPending}
+              onClick={handleSubmit}
+            >
+              {t("payments.vendor.new", lang)}
+            </Button>
+          </Space>
+        }
       >
         <Form form={form} layout="vertical">
           <Form.Item
@@ -733,7 +740,7 @@ export default function VendorPayments() {
             <Input.TextArea rows={2} />
           </Form.Item>
         </Form>
-      </Modal>
+      </Drawer>
 
       {/* ── Detail Drawer ───────────────────────────────────────────────── */}
       <Drawer

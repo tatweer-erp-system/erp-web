@@ -1,4 +1,5 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
+import type { Dayjs } from "dayjs";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
 import { useLangStore } from "@/stores/lang.store";
@@ -39,6 +40,7 @@ import {
   Drawer,
   Input,
   notification,
+  Segmented,
 } from "antd";
 import type { TableColumnsType, TablePaginationConfig } from "antd";
 import {
@@ -56,6 +58,10 @@ import {
   ShoppingCartOutlined,
   InboxOutlined,
   AuditOutlined,
+  SearchOutlined,
+  DownloadOutlined,
+  AppstoreOutlined,
+  UnorderedListOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 
@@ -139,16 +145,30 @@ export default function PurchaseOrders() {
   // ── State ───────────────────────────────────────────────────────────────
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
+  const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [dateFrom, setDateFrom] = useState<string | undefined>();
-  const [dateTo, setDateTo] = useState<string | undefined>();
+  const [dateRange, setDateRange] = useState<
+    [Dayjs | null, Dayjs | null] | null
+  >(null);
+  const [viewMode, setViewMode] = useState<"table" | "grid">("table");
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [createDrawerOpen, setCreateDrawerOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [viewRecord, setViewRecord] = useState<PurchaseOrderRow | null>(null);
 
   const [createForm] = Form.useForm();
+
+  // ── Search debounce ──────────────────────────────────────────────────────
+  useEffect(() => {
+    debounceRef.current = setTimeout(() => {
+      setSearch(searchInput);
+      setPage(1);
+    }, 400);
+    return () => clearTimeout(debounceRef.current);
+  }, [searchInput]);
 
   // ── Queries ─────────────────────────────────────────────────────────────
 
@@ -157,8 +177,8 @@ export default function PurchaseOrders() {
     limit: pageSize,
     ...(search ? { search } : {}),
     ...(statusFilter !== "all" ? { status: statusFilter } : {}),
-    ...(dateFrom ? { dateFrom } : {}),
-    ...(dateTo ? { dateTo } : {}),
+    ...(dateRange?.[0] ? { dateFrom: dateRange[0].format("YYYY-MM-DD") } : {}),
+    ...(dateRange?.[1] ? { dateTo: dateRange[1].format("YYYY-MM-DD") } : {}),
     sortBy: "createdAt",
     sortOrder: "DESC" as const,
   };
@@ -265,11 +285,11 @@ export default function PurchaseOrders() {
 
   const openCreate = useCallback(() => {
     createForm.resetFields();
-    setCreateModalOpen(true);
+    setCreateDrawerOpen(true);
   }, [createForm]);
 
   const closeCreateModal = useCallback(() => {
-    setCreateModalOpen(false);
+    setCreateDrawerOpen(false);
     createForm.resetFields();
   }, [createForm]);
 
@@ -532,16 +552,6 @@ export default function PurchaseOrders() {
     setPageSize(pagination.pageSize ?? 20);
   };
 
-  // ── Gradient header style for modals ──────────────────────────────────
-
-  const gradientHeader = {
-    background: `linear-gradient(135deg, ${primary}, ${theme === "dark" ? "#2dd4bf" : "#6366f1"})`,
-    padding: "16px 24px",
-    margin: "-20px -24px 16px -24px",
-    borderRadius: "8px 8px 0 0",
-    color: "#fff",
-  };
-
   return (
     <DashboardLayout
       currentPage="Purchase Orders"
@@ -660,74 +670,8 @@ export default function PurchaseOrders() {
 
         {/* ── Toolbar Card ─────────────────────────────────────────────── */}
         <Card size="small" styles={{ body: { padding: "12px 16px" } }}>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: 8,
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Space wrap>
-              <Input.Search
-                placeholder={t("purchasing.po.search", lang)}
-                allowClear
-                onSearch={v => {
-                  setSearch(v);
-                  setPage(1);
-                }}
-                style={{ width: 220 }}
-              />
-              <Select
-                value={statusFilter}
-                onChange={v => {
-                  setStatusFilter(v);
-                  setPage(1);
-                }}
-                style={{ width: 160 }}
-                suffixIcon={<FilterOutlined />}
-                options={[
-                  {
-                    value: "all",
-                    label: t("purchasing.po.allStatuses", lang),
-                  },
-                  {
-                    value: PurchaseOrderStatusNew.DRAFT,
-                    label: t("purchasing.po.status.draft", lang),
-                  },
-                  {
-                    value: PurchaseOrderStatusNew.CONFIRMED,
-                    label: t("purchasing.po.status.confirmed", lang),
-                  },
-                  {
-                    value: PurchaseOrderStatusNew.DONE,
-                    label: t("purchasing.po.status.done", lang),
-                  },
-                  {
-                    value: PurchaseOrderStatusNew.CANCELLED,
-                    label: t("purchasing.po.status.cancelled", lang),
-                  },
-                ]}
-              />
-              <DatePicker.RangePicker
-                onChange={dates => {
-                  setDateFrom(
-                    dates?.[0] ? dates[0].format("YYYY-MM-DD") : undefined
-                  );
-                  setDateTo(
-                    dates?.[1] ? dates[1].format("YYYY-MM-DD") : undefined
-                  );
-                  setPage(1);
-                }}
-                style={{ width: 260 }}
-              />
-            </Space>
-
-            <Space>
-              <Tooltip title="Reload">
-                <Button icon={<ReloadOutlined />} onClick={() => refetch()} />
-              </Tooltip>
+          <div className="flex flex-wrap gap-2 justify-between items-center">
+            <div className="flex flex-wrap gap-2 items-center">
               <Button
                 type="primary"
                 icon={<PlusOutlined />}
@@ -735,8 +679,128 @@ export default function PurchaseOrders() {
               >
                 {t("purchasing.po.new", lang)}
               </Button>
-            </Space>
+            </div>
+
+            <div className="flex flex-wrap gap-2 items-center">
+              <DatePicker.RangePicker
+                value={dateRange}
+                onChange={dates => {
+                  setDateRange(dates);
+                  setPage(1);
+                }}
+                placeholder={[
+                  t("common.dateFrom", lang),
+                  t("common.dateTo", lang),
+                ]}
+                allowClear
+                style={{ borderRadius: 8 }}
+              />
+              <Input
+                prefix={<SearchOutlined className="text-gray-400" />}
+                placeholder={t("common.search", lang)}
+                value={searchInput}
+                onChange={e => setSearchInput(e.target.value)}
+                allowClear
+                style={{ width: 240 }}
+              />
+              <Tooltip title={t("sales.filter.allStatuses", lang)}>
+                <Button
+                  icon={<FilterOutlined />}
+                  onClick={() => setIsFilterOpen(!isFilterOpen)}
+                  type={isFilterOpen ? "primary" : "default"}
+                />
+              </Tooltip>
+              <Tooltip title={t("seq.reload", lang)}>
+                <Button icon={<ReloadOutlined />} onClick={() => refetch()} />
+              </Tooltip>
+              <Dropdown
+                menu={{
+                  items: [
+                    {
+                      key: "csv",
+                      label: "CSV",
+                      icon: <DownloadOutlined />,
+                    },
+                    {
+                      key: "excel",
+                      label: "Excel",
+                      icon: <DownloadOutlined />,
+                    },
+                    { key: "pdf", label: "PDF", icon: <DownloadOutlined /> },
+                  ],
+                }}
+              >
+                <Button icon={<DownloadOutlined />}>
+                  {t("products.export", lang)}
+                </Button>
+              </Dropdown>
+              <Segmented
+                value={viewMode}
+                onChange={v => setViewMode(v as "table" | "grid")}
+                options={[
+                  { value: "table", icon: <UnorderedListOutlined /> },
+                  { value: "grid", icon: <AppstoreOutlined /> },
+                ]}
+              />
+            </div>
           </div>
+
+          {/* Filter Panel */}
+          {isFilterOpen && (
+            <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+              <Row gutter={[12, 12]}>
+                <Col xs={24} sm={12} lg={8}>
+                  <Text type="secondary" className="text-xs mb-1 block">
+                    {t("purchasing.po.col.status", lang)}
+                  </Text>
+                  <Segmented
+                    value={statusFilter}
+                    onChange={v => {
+                      setStatusFilter(v as string);
+                      setPage(1);
+                    }}
+                    block
+                    options={[
+                      {
+                        value: "all",
+                        label: t("purchasing.po.allStatuses", lang),
+                      },
+                      {
+                        value: PurchaseOrderStatusNew.DRAFT,
+                        label: t("purchasing.po.status.draft", lang),
+                      },
+                      {
+                        value: PurchaseOrderStatusNew.CONFIRMED,
+                        label: t("purchasing.po.status.confirmed", lang),
+                      },
+                      {
+                        value: PurchaseOrderStatusNew.DONE,
+                        label: t("purchasing.po.status.done", lang),
+                      },
+                      {
+                        value: PurchaseOrderStatusNew.CANCELLED,
+                        label: t("purchasing.po.status.cancelled", lang),
+                      },
+                    ]}
+                    size="small"
+                  />
+                </Col>
+              </Row>
+              <div className="flex flex-wrap gap-1 mt-2">
+                {statusFilter !== "all" && (
+                  <Tag closable onClose={() => setStatusFilter("all")}>
+                    {t("purchasing.po.col.status", lang)}: {statusFilter}
+                  </Tag>
+                )}
+                {dateRange?.[0] && dateRange?.[1] && (
+                  <Tag closable onClose={() => setDateRange(null)}>
+                    {dateRange[0].format("YYYY-MM-DD")} ~{" "}
+                    {dateRange[1].format("YYYY-MM-DD")}
+                  </Tag>
+                )}
+              </div>
+            </div>
+          )}
         </Card>
 
         {/* ── Table ──────────────────────────────────────────────────── */}
@@ -785,27 +849,28 @@ export default function PurchaseOrders() {
         </Card>
       </Space>
 
-      {/* ── Create Modal ──────────────────────────────────────────────── */}
-      <Modal
-        open={createModalOpen}
-        onCancel={closeCreateModal}
-        onOk={handleCreateSubmit}
-        okText={t("purchasing.po.new", lang)}
-        confirmLoading={createMutation.isPending}
-        width={isMobile ? "95vw" : 720}
-        destroyOnHidden
-        title={null}
-        styles={{ body: { paddingTop: 20 } }}
-      >
-        <div style={gradientHeader}>
-          <Space>
-            <PlusOutlined />
-            <span style={{ fontSize: 16, fontWeight: 600 }}>
+      {/* ── Create Drawer ─────────────────────────────────────────────── */}
+      <Drawer
+        open={createDrawerOpen}
+        onClose={closeCreateModal}
+        width={isMobile ? "100%" : 680}
+        title={t("purchasing.po.new", lang)}
+        destroyOnClose
+        footer={
+          <Space style={{ justifyContent: "flex-end", display: "flex" }}>
+            <Button onClick={closeCreateModal}>
+              {t("common.cancel", lang)}
+            </Button>
+            <Button
+              type="primary"
+              loading={createMutation.isPending}
+              onClick={handleCreateSubmit}
+            >
               {t("purchasing.po.new", lang)}
-            </span>
+            </Button>
           </Space>
-        </div>
-
+        }
+      >
         <Form form={createForm} layout="vertical">
           <Row gutter={16}>
             <Col xs={24} sm={12}>
@@ -951,7 +1016,7 @@ export default function PurchaseOrders() {
             )}
           </Form.List>
         </Form>
-      </Modal>
+      </Drawer>
 
       {/* ── Detail Drawer ─────────────────────────────────────────────── */}
       <Drawer

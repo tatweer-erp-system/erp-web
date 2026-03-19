@@ -315,7 +315,7 @@ export default function AgingReports() {
     <DashboardLayout
       currentPage="Aging Reports"
       breadcrumbs={[
-        { label: t("REPORTS", lang) },
+        { label: t("REPORTS", lang), href: "/reporting" },
         { label: t("agingReports.title", lang) },
       ]}
     >

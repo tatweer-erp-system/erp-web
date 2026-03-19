@@ -1,4 +1,5 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
+import type { Dayjs } from "dayjs";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
 import { useLangStore } from "@/stores/lang.store";
@@ -36,6 +37,7 @@ import {
   Drawer,
   Input,
   notification,
+  Segmented,
 } from "antd";
 import type { TableColumnsType, TablePaginationConfig } from "antd";
 import {
@@ -52,6 +54,10 @@ import {
   SendOutlined,
   DeleteOutlined,
   CreditCardOutlined,
+  SearchOutlined,
+  DownloadOutlined,
+  AppstoreOutlined,
+  UnorderedListOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 
@@ -115,11 +121,18 @@ export default function PurchaseInvoices() {
   // ── State ───────────────────────────────────────────────────────────────
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
+  const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [paymentStatusFilter, setPaymentStatusFilter] = useState<string>("all");
+  const [dateRange, setDateRange] = useState<
+    [Dayjs | null, Dayjs | null] | null
+  >(null);
+  const [viewMode, setViewMode] = useState<"table" | "grid">("table");
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [createDrawerOpen, setCreateDrawerOpen] = useState(false);
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [paymentInvoice, setPaymentInvoice] = useState<InvoiceRow | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -127,6 +140,15 @@ export default function PurchaseInvoices() {
 
   const [createForm] = Form.useForm();
   const [paymentForm] = Form.useForm();
+
+  // ── Search debounce ──────────────────────────────────────────────────────
+  useEffect(() => {
+    debounceRef.current = setTimeout(() => {
+      setSearch(searchInput);
+      setPage(1);
+    }, 400);
+    return () => clearTimeout(debounceRef.current);
+  }, [searchInput]);
 
   // ── Queries ─────────────────────────────────────────────────────────────
 
@@ -139,6 +161,10 @@ export default function PurchaseInvoices() {
     ...(paymentStatusFilter !== "all"
       ? { paymentStatus: paymentStatusFilter }
       : {}),
+    ...(dateRange?.[0]
+      ? { dateFrom: dateRange[0].format("YYYY-MM-DD") }
+      : {}),
+    ...(dateRange?.[1] ? { dateTo: dateRange[1].format("YYYY-MM-DD") } : {}),
     sortBy: "createdAt",
     sortOrder: "DESC" as const,
   };
@@ -248,11 +274,11 @@ export default function PurchaseInvoices() {
     createForm.setFieldsValue({
       invoiceDate: dayjs(),
     });
-    setCreateModalOpen(true);
+    setCreateDrawerOpen(true);
   }, [createForm]);
 
   const closeCreateModal = useCallback(() => {
-    setCreateModalOpen(false);
+    setCreateDrawerOpen(false);
     createForm.resetFields();
   }, [createForm]);
 
@@ -654,85 +680,8 @@ export default function PurchaseInvoices() {
 
         {/* ── Toolbar Card ─────────────────────────────────────────────── */}
         <Card size="small" styles={{ body: { padding: "12px 16px" } }}>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: 8,
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Space wrap>
-              <Input.Search
-                placeholder={t("purchasing.bills.search", lang)}
-                allowClear
-                onSearch={v => {
-                  setSearch(v);
-                  setPage(1);
-                }}
-                style={{ width: 220 }}
-              />
-              <Select
-                value={statusFilter}
-                onChange={v => {
-                  setStatusFilter(v);
-                  setPage(1);
-                }}
-                style={{ width: 160 }}
-                suffixIcon={<FilterOutlined />}
-                options={[
-                  {
-                    value: "all",
-                    label: t("invoices.allStatuses", lang),
-                  },
-                  {
-                    value: InvoiceStatusNew.DRAFT,
-                    label: t("invoices.status.draft", lang),
-                  },
-                  {
-                    value: InvoiceStatusNew.POSTED,
-                    label: t("invoices.status.posted", lang),
-                  },
-                  {
-                    value: InvoiceStatusNew.CANCELLED,
-                    label: t("invoices.status.cancelled", lang),
-                  },
-                ]}
-              />
-              <Select
-                value={paymentStatusFilter}
-                onChange={v => {
-                  setPaymentStatusFilter(v);
-                  setPage(1);
-                }}
-                style={{ width: 180 }}
-                suffixIcon={<FilterOutlined />}
-                options={[
-                  {
-                    value: "all",
-                    label: t("invoices.allPaymentStatuses", lang),
-                  },
-                  {
-                    value: InvoicePaymentStatus.NOT_PAID,
-                    label: t("invoices.paymentStatus.not_paid", lang),
-                  },
-                  {
-                    value: InvoicePaymentStatus.PARTIAL,
-                    label: t("invoices.paymentStatus.partial", lang),
-                  },
-                  {
-                    value: InvoicePaymentStatus.PAID,
-                    label: t("invoices.paymentStatus.paid", lang),
-                  },
-                ]}
-              />
-            </Space>
-
-            <Space>
-              <Tooltip title={t("purchasing.bills.reload", lang)}>
-                <Button icon={<ReloadOutlined />} onClick={() => refetch()} />
-              </Tooltip>
+          <div className="flex flex-wrap gap-2 justify-between items-center">
+            <div className="flex flex-wrap gap-2 items-center">
               <Button
                 type="primary"
                 icon={<PlusOutlined />}
@@ -740,8 +689,162 @@ export default function PurchaseInvoices() {
               >
                 {t("purchasing.bills.new", lang)}
               </Button>
-            </Space>
+            </div>
+
+            <div className="flex flex-wrap gap-2 items-center">
+              <DatePicker.RangePicker
+                value={dateRange}
+                onChange={dates => {
+                  setDateRange(dates);
+                  setPage(1);
+                }}
+                placeholder={[
+                  t("common.dateFrom", lang),
+                  t("common.dateTo", lang),
+                ]}
+                allowClear
+                style={{ borderRadius: 8 }}
+              />
+              <Input
+                prefix={<SearchOutlined className="text-gray-400" />}
+                placeholder={t("common.search", lang)}
+                value={searchInput}
+                onChange={e => setSearchInput(e.target.value)}
+                allowClear
+                style={{ width: 240 }}
+              />
+              <Tooltip title={t("sales.filter.allStatuses", lang)}>
+                <Button
+                  icon={<FilterOutlined />}
+                  onClick={() => setIsFilterOpen(!isFilterOpen)}
+                  type={isFilterOpen ? "primary" : "default"}
+                />
+              </Tooltip>
+              <Tooltip title={t("seq.reload", lang)}>
+                <Button icon={<ReloadOutlined />} onClick={() => refetch()} />
+              </Tooltip>
+              <Dropdown
+                menu={{
+                  items: [
+                    {
+                      key: "csv",
+                      label: "CSV",
+                      icon: <DownloadOutlined />,
+                    },
+                    {
+                      key: "excel",
+                      label: "Excel",
+                      icon: <DownloadOutlined />,
+                    },
+                    { key: "pdf", label: "PDF", icon: <DownloadOutlined /> },
+                  ],
+                }}
+              >
+                <Button icon={<DownloadOutlined />}>
+                  {t("products.export", lang)}
+                </Button>
+              </Dropdown>
+              <Segmented
+                value={viewMode}
+                onChange={v => setViewMode(v as "table" | "grid")}
+                options={[
+                  { value: "table", icon: <UnorderedListOutlined /> },
+                  { value: "grid", icon: <AppstoreOutlined /> },
+                ]}
+              />
+            </div>
           </div>
+
+          {/* Filter Panel */}
+          {isFilterOpen && (
+            <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+              <Row gutter={[12, 12]}>
+                <Col xs={24} sm={12} lg={6}>
+                  <Text type="secondary" className="text-xs mb-1 block">
+                    {t("purchasing.bills.col.status", lang)}
+                  </Text>
+                  <Segmented
+                    value={statusFilter}
+                    onChange={v => {
+                      setStatusFilter(v as string);
+                      setPage(1);
+                    }}
+                    block
+                    options={[
+                      {
+                        value: "all",
+                        label: t("invoices.allStatuses", lang),
+                      },
+                      {
+                        value: InvoiceStatusNew.DRAFT,
+                        label: t("invoices.status.draft", lang),
+                      },
+                      {
+                        value: InvoiceStatusNew.POSTED,
+                        label: t("invoices.status.posted", lang),
+                      },
+                      {
+                        value: InvoiceStatusNew.CANCELLED,
+                        label: t("invoices.status.cancelled", lang),
+                      },
+                    ]}
+                    size="small"
+                  />
+                </Col>
+                <Col xs={24} sm={12} lg={6}>
+                  <Text type="secondary" className="text-xs mb-1 block">
+                    {t("purchasing.bills.col.paymentStatus", lang)}
+                  </Text>
+                  <Segmented
+                    value={paymentStatusFilter}
+                    onChange={v => {
+                      setPaymentStatusFilter(v as string);
+                      setPage(1);
+                    }}
+                    block
+                    options={[
+                      {
+                        value: "all",
+                        label: t("invoices.allPaymentStatuses", lang),
+                      },
+                      {
+                        value: InvoicePaymentStatus.NOT_PAID,
+                        label: t("invoices.paymentStatus.not_paid", lang),
+                      },
+                      {
+                        value: InvoicePaymentStatus.PARTIAL,
+                        label: t("invoices.paymentStatus.partial", lang),
+                      },
+                      {
+                        value: InvoicePaymentStatus.PAID,
+                        label: t("invoices.paymentStatus.paid", lang),
+                      },
+                    ]}
+                    size="small"
+                  />
+                </Col>
+              </Row>
+              <div className="flex flex-wrap gap-1 mt-2">
+                {statusFilter !== "all" && (
+                  <Tag closable onClose={() => setStatusFilter("all")}>
+                    {t("purchasing.bills.col.status", lang)}: {statusFilter}
+                  </Tag>
+                )}
+                {paymentStatusFilter !== "all" && (
+                  <Tag closable onClose={() => setPaymentStatusFilter("all")}>
+                    {t("purchasing.bills.col.paymentStatus", lang)}:{" "}
+                    {paymentStatusFilter}
+                  </Tag>
+                )}
+                {dateRange?.[0] && dateRange?.[1] && (
+                  <Tag closable onClose={() => setDateRange(null)}>
+                    {dateRange[0].format("YYYY-MM-DD")} ~{" "}
+                    {dateRange[1].format("YYYY-MM-DD")}
+                  </Tag>
+                )}
+              </div>
+            </div>
+          )}
         </Card>
 
         {/* ── Table ──────────────────────────────────────────────────── */}
@@ -790,27 +893,28 @@ export default function PurchaseInvoices() {
         </Card>
       </Space>
 
-      {/* ── Create Modal ──────────────────────────────────────────────── */}
-      <Modal
-        open={createModalOpen}
-        onCancel={closeCreateModal}
-        onOk={handleCreateSubmit}
-        okText={t("purchasing.bills.new", lang)}
-        confirmLoading={createMutation.isPending}
-        width={isMobile ? "95vw" : 720}
-        destroyOnHidden
-        title={null}
-        styles={{ body: { paddingTop: 20 } }}
-      >
-        <div style={gradientHeader}>
-          <Space>
-            <PlusOutlined />
-            <span style={{ fontSize: 16, fontWeight: 600 }}>
+      {/* ── Create Drawer ─────────────────────────────────────────────── */}
+      <Drawer
+        open={createDrawerOpen}
+        onClose={closeCreateModal}
+        width={isMobile ? "100%" : 680}
+        title={t("purchasing.bills.new", lang)}
+        destroyOnClose
+        footer={
+          <Space style={{ justifyContent: "flex-end", display: "flex" }}>
+            <Button onClick={closeCreateModal}>
+              {t("common.cancel", lang)}
+            </Button>
+            <Button
+              type="primary"
+              loading={createMutation.isPending}
+              onClick={handleCreateSubmit}
+            >
               {t("purchasing.bills.new", lang)}
-            </span>
+            </Button>
           </Space>
-        </div>
-
+        }
+      >
         <Form form={createForm} layout="vertical">
           <Row gutter={16}>
             <Col xs={24} sm={12}>
@@ -975,7 +1079,7 @@ export default function PurchaseInvoices() {
             )}
           </Form.List>
         </Form>
-      </Modal>
+      </Drawer>
 
       {/* ── Register Payment Modal ────────────────────────────────────── */}
       <Modal

@@ -156,11 +156,12 @@ export default function CrmPipeline() {
 
   const partners = useMemo(
     () =>
-      (partnersDropdown ?? []) as {
+      ((partnersDropdown as unknown as Record<string, unknown>)
+        ?.data as {
         id: string;
         nameEn?: string;
         nameAr?: string;
-      }[],
+      }[]) ?? [],
     [partnersDropdown]
   );
 

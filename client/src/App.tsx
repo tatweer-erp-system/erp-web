@@ -90,7 +90,29 @@ function LayoutWrapper() {
   const breadcrumbs = currentRoute
     ? [
         { label: "Dashboard", href: "/" },
-        ...currentRoute.breadcrumb.map(label => ({ label, href: undefined })),
+        ...currentRoute.breadcrumb.map((label, i) => {
+          // Last segment is the current page — not clickable
+          if (i === currentRoute.breadcrumb.length - 1) {
+            return { label, href: undefined };
+          }
+          // Find a route whose breadcrumb matches the prefix up to this segment
+          const prefix = currentRoute.breadcrumb.slice(0, i + 1);
+          // Try exact match first, then fall back to first route under this section
+          const exact = routes.find(
+            r =>
+              r.breadcrumb.length === prefix.length &&
+              r.breadcrumb.every((b, j) => b === prefix[j])
+          );
+          const match =
+            exact ??
+            routes.find(
+              r =>
+                r.breadcrumb.length > prefix.length &&
+                !r.path.includes(":") &&
+                prefix.every((b, j) => r.breadcrumb[j] === b)
+            );
+          return { label, href: match?.path };
+        }),
       ]
     : [{ label: "Dashboard" }];
 
