@@ -2947,6 +2947,19 @@ export const en: Record<string, string> = {
   "financialReports.disclaimer":
     "All figures in SAR. Financial data is unaudited and for management reporting purposes only.",
 
+  // ─── Inventory Reports ─────────────────────────────────────────────────────
+  "inventoryReports.title": "Inventory Reports",
+  "inventoryReports.subtitle": "Stock levels, low stock alerts, and warehouse overview",
+  "inventoryReports.totalProducts": "Total Products",
+  "inventoryReports.totalWarehouses": "Warehouses",
+  "inventoryReports.lowStock": "Low Stock",
+  "inventoryReports.outOfStock": "Out of Stock",
+  "inventoryReports.inStock": "In Stock",
+  "inventoryReports.quantity": "Quantity",
+  "inventoryReports.reorderPoint": "Reorder Point",
+  "inventoryReports.lowStockItems": "Low Stock Items",
+  "inventoryReports.total": "Total",
+
   // ─── Aging Reports ─────────────────────────────────────────────────────────
   "agingReports.title": "Aging Reports",
   "agingReports.receivable": "Accounts Receivable",

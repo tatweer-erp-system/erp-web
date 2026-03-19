@@ -431,6 +431,18 @@ export const routes: RouteConfig[] = [
     permissions: ["reporting:view"],
     breadcrumb: ["Reports", "Financial"],
   },
+  {
+    path: "/reporting/inventory",
+    component: lz(() => import("@/pages/reporting/InventoryReports")),
+    permissions: ["reporting:view"],
+    breadcrumb: ["Reports", "Inventory"],
+  },
+  {
+    path: "/reporting/aging",
+    component: lz(() => import("@/pages/reporting/AgingReports")),
+    permissions: ["reporting:view"],
+    breadcrumb: ["Reports", "Aging"],
+  },
 
   // ── System Settings ─────────────────────────────────────────────────────────
   {

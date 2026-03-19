@@ -2892,6 +2892,19 @@ export const ar: Record<string, string> = {
   "financialReports.disclaimer":
     "جميع الأرقام بالريال السعودي. البيانات المالية غير مدققة ولأغراض التقارير الإدارية فقط.",
 
+  // ─── Inventory Reports ─────────────────────────────────────────────────────
+  "inventoryReports.title": "تقارير المخزون",
+  "inventoryReports.subtitle": "مستويات المخزون وتنبيهات النقص ونظرة عامة على المستودعات",
+  "inventoryReports.totalProducts": "إجمالي المنتجات",
+  "inventoryReports.totalWarehouses": "المستودعات",
+  "inventoryReports.lowStock": "مخزون منخفض",
+  "inventoryReports.outOfStock": "نفد المخزون",
+  "inventoryReports.inStock": "متوفر",
+  "inventoryReports.quantity": "الكمية",
+  "inventoryReports.reorderPoint": "نقطة إعادة الطلب",
+  "inventoryReports.lowStockItems": "المنتجات منخفضة المخزون",
+  "inventoryReports.total": "الإجمالي",
+
   // ─── Aging Reports ─────────────────────────────────────────────────────────
   "agingReports.title": "تقارير الأعمار",
   "agingReports.receivable": "المدينون",
