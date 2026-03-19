@@ -57,8 +57,8 @@ export const ROUTES = {
   STOCK_ADJUSTMENTS: "/inventory/stock-adjustments",
   STOCK_TRANSFERS: "/inventory/stock-transfers",
   STOCK_COUNT: "/inventory/stock-count",
-  INVENTORY_VALUATION: "/inventory/valuation",
-  STOCK_MOVEMENT: "/inventory/stock-movement",
+  INVENTORY_VALUATION: "/reporting/inventory-valuation",
+  STOCK_MOVEMENT: "/reporting/stock-movement",
   DELIVERIES: "/inventory/deliveries",
 
   // ── Accounting ──────────────────────────────────────────────────────────────

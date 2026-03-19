@@ -252,16 +252,16 @@ export const routes: RouteConfig[] = [
     breadcrumb: ["Inventory", "Transfers"],
   },
   {
-    path: "/inventory/valuation",
+    path: "/reporting/inventory-valuation",
     component: lz(() => import("@/pages/InventoryValuation")),
-    permissions: ["inventory:read"],
-    breadcrumb: ["Inventory", "Valuation"],
+    permissions: ["reporting:view"],
+    breadcrumb: ["Reports", "Inventory Valuation"],
   },
   {
-    path: "/inventory/stock-movement",
+    path: "/reporting/stock-movement",
     component: lz(() => import("@/pages/StockMovement")),
-    permissions: ["inventory:read"],
-    breadcrumb: ["Inventory", "Movement"],
+    permissions: ["reporting:view"],
+    breadcrumb: ["Reports", "Stock Movement"],
   },
   {
     path: "/inventory/deliveries",

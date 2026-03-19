@@ -319,12 +319,12 @@ const NAV_ITEMS: NavItem[] = [
   {
     name: "Inventory Valuation",
     icon: <StockOutlined />,
-    href: "/inventory/valuation",
+    href: "/reporting/inventory-valuation",
   },
   {
     name: "Stock Movement",
     icon: <SwapOutlined />,
-    href: "/inventory/stock-movement",
+    href: "/reporting/stock-movement",
   },
 
   // ── Settings ────────────────────────────────────────────────────────────
