@@ -378,7 +378,6 @@ export default function PurchaseInvoices() {
     {
       title: t("purchasing.bills.col.invoiceDate", lang),
       dataIndex: "invoiceDate",
-      sorter: true,
       render: (v: string) => (
         <Text type="secondary">{dayjs(v).format("YYYY-MM-DD")}</Text>
       ),
@@ -401,7 +400,6 @@ export default function PurchaseInvoices() {
       title: t("purchasing.bills.col.amountTotal", lang),
       dataIndex: "amountTotal",
       align: "right",
-      sorter: true,
       render: (v: number | string, rec: InvoiceRow) => (
         <Text strong>
           {Number(v).toLocaleString(undefined, {

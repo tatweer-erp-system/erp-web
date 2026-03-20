@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useDebounce } from "@/hooks/useDebounce";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
 import { useLangStore } from "@/stores/lang.store";
@@ -19,6 +20,7 @@ import {
   Select,
   Tooltip,
   Typography,
+  Dropdown,
   Space,
   Input,
   notification,
@@ -27,6 +29,8 @@ import type { TableColumnsType } from "antd";
 import {
   ReloadOutlined,
   FilterOutlined,
+  SearchOutlined,
+  DownloadOutlined,
   FilePdfOutlined,
   FileExcelOutlined,
   DollarOutlined,
@@ -64,6 +68,7 @@ export default function InventoryValuation() {
   // ── State ────────────────────────────────────────────────────────────────
   const [warehouseFilter, setWarehouseFilter] = useState<string>("all");
   const [searchText, setSearchText] = useState<string>("");
+  const [filterOpen, setFilterOpen] = useState(false);
 
   // ── Queries ──────────────────────────────────────────────────────────────
 
@@ -406,51 +411,68 @@ export default function InventoryValuation() {
 
         {/* ── Toolbar Card ───────────────────────────────────────────────── */}
         <Card size="small" styles={{ body: { padding: "12px 16px" } }}>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: 8,
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Space wrap>
-              <Input.Search
+          <div className="flex flex-wrap gap-2 justify-between items-center">
+            <div />
+
+            <div className="flex flex-wrap gap-2 items-center">
+              <Input
+                prefix={<SearchOutlined className="text-gray-400" />}
                 placeholder={t("valuation.search", lang)}
                 value={searchText}
                 onChange={e => setSearchText(e.target.value)}
                 allowClear
-                style={{ width: isMobile ? "100%" : 220 }}
+                style={{ width: 240 }}
               />
-              <Select
-                value={warehouseFilter}
-                onChange={v => setWarehouseFilter(v)}
-                style={{ width: 200 }}
-                suffixIcon={<FilterOutlined />}
-                options={warehouseOptions}
-              />
-            </Space>
-
-            <Space wrap>
-              <Tooltip title={t("valuation.exportPdf", lang)}>
-                <Button icon={<FilePdfOutlined />} onClick={handleExportPdf}>
-                  {!isMobile && t("valuation.exportPdf", lang)}
-                </Button>
-              </Tooltip>
-              <Tooltip title={t("valuation.exportExcel", lang)}>
+              <Tooltip title={t("valuation.filter", lang)}>
                 <Button
-                  icon={<FileExcelOutlined />}
-                  onClick={handleExportExcel}
-                >
-                  {!isMobile && t("valuation.exportExcel", lang)}
-                </Button>
+                  icon={<FilterOutlined />}
+                  onClick={() => setFilterOpen(!filterOpen)}
+                  type={filterOpen ? "primary" : "default"}
+                />
               </Tooltip>
               <Tooltip title={t("valuation.reload", lang)}>
                 <Button icon={<ReloadOutlined />} onClick={() => refetch()} />
               </Tooltip>
-            </Space>
+              <Dropdown
+                menu={{
+                  items: [
+                    {
+                      key: "pdf",
+                      label: "PDF",
+                      icon: <FilePdfOutlined />,
+                      onClick: handleExportPdf,
+                    },
+                    {
+                      key: "excel",
+                      label: "Excel",
+                      icon: <FileExcelOutlined />,
+                      onClick: handleExportExcel,
+                    },
+                  ],
+                }}
+              >
+                <Button icon={<DownloadOutlined />}>
+                  {t("products.export", lang)}
+                </Button>
+              </Dropdown>
+            </div>
           </div>
+
+          {/* Filter Panel */}
+          {filterOpen && (
+            <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+              <Row gutter={[12, 12]}>
+                <Col xs={24} sm={12}>
+                  <Select
+                    value={warehouseFilter}
+                    onChange={v => setWarehouseFilter(v)}
+                    style={{ width: "100%" }}
+                    options={warehouseOptions}
+                  />
+                </Col>
+              </Row>
+            </div>
+          )}
         </Card>
 
         {/* ── Table ──────────────────────────────────────────────────────── */}

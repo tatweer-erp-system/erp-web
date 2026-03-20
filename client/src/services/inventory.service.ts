@@ -58,6 +58,18 @@ export const productsService = {
     apiClient
       .get<ApiResponse<DropdownItem[]>>("/products/dropdown", { params })
       .then(r => r.data.data),
+
+  summary: () =>
+    apiClient
+      .get<ApiResponse<{
+        totalProducts: number;
+        totalActive: number;
+        totalInactive: number;
+        totalStorable: number;
+        totalConsumable: number;
+        totalService: number;
+      }>>("/products/summary")
+      .then(r => r.data),
 };
 
 // ─── Categories ──────────────────────────────────────────────────────────────
@@ -122,6 +134,15 @@ export const warehousesService = {
     apiClient
       .get<ApiResponse<DropdownItem[]>>("/warehouses/dropdown", { params })
       .then(r => r.data.data),
+
+  summary: () =>
+    apiClient
+      .get<ApiResponse<{
+        totalWarehouses: number;
+        totalActive: number;
+        totalInactive: number;
+      }>>("/warehouses/summary")
+      .then(r => r.data),
 };
 
 // ─── Stock ──────────────────────────────────────────────────────────────────
@@ -203,6 +224,15 @@ export const transfersService = {
     apiClient
       .post<ApiResponse<StockTransfer>>("/inventory/transfers", dto)
       .then(r => r.data.data),
+
+  summary: () =>
+    apiClient
+      .get<ApiResponse<{
+        totalTransfers: number;
+        thisMonth: number;
+        totalUnits: number;
+      }>>("/inventory/transfers/summary")
+      .then(r => r.data),
 };
 
 // ─── Units of Measure ───────────────────────────────────────────────────────

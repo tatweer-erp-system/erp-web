@@ -111,6 +111,40 @@ export interface DropdownItem {
   id: string;
   nameEn: string;
   nameAr: string;
+  productType?: ProductType;
+  unitOfMeasure?: string;
+  hasVariants?: boolean;
+  hasSerialTracking?: boolean;
+  hasLotTracking?: boolean;
+  hasExpiryDate?: boolean;
+  costPrice?: number;
+}
+
+// ─── Opening Stock ──────────────────────────────────────────────────────────
+
+export interface OpeningStockItemDto {
+  productId: string;
+  quantity: number;
+  unitCost: number;
+  lotNumber?: string;
+  serialNumber?: string;
+  expiryDate?: string;
+  productVariantId?: string;
+  locationId?: string;
+}
+
+export interface CreateOpeningStockDto {
+  warehouseId: string;
+  currencyId?: string;
+  date?: string;
+  items: OpeningStockItemDto[];
+}
+
+export interface OpeningStockResponse {
+  batchReference: string;
+  itemsCreated: number;
+  totalValue: number;
+  warnings: string[];
 }
 
 // ─── Warehouse DTOs ─────────────────────────────────────────────────────────

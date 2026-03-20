@@ -4,7 +4,7 @@
  * Default export for lazy loading via React.lazy().
  */
 
-import { useState, useMemo, useCallback, useEffect, useRef } from "react";
+import { useState, useMemo, useCallback } from "react";
 
 import {
   Table,
@@ -55,7 +55,8 @@ import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { EmptyState } from "@/components/common/EmptyState";
 import { useTranslation } from "@/hooks/ui/useTranslation";
 import { useBranchStore } from "@/stores/branch.store";
-import { paymentsService } from "@/services/invoices.service";
+import { paymentsService, type PaymentSummary } from "@/services/invoices.service";
+import { useDebounce } from "@/hooks/useDebounce";
 import { treasuryAccountsService } from "@/services/treasury.service";
 import { getPartnersDropdown } from "@/api/endpoints/partners.api";
 import { PaymentTypeNew, PaymentStatusNew } from "@/constants/enums";
@@ -80,16 +81,7 @@ export default function VendorPayments() {
 
   // ── Search with 400ms debounce ──────────────────────────────────────────
   const [searchInput, setSearchInput] = useState("");
-  const [search, setSearch] = useState("");
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-
-  useEffect(() => {
-    debounceRef.current = setTimeout(() => {
-      setSearch(searchInput);
-      setPage(1);
-    }, 400);
-    return () => clearTimeout(debounceRef.current);
-  }, [searchInput]);
+  const search = useDebounce(searchInput, 400);
 
   // ── State ───────────────────────────────────────────────────────────────
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -128,6 +120,19 @@ export default function VendorPayments() {
     const raw = paymentsRaw as Record<string, unknown> | undefined;
     return (raw?.data as Payment[]) ?? [];
   }, [paymentsRaw]);
+
+  // ── Summary endpoint (KPIs) ─────────────────────────────────────────────
+  const { data: summaryRaw } = useQuery({
+    queryKey: [QUERY_KEYS.PAYMENTS_LIST, "outbound", "summary", branchId],
+    queryFn: () =>
+      paymentsService.summary({ paymentType: PaymentTypeNew.OUTBOUND }),
+    enabled: !!branchId,
+    staleTime: 15_000,
+  });
+
+  const summary = (summaryRaw as Record<string, unknown>)?.data as
+    | PaymentSummary
+    | undefined;
 
   // ── Partners dropdown (vendors) ─────────────────────────────────────────
   const { data: partnersRaw } = useQuery({
@@ -199,23 +204,19 @@ export default function VendorPayments() {
     return filtered;
   }, [allPayments, statusFilter, search, dateRange]);
 
-  // ── KPI values ──────────────────────────────────────────────────────────
-  const kpiTotal = allPayments.length;
-  const kpiPosted = allPayments.filter(
-    p => p.status === PaymentStatusNew.POSTED
-  ).length;
-  const kpiDraft = allPayments.filter(
-    p => p.status === PaymentStatusNew.DRAFT
-  ).length;
-  const kpiTotalAmount = allPayments.reduce(
-    (sum, p) => sum + Number(p.amount ?? 0),
-    0
-  );
+  // ── KPI values (from summary endpoint) ──────────────────────────────────
+  const kpiTotal = summary?.totalRecords ?? 0;
+  const kpiPosted = summary?.totalPosted ?? 0;
+  const kpiDraft = summary?.totalDraft ?? 0;
+  const kpiTotalAmount = summary?.totalAmount ?? 0;
 
   // ── Mutations ───────────────────────────────────────────────────────────
   const invalidate = () => {
     queryClient.invalidateQueries({
       queryKey: [QUERY_KEYS.PAYMENTS_LIST],
+    });
+    queryClient.invalidateQueries({
+      queryKey: [QUERY_KEYS.PAYMENTS_LIST, "outbound", "summary"],
     });
   };
 
@@ -890,14 +891,14 @@ function usePaymentColumns(
         title: t("payments.vendor.paymentNumber", lang),
         dataIndex: "paymentNumber",
         width: 160,
-        sorter: false,
+
         render: (v: string) => <CopyableCode value={v ?? "---"} />,
       },
       {
         title: t("payments.vendor.date", lang),
         dataIndex: "paymentDate",
         width: 130,
-        sorter: false,
+
         render: (v: string) => (
           <Text type="secondary">
             {v ? dayjs(v).format("DD MMM YYYY") : "---"}
@@ -922,7 +923,7 @@ function usePaymentColumns(
         title: t("payments.vendor.amount", lang),
         dataIndex: "amount",
         width: 140,
-        sorter: false,
+
         align: "end" as const,
         render: (v: number | string) => (
           <Text strong className="font-mono" style={{ color: "#ef4444" }}>
@@ -935,7 +936,7 @@ function usePaymentColumns(
         title: t("payments.vendor.status", lang),
         dataIndex: "status",
         width: 120,
-        sorter: false,
+
         render: (v: string) => statusTag(v),
       },
       {

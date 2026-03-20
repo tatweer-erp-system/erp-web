@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useDebounce } from "@/hooks/useDebounce";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
 import { useLangStore } from "@/stores/lang.store";
@@ -32,6 +33,8 @@ import {
 import type { TableColumnsType } from "antd";
 import {
   ReloadOutlined,
+  SearchOutlined,
+  FilterOutlined,
   SwapOutlined,
   ArrowUpOutlined,
   ArrowDownOutlined,
@@ -110,6 +113,7 @@ export default function StockMovement() {
 
   // ── State ────────────────────────────────────────────────────────────────
   const [searchText, setSearchText] = useState<string>("");
+  const debouncedSearch = useDebounce(searchText, 400);
   const [typeFilter, setTypeFilter] = useState<string[]>([]);
   const [warehouseFilter, setWarehouseFilter] = useState<string | undefined>(
     undefined
@@ -117,6 +121,7 @@ export default function StockMovement() {
   const [dateRange, setDateRange] = useState<
     [dayjs.Dayjs | null, dayjs.Dayjs | null] | null
   >(null);
+  const [filterOpen, setFilterOpen] = useState(false);
   const [pagination, setPagination] = useState({ page: 1, limit: 20 });
 
   // ── Queries ──────────────────────────────────────────────────────────────
@@ -478,24 +483,10 @@ export default function StockMovement() {
 
         {/* ── Toolbar Card ───────────────────────────────────────────────── */}
         <Card size="small" styles={{ body: { padding: "12px 16px" } }}>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: 8,
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Space wrap>
-              <Input.Search
-                placeholder={t("stockMovement.search", lang)}
-                value={searchText}
-                onChange={e => setSearchText(e.target.value)}
-                onSearch={() => setPagination(p => ({ ...p, page: 1 }))}
-                allowClear
-                style={{ width: isMobile ? "100%" : 220 }}
-              />
+          <div className="flex flex-wrap gap-2 justify-between items-center">
+            <div />
+
+            <div className="flex flex-wrap gap-2 items-center">
               <RangePicker
                 value={
                   dateRange as [dayjs.Dayjs | null, dayjs.Dayjs | null] | null
@@ -505,40 +496,64 @@ export default function StockMovement() {
                   setPagination(p => ({ ...p, page: 1 }));
                 }}
                 allowClear
-                style={{ width: isMobile ? "100%" : 250 }}
+                style={{ borderRadius: 8 }}
               />
-              <Select
-                mode="multiple"
-                value={typeFilter}
-                onChange={v => {
-                  setTypeFilter(v);
-                  setPagination(p => ({ ...p, page: 1 }));
-                }}
-                placeholder={t("stockMovement.filterByType", lang)}
-                options={movementTypeOptions}
+              <Input
+                prefix={<SearchOutlined className="text-gray-400" />}
+                placeholder={t("stockMovement.search", lang)}
+                value={searchText}
+                onChange={e => setSearchText(e.target.value)}
                 allowClear
-                maxTagCount={2}
-                style={{ minWidth: 200 }}
+                style={{ width: 240 }}
               />
-              <Select
-                value={warehouseFilter}
-                onChange={v => {
-                  setWarehouseFilter(v);
-                  setPagination(p => ({ ...p, page: 1 }));
-                }}
-                placeholder={t("stockMovement.filterByWarehouse", lang)}
-                options={warehouseOptions}
-                allowClear
-                style={{ minWidth: 180 }}
-              />
-            </Space>
-
-            <Space>
+              <Tooltip title={t("stockMovement.filter", lang)}>
+                <Button
+                  icon={<FilterOutlined />}
+                  onClick={() => setFilterOpen(!filterOpen)}
+                  type={filterOpen ? "primary" : "default"}
+                />
+              </Tooltip>
               <Tooltip title={t("stockMovement.reload", lang)}>
                 <Button icon={<ReloadOutlined />} onClick={() => refetch()} />
               </Tooltip>
-            </Space>
+            </div>
           </div>
+
+          {/* Filter Panel */}
+          {filterOpen && (
+            <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+              <Row gutter={[12, 12]}>
+                <Col xs={24} sm={12}>
+                  <Select
+                    mode="multiple"
+                    value={typeFilter}
+                    onChange={v => {
+                      setTypeFilter(v);
+                      setPagination(p => ({ ...p, page: 1 }));
+                    }}
+                    placeholder={t("stockMovement.filterByType", lang)}
+                    options={movementTypeOptions}
+                    allowClear
+                    maxTagCount={2}
+                    style={{ width: "100%" }}
+                  />
+                </Col>
+                <Col xs={24} sm={12}>
+                  <Select
+                    value={warehouseFilter}
+                    onChange={v => {
+                      setWarehouseFilter(v);
+                      setPagination(p => ({ ...p, page: 1 }));
+                    }}
+                    placeholder={t("stockMovement.filterByWarehouse", lang)}
+                    options={warehouseOptions}
+                    allowClear
+                    style={{ width: "100%" }}
+                  />
+                </Col>
+              </Row>
+            </div>
+          )}
         </Card>
 
         {/* ── Table ──────────────────────────────────────────────────────── */}

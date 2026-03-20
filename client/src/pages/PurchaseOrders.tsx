@@ -358,7 +358,6 @@ export default function PurchaseOrders() {
     {
       title: t("purchasing.po.col.date", lang),
       dataIndex: "createdAt",
-      sorter: true,
       render: (v: string) => (
         <Text type="secondary">{dayjs(v).format("YYYY-MM-DD")}</Text>
       ),
@@ -374,7 +373,6 @@ export default function PurchaseOrders() {
       title: t("purchasing.po.col.totalAmount", lang),
       dataIndex: "totalAmount",
       align: "right",
-      sorter: true,
       render: (v: number | string, rec: PurchaseOrderRow) => (
         <Text strong>
           {Number(v).toLocaleString(undefined, {

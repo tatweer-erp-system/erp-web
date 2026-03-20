@@ -1,4 +1,6 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useCallback } from "react";
+import { useDebounce } from "@/hooks/useDebounce";
+import { usePagination } from "@/hooks/usePagination";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
 import { useLangStore } from "@/stores/lang.store";
@@ -38,6 +40,7 @@ import {
   PlusOutlined,
   ReloadOutlined,
   FilterOutlined,
+  SearchOutlined,
   EditOutlined,
   MoreOutlined,
   EyeOutlined,
@@ -66,9 +69,14 @@ export default function Warehouses() {
     colorTextQuaternary: textMuted,
   };
 
+  const isRTL = lang === "ar";
+
   // ── State ────────────────────────────────────────────────────────────────
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [searchText, setSearchText] = useState<string>("");
+  const debouncedSearch = useDebounce(searchText, 400);
+  const [filterOpen, setFilterOpen] = useState(false);
+  const { pagination, goToPage, setLimit } = usePagination();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingWarehouse, setEditingWarehouse] = useState<Warehouse | null>(
@@ -81,51 +89,54 @@ export default function Warehouses() {
 
   // ── Queries ──────────────────────────────────────────────────────────────
 
+  const { data: summaryRes } = useQuery({
+    queryKey: [QUERY_KEYS.WAREHOUSES_SUMMARY],
+    queryFn: () => warehousesService.summary(),
+    staleTime: 30_000,
+  });
+  const summary = (summaryRes as Record<string, unknown>)?.data as
+    | { totalWarehouses: number; totalActive: number; totalInactive: number }
+    | undefined;
+
   const {
     data: warehousesRaw,
     isLoading,
     refetch,
   } = useQuery({
-    queryKey: [QUERY_KEYS.WAREHOUSES],
-    queryFn: () => warehousesService.list({ limit: 100 }),
+    queryKey: [
+      QUERY_KEYS.WAREHOUSES,
+      pagination.page,
+      pagination.limit,
+      debouncedSearch,
+      statusFilter,
+    ],
+    queryFn: () =>
+      warehousesService.list({
+        page: pagination.page,
+        limit: pagination.limit,
+        search: debouncedSearch || undefined,
+        isActive: statusFilter === "all" ? undefined : statusFilter === "active" ? "true" : "false",
+      }),
     staleTime: 30_000,
   });
 
-  const allWarehouses: Warehouse[] = useMemo(() => {
-    return warehousesRaw?.data ?? [];
-  }, [warehousesRaw]);
+  const allWarehouses: Warehouse[] = warehousesRaw?.data ?? [];
+  const total = warehousesRaw?.meta?.total ?? 0;
 
-  // ── Filtered data ──────────────────────────────────────────────────────
-  const warehouses = useMemo(() => {
-    let filtered = [...allWarehouses];
-    if (statusFilter !== "all") {
-      const isActive = statusFilter === "active";
-      filtered = filtered.filter(w => w.isActive === isActive);
-    }
-    if (searchText.trim()) {
-      const q = searchText.trim().toLowerCase();
-      filtered = filtered.filter(
-        w =>
-          w.nameEn.toLowerCase().includes(q) ||
-          w.nameAr.toLowerCase().includes(q) ||
-          (w.address ?? "").toLowerCase().includes(q) ||
-          (w.city ?? "").toLowerCase().includes(q)
-      );
-    }
-    return filtered;
-  }, [allWarehouses, statusFilter, searchText]);
+  // Status filter is now server-side via isActive query param
+  const warehouses = allWarehouses;
 
-  // ── KPI values (computed from ALL data, not filtered) ─────────────────
-  const kpiTotal = allWarehouses.length;
-  const kpiActive = allWarehouses.filter(w => w.isActive).length;
-  const kpiInactive = allWarehouses.filter(w => !w.isActive).length;
+  // ── KPI values (from summary endpoint) ───────────────────────────────
+  const kpiTotal = summary?.totalWarehouses ?? 0;
+  const kpiActive = summary?.totalActive ?? 0;
+  const kpiInactive = summary?.totalInactive ?? 0;
 
   // ── Mutations ──────────────────────────────────────────────────────────
 
-  const invalidate = () =>
-    queryClient.invalidateQueries({
-      queryKey: [QUERY_KEYS.WAREHOUSES],
-    });
+  const invalidate = () => {
+    queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.WAREHOUSES] });
+    queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.WAREHOUSES_SUMMARY] });
+  };
 
   const createMutation = useMutation({
     mutationFn: (dto: CreateWarehouseDto) => warehousesService.create(dto),
@@ -240,7 +251,6 @@ export default function Warehouses() {
     {
       title: t("warehouses.nameEn", lang),
       dataIndex: "nameEn",
-      sorter: (a, b) => getName(a).localeCompare(getName(b)),
       render: (_, rec) => (
         <Space>
           <Text strong style={{ color: token.colorPrimary }}>
@@ -345,16 +355,6 @@ export default function Warehouses() {
     },
   ];
 
-  // ── Gradient header style for drawer ────────────────────────────────────
-
-  const gradientHeader = {
-    background: `linear-gradient(135deg, ${primary}, ${theme === "dark" ? "#2dd4bf" : "#6366f1"})`,
-    padding: "16px 24px",
-    margin: "-20px -24px 16px -24px",
-    borderRadius: "8px 8px 0 0",
-    color: "#fff",
-  };
-
   return (
     <DashboardLayout
       currentPage="Warehouses"
@@ -452,49 +452,8 @@ export default function Warehouses() {
 
         {/* ── Toolbar Card ───────────────────────────────────────────────── */}
         <Card size="small" styles={{ body: { padding: "12px 16px" } }}>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: 8,
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Space wrap>
-              <Input.Search
-                placeholder={t("warehouses.search", lang)}
-                value={searchText}
-                onChange={e => setSearchText(e.target.value)}
-                allowClear
-                style={{ width: 220 }}
-              />
-              <Select
-                value={statusFilter}
-                onChange={v => setStatusFilter(v)}
-                style={{ width: 160 }}
-                suffixIcon={<FilterOutlined />}
-                options={[
-                  {
-                    value: "all",
-                    label: t("warehouses.allStatuses", lang),
-                  },
-                  {
-                    value: "active",
-                    label: t("warehouses.active", lang),
-                  },
-                  {
-                    value: "inactive",
-                    label: t("warehouses.inactive", lang),
-                  },
-                ]}
-              />
-            </Space>
-
-            <Space>
-              <Tooltip title={t("common.reload", lang)}>
-                <Button icon={<ReloadOutlined />} onClick={() => refetch()} />
-              </Tooltip>
+          <div className="flex flex-wrap gap-2 justify-between items-center">
+            <div className="flex flex-wrap gap-2 items-center">
               <Button
                 type="primary"
                 icon={<PlusOutlined />}
@@ -502,8 +461,61 @@ export default function Warehouses() {
               >
                 {t("warehouses.new", lang)}
               </Button>
-            </Space>
+            </div>
+
+            <div className="flex flex-wrap gap-2 items-center">
+              <Input
+                prefix={<SearchOutlined className="text-gray-400" />}
+                placeholder={t("warehouses.search", lang)}
+                value={searchText}
+                onChange={e => {
+                  setSearchText(e.target.value);
+                  goToPage(1);
+                }}
+                allowClear
+                style={{ width: 240 }}
+              />
+              <Tooltip title={t("warehouses.filter", lang)}>
+                <Button
+                  icon={<FilterOutlined />}
+                  onClick={() => setFilterOpen(!filterOpen)}
+                  type={filterOpen ? "primary" : "default"}
+                />
+              </Tooltip>
+              <Tooltip title={t("common.reload", lang)}>
+                <Button icon={<ReloadOutlined />} onClick={() => refetch()} />
+              </Tooltip>
+            </div>
           </div>
+
+          {/* Filter Panel */}
+          {filterOpen && (
+            <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+              <Row gutter={[12, 12]}>
+                <Col xs={24} sm={8}>
+                  <Select
+                    value={statusFilter}
+                    onChange={v => { setStatusFilter(v); goToPage(1); }}
+                    style={{ width: "100%" }}
+                    options={[
+                      {
+                        value: "all",
+                        label: t("warehouses.allStatuses", lang),
+                      },
+                      {
+                        value: "active",
+                        label: t("warehouses.active", lang),
+                      },
+                      {
+                        value: "inactive",
+                        label: t("warehouses.inactive", lang),
+                      },
+                    ]}
+                  />
+                </Col>
+              </Row>
+            </div>
+          )}
         </Card>
 
         {/* ── Table ──────────────────────────────────────────────────────── */}
@@ -516,10 +528,17 @@ export default function Warehouses() {
             size="middle"
             scroll={{ x: "max-content" }}
             pagination={{
+              current: pagination.page,
+              pageSize: pagination.limit,
+              total,
               showSizeChanger: true,
-              showTotal: (total, range) =>
-                `${range[0]}–${range[1]} ${t("common.of", lang)} ${total}`,
-              pageSizeOptions: ["5", "10", "25", "50"],
+              showTotal: (t2, range) =>
+                `${range[0]}–${range[1]} ${t("common.of", lang)} ${t2}`,
+              pageSizeOptions: ["10", "25", "50"],
+              onChange: (page, pageSize) => {
+                goToPage(page);
+                if (pageSize !== pagination.limit) setLimit(pageSize);
+              },
             }}
             locale={{
               emptyText: t("warehouses.title", lang) + " — 0",
@@ -532,12 +551,33 @@ export default function Warehouses() {
       <Drawer
         open={drawerOpen}
         onClose={closeDrawer}
-        size={isMobile ? "100%" : 560}
         destroyOnClose
-        title={null}
+        keyboard
+        placement={isMobile ? "bottom" : isRTL ? "left" : "right"}
+        width={isMobile ? "100%" : 560}
+        height={isMobile ? "90%" : undefined}
+        title={
+          <div style={{ display: "flex", alignItems: "center", gap: 10, color: "#fff" }}>
+            {editingWarehouse ? <EditOutlined /> : <PlusOutlined />}
+            <span style={{ fontWeight: 600 }}>
+              {editingWarehouse
+                ? `${t("warehouses.edit", lang)} — ${getName(editingWarehouse)}`
+                : t("warehouses.new", lang)}
+            </span>
+          </div>
+        }
+        styles={{
+          header: {
+            background: `linear-gradient(135deg, ${primary}, ${theme === "dark" ? "#2dd4bf" : "#6366f1"})`,
+          },
+          body: { direction: isRTL ? "rtl" : "ltr" },
+        }}
         footer={
-          <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
-            <Button onClick={closeDrawer}>
+          <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+            <Button
+              onClick={closeDrawer}
+              disabled={createMutation.isPending || updateMutation.isPending}
+            >
               {t("warehouses.cancel", lang)}
             </Button>
             <Button
@@ -552,18 +592,6 @@ export default function Warehouses() {
           </div>
         }
       >
-        {/* Gradient header */}
-        <div style={gradientHeader}>
-          <Space>
-            {editingWarehouse ? <EditOutlined /> : <PlusOutlined />}
-            <span style={{ fontSize: 16, fontWeight: 600 }}>
-              {editingWarehouse
-                ? `${t("warehouses.edit", lang)} — ${getName(editingWarehouse)}`
-                : t("warehouses.new", lang)}
-            </span>
-          </Space>
-        </div>
-
         <Form form={form} layout="vertical">
           <Row gutter={16}>
             <Col xs={24} sm={12}>

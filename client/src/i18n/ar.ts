@@ -351,6 +351,7 @@ export const ar: Record<string, string> = {
   "inventory.allStatuses": "جميع الحالات",
   "inventory.allWarehouses": "جميع المستودعات",
   "inventory.reload": "تحديث",
+  "inventory.filter": "تصفية",
   "inventory.product": "المنتج",
   "inventory.category": "الفئة",
   "inventory.warehouse": "المستودع",
@@ -436,6 +437,9 @@ export const ar: Record<string, string> = {
   "products.active": "نشط",
   "products.inactive": "غير نشط",
   "products.clearFilters": "مسح الفلاتر",
+  "products.filter": "تصفية",
+  "products.unsavedChanges": "تغييرات غير محفوظة",
+  "products.unsavedChangesMsg": "لديك تغييرات غير محفوظة. هل أنت متأكد أنك تريد الإغلاق؟",
   "products.save": "حفظ",
   "products.saveChanges": "حفظ التغييرات",
   "products.cancel": "إلغاء",
@@ -2535,6 +2539,7 @@ export const ar: Record<string, string> = {
   "warehouses.active": "نشط",
   "warehouses.inactive": "غير نشط",
   "warehouses.search": "بحث في المستودعات...",
+  "warehouses.filter": "تصفية",
   "warehouses.allStatuses": "جميع الحالات",
   "warehouses.new": "مستودع جديد",
   "warehouses.edit": "تعديل المستودع",
@@ -2604,6 +2609,7 @@ export const ar: Record<string, string> = {
   "valuation.grandTotal": "المجموع الكلي",
   "valuation.noData": "لا توجد بيانات تقييم",
   "valuation.reload": "تحديث",
+  "valuation.filter": "تصفية",
   "valuation.exportFailed": "فشل التصدير",
 
   // Stock Movements
@@ -2626,6 +2632,7 @@ export const ar: Record<string, string> = {
   "stockMovement.filterByType": "تصفية حسب نوع الحركة",
   "stockMovement.filterByWarehouse": "تصفية حسب المستودع",
   "stockMovement.reload": "تحديث",
+  "stockMovement.filter": "تصفية",
   "stockMovement.of": "من",
   "stockMovement.noData": "لا توجد حركات",
 
@@ -3296,4 +3303,16 @@ export const ar: Record<string, string> = {
   "Search code or recipient…": "ابحث بالرمز أو المستلم…",
   "Search code, customer, order ref…": "ابحث بالرمز، العميل، مرجع الطلب…",
   "Search customer or phone…": "ابحث بالعميل أو الهاتف…",
+
+  // Analytics KPI cards
+  "analytics.kpi.value": "القيمة",
+  "analytics.kpi.totalEmployees": "إجمالي الموظفين",
+  "analytics.kpi.active": "نشط",
+  "analytics.kpi.onLeave": "في إجازة",
+  "analytics.kpi.attendanceRate": "معدل الحضور",
+  "analytics.kpi.totalLeads": "إجمالي العملاء المحتملين",
+  "analytics.kpi.winRate": "معدل الفوز",
+  "analytics.kpi.pipelineValue": "قيمة خط الأعمال",
+  "analytics.kpi.avgDealSize": "متوسط حجم الصفقة",
+
 };

@@ -145,7 +145,9 @@ export const QUERY_KEYS = {
   DELIVERIES: "deliveries",
 
   // Inventory — extended
+  PRODUCTS_SUMMARY: "products-summary",
   WAREHOUSES: "warehouses",
+  WAREHOUSES_SUMMARY: "warehouses-summary",
   WAREHOUSES_DROPDOWN: "warehouses-dropdown",
   STOCK_LEVELS: "stock-levels",
   STOCK_MOVES: "stock-moves",
@@ -153,6 +155,7 @@ export const QUERY_KEYS = {
   STOCK_MOVEMENTS: "stock-movements",
   STOCK_ADJUSTMENTS: "stock-adjustments",
   STOCK_TRANSFERS: "stock-transfers",
+  STOCK_TRANSFERS_SUMMARY: "stock-transfers-summary",
   INVENTORY_VALUATION: "inventory-valuation",
   UNITS_OF_MEASURE: "units-of-measure",
   ADJUSTMENT_REASONS: "adjustment-reasons",

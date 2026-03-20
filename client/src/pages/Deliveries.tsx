@@ -120,27 +120,27 @@ type DeliverySummary = {
 const deliveriesApi = {
   list: (params?: Record<string, unknown>) =>
     apiClient
-      .get<PaginatedResponse<Delivery>>("/sales/deliveries", { params })
+      .get<PaginatedResponse<Delivery>>("/inventory/deliveries", { params })
       .then(r => r.data),
   get: (id: string) =>
     apiClient
-      .get<ApiResponse<Delivery>>(`/sales/deliveries/${id}`)
+      .get<ApiResponse<Delivery>>(`/inventory/deliveries/${id}`)
       .then(r => r.data),
   create: (dto: CreateDeliveryDto) =>
     apiClient
-      .post<ApiResponse<Delivery>>("/sales/deliveries", dto)
+      .post<ApiResponse<Delivery>>("/inventory/deliveries", dto)
       .then(r => r.data),
   summary: () =>
     apiClient
-      .get<ApiResponse<DeliverySummary>>("/sales/deliveries/summary")
+      .get<ApiResponse<DeliverySummary>>("/inventory/deliveries/summary")
       .then(r => r.data),
   validate: (id: string) =>
     apiClient
-      .post<ApiResponse<Delivery>>(`/sales/deliveries/${id}/validate`)
+      .post<ApiResponse<Delivery>>(`/inventory/deliveries/${id}/validate`)
       .then(r => r.data),
   cancel: (id: string) =>
     apiClient
-      .post<ApiResponse<Delivery>>(`/sales/deliveries/${id}/cancel`)
+      .post<ApiResponse<Delivery>>(`/inventory/deliveries/${id}/cancel`)
       .then(r => r.data),
 };
 
@@ -347,7 +347,7 @@ export default function Deliveries() {
 
   const breadcrumbs = [
     { label: t("Dashboard", lang), href: ROUTES.DASHBOARD },
-    { label: t("SALES", lang), href: "#" },
+    { label: t("INVENTORY", lang), href: "#" },
     { label: t("deliveries.title", lang) },
   ];
 

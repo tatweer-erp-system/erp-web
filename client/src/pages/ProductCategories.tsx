@@ -20,6 +20,7 @@ import {
   Col,
   Grid,
   Statistic,
+  Drawer,
   Modal,
   Form,
   Select,
@@ -102,6 +103,7 @@ export default function ProductCategories() {
   const lang = useLangStore(s => s.lang);
   const screens = Grid.useBreakpoint();
   const isMobile = !screens.md;
+  const isRTL = lang === "ar";
   const queryClient = useQueryClient();
 
   const primary = theme === "dark" ? "#37D399" : "#3B82F6";
@@ -316,16 +318,6 @@ export default function ProductCategories() {
     } catch {
       // form validation failed
     }
-  };
-
-  // ── Gradient header style for modal ────────────────────────────────────
-
-  const gradientHeader = {
-    background: `linear-gradient(135deg, ${primary}, ${theme === "dark" ? "#2dd4bf" : "#6366f1"})`,
-    padding: "16px 24px",
-    margin: "-20px -24px 16px -24px",
-    borderRadius: "8px 8px 0 0",
-    color: "#fff",
   };
 
   return (
@@ -626,34 +618,51 @@ export default function ProductCategories() {
         </Row>
       </Space>
 
-      {/* ── Create / Edit Modal ────────────────────────────────────────── */}
-      <Modal
+      {/* ── Create / Edit Drawer ────────────────────────────────────────── */}
+      <Drawer
         open={modalOpen}
-        onCancel={closeModal}
-        onOk={handleSubmit}
-        okText={
-          editingCategory
-            ? t("categories.edit", lang)
-            : t("categories.new", lang)
-        }
-        confirmLoading={createMutation.isPending || updateMutation.isPending}
-        width={isMobile ? "95vw" : 640}
-        destroyOnHidden
-        title={null}
-        styles={{ body: { paddingTop: 20 } }}
-      >
-        {/* Gradient header */}
-        <div style={gradientHeader}>
-          <Space>
+        onClose={closeModal}
+        destroyOnClose
+        keyboard
+        placement={isMobile ? "bottom" : isRTL ? "left" : "right"}
+        width={isMobile ? "100%" : 520}
+        height={isMobile ? "90%" : undefined}
+        title={
+          <div style={{ display: "flex", alignItems: "center", gap: 10, color: "#fff" }}>
             {editingCategory ? <EditOutlined /> : <PlusOutlined />}
-            <span style={{ fontSize: 16, fontWeight: 600 }}>
+            <span style={{ fontWeight: 600 }}>
               {editingCategory
                 ? `${t("categories.edit", lang)} — ${getName(editingCategory)}`
                 : t("categories.new", lang)}
             </span>
-          </Space>
-        </div>
-
+          </div>
+        }
+        styles={{
+          header: {
+            background: `linear-gradient(135deg, ${primary}, ${theme === "dark" ? "#2dd4bf" : "#6366f1"})`,
+          },
+          body: { direction: isRTL ? "rtl" : "ltr" },
+        }}
+        footer={
+          <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+            <Button
+              onClick={closeModal}
+              disabled={createMutation.isPending || updateMutation.isPending}
+            >
+              {t("common.cancel", lang)}
+            </Button>
+            <Button
+              type="primary"
+              onClick={handleSubmit}
+              loading={createMutation.isPending || updateMutation.isPending}
+            >
+              {editingCategory
+                ? t("categories.edit", lang)
+                : t("categories.new", lang)}
+            </Button>
+          </div>
+        }
+      >
         <Form form={form} layout="vertical">
           <Row gutter={16}>
             <Col xs={24} sm={12}>
@@ -707,7 +716,7 @@ export default function ProductCategories() {
             </Col>
           </Row>
         </Form>
-      </Modal>
+      </Drawer>
     </DashboardLayout>
   );
 }

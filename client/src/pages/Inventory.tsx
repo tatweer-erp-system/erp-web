@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useDebounce } from "@/hooks/useDebounce";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
 import { useLangStore } from "@/stores/lang.store";
@@ -100,8 +101,10 @@ export default function Inventory() {
 
   // ── State ──────────────────────────────────────────────────────────────────
   const [searchText, setSearchText] = useState("");
+  const debouncedSearch = useDebounce(searchText, 400);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [warehouseFilter, setWarehouseFilter] = useState<string>("all");
+  const [filterOpen, setFilterOpen] = useState(false);
   const [pagination, setPagination] = useState({ page: 1, limit: 20 });
 
   // ── Queries ────────────────────────────────────────────────────────────────
@@ -115,14 +118,14 @@ export default function Inventory() {
       QUERY_KEYS.STOCK_LEVELS,
       pagination.page,
       pagination.limit,
-      searchText,
+      debouncedSearch,
       warehouseFilter,
     ],
     queryFn: () =>
       stockService.getStockLevels({
         page: pagination.page,
         limit: pagination.limit,
-        ...(searchText.trim() ? { search: searchText.trim() } : {}),
+        ...(debouncedSearch.trim() ? { search: debouncedSearch.trim() } : {}),
         ...(warehouseFilter !== "all" ? { warehouseId: warehouseFilter } : {}),
       }),
     staleTime: 30_000,
@@ -193,17 +196,6 @@ export default function Inventory() {
     {
       title: t("inventory.product", lang),
       key: "product",
-      sorter: (a, b) => {
-        const nameA = getName({
-          nameEn: a.productNameEn,
-          nameAr: a.productNameAr,
-        });
-        const nameB = getName({
-          nameEn: b.productNameEn,
-          nameAr: b.productNameAr,
-        });
-        return nameA.localeCompare(nameB);
-      },
       render: (_, rec) => {
         const productName = getName({
           nameEn: rec.productNameEn,
@@ -263,7 +255,6 @@ export default function Inventory() {
     {
       title: t("inventory.quantity", lang),
       dataIndex: "quantity",
-      sorter: (a, b) => Number(a.quantity) - Number(b.quantity),
       width: 120,
       render: (v: number, rec) => {
         const qty = Number(v ?? 0);
@@ -283,7 +274,6 @@ export default function Inventory() {
       title: t("inventory.reserved", lang),
       dataIndex: "reservedQuantity",
       width: 110,
-      sorter: (a, b) => Number(a.reservedQuantity) - Number(b.reservedQuantity),
       render: (v: number) => {
         const reserved = Number(v ?? 0);
         return (
@@ -297,11 +287,6 @@ export default function Inventory() {
       title: t("inventory.available", lang),
       key: "available",
       width: 110,
-      sorter: (a, b) => {
-        const availA = Number(a.quantity) - Number(a.reservedQuantity);
-        const availB = Number(b.quantity) - Number(b.reservedQuantity);
-        return availA - availB;
-      },
       render: (_, rec) => {
         const available = Number(rec.quantity) - Number(rec.reservedQuantity);
         return (
@@ -326,7 +311,6 @@ export default function Inventory() {
       title: t("inventory.averageCost", lang),
       dataIndex: "averageCost",
       width: 130,
-      sorter: (a, b) => Number(a.averageCost) - Number(b.averageCost),
       render: (v: number) => {
         const cost = Number(v ?? 0);
         return (
@@ -481,69 +465,25 @@ export default function Inventory() {
 
         {/* ── Toolbar Card ──────────────────────────────────────────── */}
         <Card size="small" styles={{ body: { padding: "12px 16px" } }}>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: 8,
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Space wrap>
-              <Input.Search
+          <div className="flex flex-wrap gap-2 justify-between items-center">
+            <div />
+
+            <div className="flex flex-wrap gap-2 items-center">
+              <Input
+                prefix={<SearchOutlined className="text-gray-400" />}
                 placeholder={t("inventory.search", lang)}
                 value={searchText}
                 onChange={e => setSearchText(e.target.value)}
                 allowClear
-                style={{ width: screens.md ? 260 : 180 }}
+                style={{ width: 240 }}
               />
-              <Select
-                value={warehouseFilter}
-                onChange={v => {
-                  setWarehouseFilter(v);
-                  setPagination(prev => ({ ...prev, page: 1 }));
-                }}
-                style={{ width: 180 }}
-                suffixIcon={<FilterOutlined />}
-                options={[
-                  {
-                    value: "all",
-                    label: t("inventory.allWarehouses", lang),
-                  },
-                  ...warehouseOptions.map(w => ({
-                    value: w.id,
-                    label: getName(w),
-                  })),
-                ]}
-              />
-              <Select
-                value={statusFilter}
-                onChange={v => setStatusFilter(v)}
-                style={{ width: 170 }}
-                suffixIcon={<FilterOutlined />}
-                options={[
-                  {
-                    value: "all",
-                    label: t("inventory.allStatuses", lang),
-                  },
-                  {
-                    value: StockStatus.IN_STOCK,
-                    label: t("inventory.inStock", lang),
-                  },
-                  {
-                    value: StockStatus.LOW_STOCK,
-                    label: t("inventory.lowStockAlert", lang),
-                  },
-                  {
-                    value: StockStatus.OUT_OF_STOCK,
-                    label: t("inventory.outOfStock", lang),
-                  },
-                ]}
-              />
-            </Space>
-
-            <Space>
+              <Tooltip title={t("inventory.filter", lang)}>
+                <Button
+                  icon={<FilterOutlined />}
+                  onClick={() => setFilterOpen(!filterOpen)}
+                  type={filterOpen ? "primary" : "default"}
+                />
+              </Tooltip>
               <Tooltip title={t("inventory.reload", lang)}>
                 <Button
                   icon={<ReloadOutlined />}
@@ -555,8 +495,61 @@ export default function Inventory() {
                   }}
                 />
               </Tooltip>
-            </Space>
+            </div>
           </div>
+
+          {/* Filter Panel */}
+          {filterOpen && (
+            <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+              <Row gutter={[12, 12]}>
+                <Col xs={24} sm={12}>
+                  <Select
+                    value={warehouseFilter}
+                    onChange={v => {
+                      setWarehouseFilter(v);
+                      setPagination(prev => ({ ...prev, page: 1 }));
+                    }}
+                    style={{ width: "100%" }}
+                    options={[
+                      {
+                        value: "all",
+                        label: t("inventory.allWarehouses", lang),
+                      },
+                      ...warehouseOptions.map(w => ({
+                        value: w.id,
+                        label: getName(w),
+                      })),
+                    ]}
+                  />
+                </Col>
+                <Col xs={24} sm={12}>
+                  <Select
+                    value={statusFilter}
+                    onChange={v => setStatusFilter(v)}
+                    style={{ width: "100%" }}
+                    options={[
+                      {
+                        value: "all",
+                        label: t("inventory.allStatuses", lang),
+                      },
+                      {
+                        value: StockStatus.IN_STOCK,
+                        label: t("inventory.inStock", lang),
+                      },
+                      {
+                        value: StockStatus.LOW_STOCK,
+                        label: t("inventory.lowStockAlert", lang),
+                      },
+                      {
+                        value: StockStatus.OUT_OF_STOCK,
+                        label: t("inventory.outOfStock", lang),
+                      },
+                    ]}
+                  />
+                </Col>
+              </Row>
+            </div>
+          )}
         </Card>
 
         {/* ── Table ─────────────────────────────────────────────────── */}

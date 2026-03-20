@@ -20,6 +20,7 @@ import {
   Card,
   Button,
   Input,
+  Drawer,
   Modal,
   Form,
   Select,
@@ -32,6 +33,7 @@ import {
   Popconfirm,
   Dropdown,
   Segmented,
+  DatePicker,
   notification,
   message,
   theme as antTheme,
@@ -41,6 +43,7 @@ import {
   Tooltip,
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
+import type { Dayjs } from "dayjs";
 import {
   PlusOutlined,
   EditOutlined,
@@ -49,7 +52,7 @@ import {
   ReloadOutlined,
   CloseOutlined,
   SaveOutlined,
-  PrinterOutlined,
+  FilterOutlined,
   DownloadOutlined,
   AppstoreOutlined,
   UnorderedListOutlined,
@@ -67,6 +70,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { usePagination } from "@/hooks/usePagination";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useBreakpoint } from "@/hooks/ui/useBreakpoint";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -86,7 +90,7 @@ function formatCurrency(amount: number, currency = "SAR") {
 
 // ─── Product Form Modal ──────────────────────────────────────────────────────
 
-function ProductFormModal({
+function ProductFormDrawer({
   open,
   editProduct,
   onClose,
@@ -102,6 +106,7 @@ function ProductFormModal({
   const { token } = antTheme.useToken();
   const [form] = Form.useForm();
   const queryClient = useQueryClient();
+  const { isMobile } = useBreakpoint();
   const isEdit = !!editProduct;
   const isRTL = lang === "ar";
 
@@ -109,6 +114,7 @@ function ProductFormModal({
     mutationFn: (dto: CreateProductDto) => productsService.create(dto),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.PRODUCTS] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.PRODUCTS_SUMMARY] });
       message.success(t("products.createSuccess", lang));
       form.resetFields();
       onClose();
@@ -127,6 +133,7 @@ function ProductFormModal({
       productsService.update(editProduct!.id, dto as never),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.PRODUCTS] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.PRODUCTS_SUMMARY] });
       message.success(t("products.updateSuccess", lang));
       form.resetFields();
       onClose();
@@ -185,337 +192,258 @@ function ProductFormModal({
 
   const typeColor = token.colorPrimary;
 
+  const handleClose = () => {
+    if (form.isFieldsTouched()) {
+      Modal.confirm({
+        title: t("products.unsavedChanges", lang),
+        content: t("products.unsavedChangesMsg", lang),
+        onOk: () => {
+          form.resetFields();
+          onClose();
+        },
+      });
+      return;
+    }
+    form.resetFields();
+    onClose();
+  };
+
   return (
-    <Modal
+    <Drawer
       open={open}
-      onCancel={onClose}
-      footer={null}
-      closable={false}
-      destroyOnHidden
-      width={700}
+      onClose={handleClose}
+      destroyOnClose
+      keyboard
+      placement={isMobile ? "bottom" : isRTL ? "left" : "right"}
+      width={isMobile ? "100%" : 600}
+      height={isMobile ? "90%" : undefined}
+      title={
+        <div style={{ display: "flex", alignItems: "center", gap: 10, color: "#fff" }}>
+          {isEdit ? <EditOutlined /> : <PlusOutlined />}
+          <span style={{ fontWeight: 600 }}>
+            {isEdit
+              ? t("products.editProduct", lang)
+              : t("products.addProduct", lang)}
+          </span>
+        </div>
+      }
       styles={{
-        body: { padding: 0 },
-        mask: { backdropFilter: "blur(2px)", background: "rgba(0,0,0,0.35)" },
-      }}
-    >
-      {/* ── Gradient header ─────────────────────────────────────────── */}
-      <div
-        style={{
+        header: {
           background: `linear-gradient(135deg, ${typeColor} 0%, ${typeColor}dd 100%)`,
-          padding: "22px 24px 20px",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: 16,
-          }}
-        >
-          <div
-            style={{
-              background: "rgba(255,255,255,0.18)",
-              borderRadius: 6,
-              padding: "3px 10px",
-              fontSize: 11,
-              fontWeight: 700,
-              color: "#fff",
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-            }}
+        },
+        body: { direction: isRTL ? "rtl" : "ltr" },
+      }}
+      footer={
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+          <Button onClick={handleClose} disabled={isSaving}>
+            {t("products.cancel", lang)}
+          </Button>
+          <Button
+            type="primary"
+            icon={<SaveOutlined />}
+            loading={isSaving}
+            onClick={handleSave}
           >
-            {isEdit
-              ? t("products.editProduct", lang)
-              : t("products.addProduct", lang)}
-          </div>
-          <button
-            onClick={onClose}
-            style={{
-              width: 30,
-              height: 30,
-              borderRadius: 8,
-              background: "rgba(255,255,255,0.18)",
-              border: "none",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#fff",
-              fontSize: 13,
-            }}
-          >
-            <CloseOutlined />
-          </button>
+            {isEdit ? t("products.saveChanges", lang) : t("products.save", lang)}
+          </Button>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-          <div
-            style={{
-              width: 48,
-              height: 48,
-              borderRadius: 14,
-              background: "rgba(255,255,255,0.22)",
-              border: "2px solid rgba(255,255,255,0.35)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 17,
-              fontWeight: 800,
-              color: "#fff",
-              flexShrink: 0,
-            }}
-          >
-            {isEdit ? <EditOutlined /> : <PlusOutlined />}
-          </div>
-          <div style={{ fontSize: 20, fontWeight: 800, color: "#fff" }}>
-            {isEdit
-              ? t("products.editProduct", lang)
-              : t("products.addProduct", lang)}
-          </div>
-        </div>
-      </div>
-
-      {/* ── Form body (scrollable) ──────────────────────────────────── */}
-      <div
-        style={{
-          padding: "24px",
-          maxHeight: "calc(80vh - 200px)",
-          overflowY: "auto",
+      }
+    >
+      <Form
+        form={form}
+        layout="vertical"
+        initialValues={{
+          productType: ProductType.STORABLE,
+          invoicePolicy: InvoicePolicy.ORDERED,
+          taxRate: 15,
+          isActive: true,
+          canBeSold: true,
+          canBePurchased: true,
+          reorderPoint: 0,
         }}
       >
-        <Form
-          form={form}
-          layout="vertical"
-          initialValues={{
-            productType: ProductType.STORABLE,
-            invoicePolicy: InvoicePolicy.ORDERED,
-            taxRate: 15,
-            isActive: true,
-            canBeSold: true,
-            canBePurchased: true,
-            reorderPoint: 0,
-          }}
-        >
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                name="nameEn"
-                label={t("products.nameEn", lang)}
-                rules={[{ required: true }]}
-              >
-                <Input dir="ltr" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="nameAr"
-                label={t("products.nameAr", lang)}
-                rules={[{ required: true }]}
-              >
-                <Input dir="rtl" />
-              </Form.Item>
-            </Col>
-          </Row>
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item
+              name="nameEn"
+              label={t("products.nameEn", lang)}
+              rules={[{ required: true }]}
+            >
+              <Input dir="ltr" />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item
+              name="nameAr"
+              label={t("products.nameAr", lang)}
+              rules={[{ required: true }]}
+            >
+              <Input dir="rtl" />
+            </Form.Item>
+          </Col>
+        </Row>
 
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                name="sku"
-                label={t("products.sku", lang)}
-                rules={[{ required: true }]}
-              >
-                <Input dir="ltr" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item name="barcode" label={t("products.barcode", lang)}>
-                <Input dir="ltr" />
-              </Form.Item>
-            </Col>
-          </Row>
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item
+              name="sku"
+              label={t("products.sku", lang)}
+              rules={[{ required: true }]}
+            >
+              <Input dir="ltr" />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item name="barcode" label={t("products.barcode", lang)}>
+              <Input dir="ltr" />
+            </Form.Item>
+          </Col>
+        </Row>
 
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                name="categoryId"
-                label={t("products.category", lang)}
-                rules={[{ required: true }]}
-              >
-                <Select
-                  showSearch
-                  optionFilterProp="label"
-                  options={categories.map(c => ({
-                    value: c.id,
-                    label: getName(c),
-                  }))}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="productType"
-                label={t("products.productType", lang)}
-              >
-                <Select
-                  options={[
-                    {
-                      value: ProductType.STORABLE,
-                      label: t("products.storable", lang),
-                    },
-                    {
-                      value: ProductType.CONSUMABLE,
-                      label: t("products.consumable", lang),
-                    },
-                    {
-                      value: ProductType.SERVICE,
-                      label: t("products.service", lang),
-                    },
-                  ]}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item
+              name="categoryId"
+              label={t("products.category", lang)}
+              rules={[{ required: true }]}
+            >
+              <Select
+                showSearch
+                optionFilterProp="label"
+                options={categories.map(c => ({
+                  value: c.id,
+                  label: getName(c),
+                }))}
+              />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item
+              name="productType"
+              label={t("products.productType", lang)}
+            >
+              <Select
+                options={[
+                  {
+                    value: ProductType.STORABLE,
+                    label: t("products.storable", lang),
+                  },
+                  {
+                    value: ProductType.CONSUMABLE,
+                    label: t("products.consumable", lang),
+                  },
+                  {
+                    value: ProductType.SERVICE,
+                    label: t("products.service", lang),
+                  },
+                ]}
+              />
+            </Form.Item>
+          </Col>
+        </Row>
 
-          <Row gutter={16}>
-            <Col span={8}>
-              <Form.Item
-                name="unitPrice"
-                label={t("products.unitPrice", lang)}
-                rules={[{ required: true }]}
-              >
-                <InputNumber min={0} style={{ width: "100%" }} />
-              </Form.Item>
-            </Col>
-            <Col span={8}>
-              <Form.Item name="costPrice" label={t("products.costPrice", lang)}>
-                <InputNumber min={0} style={{ width: "100%" }} />
-              </Form.Item>
-            </Col>
-            <Col span={8}>
-              <Form.Item name="taxRate" label={t("products.taxRate", lang)}>
-                <InputNumber min={0} max={100} style={{ width: "100%" }} />
-              </Form.Item>
-            </Col>
-          </Row>
+        <Row gutter={16}>
+          <Col span={8}>
+            <Form.Item
+              name="unitPrice"
+              label={t("products.unitPrice", lang)}
+              rules={[{ required: true }]}
+            >
+              <InputNumber min={0} style={{ width: "100%" }} />
+            </Form.Item>
+          </Col>
+          <Col span={8}>
+            <Form.Item name="costPrice" label={t("products.costPrice", lang)}>
+              <InputNumber min={0} style={{ width: "100%" }} />
+            </Form.Item>
+          </Col>
+          <Col span={8}>
+            <Form.Item name="taxRate" label={t("products.taxRate", lang)}>
+              <InputNumber min={0} max={100} style={{ width: "100%" }} />
+            </Form.Item>
+          </Col>
+        </Row>
 
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                name="invoicePolicy"
-                label={t("products.invoicePolicy", lang)}
-              >
-                <Select
-                  options={[
-                    {
-                      value: InvoicePolicy.ORDERED,
-                      label: t("products.ordered", lang),
-                    },
-                    {
-                      value: InvoicePolicy.DELIVERED,
-                      label: t("products.delivered", lang),
-                    },
-                  ]}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="reorderPoint"
-                label={t("products.reorderPoint", lang)}
-              >
-                <InputNumber min={0} style={{ width: "100%" }} />
-              </Form.Item>
-            </Col>
-          </Row>
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item
+              name="invoicePolicy"
+              label={t("products.invoicePolicy", lang)}
+            >
+              <Select
+                options={[
+                  {
+                    value: InvoicePolicy.ORDERED,
+                    label: t("products.ordered", lang),
+                  },
+                  {
+                    value: InvoicePolicy.DELIVERED,
+                    label: t("products.delivered", lang),
+                  },
+                ]}
+              />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item
+              name="reorderPoint"
+              label={t("products.reorderPoint", lang)}
+            >
+              <InputNumber min={0} style={{ width: "100%" }} />
+            </Form.Item>
+          </Col>
+        </Row>
 
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                name="descriptionEn"
-                label={t("products.descriptionEn", lang)}
-              >
-                <Input.TextArea rows={2} dir="ltr" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="descriptionAr"
-                label={t("products.descriptionAr", lang)}
-              >
-                <Input.TextArea rows={2} dir="rtl" />
-              </Form.Item>
-            </Col>
-          </Row>
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item
+              name="descriptionEn"
+              label={t("products.descriptionEn", lang)}
+            >
+              <Input.TextArea rows={2} dir="ltr" />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item
+              name="descriptionAr"
+              label={t("products.descriptionAr", lang)}
+            >
+              <Input.TextArea rows={2} dir="rtl" />
+            </Form.Item>
+          </Col>
+        </Row>
 
-          <Row gutter={24}>
-            <Col>
-              <Form.Item
-                name="isActive"
-                label={t("products.isActive", lang)}
-                valuePropName="checked"
-              >
-                <Switch />
-              </Form.Item>
-            </Col>
-            <Col>
-              <Form.Item
-                name="canBeSold"
-                label={t("products.canBeSold", lang)}
-                valuePropName="checked"
-              >
-                <Switch />
-              </Form.Item>
-            </Col>
-            <Col>
-              <Form.Item
-                name="canBePurchased"
-                label={t("products.canBePurchased", lang)}
-                valuePropName="checked"
-              >
-                <Switch />
-              </Form.Item>
-            </Col>
-          </Row>
-        </Form>
-      </div>
-
-      {/* ── Footer ──────────────────────────────────────────────────── */}
-      <div
-        style={{
-          background: token.colorBgContainer,
-          borderTop: `1px solid ${token.colorBorderSecondary}`,
-          padding: "14px 24px",
-          display: "flex",
-          gap: 10,
-        }}
-      >
-        <Button
-          type="primary"
-          icon={<SaveOutlined />}
-          loading={isSaving}
-          onClick={handleSave}
-          size="large"
-          style={{
-            flex: 1,
-            height: 42,
-            fontWeight: 700,
-            background: `linear-gradient(135deg, ${typeColor}, ${typeColor}dd)`,
-            border: "none",
-            boxShadow: `0 4px 12px ${typeColor}44`,
-          }}
-        >
-          {isEdit ? t("products.saveChanges", lang) : t("products.save", lang)}
-        </Button>
-        <Button
-          icon={<CloseOutlined />}
-          onClick={onClose}
-          size="large"
-          style={{ height: 42, fontWeight: 600, minWidth: 100 }}
-        >
-          {t("products.cancel", lang)}
-        </Button>
-      </div>
-    </Modal>
+        <Row gutter={24}>
+          <Col>
+            <Form.Item
+              name="isActive"
+              label={t("products.isActive", lang)}
+              valuePropName="checked"
+            >
+              <Switch />
+            </Form.Item>
+          </Col>
+          <Col>
+            <Form.Item
+              name="canBeSold"
+              label={t("products.canBeSold", lang)}
+              valuePropName="checked"
+            >
+              <Switch />
+            </Form.Item>
+          </Col>
+          <Col>
+            <Form.Item
+              name="canBePurchased"
+              label={t("products.canBePurchased", lang)}
+              valuePropName="checked"
+            >
+              <Switch />
+            </Form.Item>
+          </Col>
+        </Row>
+      </Form>
+    </Drawer>
   );
 }
 
@@ -523,17 +451,18 @@ function ProductFormModal({
 
 export default function ProductDetails() {
   const lang = useLangStore(s => s.lang);
-  const isRTL = lang === "ar";
   const navigate = useNavigate();
   const { pagination, goToPage, setLimit } = usePagination();
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 400);
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
-  const [modalOpen, setModalOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [editProduct, setEditProduct] = useState<Product | null>(null);
   const [filterType, setFilterType] = useState<string | undefined>();
   const [filterStatus, setFilterStatus] = useState<string | undefined>();
   const [filterCategory, setFilterCategory] = useState<string | undefined>();
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [dateRange, setDateRange] = useState<[Dayjs | null, Dayjs | null] | null>(null);
   const queryClient = useQueryClient();
 
   // ── Fetch categories (shared by filters + modal) ──
@@ -542,6 +471,16 @@ export default function ProductDetails() {
     queryFn: () => categoriesService.dropdown({ limit: 100 }),
     staleTime: 60_000,
   });
+
+  // ── Fetch summary (server-side aggregates) ──
+  const { data: summaryRes } = useQuery({
+    queryKey: [QUERY_KEYS.PRODUCTS_SUMMARY],
+    queryFn: () => productsService.summary(),
+    staleTime: 30_000,
+  });
+  const summary = (summaryRes as Record<string, unknown>)?.data as
+    | { totalProducts: number; totalActive: number; totalInactive: number; totalStorable: number; totalConsumable: number; totalService: number }
+    | undefined;
 
   // ── Fetch products ──
   const {
@@ -579,6 +518,7 @@ export default function ProductDetails() {
     mutationFn: (id: string) => productsService.remove(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.PRODUCTS] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.PRODUCTS_SUMMARY] });
       message.success(t("products.deleteSuccess", lang));
     },
     onError: (err: { message?: string }) => {
@@ -590,20 +530,20 @@ export default function ProductDetails() {
     },
   });
 
-  // ── Open modal ──
+  // ── Open drawer ──
   const openCreate = () => {
     setEditProduct(null);
-    setModalOpen(true);
+    setDrawerOpen(true);
   };
 
   const openEdit = (product: Product) => {
     setEditProduct(product);
-    setModalOpen(true);
+    setDrawerOpen(true);
   };
 
-  const closeModal = () => {
+  const closeDrawer = () => {
     setEditProduct(null);
-    setModalOpen(false);
+    setDrawerOpen(false);
   };
 
   // ── Export / Print ──
@@ -639,8 +579,6 @@ export default function ProductDetails() {
     a.click();
     URL.revokeObjectURL(url);
   };
-
-  const handlePrint = () => window.print();
 
   // ── Table columns ──
   const columns: ColumnsType<Product> = [
@@ -765,7 +703,7 @@ export default function ProductDetails() {
             <Card>
               <Statistic
                 title={t("products.totalProducts", lang)}
-                value={total}
+                value={summary?.totalProducts ?? 0}
                 prefix={
                   <InboxOutlined style={{ fontSize: 20, color: "#3B82F6" }} />
                 }
@@ -778,15 +716,8 @@ export default function ProductDetails() {
           <Col xs={24} sm={12} md={6}>
             <Card>
               <Statistic
-                title={t("products.lowStockItems", lang)}
-                value={
-                  products.filter(
-                    p =>
-                      p.productType === ProductType.STORABLE &&
-                      p.reorderPoint != null &&
-                      p.reorderPoint > 0
-                  ).length
-                }
+                title={t("products.storable", lang)}
+                value={summary?.totalStorable ?? 0}
                 prefix={
                   <WarningOutlined style={{ fontSize: 20, color: "#F59E0B" }} />
                 }
@@ -800,8 +731,8 @@ export default function ProductDetails() {
           <Col xs={24} sm={12} md={6}>
             <Card>
               <Statistic
-                title={t("products.outOfStockItems", lang)}
-                value={products.filter(p => !p.isActive).length}
+                title={t("products.inactive", lang)}
+                value={summary?.totalInactive ?? 0}
                 prefix={
                   <StopOutlined style={{ fontSize: 20, color: "#EF4444" }} />
                 }
@@ -815,17 +746,12 @@ export default function ProductDetails() {
           <Col xs={24} sm={12} md={6}>
             <Card>
               <Statistic
-                title={t("products.totalValue", lang)}
-                value={formatCurrency(
-                  products.reduce(
-                    (sum, p) => sum + (p.costPrice ?? p.unitPrice ?? 0),
-                    0
-                  )
-                )}
+                title={t("products.isActive", lang)}
+                value={summary?.totalActive ?? 0}
                 prefix={
                   <DollarOutlined style={{ fontSize: 20, color: "#10B981" }} />
                 }
-                styles={{ content: { color: "#10B981", fontSize: 24 } }}
+                styles={{ content: { color: "#10B981" } }}
               />
               <div className="text-xs text-muted-foreground mt-1">
                 {t("products.inventoryValue", lang)}
@@ -834,105 +760,51 @@ export default function ProductDetails() {
           </Col>
         </Row>
 
-        {/* Search + Actions Toolbar */}
+        {/* ── Toolbar Card ─────────────────────────────────────────────── */}
         <Card size="small" styles={{ body: { padding: "12px 16px" } }}>
-          <div className="flex flex-wrap gap-2 items-center justify-between">
-            {/* Search + Filters — left */}
-            <Space wrap>
+          <div className="flex flex-wrap gap-2 justify-between items-center">
+            <div className="flex flex-wrap gap-2 items-center">
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={openCreate}
+              >
+                {t("products.addProduct", lang)}
+              </Button>
+            </div>
+
+            <div className="flex flex-wrap gap-2 items-center">
+              <DatePicker.RangePicker
+                value={dateRange}
+                onChange={dates => {
+                  setDateRange(dates);
+                  goToPage(1);
+                }}
+                placeholder={[
+                  t("common.dateFrom", lang),
+                  t("common.dateTo", lang),
+                ]}
+                allowClear
+                style={{ borderRadius: 8 }}
+              />
               <Input
+                prefix={<SearchOutlined className="text-gray-400" />}
                 placeholder={t("products.search", lang)}
-                prefix={<SearchOutlined />}
                 value={search}
                 onChange={e => {
                   setSearch(e.target.value);
                   goToPage(1);
                 }}
                 allowClear
-                style={{ minWidth: 220, maxWidth: 300 }}
-                dir={isRTL ? "rtl" : "ltr"}
+                style={{ width: 240 }}
               />
-
-              <Select
-                placeholder={t("products.allTypes", lang)}
-                value={filterType}
-                onChange={val => {
-                  setFilterType(val);
-                  goToPage(1);
-                }}
-                allowClear
-                style={{ minWidth: 140 }}
-                options={[
-                  {
-                    value: ProductType.STORABLE,
-                    label: t("products.storable", lang),
-                  },
-                  {
-                    value: ProductType.CONSUMABLE,
-                    label: t("products.consumable", lang),
-                  },
-                  {
-                    value: ProductType.SERVICE,
-                    label: t("products.service", lang),
-                  },
-                ]}
-              />
-
-              <Select
-                placeholder={t("products.allStatuses", lang)}
-                value={filterStatus}
-                onChange={val => {
-                  setFilterStatus(val);
-                  goToPage(1);
-                }}
-                allowClear
-                style={{ minWidth: 140 }}
-                options={[
-                  {
-                    value: "active",
-                    label: t("products.active", lang),
-                  },
-                  {
-                    value: "inactive",
-                    label: t("products.inactive", lang),
-                  },
-                ]}
-              />
-
-              <Select
-                placeholder={t("products.allCategories", lang)}
-                value={filterCategory}
-                onChange={val => {
-                  setFilterCategory(val);
-                  goToPage(1);
-                }}
-                allowClear
-                showSearch
-                optionFilterProp="label"
-                style={{ minWidth: 160 }}
-                options={categoryOptions.map(c => ({
-                  value: c.id,
-                  label: getName(c),
-                }))}
-              />
-
-              {(filterType || filterStatus || filterCategory) && (
+              <Tooltip title={t("products.filter", lang)}>
                 <Button
-                  type="link"
-                  size="small"
-                  onClick={() => {
-                    setFilterType(undefined);
-                    setFilterStatus(undefined);
-                    setFilterCategory(undefined);
-                    goToPage(1);
-                  }}
-                >
-                  {t("products.clearFilters", lang)}
-                </Button>
-              )}
-            </Space>
-
-            {/* Actions — right */}
-            <Space wrap>
+                  icon={<FilterOutlined />}
+                  onClick={() => setIsFilterOpen(!isFilterOpen)}
+                  type={isFilterOpen ? "primary" : "default"}
+                />
+              </Tooltip>
               <Tooltip title={t("products.reload", lang)}>
                 <Button
                   icon={<ReloadOutlined spin={isFetching} />}
@@ -943,62 +815,132 @@ export default function ProductDetails() {
                   }
                 />
               </Tooltip>
-
-              <Tooltip title={t("products.print", lang)}>
-                <Button icon={<PrinterOutlined />} onClick={handlePrint} />
-              </Tooltip>
-
               <Dropdown
                 menu={{
                   items: [
                     {
                       key: "csv",
-                      label: t("products.exportCsv", lang),
+                      label: "CSV",
+                      icon: <DownloadOutlined />,
                       onClick: handleExport,
                     },
                     {
                       key: "excel",
-                      label: t("products.exportExcel", lang),
-                      disabled: true,
+                      label: "Excel",
+                      icon: <DownloadOutlined />,
                     },
                     {
                       key: "pdf",
-                      label: t("products.exportPdf", lang),
-                      disabled: true,
+                      label: "PDF",
+                      icon: <DownloadOutlined />,
                     },
                   ],
                 }}
-                placement={isRTL ? "bottomLeft" : "bottomRight"}
               >
                 <Button icon={<DownloadOutlined />}>
                   {t("products.export", lang)}
                 </Button>
               </Dropdown>
-
               <Segmented
                 value={viewMode}
                 onChange={val => setViewMode(val as "table" | "grid")}
                 options={[
-                  {
-                    value: "table",
-                    icon: <UnorderedListOutlined />,
-                  },
-                  {
-                    value: "grid",
-                    icon: <AppstoreOutlined />,
-                  },
+                  { value: "table", icon: <UnorderedListOutlined /> },
+                  { value: "grid", icon: <AppstoreOutlined /> },
                 ]}
               />
-
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={openCreate}
-              >
-                {t("products.addProduct", lang)}
-              </Button>
-            </Space>
+            </div>
           </div>
+
+          {/* Filter Panel */}
+          {isFilterOpen && (
+            <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+              <Row gutter={[12, 12]}>
+                <Col xs={24} sm={8}>
+                  <Select
+                    placeholder={t("products.allTypes", lang)}
+                    value={filterType}
+                    onChange={val => {
+                      setFilterType(val);
+                      goToPage(1);
+                    }}
+                    allowClear
+                    style={{ width: "100%" }}
+                    options={[
+                      {
+                        value: ProductType.STORABLE,
+                        label: t("products.storable", lang),
+                      },
+                      {
+                        value: ProductType.CONSUMABLE,
+                        label: t("products.consumable", lang),
+                      },
+                      {
+                        value: ProductType.SERVICE,
+                        label: t("products.service", lang),
+                      },
+                    ]}
+                  />
+                </Col>
+                <Col xs={24} sm={8}>
+                  <Select
+                    placeholder={t("products.allStatuses", lang)}
+                    value={filterStatus}
+                    onChange={val => {
+                      setFilterStatus(val);
+                      goToPage(1);
+                    }}
+                    allowClear
+                    style={{ width: "100%" }}
+                    options={[
+                      {
+                        value: "active",
+                        label: t("products.active", lang),
+                      },
+                      {
+                        value: "inactive",
+                        label: t("products.inactive", lang),
+                      },
+                    ]}
+                  />
+                </Col>
+                <Col xs={24} sm={8}>
+                  <Select
+                    placeholder={t("products.allCategories", lang)}
+                    value={filterCategory}
+                    onChange={val => {
+                      setFilterCategory(val);
+                      goToPage(1);
+                    }}
+                    allowClear
+                    showSearch
+                    optionFilterProp="label"
+                    style={{ width: "100%" }}
+                    options={categoryOptions.map(c => ({
+                      value: c.id,
+                      label: getName(c),
+                    }))}
+                  />
+                </Col>
+              </Row>
+              {(filterType || filterStatus || filterCategory) && (
+                <div className="mt-2">
+                  <Button
+                    type="link"
+                    size="small"
+                    onClick={() => {
+                      setFilterType(undefined);
+                      setFilterStatus(undefined);
+                      setFilterCategory(undefined);
+                      goToPage(1);
+                    }}
+                  >
+                    {t("products.clearFilters", lang)}
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
         </Card>
 
         {/* Table View */}
@@ -1209,11 +1151,11 @@ export default function ProductDetails() {
           </div>
         </Card>
 
-        {/* Product Form Modal */}
-        <ProductFormModal
-          open={modalOpen}
+        {/* Product Form Drawer */}
+        <ProductFormDrawer
+          open={drawerOpen}
           editProduct={editProduct}
-          onClose={closeModal}
+          onClose={closeDrawer}
           lang={lang}
           categories={categoryOptions}
         />

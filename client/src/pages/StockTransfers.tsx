@@ -1,4 +1,6 @@
 import { useState, useMemo, useCallback } from "react";
+import { useDebounce } from "@/hooks/useDebounce";
+import { usePagination } from "@/hooks/usePagination";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
 import { useLangStore } from "@/stores/lang.store";
@@ -38,6 +40,7 @@ import type { TableColumnsType } from "antd";
 import {
   PlusOutlined,
   ReloadOutlined,
+  SearchOutlined,
   SwapOutlined,
   ArrowRightOutlined,
   CalendarOutlined,
@@ -54,6 +57,7 @@ export default function StockTransfers() {
   const lang = useLangStore(s => s.lang);
   const screens = Grid.useBreakpoint();
   const isMobile = !screens.md;
+  const isRTL = lang === "ar";
   const queryClient = useQueryClient();
 
   const primary = theme === "dark" ? "#37D399" : "#3B82F6";
@@ -65,24 +69,44 @@ export default function StockTransfers() {
 
   // ── State ────────────────────────────────────────────────────────────────
   const [searchText, setSearchText] = useState<string>("");
+  const debouncedSearch = useDebounce(searchText, 400);
+  const { pagination, goToPage, setLimit } = usePagination();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [form] = Form.useForm();
 
   // ── Queries ──────────────────────────────────────────────────────────────
+
+  const { data: summaryRes } = useQuery({
+    queryKey: [QUERY_KEYS.STOCK_TRANSFERS_SUMMARY],
+    queryFn: () => transfersService.summary(),
+    staleTime: 30_000,
+  });
+  const summary = (summaryRes as Record<string, unknown>)?.data as
+    | { totalTransfers: number; thisMonth: number; totalUnits: number }
+    | undefined;
 
   const {
     data: transfersRaw,
     isLoading,
     refetch,
   } = useQuery({
-    queryKey: [QUERY_KEYS.STOCK_TRANSFERS],
-    queryFn: () => transfersService.list({ limit: 100 }),
+    queryKey: [
+      QUERY_KEYS.STOCK_TRANSFERS,
+      pagination.page,
+      pagination.limit,
+      debouncedSearch,
+    ],
+    queryFn: () =>
+      transfersService.list({
+        page: pagination.page,
+        limit: pagination.limit,
+        search: debouncedSearch || undefined,
+      }),
     staleTime: 30_000,
   });
 
-  const allTransfers: StockTransfer[] = useMemo(() => {
-    return transfersRaw?.data ?? [];
-  }, [transfersRaw]);
+  const allTransfers: StockTransfer[] = transfersRaw?.data ?? [];
+  const total = transfersRaw?.meta?.total ?? 0;
 
   const { data: productsDropdown } = useQuery({
     queryKey: [QUERY_KEYS.PRODUCTS, "dropdown"],
@@ -112,43 +136,17 @@ export default function StockTransfers() {
     }));
   }, [warehousesDropdown]);
 
-  // ── Filtered data ──────────────────────────────────────────────────────
-  const transfers = useMemo(() => {
-    if (!searchText.trim()) return allTransfers;
-    const q = searchText.trim().toLowerCase();
-    return allTransfers.filter(
-      tr =>
-        (tr.productNameEn ?? "").toLowerCase().includes(q) ||
-        (tr.productNameAr ?? "").toLowerCase().includes(q) ||
-        (tr.productSku ?? "").toLowerCase().includes(q) ||
-        (tr.sourceWarehouseNameEn ?? "").toLowerCase().includes(q) ||
-        (tr.sourceWarehouseNameAr ?? "").toLowerCase().includes(q) ||
-        (tr.destinationWarehouseNameEn ?? "").toLowerCase().includes(q) ||
-        (tr.destinationWarehouseNameAr ?? "").toLowerCase().includes(q) ||
-        (tr.notes ?? "").toLowerCase().includes(q)
-    );
-  }, [allTransfers, searchText]);
-
-  // ── KPI values (computed from ALL data, not filtered) ──────────────────
-  const kpiTotal = allTransfers.length;
-
-  const kpiThisMonth = useMemo(() => {
-    const startOfMonth = dayjs().startOf("month");
-    return allTransfers.filter(tr =>
-      tr.createdAt ? dayjs(tr.createdAt).isAfter(startOfMonth) : false
-    ).length;
-  }, [allTransfers]);
-
-  const kpiTotalUnits = useMemo(() => {
-    return allTransfers.reduce((sum, tr) => sum + Number(tr.quantity ?? 0), 0);
-  }, [allTransfers]);
+  // ── KPI values (from summary endpoint) ──────────────────────────────────
+  const kpiTotal = summary?.totalTransfers ?? 0;
+  const kpiThisMonth = summary?.thisMonth ?? 0;
+  const kpiTotalUnits = summary?.totalUnits ?? 0;
 
   // ── Mutations ────────────────────────────────────────────────────────────
 
-  const invalidate = () =>
-    queryClient.invalidateQueries({
-      queryKey: [QUERY_KEYS.STOCK_TRANSFERS],
-    });
+  const invalidate = () => {
+    queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.STOCK_TRANSFERS] });
+    queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.STOCK_TRANSFERS_SUMMARY] });
+  };
 
   const createMutation = useMutation({
     mutationFn: (dto: CreateTransferDto) => transfersService.create(dto),
@@ -212,10 +210,6 @@ export default function StockTransfers() {
       title: t("inventory.transfers.date", lang),
       dataIndex: "createdAt",
       width: 140,
-      sorter: (a, b) =>
-        new Date(a.createdAt ?? "").getTime() -
-        new Date(b.createdAt ?? "").getTime(),
-      defaultSortOrder: "descend",
       render: (v: string) =>
         v ? (
           <Text style={{ fontSize: 13 }}>
@@ -228,13 +222,6 @@ export default function StockTransfers() {
     {
       title: t("inventory.transfers.product", lang),
       dataIndex: "productNameEn",
-      sorter: (a, b) => {
-        const nameA =
-          lang === "ar" ? (a.productNameAr ?? "") : (a.productNameEn ?? "");
-        const nameB =
-          lang === "ar" ? (b.productNameAr ?? "") : (b.productNameEn ?? "");
-        return nameA.localeCompare(nameB);
-      },
       render: (_, rec) => (
         <div>
           <Text strong style={{ color: token.colorPrimary }}>
@@ -289,7 +276,6 @@ export default function StockTransfers() {
       dataIndex: "quantity",
       align: "center",
       width: 100,
-      sorter: (a, b) => Number(a.quantity) - Number(b.quantity),
       render: (v: number) => (
         <Text strong style={{ fontFamily: "monospace" }}>
           {Number(v ?? 0)}
@@ -304,16 +290,6 @@ export default function StockTransfers() {
         v ? <Text>{v}</Text> : <Text type="secondary">—</Text>,
     },
   ];
-
-  // ── Gradient header style for drawer ──────────────────────────────────
-
-  const gradientHeader = {
-    background: `linear-gradient(135deg, ${primary}, ${theme === "dark" ? "#2dd4bf" : "#6366f1"})`,
-    padding: "16px 24px",
-    margin: "-20px -24px 16px -24px",
-    borderRadius: "8px 8px 0 0",
-    color: "#fff",
-  };
 
   return (
     <DashboardLayout
@@ -412,29 +388,8 @@ export default function StockTransfers() {
 
         {/* ── Toolbar Card ───────────────────────────────────────────────── */}
         <Card size="small" styles={{ body: { padding: "12px 16px" } }}>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: 8,
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Space wrap>
-              <Input.Search
-                placeholder={t("inventory.transfers.search", lang)}
-                value={searchText}
-                onChange={e => setSearchText(e.target.value)}
-                allowClear
-                style={{ width: 260 }}
-              />
-            </Space>
-
-            <Space>
-              <Tooltip title={t("common.reload", lang)}>
-                <Button icon={<ReloadOutlined />} onClick={() => refetch()} />
-              </Tooltip>
+          <div className="flex flex-wrap gap-2 justify-between items-center">
+            <div className="flex flex-wrap gap-2 items-center">
               <Button
                 type="primary"
                 icon={<PlusOutlined />}
@@ -442,7 +397,24 @@ export default function StockTransfers() {
               >
                 {t("inventory.transfers.new", lang)}
               </Button>
-            </Space>
+            </div>
+
+            <div className="flex flex-wrap gap-2 items-center">
+              <Input
+                prefix={<SearchOutlined className="text-gray-400" />}
+                placeholder={t("inventory.transfers.search", lang)}
+                value={searchText}
+                onChange={e => {
+                  setSearchText(e.target.value);
+                  goToPage(1);
+                }}
+                allowClear
+                style={{ width: 240 }}
+              />
+              <Tooltip title={t("common.reload", lang)}>
+                <Button icon={<ReloadOutlined />} onClick={() => refetch()} />
+              </Tooltip>
+            </div>
           </div>
         </Card>
 
@@ -451,15 +423,22 @@ export default function StockTransfers() {
           <Table
             rowKey="id"
             columns={columns}
-            dataSource={transfers}
+            dataSource={allTransfers}
             loading={isLoading}
             size="middle"
             scroll={{ x: "max-content" }}
             pagination={{
+              current: pagination.page,
+              pageSize: pagination.limit,
+              total,
               showSizeChanger: true,
-              showTotal: (total, range) =>
-                `${range[0]}–${range[1]} ${t("common.of", lang)} ${total}`,
+              showTotal: (t2, range) =>
+                `${range[0]}–${range[1]} ${t("common.of", lang)} ${t2}`,
               pageSizeOptions: ["10", "25", "50", "100"],
+              onChange: (page, pageSize) => {
+                goToPage(page);
+                if (pageSize !== pagination.limit) setLimit(pageSize);
+              },
             }}
             locale={{
               emptyText: t("inventory.transfers.title", lang) + " — 0",
@@ -472,11 +451,28 @@ export default function StockTransfers() {
       <Drawer
         open={drawerOpen}
         onClose={closeDrawer}
-        size={isMobile ? "100%" : 520}
-        title={null}
+        destroyOnClose
+        keyboard
+        placement={isMobile ? "bottom" : isRTL ? "left" : "right"}
+        width={isMobile ? "100%" : 520}
+        height={isMobile ? "90%" : undefined}
+        title={
+          <div style={{ display: "flex", alignItems: "center", gap: 10, color: "#fff" }}>
+            <SwapOutlined />
+            <span style={{ fontWeight: 600 }}>
+              {t("inventory.transfers.new", lang)}
+            </span>
+          </div>
+        }
+        styles={{
+          header: {
+            background: `linear-gradient(135deg, ${primary}, ${theme === "dark" ? "#2dd4bf" : "#6366f1"})`,
+          },
+          body: { direction: isRTL ? "rtl" : "ltr" },
+        }}
         footer={
-          <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
-            <Button onClick={closeDrawer}>
+          <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+            <Button onClick={closeDrawer} disabled={createMutation.isPending}>
               {t("inventory.transfers.cancel", lang)}
             </Button>
             <Button
@@ -489,16 +485,6 @@ export default function StockTransfers() {
           </div>
         }
       >
-        {/* Gradient header */}
-        <div style={gradientHeader}>
-          <Space>
-            <SwapOutlined />
-            <span style={{ fontSize: 16, fontWeight: 600 }}>
-              {t("inventory.transfers.new", lang)}
-            </span>
-          </Space>
-        </div>
-
         <Form form={form} layout="vertical">
           <Form.Item
             label={t("inventory.transfers.product", lang)}

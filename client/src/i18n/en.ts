@@ -349,6 +349,7 @@ export const en: Record<string, string> = {
   "inventory.allStatuses": "All Statuses",
   "inventory.allWarehouses": "All Warehouses",
   "inventory.reload": "Reload",
+  "inventory.filter": "Filter",
   "inventory.product": "Product",
   "inventory.category": "Category",
   "inventory.warehouse": "Warehouse",
@@ -435,6 +436,9 @@ export const en: Record<string, string> = {
   "products.active": "Active",
   "products.inactive": "Inactive",
   "products.clearFilters": "Clear Filters",
+  "products.filter": "Filter",
+  "products.unsavedChanges": "Unsaved Changes",
+  "products.unsavedChangesMsg": "You have unsaved changes. Are you sure you want to close?",
   "products.save": "Save",
   "products.saveChanges": "Save Changes",
   "products.cancel": "Cancel",
@@ -2590,6 +2594,7 @@ export const en: Record<string, string> = {
   "warehouses.active": "Active",
   "warehouses.inactive": "Inactive",
   "warehouses.search": "Search warehouses...",
+  "warehouses.filter": "Filter",
   "warehouses.allStatuses": "All Statuses",
   "warehouses.new": "New Warehouse",
   "warehouses.edit": "Edit Warehouse",
@@ -2659,6 +2664,7 @@ export const en: Record<string, string> = {
   "valuation.grandTotal": "Grand Total",
   "valuation.noData": "No valuation data available",
   "valuation.reload": "Reload",
+  "valuation.filter": "Filter",
   "valuation.exportFailed": "Export failed",
 
   // Stock Movements
@@ -2681,6 +2687,7 @@ export const en: Record<string, string> = {
   "stockMovement.filterByType": "Filter by movement type",
   "stockMovement.filterByWarehouse": "Filter by warehouse",
   "stockMovement.reload": "Reload",
+  "stockMovement.filter": "Filter",
   "stockMovement.of": "of",
   "stockMovement.noData": "No movements found",
 
@@ -2713,6 +2720,23 @@ export const en: Record<string, string> = {
   "openingStock.submitPartial": "Partial success",
   "openingStock.succeeded": "succeeded",
   "openingStock.failed": "failed",
+  "openingStock.batchCreated": "Opening stock batch created",
+  "openingStock.batchRef": "Batch Reference",
+  "openingStock.costPrice": "Cost Price",
+  "openingStock.duplicateDesc": "The following products appear more than once",
+  "openingStock.duplicateWarning": "Duplicate products detected",
+  "openingStock.existingStockWarning": "Some products already have stock",
+  "openingStock.expiryDate": "Expiry Date",
+  "openingStock.itemsCreated": "items created",
+  "openingStock.noProductsSelected": "No products selected",
+  "openingStock.notApplicable": "N/A",
+  "openingStock.sku": "SKU",
+  "openingStock.storableOnly": "Only storable products can have opening stock",
+  "openingStock.totalQuantity": "Total Quantity",
+  "openingStock.totalRows": "Total Rows",
+  "openingStock.totalValue": "Total Value",
+  "openingStock.uom": "Unit",
+  "openingStock.variant": "Variant",
 
   // ── Stock Adjustments Page ──────────────────────────────────────────────────
   "inventory.adjustments.title": "Stock Adjustments",
@@ -3336,12 +3360,6 @@ export const en: Record<string, string> = {
   "analytics.kpi.winRate": "Win Rate",
   "analytics.kpi.pipelineValue": "Pipeline Value",
   "analytics.kpi.avgDealSize": "Avg Deal Size",
-
-  // Analytics tabs
-  "analytics.tabs.sales": "Sales",
-  "analytics.tabs.inventory": "Inventory",
-  "analytics.tabs.hr": "HR",
-  "analytics.tabs.crm": "CRM",
 
   // Common UI strings
   "Just now": "Just now",

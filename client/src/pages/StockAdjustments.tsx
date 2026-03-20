@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback } from "react";
+import { useDebounce } from "@/hooks/useDebounce";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { useAppSettings } from "@/contexts/AppSettingsContext";
 import { useLangStore } from "@/stores/lang.store";
@@ -39,6 +40,7 @@ import type { TableColumnsType } from "antd";
 import {
   PlusOutlined,
   ReloadOutlined,
+  SearchOutlined,
   ArrowUpOutlined,
   ArrowDownOutlined,
   FileTextOutlined,
@@ -56,6 +58,7 @@ export default function StockAdjustments() {
   const lang = useLangStore(s => s.lang);
   const screens = Grid.useBreakpoint();
   const isMobile = !screens.md;
+  const isRTL = lang === "ar";
   const queryClient = useQueryClient();
 
   const primary = theme === "dark" ? "#37D399" : "#3B82F6";
@@ -67,6 +70,7 @@ export default function StockAdjustments() {
 
   // ── State ────────────────────────────────────────────────────────────────
   const [searchText, setSearchText] = useState<string>("");
+  const debouncedSearch = useDebounce(searchText, 400);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [form] = Form.useForm();
 
@@ -116,8 +120,8 @@ export default function StockAdjustments() {
 
   // ── Filtered data ──────────────────────────────────────────────────────
   const adjustments = useMemo(() => {
-    if (!searchText.trim()) return allAdjustments;
-    const q = searchText.trim().toLowerCase();
+    if (!debouncedSearch.trim()) return allAdjustments;
+    const q = debouncedSearch.trim().toLowerCase();
     return allAdjustments.filter(
       a =>
         (a.productNameEn ?? "").toLowerCase().includes(q) ||
@@ -127,7 +131,7 @@ export default function StockAdjustments() {
         (a.warehouseNameAr ?? "").toLowerCase().includes(q) ||
         (a.reason ?? "").toLowerCase().includes(q)
     );
-  }, [allAdjustments, searchText]);
+  }, [allAdjustments, debouncedSearch]);
 
   // ── KPI values (computed from ALL data, not filtered) ──────────────────
   const kpiTotal = allAdjustments.length;
@@ -197,10 +201,6 @@ export default function StockAdjustments() {
       title: t("inventory.adjustments.date", lang),
       dataIndex: "createdAt",
       width: 140,
-      sorter: (a, b) =>
-        new Date(a.createdAt ?? "").getTime() -
-        new Date(b.createdAt ?? "").getTime(),
-      defaultSortOrder: "descend",
       render: (v: string) =>
         v ? (
           <Text style={{ fontSize: 13 }}>
@@ -213,13 +213,6 @@ export default function StockAdjustments() {
     {
       title: t("inventory.adjustments.product", lang),
       dataIndex: "productNameEn",
-      sorter: (a, b) => {
-        const nameA =
-          lang === "ar" ? (a.productNameAr ?? "") : (a.productNameEn ?? "");
-        const nameB =
-          lang === "ar" ? (b.productNameAr ?? "") : (b.productNameEn ?? "");
-        return nameA.localeCompare(nameB);
-      },
       render: (_, rec) => (
         <div>
           <Text strong style={{ color: token.colorPrimary }}>
@@ -258,7 +251,6 @@ export default function StockAdjustments() {
       dataIndex: "quantity",
       align: "center",
       width: 130,
-      sorter: (a, b) => Number(a.quantity) - Number(b.quantity),
       render: (v: number) => {
         const num = Number(v ?? 0);
         const isPositive = num > 0;
@@ -324,16 +316,6 @@ export default function StockAdjustments() {
       ),
     },
   ];
-
-  // ── Gradient header style for drawer ──────────────────────────────────
-
-  const gradientHeader = {
-    background: `linear-gradient(135deg, ${primary}, ${theme === "dark" ? "#2dd4bf" : "#6366f1"})`,
-    padding: "16px 24px",
-    margin: "-20px -24px 16px -24px",
-    borderRadius: "8px 8px 0 0",
-    color: "#fff",
-  };
 
   return (
     <DashboardLayout
@@ -432,29 +414,8 @@ export default function StockAdjustments() {
 
         {/* ── Toolbar Card ───────────────────────────────────────────────── */}
         <Card size="small" styles={{ body: { padding: "12px 16px" } }}>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: 8,
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Space wrap>
-              <Input.Search
-                placeholder={t("inventory.adjustments.search", lang)}
-                value={searchText}
-                onChange={e => setSearchText(e.target.value)}
-                allowClear
-                style={{ width: 260 }}
-              />
-            </Space>
-
-            <Space>
-              <Tooltip title={t("common.reload", lang)}>
-                <Button icon={<ReloadOutlined />} onClick={() => refetch()} />
-              </Tooltip>
+          <div className="flex flex-wrap gap-2 justify-between items-center">
+            <div className="flex flex-wrap gap-2 items-center">
               <Button
                 type="primary"
                 icon={<PlusOutlined />}
@@ -462,7 +423,21 @@ export default function StockAdjustments() {
               >
                 {t("inventory.adjustments.new", lang)}
               </Button>
-            </Space>
+            </div>
+
+            <div className="flex flex-wrap gap-2 items-center">
+              <Input
+                prefix={<SearchOutlined className="text-gray-400" />}
+                placeholder={t("inventory.adjustments.search", lang)}
+                value={searchText}
+                onChange={e => setSearchText(e.target.value)}
+                allowClear
+                style={{ width: 240 }}
+              />
+              <Tooltip title={t("common.reload", lang)}>
+                <Button icon={<ReloadOutlined />} onClick={() => refetch()} />
+              </Tooltip>
+            </div>
           </div>
         </Card>
 
@@ -500,11 +475,28 @@ export default function StockAdjustments() {
       <Drawer
         open={drawerOpen}
         onClose={closeDrawer}
-        size={isMobile ? "100%" : 520}
-        title={null}
+        destroyOnClose
+        keyboard
+        placement={isMobile ? "bottom" : isRTL ? "left" : "right"}
+        width={isMobile ? "100%" : 520}
+        height={isMobile ? "90%" : undefined}
+        title={
+          <div style={{ display: "flex", alignItems: "center", gap: 10, color: "#fff" }}>
+            <PlusOutlined />
+            <span style={{ fontWeight: 600 }}>
+              {t("inventory.adjustments.new", lang)}
+            </span>
+          </div>
+        }
+        styles={{
+          header: {
+            background: `linear-gradient(135deg, ${primary}, ${theme === "dark" ? "#2dd4bf" : "#6366f1"})`,
+          },
+          body: { direction: isRTL ? "rtl" : "ltr" },
+        }}
         footer={
-          <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
-            <Button onClick={closeDrawer}>
+          <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+            <Button onClick={closeDrawer} disabled={createMutation.isPending}>
               {t("inventory.adjustments.cancel", lang)}
             </Button>
             <Button
@@ -517,16 +509,6 @@ export default function StockAdjustments() {
           </div>
         }
       >
-        {/* Gradient header */}
-        <div style={gradientHeader}>
-          <Space>
-            <PlusOutlined />
-            <span style={{ fontSize: 16, fontWeight: 600 }}>
-              {t("inventory.adjustments.new", lang)}
-            </span>
-          </Space>
-        </div>
-
         <Form form={form} layout="vertical">
           <Form.Item
             label={t("inventory.adjustments.product", lang)}

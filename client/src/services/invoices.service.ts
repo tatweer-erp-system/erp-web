@@ -86,4 +86,17 @@ export const paymentsService = {
     apiClient
       .post<ApiResponse<Payment>>(`/payments/${id}/cancel`)
       .then(r => r.data.data),
+
+  summary: (params?: Record<string, unknown>) =>
+    apiClient
+      .get<ApiResponse<PaymentSummary>>("/payments/summary", { params })
+      .then(r => r.data),
 };
+
+export interface PaymentSummary {
+  totalRecords: number;
+  totalDraft: number;
+  totalPosted: number;
+  totalCancelled: number;
+  totalAmount: number;
+}

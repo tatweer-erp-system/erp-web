@@ -309,7 +309,6 @@ export default function PurchaseReturns() {
     {
       title: t("purchasing.returns.col.invoiceDate", lang),
       dataIndex: "invoiceDate",
-      sorter: true,
       render: (v: string) => (
         <Text type="secondary">{dayjs(v).format("YYYY-MM-DD")}</Text>
       ),
@@ -334,7 +333,6 @@ export default function PurchaseReturns() {
       title: t("purchasing.returns.col.amountTotal", lang),
       dataIndex: "amountTotal",
       align: "right",
-      sorter: true,
       render: (v: number | string, rec: InvoiceRow) => (
         <Text strong>
           {Number(v).toLocaleString(undefined, {
